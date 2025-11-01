@@ -1,0 +1,11 @@
+"0","#check counts: raw_data_cleaned %>% count(d_incppl_pris_abc)"
+"0",""
+"0","#summary:"
+"0","summary(raw_data_cleaned$d_incppl_pris_abc)"
+"1","   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+   0.00   25.00   50.00   46.13   66.00  100.00      33 
+"
+"0","#histogram"
+"0","hist(raw_data_cleaned$d_incppl_pris_abc, breaks = 20,"
+"0","     main = ""Deservingness of Incarcerated People/Prisoners"","
+"0","     xlab = ""Deservingness (0–100)"", col = ""gray80"", border = ""white"")"

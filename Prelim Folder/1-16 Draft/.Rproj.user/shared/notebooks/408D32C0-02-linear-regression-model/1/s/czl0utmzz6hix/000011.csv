@@ -1,0 +1,2 @@
+"0","my.lm<- lm(trees$Volume ~ trees$Height + trees$Girth)"
+"0","plot3d$plane3d(my.lm, lty.box = ""solid"")"

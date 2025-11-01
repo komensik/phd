@@ -1,0 +1,4 @@
+"0","raw_data_cleaned <- readr::read_csv(""data/cleaned/cleaned_light.csv"") #note that althhough this is called raw_data_cleaned, it is the equivalent of ""cleaned_data_light"" from data_prep.qmd. See that file to pull the version with old var names for D andP. Note: no power here."
+"0",""
+"0","#names(raw_data_cleaned)"
+"0",""

@@ -1,0 +1,16 @@
+"0","library(marginaleffects)"
+"2","Warning: package ‘marginaleffects’ was built under R version 4.3.3"
+"2","Registered S3 method overwritten by 'data.table':
+  method           from
+  print.data.table     
+"
+"2","Please cite the software developers who make your work possible.
+One package:             citation(""package_name"")
+All project packages:    softbib::softbib()
+"
+"0","# effect of decision at values of know01"
+"0","slopes(m3, "
+"0","       variables = c(""decision""), "
+"0","       newdata = datagrid(know01 = seq(0, 1, 0.1)))"
+"1","
+"

@@ -1,0 +1,699 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+]{apsr}
+
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else  
+    % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\ifLuaTeX
+  \usepackage{luacolor}
+  \usepackage[soul]{lua-ul}
+\else
+  \usepackage{soul}
+  
+\fi
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{5}
+% Make \paragraph and \subparagraph free-standing
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+% Set double spacing (apsr.cls already does this, but okay to reinforce)
+\usepackage{setspace}
+\doublespacing
+
+% Use Times-like font
+\usepackage{mathptmx}
+
+% Optional: cleaner figure/table spacing
+\usepackage{caption}
+\captionsetup{font=small, labelfont=bf}
+
+% Optional: remove paragraph indentation
+\setlength\parindent{0pt}
+\setlength\parskip{6pt}
+
+% Optional: cleaner headers
+\usepackage{sectsty}
+\sectionfont{\normalsize\bfseries}
+\subsectionfont{\normalsize\itshape}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage[]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{bookmark}
+
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Prelim 3-23},
+  pdfauthor={Kristina Mensik},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Prelim 3-23}
+\author{Kristina Mensik}
+\date{}
+
+\begin{document}
+\maketitle
+
+\renewcommand*\contentsname{Table of contents}
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+Revised intro from Adrianne:
+
+Contact with the the state's carceral policy in the United States is
+extensive. At year end 2001, more than 5.6 million U.S. adults had
+served time in a state or federal prison (BOP 2003). Many millions more
+experience incarceration through proximal contact -- because they have a
+family member or friend who is incarcerated, or because they were the
+victim of a crime prosecuted by the state. This direct and proximal
+carceral contact has generated a significant scholarship in recent years
+that attempts to understand how contact with this particular state
+policy feeds back to shape attitudes towards the state (\emph{cite}),
+attitudes towards policies (\emph{cite}), and political engagement
+(\emph{cite}).
+
+Implicit in much of this carceral policy feedback literature is the
+contention that attitudes and engagement are shaped by perceptions of
+what the targets of state policy \emph{deserve}. Across numerous policy
+domains, individuals report being more willing to support policy when
+the targets of that policy are viewed as deserving (cite). Yet, there is
+limited evidence on how carceral contact, specifically, shapes
+deservingness.
+
+This paper addresses these two gaps\ldots To do so, I ask\ldots I
+theorize that\ldots I collect new data\ldots{}
+
+sA key insight from policy feedback literature is that the American
+carceral state shapes political behavior. Policing and incarceration can
+stymie political engagement, foment government distrust, and alter
+narratives about one's own civic standing (Lerman and Weaver 2010, Owens
+2014, Burch 2011, 2014, White 2019, Walker 2020). ~While this literature
+deals with impacts on political mobilization -- particularly voting --
+it has not addressed how contact with the criminal legal system shapes
+policy opinions themselves. The closely interrelated literature on
+social constructions holds that such opinions are based on constructions
+about the given group targeted by policy, and specifically whether these
+constructs are considered ``deserving of help, sympathy, and support''
+(). While this literature has established that institutions and policies
+shape perceptions of what targets of policy deserve, both it and policy
+feedback scholarship leaves open the question of how contact with the
+criminal legal shapes perceptions of what its \emph{targets} deserve.~
+Further, both literatures have focused on interactions with the criminal
+legal system of the ``accused'' -- policing and incarceration -- but
+leave open the question of feedbacks experienced and perceptions of
+target deservingness held by those who interact with the system as
+victims.
+
+In the criminal legal domain, perceptions of deservingness have myriad
+real-world consequences. They may inform judgements about criminal
+culpability in juries and sentencing decisions by judges, employers'
+judgements about whether to hire returning citizens, or how a
+neighborhood association responds to a proposal to construct a re-entry
+home nearby. Literature on social constructions, however, situates
+perceptions of deservingness as particularly important in their capacity
+to shape policy preferences and ultimately determine policy outcomes
+(Kreitzer and Smith 2018, Kreitzer, Maltby, and Smith 2022). However,
+scant literature has tested this link in the criminal legal domain.
+While scholars have begun to establish that experience with a policy can
+generate warmer perceptions of that policy's targets, more recent
+evidence suggests that judgements about what an individual deserves do
+not always translate to support for policy that would accomplish that
+end (Sorelle and Laws, 2022).
+
+In this paper, \ul{I ask how experiences of incarceration and
+victimization shape perceptions of what incarcerated people deserve, and
+whether these perceptions translate to opinions on prison policy.} In
+doing so, I seek to connect literatures on policy feedback and social
+constructions of deservingness. To do so, I leverage novel survey data
+to establish correlational relationship between incarceration and
+victimization and perceptions of carceral citizens' deservingness.
+
+My theoretical starting point is that perceptions of what groups like
+carceral citizens deserve are often based on discursive social
+constructions about them (Schneider and Ingram, 1993). Policy directly
+shapes these constructions, as it produces both resource and
+interpretive feedback effects that are part of the discourse that shapes
+constructions. In forming opinions about policy and deciding what
+inequalities are tolerable, publics draw on salient social constructions
+about the relevant policy target and use them in a heuristic process to
+quickly determine whether a target is ``deserving'' of help (citation).
+Theoretically, then these judgements translate to, or at play in the
+formation of, beliefs about criminal legal policy.
+
+Here, I suggest that this loop between policy design and the messages it
+transmits about what it's targets deserve may be interrupted for some
+citizens due to their connections to those who are justice involved,
+Emerging evidence that \emph{responses to} the criminal legal system's
+policy messages vary, and specifically that some respond to the negative
+messages transmitted by criminal legal policy with dubiousness towards
+state legitimacy suggest perceptions of what its targets deserve may
+vary as well (Walker 2020, Harris 2025).
+
+. . .
+
+\section{Literature}\label{literature}
+
+How does contact with the criminal legal system affect perceptions of
+it's targets deserve? And what do these deservingness perceptions mean
+for policy views? These questions intersect with two literatures. First,
+scholarship on social constructions and deservingness examine how groups
+become characterized as deserving or undeserving of government
+assistance, and theorizes that policy views hinge on such
+characterizations (Schneider and Ingram 1993, Smith and Kreitzer 2024,
+Oorschot 2006). While this literature leaves open the question of how
+experiences with a policy might alter characterizations about it's
+targets, policy feedback literature informs that gap by taking up
+questions about how policies shape political attitudes and behavior.
+{[}add something about interpretive effects{]} {[}\emph{While policy
+feedback research has established that carceral contact influences
+political participation and institutional trust, much less is known
+about how such contact affects attitudes toward the targets of these
+policies---specifically, how direct or proximal experience with
+incarceration or victimization might reshape perceptions of incarcerated
+people's deservingness and, in turn, opinions on prison policy.{]}} I
+briefly review these literatures here.
+
+In the wake of Schneider and Ingram's (1993) theory of social
+constructions, a deservingness literature has coalesced around the idea
+that attitudes towards policy targets are in dialectic with policy. That
+is, policy design not only has ``interpretive effects'' on its targets
+but also shapes discourse \emph{about} them. In this way, policy can
+``telegraph to the public how target groups should be treated,'' and
+helps to produce social constructions or ``value-laden components,
+including stereotypes, dominant ideologies, and assumptions'' about
+groups (Smith and Kreitzer 2024, PAGE). As consequence, social
+constructions are contingent -- for example, on local, state, and
+political and cultural contexts, and also on the political identity of
+and ideology held by the `perceiver' (Smith and Kreitzer 2018). This
+means both that policy can \emph{reflect} existing social constructions,
+and that it can feed back to causally affect further social
+constructions of who targets are. The notion of who targets \emph{are}
+in turn affects how people perceive what they \emph{should} receive --
+i.e., what they deserve.
+
+A related stream of literature explains that people form quick
+judgements about policy targets' deservingness by evaluating
+constructions along five dimensions in an evolutionarily-grounded
+impulse to help ``reciprocators'' and avoid ``free-riders'' (Petersen
+2012, Aaroe and Petersen 2014). These ``CARIN'' criteria primarily
+attend to cues about whether recipients cannot help their circumstances,
+or whether they are seeking unearned benefits. They refer to:
+\emph{control,} which in its original conception was closely related to
+\emph{need}, referring to whether someone is perceived as lazy or
+unlucky -- a consideration Oorschot (2006) argues can override all
+others. More recently, perception of a group or individual's \emph{need}
+for assistance has considered the severity of their neediness and
+\emph{control} the degree to which they are responsible (SoRelle and
+Laws 2024). Perceptions of the group's \emph{attitude} refer to whether
+the beneficiary is grateful and likeable, and closely related
+perceptions of the group's \emph{reciprocity} connote their history or
+apparent willingness to contribute to society. Last, the \emph{identity}
+characteristic holds that people will evaluate more generously the
+deservingness of people whose identity is aligned with their own
+(Oorschot 2000, 2006).
+
+How might experiences with policy shape how these characteristics or
+social constructions are interpreted? In the context of student debt
+relief, SoRelle and Laws (2023) find that people who have had student
+debt themselves view borrowers as more deserving of debt forgiveness.
+Maltby and Kreitzer (2022) finding that solidaristic effects of policy
+experience begin to erode when one considers the deservingness of, in
+this case, welfare recipients who benefit from a \emph{different}
+welfare program than one's own. While SoRelle and Laws find empirical
+support for these warmer perceptions hinging on the identity CARIN
+characteristic, the deservingness literature otherwise offers scant
+theoretical or empirical explanations for how and why not only direct,
+but also proximate policy experiences might shape perceptions of target
+deservingness. SoRelle and Laws' finding that {[}{]} also highlights an
+additional gap in this literature, to empirically test whether
+deservingness is a true mediator.
+
+How might policy experience shape social constructions, perceptions of
+target deservingness, and produce policy preferences?
+
+While little work in the deservingness literature has taken this up up
+directly, there are reasons to think it might. Within the deservingness
+literature, the identity characteristic helps explain SoRelle and Laws'
+(2023) finding that people who have had student debt themselves view
+borrowers as more deserving of debt forgiveness. Similarly, Maltby and
+Kreitzer's (2022) findings that solidaristic effects of policy
+experience begin to erode when one considers the deservingness of, in
+this case, welfare recipients who benefit from a \emph{different}
+welfare program than one's own. {[}transition/clearly state further
+deservingness limitations{]}
+
+Alternatively, social construction scholars note that \textbf{particular
+constructions are more sticky}.
+
+What deservingness literature doesn't tell us (particularly about
+proximal contact
+
+\subsubsection{Policy Feedback}\label{policy-feedback}
+
+Once enacted, policies can reshape politics and subsequent policy
+outcomes.
+
+Insights from policy feedback literature inform these gaps by showing
+that both direct and indirect policy experience shapes policy
+preferences,
+
+\begin{itemize}
+\item
+  bridge -- forming preferences from policy experiences
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ppl interpret that differentially based on experience
+  \end{itemize}
+\end{itemize}
+
+{[}policy feedback literature tells us that people's experiences
+shape{]}
+
+{[}
+
+. Findings from Soss's (2005) a study of recipients of means tested
+versus non-means tested welfare, supports the latter.
+
+undeserving messages and resources effects unique to AFDC design, like
+stringent behavioral monitoring and caseworker discretion in lieu of
+standardized rules, lead its recipients to not only~ internalize a more
+``undeserving'' perception of AFDC beneficiaries, but do so to the point
+they seek to differentiate themselves from other beneficiaries and
+splinter any sense of beneficiary group solidarity -- and splintering
+their welfare policy views from their views of the deservingness of
+beneficiaries.
+
+\section{Theory}\label{theory}
+
+How does being directly or proximally impacted by the criminal legal
+system shape perceptions of what carceral citizens -- incarcerated
+people, particularly -- deserve?
+
+My theoretical starting point is that perceptions of what groups like
+carceral citizens deserve are often shaped by social constructions about
+them (Schneider and Ingram 1993). Like stereotypes, these constructions
+are produced by policy and discourse -- both political, cultural, and
+popular. On the individual level, then, these constructions are often
+taken up in a heuristic process to form quick judgements about what a
+target group deserves. Thus, predominant racialized constructions of
+incarcerated people -- ``thugs,'' ``felons,'' or ``inmates'' --
+suggesting culpable, ungrateful, ``takers'' responsible for their
+condition of confinement are likely interpolated as undeserving,
+translating to support for punitive carceral policy.~
+
+Building on a policy feedback literature that shows interactions with
+the criminal legal system shape political behavior and attitudes towards
+the state (Anoll et al 2022, Anoll and Israel-Trummel 2019, Walker 2020,
+Lerman and Weaver 2014), I propose interactions with the criminal legal
+system also shape attitudes towards \emph{targets} of the state --
+incarcerated people, what they deserve, and policy. ~
+
+While some work finds that targets of policy can internalize negative or
+undeserving constructions (Soss 1999), much of the work on criminal
+legal contact stresses that demobilization is a product of resource
+effects or interpretive effects \emph{distinct} from an ``undeserving''
+self-conception (Lerman and Weaver 2014, White 2019). Instead, other
+work emphasizes that direct contact with the criminal legal system can
+heighten in-group solidarity (Lerman and Weaver 2014) and mobilize
+despite resource and interpretive feedbacks that should be demobilizing,
+specifically when policy targets reject policy ``teachings'' about their
+lower civic status as part of a sense of systemic injustice --
+suggesting a perception that the criminal legal system is less
+legitimate or authoritative, and of its targets as distinctly deserving
+(Walker 2020).
+
+Proximal contact also generates political mobilization (Anoll et al
+2022, White 2019b). Anoll's (2022) findings that family of the
+incarcerated vote at higher rates in states with more stringent carceral
+disenfranchisement policies suggests that ``surrogate'' mobilization is
+motivated by a desire to act on behalf a ``deserving'' incarcerated
+citizen. Further, from Anoll and Israel-Trummel's (2019) findings that
+neighborhood exposure to racially discriminatory policing generate
+perceptions of institutional \emph{il}legitimacy -- distrust in police
+and government -- one might infer that exposure should also alter and
+perhaps enhance perceptions in institutional targets as well.~
+
+Coupled with deservingness scholarship on experience (Sorelle and Laws),
+I expect that the perceptions of what carceral citizens deserve may look
+different for people who have themselves been or who know carceral
+citizens. Specifically, I hypothesize that \textbf{(H1) those with
+direct or proximal contact, or who have close social ties to
+incarcerated people, will view incarcerated people as more deserving}.
+While Maltby and Kreitzer (2022) find that proximal contact does
+\emph{not} impact perceptions of deservingness, there are important
+limitations in their study that necessitate further examination of
+direct and proximate impact. First, they report a dependent variable of
+aggregated deservingness scores for disparate groups -- ranging from
+``prisoners'' to ``opioid users'' to ``welfare cheats.'' Second, they
+measure criminal legal contact by asking participants whether they or
+someone they know has been either arrested or incarcerated. Grouping
+these distinct experiences together muddies the waters. Arrest and
+incarceration impact different swaths of the population (CITATION).
+\hyperref[_msocom_1]{{[}KM1{]}}~Arrest alone is distinct in its
+distribution of resources and political incentives as incarceration
+(CITATION). And while short stints in jail can reduce voter
+participation, individuals who are convicted, sentenced, and
+incarcerated in prison encounter entirely different policy designs,
+which ``teach'' very different ``lessons'' about one's civic standing
+and government responsiveness. Soss (2005) finds that not only do
+recipients of non-means tested welfare differentiate themselves as more
+deserving of help than recipients of means-tested healthcare, but that
+deserving-skeptic messages imbued in policy design (drug testing, a
+requirement to prove need or exhaust alternative sources of aid) are so
+pervasive as to motivate beneficiaries to maintain negative social
+constructions of welfare recipients, from whom they try to differentiate
+themselves and their networks. Thus, like affluent individuals for whom
+inequality motivates a belief in meritocracy (Newman et al 2014),
+individuals who are arrested and not found guilty, or are given
+alternative ``lighter'' sentences than incarceration, may differentiate
+themselves or their networks.
+
+Most obviously, under a judicial system that maintains the presumption
+of innocence and that leverages sentences based on seriousness,
+individuals who are arrested and individuals who are incarcerated should
+send very different messages about targets' deservingness to mass
+publics and policymakers.
+
+Placing carceral contact in the frame of cumulative punishment in the US
+highlights another layer around which literature on policy feedbacks of
+the carceral state has under-explored -- namely, the overlap of
+``victims'' and ``perpetrators'' and policy feedbacks resulting from
+contact with the criminal legal system as a victim of crime. To consider
+how serious victimization may shape perception of target deservingness
+and prison policy, I first note the clear and expected consequences of
+victimization for these matters. Victimization is obviously a salient
+experience that often generates anger (Ditton et al 1999) and drive
+negative affect and perceptions of what criminals deserve. Victims of
+crime, to be sure, usually engage the criminal legal system because they
+believe their offender is deserving of punishment, and they are
+deserving of establishing a sense of safety and justice. But it is also
+true that to accomplish the latter, victims of violent crime have few
+other options -- including if they know their perpetrator personally or
+understand their perpetrator to be in need of help. Evidence that crime
+victimization increases political participation (Bateson 2012),
+including in resource-intensive activities like sustained community
+organizing may offer pathways for coping with trauma (Rozowsky 2002,
+Walklate 2007), but may also reflect more nuanced views of policy
+changes needed to address root causes of crime.
+
+Further, victims of violent crime are disproportionately part of
+communities most heavily policed and incarcerated, and most victims of
+violent crime know their offender (Bureau of Justice 2024). An extensive
+literature shows that people who are incarcerated have
+disproportionately been victims of crime -- one review article cited 31
+of 37 papers support this overlap (Jennings et al 2012). While 2\% of
+the general US population report being victims of violent crime, up to
+45\% of carceral citizens have experienced pre-incarceration physical
+abuse, and 8.5 to 39.2\% of specifically sexual abuse (Azimi et al 2019,
+Carlson and Shafer 2010, Messina et al 2007, Wolff and Shi 2012, Yoder
+et al.~2017). Still more experience violence while incarcerated (Wolff
+et al 2009). ~Thus, while for many victims the proximity and salience of
+a criminal may bolster negative social constructions and deservingness
+perceptions, it might also translate to more nuanced perceptions of
+culpability and a closer alignment of identity that moderates negative
+affect.
+
+While victims are usually presented as supportive of punitive policy in
+public theater -- the recent naming of the Laken Riley Act, offers a
+clear example -- the relationship is far less clear. Instead,
+victimization does not appear to increase punitiveness (Kleck and
+Jackson 2016), and victims instead appear more concerned with improved
+victims compensation (Shapland 1984) and policies addressing ``root
+causes'' of crime (ASJ 2024). Further, victims themselves may experience
+a wide arrange of policy feedbacks, complicating views on policy
+compared to those without direct experience. Thus, I include victims in
+H1.
+
+Social construction theory holds that perceptions of target group
+deservingness translate to policy: legislators understand how groups are
+perceived, and produce policy that, in this case, will punish
+undeserving incarcerated targets. Deservingness scholars expect that
+perceptions of deservingness translate directly into support policy
+opinion, too. However, findings from Sorelle and Laws () and legislative
+responsiveness literature () suggest neither relationship may be as
+straightforward -- further still, literature in the criminal legal
+domain has not assessed this relationship directly. In the criminal
+legal domain, I expect that the salience of negative social
+constructions of policy targets could make perceptions of deservingness
+``stickier'' than views on what policy help or punishment targets
+deserve. Thus, while I expect that individuals who are directly or
+proximately impacted by the criminal legal system will hold different
+beliefs about criminal policy than those who are not, the role of
+deservingness perceptions in this context remains to be seen.
+
+To summarize:
+
+H1: People who are directly or proximally impacted by the criminal legal
+system will see incarcerated people as more deserving than people who do
+not.
+
+1B: Among those who xyz,
+
+H2:~ People who are directly or proximally impacted by the criminal
+legal system will hold different beliefs about criminal legal policy
+\ul{than those who are not}.~
+
+*Relationship between deservingness and policy preferences may look
+different for those who are impacted than those who are not impacted.
+
+~\hyperref[_msoanchor_1]{{[}KM1{]}}Move to methods? Or, because their
+findings contradict the H, I thought I should still address somewhat
+here?
+
+. . .
+
+\section{Data and Methods}\label{data-and-methods}
+
+\textbf{Analysis}
+
+I test these hypotheses using a nationally-representative survey that
+asks about participants' direct and proximal experience with
+incarceration or victimization of violent crime, perceptions of
+deservingness, and views on policy. In this section, I describe these
+data and methods for analyses.
+
+\textbf{Data}
+
+\emph{Survey}
+
+I explore the application of deservingness to carceral contexts using
+novel survey data collected in September 2024 by Smith, Bowman, and
+Mensik.~ Kreitzer and Smith, previously empirically mapped constructions
+of power and deservingness of 87 target populations by employing MTurk
+workers; this new data set mimics the strengths of that data collection
+strategy, and makes important changes, such as relying on survey
+respondents recruited from Bovitz proprietary panel and reducing the
+number of groups individuals assess, to address issues of respondent
+fatigue.
+
+This survey targets the US adult general population. 2,716 participants
+were on recruited to complete surveys on the platform Forthright. To be
+eligible for the study, participants were required to provide informed
+consent, be at least 18 years old, and be residents of the US. They were
+paid \$10 for completing the 30-minute survey. The sample is just under
+51\% women, and 49\% men. The sample is more Democratic than the
+national average (39\% versus 31\%), but as Republican (25\%). I apply
+exclusions for low response quality failing to pass two attention
+checks, satisficing, and extreme outlier response
+times\hyperref[_msocom_1]{{[}KM1{]}}~.
+
+\emph{Measuring Deservingness}
+
+My first key variable of interest is perceptions of target group
+deservingness. These perceptions are measured as in Kreitzer and Smith
+(2018) . Participants are asked to consider a definitional deservingness
+prompt, and indicate their perception of group deservingness using a
+0-100 slider scale set to 50. Participants rate the deseringness of a
+total of 65 groups, including ``incarcerated people/prisoners.''
+
+I standardize deservingness by taking difference between the score a
+respondent gives to a given group and the average score the respondent
+gave across all groups. I also normalize deservingness scores by
+calculating mean deservingness scores of incarcerated people for all
+respondents and subtract each respondent's individual rating of
+incarcerated people from this mean to report whether incarcerated
+deservingness ratings are above or below average.
+
+As I describe in the theory section, I expect that experiencing
+incarceration, or having close ties with someone who has, and
+experiences of victimization affect perceptions of target deservingness
+and policy preferences. To measure contact and proximate contact, I ask
+respondents whether they or someone they know well have been
+``incarcerated in jail or prison,'' and/or whether they ``been a victim
+of violent crime.'' I operationalize these measures using three separate
+dummy variables.
+
+I include variables to control for alternative explanations for both how
+policy exposure might impact perceptions of target deservingness.
+
+Perceptions of an incarcerated person's deservingness may reflect
+broader attitudes towards policy targets who are implicitly constructed
+as needy and or deviant. \emph{This may be particularly true in this
+experiment design, where participants are given definitions of deserving
+(groups ``contributing to the general welfare of society and worthy, and
+thus\ldots deserving of sympathy, pity, or help {[}and{]} \ldots good,
+smart, hardworking, loyal, disciplined, generous, caring of others,
+respectful, and creative'') and undeserving (``burden to the general
+welfare of society, and believed to be undeserving of sympathy, pity, or
+help,'' and described as ``greedy, disrespectful, disloyal, immoral,
+disgusting, dangerous, lazy, and expect{[}ing{]} others to care for
+them.''}). To control for this general tendency, I compile deservingness
+scores of groups who fit these frames, such as different welfare
+recipients, Medicaid and Medicare/SSN recipients, the unemployed, poor
+families, homeless individuals, and asylum seekers/refugees.
+
+\ldots{} these perceptions could reasonably reflect negative attitudes
+towards and beliefs about people who are presumed to commit crimes.
+``Punitiveness,'' broadly conceived as tendencies to explain crime
+through the lens of individual culpability and moral failing, and
+prioritize retributive justice in policy responses to crime, may
+definitially prescribe perceptions that people who are incarcerated are
+\emph{undeserving}.
+
+\begin{itemize}
+\tightlist
+\item
+  note about conditions
+\end{itemize}
+
+anchor support for punitive (rather than rehabilitative) policy in a
+retributive framework
+
+In the US, the ``punitive impulse'' or tendency to explain crime through
+the lens of individual culpability and support retributive justice is
+
+Public opinion and criminological literature dealing with attitudes
+towards criminal legal policy usually, and rightly, control for
+punitiveness. I
+
+. . .
+
+\section{Conclusion}\label{conclusion}
+
+. . .
+
+
+\renewcommand\refname{References}
+  \bibliography{references.bib}
+
+
+\end{document}

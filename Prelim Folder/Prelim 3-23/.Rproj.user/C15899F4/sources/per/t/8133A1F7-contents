@@ -1,0 +1,458 @@
+---
+title: "Panel Data"
+subtitle: "POLSCI 630: Probability and Basic Regression"
+format: clean-revealjs
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+date: 4/17/2025
+embed-resources: true
+---
+
+## Panel data
+
+There are many cases in political science where we observe the same observations at multiple points in time
+
+-   Hope that temporal data provides leverage on causal questions
+
+    -   What designs can we use to do this right? And what assumptions are needed?
+    -   What additional statistical complications might arise?
+
+## Intervention analysis
+
+Imagine we have 2 groups (e.g., near or far from a new garbage incinerator) measured at 2 time points (e.g., before and after incinerator is located)
+
+-   What we want to know is whether the "treatment" had an (average) effect on housing prices
+
+. . .
+
+What might we do?
+
+::: incremental
+-   We can't simply look at the treated group itself across time
+
+-   We can't simply compare the two groups, in terms of averages, post-incinerator
+
+    -   *Could* control for as many observed differences as possible - but there could always be something excluded...
+:::
+
+## Diff-in-Diff combines these two strategies
+
+-   [Differences-in-differences]{.alert} *compares* the *trends* between groups
+-   Think about what this does: it subtracts out both the time-independent characteristics of each group and the group-independent characteristics of each time
+
+```{r fig.width=7, fig.align='center'}
+library(wooldridge)
+data("kielmc")
+
+# create near/far var
+kielmc$near <- ifelse(kielmc$dist/5280 < 3, 1, 0)
+
+# create pre-post var
+kielmc$post <- ifelse(kielmc$year == 1981, 1, 0)
+
+# plot two home types across time
+par(mar=c(5,4,1,1))
+plot(1:2, c(mean(kielmc$price[kielmc$near==1 & kielmc$post==0]), 
+            mean(kielmc$price[kielmc$near==1 & kielmc$post==1])),
+     type="l", xlab="", ylab="average sale price ($)", axes=F, ylim=c(25000,150000), xlim=c(0.75,2.25))
+lines(1:2, c(mean(kielmc$price[kielmc$near==0 & kielmc$post==0]), 
+            mean(kielmc$price[kielmc$near==0 & kielmc$post==1])), lty=2)
+axis(1, at=1:2, labels = c("1978","1981"))
+axis(2, at=seq(25000,150000,25000))
+legend("topleft", c("Close","Far"), lty=1:2, bty="n")
+```
+
+## DiD estimator
+
+We can estimate this DiD quantity using a simple, interactive OLS model:
+
+```{r echo=TRUE}
+# estimate DiD model
+m1 <- lm(price ~ near*post, data=kielmc)
+summary(m1)
+```
+
+## Parallel trends assumption
+
+The key assumption that identifies the causal effect of "treatment" (being close to incinerator) is called [parallel trends]{.alert}
+
+::: incremental
+-   The over-time *trends* of the two groups *would have* been the same, if not for the intervention
+-   Obviously this can never be determined with 100% confidence (it is a counterfactual world)
+-   Can try to provide evidence by looking at pre-intervention trends (if such data is available)
+:::
+
+## Example (this is made up data)
+
+```{r}
+# plot two home types across time
+par(mar=c(5,4,1,1))
+plot(1:3, c(82517-18824 - 49385*1,
+            mean(kielmc$price[kielmc$near==1 & kielmc$post==0]), 
+            mean(kielmc$price[kielmc$near==1 & kielmc$post==1])),
+     type="l", xlab="", ylab="average sale price ($)", axes=F, ylim=c(10000,150000), xlim=c(0.75,3.25))
+lines(1:3, c(82517 - 49385*1,
+             mean(kielmc$price[kielmc$near==0 & kielmc$post==0]), 
+             mean(kielmc$price[kielmc$near==0 & kielmc$post==1])), lty=2)
+axis(1, at=1:3, labels = c("1975", "1978", "1981"))
+axis(2, at=seq(25000,150000,25000))
+legend("topleft", c("Close","Far"), lty=1:2, bty="n")
+```
+
+## Put another way: no relevant coincident changes
+
+Consider the estimator: `m1 <- lm(price ~ near*post, data=kielmc)`
+
+::: incremental
+-   All this says is that there is an interaction between time and group
+-   We want to *claim* that the interaction is due to a *particular* attribute of the near group (incinerator)
+-   For this to be credible, we need to be confident that there were no other **coincident changes** in the near group over this period that could better explain the DiD
+-   This is a standard omitted variable bias problem - are there variables measured at the *group-time level* that are correlated with both the DV (changes in price over time by group) and the IV (changes in treatment over time by group)?
+:::
+
+## Diff-in-Diff-in-Diff design
+
+An extension of this design adds a "control" *diff-in-diff*
+
+::: incremental
+-   Find two of the same groups in an area that did *not* receive a treatment during that period
+-   Use their diff-in-diff estimate as a control for the difference in trends between such groups, absent treatment
+-   Does our treatment diff-in-diff differ significantly from the control diff-in-diff?
+:::
+
+. . .
+
+This logic suggests a more general extension: why not get as many control and treatment groups across as many time periods as possible?
+
+## A general modeling framework
+
+$$
+y_{igt} = \lambda_t + \alpha_g + \beta x_{gt} + \boldsymbol{z}_{igt}' \boldsymbol{\gamma} + u_{igt}
+$$
+
+-   $\lambda_t$ is a time-specific dummy variable
+-   $\alpha_g$ is a group-specific dummy variable
+-   $x_{gt}$ is 1 when group $g$ is under treatment, and 0 otherwise
+-   $\boldsymbol{z}_{igt}'$ is a vector of control variables
+
+## Assumptions
+
+$$
+y_{igt} = \lambda_t + \alpha_g + \beta x_{gt} + \boldsymbol{z}_{igt}' \boldsymbol{\gamma} + u_{igt}
+$$
+
+::: incremental
+-   $\lambda_t$ encodes a parallel trends assumption: absent treatment, all groups are assumed to have the same time trend
+
+    -   Can include group-specific time trends (e.g., linear, quadratic) to attempt to control for violations (need many time points for complex group-specific curves)
+
+-   Independence of $x_{gt}$ with respect to $u_{igt}$ (generalization of the no coincident changes idea)
+:::
+
+## Example
+
+```{=html}
+<iframe width="1000" height="750" src="images/aerguns.html" title="Webpage example"></iframe>
+```
+
+```{r echo=FALSE}
+# Load the Guns dataset
+data("Guns", package = "AER")
+```
+
+## Example
+
+```{r echo=TRUE}
+# estimate 2-way fixed effects model
+m_guns <- lm(violent ~ law + as.factor(state) + as.factor(year), data = Guns)
+summary(m_guns) # should cluster SEs by state
+```
+
+## Using `plm` package
+
+```{r echo=TRUE}
+library(plm)
+
+# Estimate a two-way fixed effects model
+m_guns_plm <- plm(violent ~ law, data = Guns, 
+             index = c("state", "year"), 
+             model = "within", 
+             effect = "twoways")
+
+# Display the summary of the model
+summary(m_guns_plm, vcov = function(x) vcovBK(x, cluster="group", type="HC3"))
+```
+
+## Adding covariates
+
+```{r echo=TRUE}
+# Estimate a two-way fixed effects model
+m_guns_plm <- plm(violent ~ law + density + income + population + afam + cauc + male, 
+                  data = Guns, 
+                  index = c("state", "year"), 
+                  model = "within", 
+                  effect = "twoways")
+
+# Display the summary of the model
+summary(m_guns_plm, vcov = function(x) vcovBK(x, cluster="group", type="HC3"))
+```
+
+## Using `fixest`
+
+```{r echo=TRUE}
+library(fixest)
+
+# Estimate a two-way fixed effects model
+m_guns_fixest <- feols(violent ~ law | state + year, 
+                  data = Guns, 
+                  vcov = cluster ~ state)
+
+# Display the summary of the model
+summary(m_guns_fixest)
+```
+
+## Issues arising from staggered treatments {.scrollable}
+
+[Goodman-Bacon (2021)](https://www.sciencedirect.com/science/article/pii/S0304407621001445) showed that, if units become "treated" at different times, the total treatment effect can be decomposed into a weighted average over all instances of three types of 2x2 DiDs:
+
+::: incremental
+1.  DiDs comparing treated to never treated for each possible post-treatment and pre-treatment combination
+2.  DiDs comparing early-treated to late-treated for each possible post-treatment (early treated, late not) and pre-treatment (neither treated) combination
+3.  DiDs comparing late-treated to early-treated for each possible post-treatment (both treated) and pre-treatment (early treated, post not) combination
+:::
+
+. . .
+
+The weights are a function of two things: (1) the sample size for each of these, and (2) its variance, where variance is highest for groups treated in the middle of the series
+
+## Intuition
+
+![https://andrewcbaker.netlify.app/soda#11](images/baker_1.png)
+
+## Intuition
+
+![https://andrewcbaker.netlify.app/soda#12](images/baker_2.png)
+
+## Implications
+
+This discovery makes it harder to interpret many DiD designs:
+
+::: incremental
+- If there is unit-level effect heterogeneity, changing the length or temporal structure of the panel can change estimates (middle treated units have larger weights)
+- If there is temporal effect heterogeneity, group (3) comparisons can be misleading in estimating the causal effect of treatment
+
+  - Group (3) estimates this DiD: $(Late(3) - Late(2)) - (Early(3) - Early(2))$
+  - Now imagine the treatment "decays" over time: it is 2 in the first period, and 1 in period 2nd
+  - Thus, we get: $(2 - 0) - (1 - 2) = 2 - (-1) = 3$, which is an *overestimate* of the treatment effect
+:::
+
+## Dynamic estimation and pre-trend checks
+
+I am still working through this method (Sun & Abraham 2021) and functions, so "buyer beware" with this code
+
+```{r echo=FALSE, warning=FALSE}
+library(dplyr)
+
+Guns <- Guns %>% 
+  mutate(
+    year     = as.integer(as.character(year)),  
+    law_ind  = as.integer(law == "yes")         
+  ) %>% 
+  group_by(state) %>% 
+  mutate(
+    treat_year = if (any(law_ind == 1L))      
+                  min(year[law_ind == 1L], na.rm = TRUE)
+                else NA_integer_
+  ) %>% 
+  ungroup()
+```
+
+```{r echo=TRUE, eval=FALSE}
+m_dyn <- feols(
+  violent ~ sunab(treat_year, year, ref.p = -1) | state + year,
+  data  = Guns,
+  vcov  = cluster ~ state
+)
+
+iplot(m_dyn,
+      xlab = "Years since adoption",
+      main = "Shall issue laws and violent crime",
+      ref.line = 0,
+      ci.join  = TRUE)
+```
+
+## Dynamic estimation and pre-trend checks
+
+```{r echo=FALSE, fig.height=6}
+m_dyn <- feols(
+  violent ~ sunab(treat_year, year, ref.p = -1) | state + year,
+  data  = Guns,
+  vcov  = cluster ~ state
+)
+
+iplot(m_dyn,
+      xlab = "Years since adoption",
+      main = "Shall issue laws and violent crime",
+      ref.line = 0,
+      ci.join  = TRUE)
+```
+
+
+
+
+<!-- ## Panel data analysis -->
+
+<!-- Let's say we are interested in the relationships between independent variables and a dependent variable for a set of units, and we have multiple observations of these units across time -->
+
+<!-- ::: incremental -->
+<!-- -   e.g., city crime rate as a function of unemployment -->
+
+<!-- -   as always, we are worried that the simple correlation of the two is subject to omitted variable bias -->
+
+<!-- -   how can we leverage the time component of the data to aid causal inference? -->
+
+<!--     -   Ideally, we will use variation in the IV, within units, across time -->
+<!-- ::: -->
+
+<!-- ## Two types of omitted variables -->
+
+<!-- Divide the unobserved confounders into three groups: -->
+
+<!-- ::: incremental -->
+<!-- -   Those that vary across units, but are constant within units through time -->
+<!-- -   Those that vary across time, but are constant within units -->
+<!-- -   Those that vary across units *and* across time -->
+<!-- ::: -->
+
+<!-- . . . -->
+
+<!-- We are trying to model the third type of variation directly (e.g., how does crime rate within cities change as unemployment within cities changes?) -->
+
+<!-- -   So we want to "get rid" of the first two - they are just confounding our ability to get the estimate we want -->
+
+<!-- ## Simplest example: two time periods -->
+
+<!-- Let's say we have multiple cities measured at two time points -->
+
+<!-- -   We might posit this model: -->
+
+<!-- . . . -->
+
+<!-- $$ -->
+<!-- y_{it} = \beta_0 + \delta_0d2_t + \beta_1x_{it} + \alpha_i + u_{it}  -->
+<!-- $$ -->
+
+<!-- ::: incremental -->
+<!-- -   $d2_t$ is a dummy, equals 1 if in time period 2, 0 in period 1 (time-specific, unit-independent variation) -->
+
+<!-- -   $\alpha_i$ captures unit-specific, time-independent variation in the DV -->
+
+<!-- -   Our target for inference is $\beta_1$ -->
+
+<!--     -   If $x_{it}$ is correlated with wither $d2_t$ or $\alpha_i$, we need to control for these - how? -->
+<!-- ::: -->
+
+<!-- ## First difference estimator -->
+
+<!-- Consider what happens if we subtract the 1st time point from the 2nd for each unit: -->
+
+<!-- $$ -->
+<!-- \begin{align} -->
+<!-- y_{i2} &= \beta_0 + \delta_0(1) + \beta_1x_{i2} + \alpha_i + u_{i2} \space - \\ -->
+<!-- y_{i1} &= \beta_0 + \delta_0(0) + \beta_1x_{i2} + \alpha_i + u_{i2} \space -->
+<!-- \end{align} -->
+<!-- $$ -->
+
+<!-- . . . -->
+
+<!-- $$ -->
+<!-- = y_{i2} - y_{i1} = \delta_0 + \beta_1(x_{i2} - x_{i1}) + (u_{i2} - u_{i1}) -->
+<!-- $$ -->
+
+<!-- . . . -->
+
+<!-- $$ -->
+<!-- = \Delta y_i = \delta_0 + \beta_1 \Delta x_i + \Delta u_i -->
+<!-- $$ -->
+
+<!-- ## Assumptions -->
+
+<!-- What is great about this is that we have controlled for differences in units that are constant across time - but what assumptions do we need for this to work? -->
+
+<!-- ::: incremental -->
+<!-- -   Key assumption is standard OLS: $\Delta x_i$ is uncorrelated with $\Delta u_i$ -->
+
+<!--     -   Requires no unit-specific, time-varying confounds (control for as many as you can!) -->
+
+<!-- -   Need variation in the time-varying independent vars! -->
+
+<!--     -   To the extent your key variable is time-constant, this obviously doesn't work -->
+<!--     -   The less temporal variation within units, the more inefficient your estimates of $\beta$ will be -->
+<!-- ::: -->
+
+<!-- ## Extensions to more than 2 time points -->
+
+<!-- This is easily extended to more than 2 time points: -->
+
+<!-- ::: incremental -->
+<!-- -   Take first differences for each unit for each set of adjacent time points -->
+
+<!-- -   This means you now have multiple observations for each unit (i.e., T-1 observations) -->
+
+<!--     -   Multiple dummies for changes between adjacent time points -->
+
+<!--     -   Potential for [serial correlation]{.alert} of errors: correlation of error term, within-units, across time -->
+
+<!--         -   This is fixed with clustered standard errors -->
+<!-- ::: -->
+
+<!-- ## Asumptions -->
+
+<!-- ::: incremental -->
+<!-- -   For consistency: $\Delta x_{it}$ is uncorrelated with $\Delta u_{it}$ -->
+
+<!-- -   Stronger assumption for unbiasedness: $\text{E}(\Delta u_{it} | \mathbf{X}_{i}) = 0$ -->
+
+<!--     -   $\mathbf{X}_{i}$ contains all $x_{itk}$ for unit $i$ (all IVs for unit i across all time points) -->
+
+<!-- -   Generally want to correct for heteroskedasticity and serial correlation using clustered SEs (by unit) -->
+
+<!-- -   With assumption of normally distributed $\Delta u_{it}$, we get finite sample properties of OLS -->
+
+<!--     -   In absence of these assumptions, we are back in the world of asymptotic properties, as with standard OLS -->
+<!-- ::: -->
+
+<!-- ## Within and between variance -->
+
+<!-- The key move for the first differencing estimator removes the time-constant effect of units -->
+
+<!-- -   This is not the only possible way to do it -->
+
+<!-- . . . -->
+
+<!-- Consider that the variance of the dependent variable can be decomposed into two parts: -->
+
+<!-- -   Variance in unit-specific averages over time ("between-group" variance, i.e., variance in group means, averaging over time points for each group) -->
+<!-- -   Variance in observations of the same units around their averages across time ("within-group" variance) -->
+<!-- -   The second of these is defined by removing the time-constant differences in units -->
+
+<!-- ## Within estimator -->
+
+<!-- Start with a simple model: -->
+
+<!-- $$ -->
+<!-- y_{it} = \beta_1 x_{it} + \alpha_i + u_{it} -->
+<!-- $$ -->
+
+<!-- If we take unit-specific average across time: -->
+
+<!-- $$ -->
+<!-- \bar{y}_i = \beta_1 \bar{x}_i + \alpha_i + \bar{u}_i -->
+<!-- $$ -->
+
+<!-- And then subtract the two equations: -->
+
+<!-- $$ -->
+<!-- (y_{it} - \bar{y}_i) = \beta_1 (x_{it} - \bar{x}_i) + (u_{it} - \bar{u}_i) -->
+<!-- $$ -->

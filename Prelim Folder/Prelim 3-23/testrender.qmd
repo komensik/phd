@@ -1,0 +1,29 @@
+---
+title: "TESTING The Politics of Proximity"
+author: "Kristina Mensik, Duke University"
+format:
+  pdf:
+    pdf-engine: pdflatex
+    toc: true
+    number-sections: true
+    fig-cap-location: top
+bibliography: []
+---
+
+```{r}
+
+library(tinytex)
+
+```
+
+# Abstract
+
+Your abstract text goes here. This should summarize your contribution, theory, methods, and main findings (even if results-blind), in a clear and concise paragraph.
+
+## 
+
+## Introduction
+
+Personal experience with carceral policy in the United States is extensive. By year-end 2001, more than 5.6 million U.S. adults had served time in a state or federal prison (BOP 2003), and by 2010, an estimated 8 % had a felony conviction and 3 % had served or were serving prison time (Shannon et al 2017). While systematized data on non-felony convictions remain, as Stenson and Mayson (2018) put it, "absurdly, embarassingly" (p. 732) elusive, they estimate 13.2 million such cases are filed annually. Many millions more experience incarceration indirectly – through proximal contact – as family, friends, or neighbors of those incarcerated – or through victimization, having been harmed by a crime prosecuted by the state. While the interests of these two groups are regularly presented as oppositional, we actually know very little about how these experiences – incarceration, proximal carceral contact, and victimization – shape how people think about criminal legal policy.
+
+Scholars have shown that an important driver of public support for state intervention across other domains is people's beliefs about whether a given target group is *deserving* of policy help or punishment [@desante2013; @ellis2020a]. Further still, such deservingness perceptions often predict state policy outcomes [@kreitzer2022]. These perceptions of deservingness are not purely personal – they are shaped by myriad factors including policy designs themselves [@schneider2019]. Yet, while scholars have shown that deservingness perceptions inform opinions about social welfare, immigration, and even gun policy [@oorschot2000; @kreitzer2022a], the role of deservingness in the criminal legal context remains less well-developed. In particular, we do not know how people’s experiences with the carceral state—either through direct or proximal contact—shape perceptions of deservingness when it comes to criminal justice policy.

@@ -1,0 +1,1 @@
+"0","text(6, 15, expression(paste(beta[1], "" = "", paste(Delta, ""y"", ""/"", Delta, ""x""), )), col=""red"")"

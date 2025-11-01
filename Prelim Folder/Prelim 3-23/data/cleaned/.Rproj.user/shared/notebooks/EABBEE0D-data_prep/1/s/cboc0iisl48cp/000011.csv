@@ -1,0 +1,5 @@
+"0","print("
+"0","  mapping %>%"
+"0","    select(target_slug, `Deserving Group A`, `Deserving Group B`, `Deserving Group C`) %>%"
+"0","    head(10)"
+"0",")"

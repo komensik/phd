@@ -1,0 +1,23 @@
+format: pdf: documentclass: apsr keep-tex: true html: math: mathjax
+
+Data
+
+Survey
+
+I explore the application of deservingness to carceral contexts using novel survey data collected in September 2024 by Smith, Bowman, and Mensik.  Kreitzer and Smith, previously empirically mapped constructions of power and deservingness of 87 target populations by employing MTurk workers; this new data set mimics the strengths of that data collection strategy, and makes important changes, such as relying on survey respondents recruited from Bovitz proprietary panel and reducing the number of groups individuals assess, to address issues of respondent fatigue.
+
+This survey targets the US adult general population. 2,716 participants were on recruited to complete surveys on the platform Forthright. To be eligible for the study, participants were required to provide informed consent, be at least 18 years old, and be residents of the US. They were paid \$10 for completing the 30-minute survey. The sample is just under 51% women, and 49% men. The sample is more Democratic than the national average (39% versus 31%), but as Republican (25%). I apply exclusions for low response quality failing to pass two attention checks, satisficing, and extreme outlier response times\[KM1\] .
+
+Measuring Deservingness
+
+I include variables to control for alternative explanations for both how policy exposure might impact perceptions of target deservingness.
+
+... these perceptions could reasonably reflect negative attitudes towards and beliefs about people who are presumed to commit crimes. "Punitiveness," broadly conceived as tendencies to explain crime through the lens of individual culpability and moral failing, and prioritize retributive justice in policy responses to crime, may definitially prescribe perceptions that people who are incarcerated are undeserving.
+
+note about conditions
+
+anchor support for punitive (rather than rehabilitative) policy in a retributive framework
+
+In the US, the "punitive impulse" or tendency to explain crime through the lens of individual culpability and support retributive justice is
+
+Public opinion and criminological literature dealing with attitudes towards criminal legal policy usually, and rightly, control for punitiveness. I

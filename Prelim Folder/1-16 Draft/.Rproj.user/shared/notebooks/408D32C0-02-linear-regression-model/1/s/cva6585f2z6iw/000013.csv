@@ -1,0 +1,1 @@
+"0","abline(h=mean(trees$Volume[trees$Height==80]), lty=3)"

@@ -1,0 +1,27 @@
+---
+title: "p1_results"
+---
+
+In a series of bivariate regressions, I examined how much variation in deservingness perceptions of incarcerated people (`d_incppl_pris_abc`) each control variable accounted for. Adjusted R² values indicate the proportion of total outcome variance explained by each predictor. For example, baseline help orientations (`desor_core`) alone explain roughly 30% of the variance in deservingness – meaning that people’s differences in perceived deservingness align strongly with their differences in support levels. Other predictors, such as ideology or partisanship, each explain smaller portions of the variance (roughly 3–8%), while carceral impact explains little by itself.
+
+In the full model, experiencing carceral impact is associated with a **4.6-point** increase in the policy support index (0–100), controlling for ideology, party ID, and deservingness. By contrast, a 10-point increase in the `desor_core` index predicts about a **7.3-point** increase. Standardized coefficients and semi-partial R² confirm that `desor_core` accounts for more of the outcome’s variance than `impact` does uniquely; however `impact` still has an independent, statistically significant association. This pattern suggests that while personal impact matters, core deservingness beliefs explain a larger portion of cross-person variation in support.
+
+When all variables are standardized, *desor_core* has by far the largest standardized coefficient (β = 0.51), indicating that respondents who rate carceral citizens as more deserving tend to express much stronger support for prison-help policies. A one–standard deviation increase in *desor_core* corresponds to roughly a half–standard deviation increase in support.
+
+The coefficient for *impact* (β = 0.08) remains positive and statistically significant, suggesting that direct or indirect experience with the carceral system is associated with higher policy support, though the magnitude is relatively modest compared with attitudinal factors.
+
+*Social ideology* (β = −0.11) and *punitiveness* (β = −0.07) show smaller negative relationships, while partisan identifiers and FIRE items contribute little once these factors are controlled.
+
+**Incarceration on Deservingness**
+
+When we include both experiential exposure (`incarc`) and the attitudinal control reflecting general orientation toward help-needing groups (`desor_core`) in the same model, both predictors are statistically significant. The semi-partial R² values reveal that `desor_core` uniquely accounts for approximately **23% of the variance** in policy support, whereas `incarc` explains less than **1% of unique variance**. This indicates that generalized perceptions of deservingness are the dominant driver of support, while personal experience with incarceration contributes a smaller, though still meaningful, independent effect.
+
+Because deservingness orientations (`desor_core`) strongly predict views on incarcerated people and may correlate with experience of incarceration (`incarc`), we include `desor_core` as a control in all models. Controlling for `desor_core` allows us to estimate the independent association of incarceration experience with policy support, net of respondents’ attitudinal differences. The semi-partial R² results highlight the relative explanatory contributions of each predictor, confirming that attitudes toward carceral citizens are far more influential than demographic or ideological controls.
+
+These results demonstrate that while attitudes about deservingness dominate variance in policy support, experiential exposure to the criminal legal system has a measurable, independent effect — which aligns with our experimental interest in whether incarceration shapes perceptions of carceral citizens (`d_incppl_pris_abc`).
+
+When we include both experiential exposure (`incarc`) and the control for generalized deservingness attitudes (`desor_core`) in the same model predicting policy support, both predictors are statistically significant. The unstandardized coefficient for `incarc` indicates that respondents who have experienced incarceration score roughly **8.7 points higher** on the policy support scale (0–100), holding other variables constant. By comparison, a one-unit increase in `desor_core` is associated with a **0.74-point increase**, though the 0–100 scale of this composite makes direct comparisons challenging.
+
+Standardized coefficients place all predictors on the same scale and clarify relative influence: a **1 SD increase in `desor_core` corresponds to a 0.51 SD increase** in policy support, whereas a change from 0 to 1 in `incarc` corresponds to only a **0.079 SD increase**. Similarly, semi-partial R² values show that `desor_core` uniquely explains **\~23% of the variance**, while `incarc` explains less than **1%**, confirming that generalized attitudes about deservingness are the dominant driver of support.
+
+Including `desor_core` as a control allows us to isolate the independent association of incarceration experience with policy support, net of respondents’ broader attitudinal dispositions. Taken together, these results indicate that while attitudes toward deservingness strongly predict policy support, personal experience with the criminal legal system exerts a smaller but meaningful effect — which aligns with our experimental interest in whether incarceration shapes perceptions of carceral citizens (`d_incppl_pris_abc`).

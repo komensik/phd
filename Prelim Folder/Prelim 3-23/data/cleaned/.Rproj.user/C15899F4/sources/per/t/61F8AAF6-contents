@@ -1,0 +1,125 @@
+**Data Cleaning Log for Qualtrics Survey Data**
+
+**Project:** Political Science PhD Paper  
+**Data Source:** Qualtrics survey export  
+**Data Format:** CSV (from zipped export file)
+
+---
+
+### 1. Export Settings Used (Qualtrics)
+- Export **values** (numeric codes), not labels
+- ✅ Compress data as .zip file
+- ❌ Did not use commas for decimals (use periods instead)
+- ✅ Remove line breaks
+- ✅ Recode seen but unanswered questions as **-99**
+- ✅ Recode seen but unanswered multi-value fields as **0**
+- ✅ Export viewing order data for randomized surveys
+- ✅ Split multi-value fields into columns
+- ❌ Did not use internal IDs in header
+- ✅ Exclude survey response edits
+- ✅ Include download links for user-uploaded files — **not selected** (not applicable)
+
+---
+
+### 2. Cleaning Steps
+
+#### A. Unzip and load CSV into R
+
+-loaded "scotg_results.csv" as a tibble using readr tidyverse packagge, stored as "raw_data" 
+- returned actual col names instead of #s
+- used clean_names() from janitor package to convert col names to format:
+  - lowercase
+  - spaces and punctuation replaced with underscores
+  - ensured names are valied R var names
+- 
+
+___
+
+#### B. Power block
+
+created new variable ("block") to label participants as in block A, B, C
+went through and c
+
+saved version with labels but otherwise unmodified as "labeled_raw_data.csv". var is in raw_data_cleaned too.
+
+#### C. Drop unneeded columns
+| Variable Name     | Description                    | Kept? | Notes                                         |
+|------------------|--------------------------------|--------|-----------------------------------------------|
+| `StartDate`, `EndDate` | Survey timing info       | ❌ No  | Dropped: metadata                            |
+| `IPAddress`            | IP address of respondent | ❌ No  | Dropped: privacy concern                     |
+| `RecipientLastName`, etc.| Email/contact metadata | ❌ No  | Dropped: irrelevant + sensitive              |
+                |
+| `*_DO`                   | Display order metadata | ❌ No  | Dropped after use in block assignment        |
+| `Consent:`               | Consent question      | ❌ No  | Used to filter, then dropped                 |
+| `Duration (in seconds)`  | Time to complete survey | ✅ Yes | Used for speed check filtering               |
+| `block`                  | A/B/C random assignment| ✅ added | Created from _DO columns     
+
+** Recoded `-99` to `NA`
+```r
+data[data == -99] <- NA
+```
+
+#### D. 
+
+#### #. Handled multi-select questions
+- These should now be split into columns (e.g., `Q12_1`, `Q12_2`, ...)
+- Coded as: `1 = selected`, `0 = not selected`, `NA = not shown`
+- Consider using `dplyr::rename()` to make them readable
+
+
+#### E. Set column types as needed
+```r
+library(dplyr)
+cols_to_factor <- c("gender", "race", "party")
+data <- data %>% mutate(across(all_of(cols_to_factor), as.factor))
+```
+
+
+#### F. Save labeled or cleaned versions
+```r
+write_csv(raw_data, "data/cleaned/labeled_raw_data.csv")  # after adding block
+write_csv(raw_data_cleaned, "data/cleaned/cleaned_data.csv")  # final cleaned data
+```
+
+---
+
+### 3. Cleaning Checks Applied
+
+#### ✅ Duration Filtering
+- `Duration (in seconds)` distribution reviewed
+- Dropped participants who completed in under **8 minutes (480 sec)**
+
+#### ✅ Consent Filtering
+- Dropped participants who selected `2` (Did not consent)
+- Dropped `Consent:` column after filtering
+
+#### ✅ Attention Checks
+- Created pass flags:
+  - `attn_q9_pass` → `Q9 == 4`
+  - `attn_q17_pass` → matches "purple" (case-insensitive, typo-tolerant)
+  - `attn_q1114_pass` → selected "Not at all" for fake platform (code `6`)
+    - `-99` → treated as fail
+    - `NA` → treated as pass (not shown)
+- Dropped participants who failed **all** three checks
+
+#### ✅ Notes for Future Cleaning (TBD)
+- `Finished`: check for cases where participants broke off
+- Skipped questions: flag high-missingness responses
+- Satisficing: investigate fast completion + straightlining
+- Implausible combinations (e.g., contradictory demographics)
+
+---
+
+### 4. Codebook Note (Q4 Matrix)
+See section above for cleaned variable structure for Q4 responses.
+
+---
+
+### 5. Next Steps
+- Add `attention_score` column (optional)
+- Review distribution of skipped answers
+- Flag/remove straightlining or high item-nonresponse
+- Recode demographics and composite indexes
+
+_Last updated: 2025-03-31_
+

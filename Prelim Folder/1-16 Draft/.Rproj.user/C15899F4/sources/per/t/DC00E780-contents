@@ -1,0 +1,243 @@
+---
+title: "Introduction to Quarto in R Studio"
+format: html
+editor: visual
+embed-resources: true
+---
+
+Welcome! this is a tutorial for using R and R Studio in Posit Cloud. Here, you will learn the basics of using these software to do data analysis.
+
+The document you are currently reading is a **Quarto document** that has been "rendered" to html, so that you can read it in any browser.
+
+A Quarto document combines both word processing AND data science tools, all in one. It is very convenient! You can do all of your work in one place. Then, when you are done, you can convert the document into a reader-friendly version, presenting only what you want to, and leaving the rest "under the hood".
+
+### Creating a new Quarto document
+
+To get started with Quarto, open a new Quarto document like this:
+
+![](images/quarto_open.png)
+
+And then give it a title and hit "Create":
+
+![](images/quarto_create.png)
+
+To get started using Quarto documents, you will need to install the R "package" `rmarkdown` - just click "Install" in the yellow banner:
+
+![](images/quarto_rmarkdown.png)
+
+Before you move on, remember to save this new document to your general project folder:
+
+![](images/quarto_save.png)
+
+### Getting acquainted with your document
+
+There are two ways to interact with your Quarto document: "Visual" and "Source" - you can see them both toward the top left of the document. The "visual" style is more like a typical word processing document, because text is rendered automatically to look like it will on the final document. The "source" style is the underlying source code, and is plain text. You can use either, whatever is more comfortable!
+
+You will see that Quarto gives you some examples for how it is used. There are a few things to notice right away.
+
+At the top is a "yaml" block - this is used to control overall options for the document, like whether it should be rendered to html or pdf. We won't use that much.
+
+![](images/yaml.png)
+
+Below that is the document content. You will see two different kinds of content: (1) text and (2) R code.
+
+To write text, you just start typing anywhere: Quarto knows that it should be text. To format it, you can use the tools at the top (e.g., bold, italics, etc.). If you are using "source", there are other ways to change text format. The most common are (1) headers using `#`, `##`, and `###` (e.g., `# This is a big header`, and decreasing in font size with more `#`); (2) *italics* by wrapping words in `*` (e.g., `*these words will be italicized*`); and (3) **boldface** by wrapping words in `**` (e.g., `**these words will be boldface**`).
+
+To write code in the R language, you need to put it in **executable cells**. Quarto will only know you are writing code if it is in one of these cells! Anything outside of these, it will assume is text. To start a new executable cell, you can either click "Insert/Executable Cell/R", or (more easily), type "Control-Alt-I".
+
+![](images/quarto_newcell.png)
+
+Give it a try, you will see a new cell appear. It has a label `{r}` to tell you it expected R code (if you had chosen "Python", it would expected Python code, and so on).
+
+Click into your new code cell, and try out some math, to see how this works. In the cell, type `10 * 37`, then hit the little play button in the upper-right corner of the cell (if you are using the "Source" view, you can type "Control-Shift-Enter" whenever your cursor is within the cell). Magic!
+
+![](images/quarto_testcell.png)
+
+The last thing to know about your document is how to render it into a final product. This is easy: just click "Render" at the top. Once you do that, it will translate your Quarto document into an html document (it will open in a new window).
+
+### Reading in your data
+
+You are going to be working with data. To do so, you need to read it into your document. Here is how (remember to write the code below \[or any other code\] in an executable cell!):
+
+```{r echo=TRUE}
+# read in beps.csv data and store it in an object called `df` for data frame
+df <- read.csv("beps.csv")
+```
+
+> TIP: An important thing to know is that R Studio will ignore anything in a code block that is on the same line as `#`. This is an easy way to leave notes and tell the person reading your code what you are doing. It is good practice to make a note for every chunk of code you write. I assure you, you will forget what you were trying to do! And your reader will be very confused if you don't.
+
+If you want to see what is in your data, it is useful to summarize the variables:
+
+```{r echo=TRUE}
+# see what is in the data by summarizing all the variables
+summary(df)
+```
+
+You can also see the data directly, in spreadsheet format:
+
+```{r echo=TRUE}
+# take a look at the data itself in spreadsheet format (opens a new tab in R Studio)
+View(df)
+
+# alternatively, use "head" to see the first few rows
+head(df)
+```
+
+### Data cleaning / making variables
+
+A first step in data analysis is typically "cleaning" your data. This means: get your data and your variables into a format that can be analyzed. For example, some variables might need to be "recoded" - e.g., a variable that has text values of "Democrat" or "Republican" might need to be recoded to have numeric values of either 0 or 1. Here are some examples.
+
+Let's start by looking at the variable `gender` in our dataset `df`. To reference a variable in a data frame, you use the `$`, like this:
+
+```{r echo=TRUE}
+# look at a table that lists all values of gender and how many people are in each category
+table(df$gender)
+```
+
+So `gender` is currently defined using text values. Let's recode it to be numeric, with `female` equal to `1` and `male` equal to `0`:
+
+```{r echo=TRUE}
+# create a new variable named gender_01 that is 1 if gender is female and 0 otherwise
+df$gender_01 <- ifelse(df$gender == "female", 1, 0)
+
+# let's see how it looks
+table(original = df$gender, new = df$gender_01)
+```
+
+Success! Let's try another. There are two variables in our data measuring people's views on the economy: `economic.cond.national` (views on the national economy) and `economic.cond.household` (views on household economic well-being). Let's say we want to combine these into a single measure of people's overall economic views. We can do that by (1) making sure they are on the same scale and (2) averaging them together:
+
+```{r echo=TRUE}
+# let's see what scale each variable is on
+table(natl = df$economic.cond.national, HH = df$economic.cond.household)
+```
+
+Good! They are on the same scale. Now let's create a new variable, `econ_views`, that is the average of the two:
+
+```{r echo=TRUE}
+# create new var that is average of the two econ variables
+df$econ_views <- (df$economic.cond.national + df$economic.cond.household) / 2
+
+# let's see what it looks like
+table(df$econ_views)
+```
+
+Success! If you want to see what the variable looks like graphically, you can use `hist` for a histogram plot:
+
+```{r echo=TRUE}
+# plot of histogram of econ_views
+hist(df$econ_views)
+```
+
+Let's try one more example. The variable `Europe` is coded from `1` to `11`. But let's say you need it to be on a scale that ranges from `0` to `1`, with zero being the minimum value and one being the maximum. Here is how we could do this:
+
+```{r echo=TRUE}
+# create a new variable, Europe_01, that has minimum value 0 and maximum 1
+df$Europe_01 <- (df$Europe - 1) / 10
+
+# did it work?
+table(df$Europe_01)
+```
+
+Success! But why did that work? The first thing we did was subtract an amount from the original variable needed to make the minimum equal to zero. Since the original minimum was `1`, we just needed to subtract one. That made the new maximum equal to `10`, but we want it to be `1`, which means we needed to then divide the new variable by ten.
+
+### Some basic data analysis
+
+There are lots of things you might want to do with your data once it is cleaned. In some cases, we will likely have to help you with analyses that are specific to your project. But there are many cases that rely on similar kinds of analysis techniques, and we will show you some basic ones here.
+
+One of the simplest things you might want to do is to calculate correlations between variables. A **correlation** tells us about both the *strength* and the *direction* of the relationship between two variables. Correlations range from negative one to one. The further a correlation is from zero, the stronger it is. Negative correlations mean: as one variable gets bigger (smaller), the other gets smaller (bigger). Positive correlations mean: as one variable gets bigger (smaller) the other variable gets bigger (smaller).
+
+#### Correlations
+
+Here is an example. Let's correlate national and household economic views (the option `use = "complete.obs"` is needed if either variable has missing values):
+
+```{r echo=TRUE}
+# calculate correlation of national and household economic views
+cor(df$economic.cond.national, df$economic.cond.household, use = "complete.obs")
+```
+
+So the correlation is about `0.35`. This means that the two variables are moderately positively correlated. People who think the national economy is doing well are more likely to their own household is doing well, and vice-versa.
+
+Now let's look at the correlation between opposition to European integration (`Europe`) and feelings about Prime Minister Tony Blair (`Blair`):
+
+```{r echo=TRUE}
+# calculate correlation of opposition to European integration and evals of Blair
+cor(df$Europe, df$Blair, use = "complete.obs")
+```
+
+So these two variables are *negatively* correlated, at about `-0.30`. This means that people who are more opposed to European integration (have higher values on `Europe`) feel less positive about Tony Blair. Similarly, people who feel *more* positive about Tony Blair, are less opposed to European integration.
+
+We can see this relationship graphically using a figure. Here, we will plot the average evaluations of Tony Blair for each value of `Europe`. First, we can calculate the average value of `Blair` at each value of `Europe`:
+
+```{r echo=TRUE}
+# calculate the mean of Blair at each value of Europe
+blair_means <- aggregate(Blair ~ Europe, data = df, FUN = mean)
+
+# let's see what it looks like
+blair_means
+```
+
+Great! Now let's plot this in a bar plot:
+
+```{r echo=TRUE}
+barplot(height = blair_means$Blair,
+        names.arg = blair_means$Europe,
+        col = "lightblue",
+        xlab = "Opposition to European Integration",
+        ylab = "Feelings about Tony Blair",
+        main = "Support for Tony Blair by Opposition to European Integration",
+        ylim = c(0,5))
+```
+
+#### Mean differences
+
+It is often the case that we expect the average value of one variable to be different across categories of some other variable. This is true for most experiments: we assign people to either a treatment or control condition, and then we look at whether some variable is different for treatment versus control. This kind of analysis requires us to calculate the averages in each category, and then say something about how confident we can be that those averages are *really* different from one another.
+
+Let's look at differences in opposition to European integration by gender. Let's start by calculating the average opposition to integration for each gender category:
+
+```{r echo=TRUE}
+# calculate the mean of Europe at each value of gender
+Europe_means <- aggregate(Europe ~ gender, data = df, FUN = mean)
+
+# let's see what it looks like
+Europe_means
+```
+
+So there is a difference in means: people who identify as female are more opposed to European integration tha people who identify as male. But is this difference "real", or is it due to random sampling error? Notice that it is not *that* big (about half a point on an 11-point scale), so maybe it is just random error. Let's conduct a statistical test to see:
+
+```{r echo=TRUE}
+t.test(Europe ~ gender, data = df)
+```
+
+This test - called a "t-test" - tells us whether we can, or cannot, be confident that the true difference between the two groups is NOT zero. There are two things to look at.
+
+First, the `p-value`: when this value is less than `0.05`, we say the difference between groups is "statistically significant", and we feel confident it is a true difference (i.e., not due to random sampling error). In our case, the p-value is `0.003`, which is much less than `0.05`, so we feel confident the difference between males and females is a real one.
+
+Second, the `95 percent confidence interval`: this tells us the range of values within which the true difference between groups is likely to fall. Our confidence interval is `0.18` to `0.84`: this means that the true difference between males and females is likely to be somewhere between `0.18` and `0.84`. We cannot be certain of the exact value of the true difference, but we feel confident it is somewhere in that range!
+
+#### Regression
+
+Regression is a method for estimating how two variables are related to one another, while "controlling" for other variables that might also matter. Why do we need to control for other variables at all? Consider an example. Imagine you are trying to see if exercise reduces the risk of a heart attack. You might find that people who exercise more are also less likely to have heart attacks. But consider that young people are both more likely to exercise AND less likely to have heart attacks (for reasons unrelated to exercise)! If you don't "control" or "adjust" for age differences, you will overstate the degree to which exercise is associated with heart attacks. The same basic logic applies in lots of cases. For example, you might find that income is positively correlated with political knowledge, but is that because of income itself? An alternative hypothesis is that more educated people have both higher incomes and more knowledge of politics. To make sure you don't overestimate the relationship of income to knowledge, you need to control for education.
+
+Regression analysis allows you to estimate relationships while controlling for other variables. Let's look at a simple example using the same data as above. Specifically, we want to know whether people's beliefs about their own economic circumstances (`economic.cond.household`) are related to support for the sitting Prime Minister, Tony Blair. We might expect that people who feel more positive about their household finances evaluate Blair more positively. Let's see if that's true, but estimating a simple regression of feelings toward Blair on evaluations of household finances:
+
+```{r echo=TRUE}
+# estimate regression of Blair on household econ and store it in an object called m1
+m1 <- lm(Blair ~ economic.cond.household, data = df)
+
+# use the summary function to print the results
+summary(m1)
+```
+
+There are a couple things to look at here. The first is the "Estimate" for `economic.cond.household`: this tells us the expected change in `Blair` for a 1-unit increase in `economic.cond.household`. Just as we expected, a 1-point increase in positive evaluations of one's household finances is associated with a 0.27 point increase in positive feelings toward Tony Blair. This makes sense! The second thing to look at is the column labeled "Pr(\>{t})" for `economic.cond.household`: this tells us the "p-value" for the relationship between the two variables. Just like for mean differences above, if this number is less than 0.05 (indicated by having one or more "\*" next to it), then we say the relationship is "statistically significant", and we are confident it is real and not due to sampling error. Our p-value has three stars: it is much less than 0.05, and we conclude that there is a real relationship between evaluations of personal economic finances and feelings toward Tony Blair.
+
+But is it really *household* economic assessments that matter? What if, instead, it is *national* economic assessments that really shape evaluations of the Prime Minister, and people who have positive national assessments have both positive household assessments AND positive feelings toward the Prime Minister? How can we know? Well, we can "control" or "adjust" for this other variable, `economic.cond.national`. Here is how we do it:
+
+```{r echo=TRUE}
+# estimate regression of Blair on household econ AND national econ and store it in an object called m2
+m2 <- lm(Blair ~ economic.cond.household + economic.cond.national, data = df)
+
+# use the summary function to print the results
+summary(m2)
+```
+
+Notice a few things about the new results. First, we now have two different "Estimates": one for `economic.cond.household` and one for `economic.cond.national`. Second, the Estimate for national assessments is larger than the one for household assessments. This seems to confirm our worry! Third, after we control for national assessments, the size of the relationship between household assessments and evaluations of Tony Blair gets smaller; that is, closer to zero. So we had good reason to worry, and it does seem like controlling for `economic.cond.national` was a good idea. Having said that, the relationship between household assessments and feelings toward Blair remains positive and statistically significant, so it still matters, just not as *much* as national economic assessments.

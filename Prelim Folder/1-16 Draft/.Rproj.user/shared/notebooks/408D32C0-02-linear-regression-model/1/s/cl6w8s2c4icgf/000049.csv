@@ -1,0 +1,1 @@
+"0","abline(a = coef(my.lm)[1], b = coef(my.lm)[2])"

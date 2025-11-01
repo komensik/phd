@@ -1,0 +1,722 @@
+---
+title: "Prelim Data"
+author: "Kristina Mensik"
+date: "2024-12-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+install.packages(janitor)
+# Load necessary libraries
+library(tidyverse)
+library(readr)
+library(janitor)
+library(stringr)
+library(VIM)
+library(reshape2)
+library(emmeans)
+library(ggplot2)
+library(dplyr)
+
+# Load the data
+prelim_data <- read.csv("/Users/kristinamensik/Documents/Duke/2024-2025/902 Legislators Pre-Ananlysis Plan/Prelim Folder/prelimdata1.csv", stringsAsFactors = FALSE)
+
+view(prelim_data)
+```
+
+
+```{r}
+#create separate data set for just impacted respondents
+
+# Load necessary library
+library(dplyr)
+
+# Filter respondents who meet the criteria
+filtered_data <- dplyr::filter( 
+    prelim_data, 
+    (!is.na(Q4_1) & grepl("1|2", Q4_1)) | 
+    (!is.na(Q4_2) & grepl("1|2", Q4_2))
+  )
+
+
+# View the first few rows of the new data frame to verify
+head(filtered_data)
+
+# Print the number of rows in the filtered data frame
+nrow(filtered_data)
+
+view(filtered_data)
+
+
+#specific counts
+
+# Count specific conditions in the filtered data
+
+counts <- list(
+  "1 in Q4_1, 3 in Q4_2" = filtered_data %>%
+    filter(Q4_1 == "1" & Q4_2 == "3") %>%
+    nrow(),
+  
+  "2 in Q4_1, 3 in Q4_2" = filtered_data %>%
+    filter(Q4_1 == "2" & Q4_2 == "3") %>%
+    nrow(),
+  
+  "1,2 in Q4_1, 3 in Q4_2" = filtered_data %>%
+    filter(Q4_1 == "1,2" & Q4_2 == "3") %>%
+    nrow(),
+  
+  "1 in Q4_2, 3 in Q4_1" = filtered_data %>%
+    filter(Q4_2 == "1" & Q4_1 == "3") %>%
+    nrow(),
+  
+  "2 in Q4_2, 3 in Q4_1" = filtered_data %>%
+    filter(Q4_2 == "2" & Q4_1 == "3") %>%
+    nrow(),
+  
+  "1,2 in Q4_2, 3 in Q4_1" = filtered_data %>%
+    filter(Q4_2 == "1,2" & Q4_1 == "3") %>%
+    nrow(),
+  
+  "1 in Q4_1, 2 in Q4_2" = filtered_data %>%
+    filter(Q4_1 == "1" & Q4_2 == "2") %>%
+    nrow(),
+  
+  "1,2 in Q4_1, 2 in Q4_2" = filtered_data %>%
+    filter(Q4_1 == "1,2" & Q4_2 == "2") %>%
+    nrow(),
+  
+  "2 in Q4_1, 2 in Q4_2" = filtered_data %>%
+    filter(Q4_1 == "2" & Q4_2 == "2") %>%
+    nrow(),
+  
+  "1 in Q4_1, 1 in Q4_2" = filtered_data %>%
+    filter(Q4_1 == "1" & Q4_2 == "1") %>%
+    nrow(),
+  
+  "1,2 in Q4_1, 1 in Q4_2" = filtered_data %>%
+    filter(Q4_1 == "1,2" & Q4_2 == "1") %>%
+    nrow(),
+  
+  "2 in Q4_1, 1 in Q4_2" = filtered_data %>%
+    filter(Q4_1 == "2" & Q4_2 == "1") %>%
+    nrow(),
+  
+  "2 in Q4_1, 2 in Q4_1" = filtered_data %>%
+    filter(Q4_1 == "2" & Q4_1 == "2") %>%
+    nrow()
+)
+
+# Print all counts
+print(counts)
+
+
+#1,2 in both 4_1 and 4_2
+# Count respondents with "1,2" in both Q4_1 and Q4_2
+count_1_2_both <- filtered_data %>%
+  filter(Q4_1 == "1,2" & Q4_2 == "1,2") %>%
+  nrow()
+
+# Print the result
+print(paste("Number of respondents with '1,2' in both Q4_1 and Q4_2:", count_1_2_both))
+
+#checking what double 1,2s put for deservingness
+# Filter respondents with "1,2" in both Q4_1 and Q4_2
+selected_respondents <- filtered_data %>%
+  filter(Q4_1 == "1,2" & Q4_2 == "1,2") %>%
+  select(dg.A_25, dg.A_26, dg.A_7, dg.B_25, dg.B_26, dg.B_7, dg.C_25, dg.C_26, dg.C_7)
+
+# Create a small data frame for these respondents
+small_df <- as.data.frame(selected_respondents)
+
+# View the small data frame
+print(small_df)
+
+#end checkig what double 1,2s put for deservingness
+
+#count #3s (non impacted) 
+
+# Count respondents with "3" in both Q4_1 and Q4_2
+count_3_both <- prelim_data %>%
+  filter(Q4_1 == "3" & Q4_2 == "3") %>%
+  nrow()
+
+# Print the result
+print(paste("Number of respondents with '3' in both Q4_1 and Q4_2:", count_3_both))
+
+
+#end count 3s (non impacted0)
+
+
+# Combine all conditions into a single filter to count unique rows
+unique_count <- filtered_data %>%
+  filter(
+    (Q4_1 == "1" & Q4_2 == "3") |
+    (Q4_1 == "2" & Q4_2 == "3") |
+    (Q4_1 == "1,2" & Q4_2 == "3") |
+    (Q4_2 == "1" & Q4_1 == "3") |
+    (Q4_2 == "2" & Q4_1 == "3") |
+    (Q4_2 == "1,2" & Q4_1 == "3") |
+    (Q4_1 == "1" & Q4_2 == "2") |
+    (Q4_1 == "1,2" & Q4_2 == "2") |
+    (Q4_1 == "2" & Q4_2 == "2") |
+    (Q4_1 == "1" & Q4_2 == "1") |
+    (Q4_1 == "1,2" & Q4_2 == "1") |
+    (Q4_1 == "2" & Q4_2 == "1") |
+    (Q4_1 == "2" & Q4_1 == "2") # This might need clarification
+  ) %>%
+  nrow()
+
+# Print unique count
+print(paste("Unique rows meeting any condition:", unique_count))
+
+
+
+#checking for problem responses
+# Count respondents with "2,3", "-99", or "1,2,3" in Q4_1 or Q4_2
+count_special_cases <- filtered_data %>%
+  filter(
+    grepl("2,3", Q4_1) | Q4_1 == "-99" | grepl("1,2,3", Q4_1) | 
+    grepl("2,3", Q4_2) | Q4_2 == "-99" | grepl("1,2,3", Q4_2)
+  ) %>%
+  nrow()
+
+# Print the count
+print(paste("Number of respondents with '2,3', '-99', or '1,2,3':", count_special_cases))
+
+
+```
+
+
+
+
+
+```{r setup, include=FALSE}
+# Clean column names
+names(prelim_data) <- gsub("\\{\\\"ImportId\\\":\\\"|\\\"\\}", "", names(prelim_data))
+
+# Define deservingness and subsequent question columns
+deservingness_columns <- c("dg.A_25", "dg.B_25", "dg.C_25", 
+                           "dg.A_7", "dg.B_7", "dg.C_7",
+                           "dg.A_26", "dg.B_26", "dg.C_26")
+subsequent_questions <- c("Q25_1", "Q25_2", "Q25_3", "Q25_4", "Q25_5", "Q25_6", 
+                          "Q4_1", "Q4_2", "impact_score")
+
+
+#check for group/subset counts
+# Define the columns and responses of interest
+columns_of_interest <- c("dg.A_44", "dg.A_56", "dg.C_52", "dg.C_55")
+responses_Q4 <- c("1", "2", "1,2", "3")
+Q4_columns <- c("Q4_1", "Q4_2")
+
+# Initialize a data frame to store the results
+results <- data.frame(
+  column = character(),
+  Q4 = character(),
+  response = character(),
+  count = integer(),
+  stringsAsFactors = FALSE
+)
+
+# Loop through each column of interest and Q4_1/Q4_2
+for (col in columns_of_interest) {
+  for (q4 in Q4_columns) {
+    for (response in responses_Q4) {
+      # Filter rows meeting the conditions
+      count <- prelim_data %>%
+        filter(!is.na(!!sym(col)) & as.numeric(!!sym(col)) >= 0 & as.numeric(!!sym(col)) <= 100 &
+                 !!sym(q4) == response) %>%
+        nrow()
+      
+      # Append the result to the data frame
+      results <- rbind(results, data.frame(
+        column = col,
+        Q4 = q4,
+        response = response,
+        count = count
+      ))
+    }
+  }
+}
+
+# View the results
+print(results)
+```
+
+```{r}
+#table / counts for  incarcerated types seen by all ("dg.A_25", "dg.A_7", "dg.A_26",
+# "dg.B_25", "dg.B_7", "dg.B_26", "dg.C_25", "dg.C_7", "dg.C_26")
+
+# Define the columns and responses of interest
+all_columns_of_interest <- c("dg.A_25", "dg.A_7", "dg.A_26",
+"dg.B_25", "dg.B_7", "dg.B_26", "dg.C_25", "dg.C_7", "dg.C_26")
+all_responses_Q4 <- c("1", "2", "1,2", "3")
+all_Q4_columns <- c("Q4_1", "Q4_2")
+
+# Initialize a data frame to store the results
+results <- data.frame(
+  column = character(),
+  Q4 = character(),
+  response = character(),
+  count = integer(),
+  stringsAsFactors = FALSE
+)
+
+# Loop through each column of interest and Q4_1/Q4_2
+for (col in all_columns_of_interest) {
+  for (q4 in all_Q4_columns) {
+    for (response in all_responses_Q4) {
+      # Filter rows meeting the conditions
+      count <- prelim_data %>%
+        filter(!is.na(!!sym(col)) & as.numeric(!!sym(col)) >= 0 & as.numeric(!!sym(col)) <= 100 &
+                 !!sym(q4) == response) %>%
+        nrow()
+      
+      # Append the result to the data frame
+      all_results <- rbind(results, data.frame(
+        column = col,
+        Q4 = q4,
+        response = response,
+        count = count
+      ))
+    }
+  }
+}
+
+# View the results
+print(all_results)
+
+```
+
+
+
+
+
+
+```{r setup, include=FALSE}
+#table?
+# Reshape results into a wide table format
+# Libraries
+library(dplyr)
+
+# Columns and responses of interest
+columns_of_interest <- c("dg.A_44", "dg.A_56", "dg.C_52", "dg.C_55")
+responses_Q4 <- c("1", "2", "1,2", "3")
+
+# Rename mappings for rows and columns
+row_names <- c("1" = "Self", "2" = "Know Well", "1,2" = "Both", "3" = "Not Impacted")
+column_names <- c(
+  "dg.A_44" = "Incarcerated Parents", 
+  "dg.A_56" = "Exonerated/Wrongly Convicted", 
+  "dg.C_52" = "Sex Offenders", 
+  "dg.C_55" = "Formerly Inc/Ex-Felons"
+)
+
+# Ensure that all columns exist in the dataset
+missing_columns <- setdiff(columns_of_interest, names(prelim_data))
+if (length(missing_columns) > 0) {
+  stop(paste("The following required columns are missing from the dataset:", 
+             paste(missing_columns, collapse = ", ")))
+}
+
+# --- 1. Perceptions by Carceral Impact (Q4_1) ---
+perceptions_by_carceral <- prelim_data %>%
+  filter(Q4_1 %in% responses_Q4) %>%
+  group_by(Q4_1) %>%
+  summarise(across(all_of(columns_of_interest), ~ sum(!is.na(.) & Q4_1 == cur_group()$Q4_1), .names = "n_{col}")) %>%
+  ungroup() %>%
+  mutate(Q4_1 = row_names[Q4_1])
+
+# Add Total Incarcerated row
+total_incarcerated <- prelim_data %>%
+  filter(Q4_1 %in% c("1", "2", "1,2")) %>%
+  summarise(across(all_of(columns_of_interest), ~ sum(!is.na(.)))) %>%
+  mutate(Q4_1 = "Total Incarcerated")
+
+# Combine into the final table
+perceptions_by_carceral <- bind_rows(perceptions_by_carceral, total_incarcerated)
+
+# Rename columns (only if column mapping matches perfectly)
+if (all(columns_of_interest %in% names(column_names))) {
+  perceptions_by_carceral <- rename(perceptions_by_carceral, Response = Q4_1)
+  perceptions_by_carceral <- rename_with(perceptions_by_carceral, ~ column_names[.], starts_with("n_"))
+}
+
+# --- 2. Perceptions by Victimization (Q4_2) ---
+perceptions_by_victimization <- prelim_data %>%
+  filter(Q4_2 %in% responses_Q4) %>%
+  group_by(Q4_2) %>%
+  summarise(across(all_of(columns_of_interest), ~ sum(!is.na(.) & Q4_2 == cur_group()$Q4_2), .names = "n_{col}")) %>%
+  ungroup() %>%
+  mutate(Q4_2 = row_names[Q4_2])
+
+# Add Total Victimized row
+total_victimized <- prelim_data %>%
+  filter(Q4_2 %in% c("1", "2", "1,2")) %>%
+  summarise(across(all_of(columns_of_interest), ~ sum(!is.na(.)))) %>%
+  mutate(Q4_2 = "Total Victimized")
+
+# Combine into the final table
+perceptions_by_victimization <- bind_rows(perceptions_by_victimization, total_victimized)
+
+# Rename columns (only if column mapping matches perfectly)
+if (all(columns_of_interest %in% names(column_names))) {
+  perceptions_by_victimization <- rename(perceptions_by_victimization, Response = Q4_2)
+  perceptions_by_victimization <- rename_with(perceptions_by_victimization, ~ column_names[.], starts_with("n_"))
+}
+
+# --- 3. Impact Interactions ---
+# Victim/Incarcerated: Respondents who marked "1" in both Q4_1 and Q4_2
+victim_incarcerated_self <- prelim_data %>%
+  filter(Q4_1 == "1" & Q4_2 == "1") %>%
+  summarise(across(all_of(columns_of_interest), ~ sum(!is.na(.)))) %>%
+  mutate(Response = "Victim/Incarcerated - Self")
+
+# Total Impacted: Respondents who marked "1", "2", or "1,2" in Q4_1 or Q4_2
+total_impacted <- prelim_data %>%
+  filter(Q4_1 %in% c("1", "2", "1,2") | Q4_2 %in% c("1", "2", "1,2")) %>%
+  summarise(across(all_of(columns_of_interest), ~ sum(!is.na(.)))) %>%
+  mutate(Response = "Total Impacted")
+
+# Combine into the final table
+impact_interactions <- bind_rows(victim_incarcerated_self, total_impacted)
+
+# Rename columns (only if column mapping matches perfectly)
+if (all(columns_of_interest %in% names(column_names))) {
+  impact_interactions <- rename_with(impact_interactions, ~ column_names[.], starts_with("n_"))
+}
+
+# --- Save or View the Tables ---
+# View tables
+print("Perceptions by Carceral Impact")
+print(perceptions_by_carceral)
+
+print("Perceptions by Victimization")
+print(perceptions_by_victimization)
+
+print("Impact Interactions")
+print(impact_interactions)
+
+# Save tables to CSV
+write.csv(perceptions_by_carceral, "perceptions_by_carceral.csv", row.names = FALSE)
+write.csv(perceptions_by_victimization, "perceptions_by_victimization.csv", row.names = FALSE)
+write.csv(impact_interactions, "impact_interactions.csv", row.names = FALSE)
+
+
+##END
+
+# Optional: Save the table to a CSV for easier viewing
+write.csv(wide_results, "wide_results.csv", row.names = FALSE)
+
+
+
+# Clean experience questions and calculate impact_score
+define_binary <- function(data, column, value) ifelse(grepl(value, data[[column]]), 1, 0)
+prelim_data$Q4_1_clean <- ifelse(grepl("3", prelim_data$Q4_1) & grepl("1|2", prelim_data$Q4_1), NA, prelim_data$Q4_1)
+prelim_data$Q4_2_clean <- ifelse(grepl("3", prelim_data$Q4_2) & grepl("1|2", prelim_data$Q4_2), NA, prelim_data$Q4_2)
+prelim_data$incarcerated_self <- define_binary(prelim_data, "Q4_1_clean", "1")
+prelim_data$knows_incarcerated <- define_binary(prelim_data, "Q4_1_clean", "2")
+prelim_data$victim_self <- define_binary(prelim_data, "Q4_2_clean", "1")
+prelim_data$knows_victim <- define_binary(prelim_data, "Q4_2_clean", "2")
+prelim_data$impact_score <- rowSums(prelim_data[, c("incarcerated_self", "knows_incarcerated", "victim_self", "knows_victim")], na.rm = TRUE)
+
+# Clean "Not App." values and convert to numeric for deservingness columns
+prelim_data[, deservingness_columns] <- lapply(prelim_data[, deservingness_columns], function(x) {
+  x <- ifelse(x == "Not App." | x == -99, NA, x)
+  as.numeric(x)
+})
+
+# Combine columns into unified variables
+prelim_data_filtered <- prelim_data %>%
+  mutate(
+    deservingness_criminals = coalesce(dg.A_25, dg.B_25, dg.C_25),
+    deservingness_incarcerated_women = coalesce(dg.A_7, dg.B_7, dg.C_7),
+    deservingness_incarcerated_people = coalesce(dg.A_26, dg.B_26, dg.C_26)
+  )
+
+# Add composite deservingness score
+prelim_data_filtered <- prelim_data_filtered %>%
+  mutate(
+    composite_deservingness = rowMeans(select(., deservingness_criminals, deservingness_incarcerated_people), na.rm = TRUE)
+  )
+
+# Racial resentment calculation
+resentment_questions <- c("Q38", "Q36", "Q35", "Q37", "Q32", "Q111", "Q33", "Q34")
+resentment_recode <- function(q, match_values) ifelse(prelim_data_filtered[[q]] %in% match_values, 1, 0)
+
+prelim_data_filtered$racial_resentment <- rowSums(data.frame(
+  resentment_recode("Q38", c(3, 4)), resentment_recode("Q36", c(3, 4)),
+  resentment_recode("Q35", c(1, 2)), resentment_recode("Q37", c(1, 2)),
+  resentment_recode("Q32", c(2, 1)), resentment_recode("Q111", c(2, 1)),
+  resentment_recode("Q33", c(3, 4)), resentment_recode("Q34", c(3, 4))
+), na.rm = TRUE)
+
+# Punitiveness score calculation
+treat_as_neutral <- function(x) ifelse(x == 5, 3, 5 - x) # Recode "Don't know" to neutral and invert scale
+
+# Invert relevant punitiveness questions
+prelim_data_filtered$Q25_dpen_inverted <- treat_as_neutral(as.numeric(prelim_data_filtered$Q25_1))
+prelim_data_filtered$Q25_lwop_inverted <- treat_as_neutral(as.numeric(prelim_data_filtered$Q25_5))
+
+# Compute punitiveness score as the mean of relevant questions
+prelim_data_filtered$punitiveness <- rowMeans(prelim_data_filtered[, c("Q25_dpen_inverted", "Q25_lwop_inverted")], na.rm = TRUE)
+
+# Filter for non-missing data
+# Filter for non-missing data and include punitiveness
+analysis_data <- prelim_data_filtered %>%
+  filter(
+    !is.na(deservingness_criminals) & 
+    !is.na(deservingness_incarcerated_people) & 
+    !is.na(deservingness_incarcerated_women) & 
+    !is.na(racial_resentment) & 
+    !is.na(punitiveness)
+  )
+
+# Fit regression models
+model_criminals <- lm(deservingness_criminals ~ impact_score + racial_resentment + punitiveness, data = analysis_data)
+model_incarcerated_people <- lm(deservingness_incarcerated_people ~ impact_score + racial_resentment + punitiveness, data = analysis_data)
+model_incarcerated_women <- lm(deservingness_incarcerated_women ~ impact_score + racial_resentment + punitiveness, data = analysis_data)
+
+# Summarize the models
+summary(model_criminals)
+summary(model_incarcerated_people)
+summary(model_incarcerated_women)
+
+# Group comparisons (if needed)
+group_comparisons <- emmeans(model_criminals, ~ impact_score)
+pairs(group_comparisons)
+
+
+
+```
+Y_i = β₀ + β₁(Impacted) + β₂(Urban) + β₃(White) + β₄(Republican) + β₅(Democrat) + β₆(Male) + β₇(NonReligious) + β₈(ReligionNotImportant) + ... + ε_i
+
+
+
+```{r}
+
+#sample regression equation
+
+
+```
+
+
+
+
+
+
+```{r}
+# is relationship between these perceptions of deservingness and views on policy (ideally, Q25_1, Q25_2, Q25_3, Q25_4, Q25_5, Q25_6, and also Q23_2 and Q23_7 tho the latter 2 are coded differently) is meaningfully different for impacted than non-impacted people
+
+# Recode Q25: Treat "Don't know" as neutral and invert scale
+treat_as_neutral_q25 <- function(x) {
+  x <- ifelse(x == 5, 3, x) # Recode "don't know" as neutral
+  return(5 - x)            # Invert scale: 1->4, 2->3, 3->2, 4->1
+}
+
+# Apply recoding to Q25 questions
+analysis_data <- analysis_data %>%
+  mutate(
+    across(starts_with("Q25"), ~ treat_as_neutral_q25(as.numeric(.)))
+  )
+
+# Recode Q23 to binary: 1 (favor) vs. 0 (oppose), exclude "don't know" (coded as NA)
+recode_q23_binary <- function(x) {
+  ifelse(x == 1, 1, ifelse(x == 2, 0, NA))
+}
+
+# Apply binary recoding to Q23_2 and Q23_7
+analysis_data <- analysis_data %>%
+  mutate(
+    Q23_2_binary = recode_q23_binary(as.numeric(Q23_2)),
+    Q23_7_binary = recode_q23_binary(as.numeric(Q23_7))
+  )
+
+# Function to run interaction models for Q25 policy questions
+run_interaction_model_q25 <- function(policy_var) {
+  model <- lm(as.formula(
+    paste(policy_var, "~ deservingness_criminals * impact_score + racial_resentment + punitiveness")
+  ), data = analysis_data)
+  summary(model)
+}
+
+# Run models for Q25 questions
+q25_results <- lapply(c("Q25_1", "Q25_2", "Q25_3", "Q25_4", "Q25_5", "Q25_6"), run_interaction_model_q25)
+
+# Function to run logistic interaction models for binary Q23 questions
+run_logistic_interaction_model_q23 <- function(policy_var) {
+  model <- glm(as.formula(
+    paste(policy_var, "~ deservingness_criminals * impact_score + racial_resentment + punitiveness")
+  ), data = analysis_data, family = binomial)
+  summary(model)
+}
+
+# Run logistic regression for recoded binary Q23 questions
+q23_results <- lapply(c("Q23_2_binary", "Q23_7_binary"), run_logistic_interaction_model_q23)
+
+# Combine results for clarity
+names(q25_results) <- c("Q25_1", "Q25_2", "Q25_3", "Q25_4", "Q25_5", "Q25_6")
+names(q23_results) <- c("Q23_2_binary", "Q23_7_binary")
+list(Q25_results = q25_results, Q23_results = q23_results)
+
+view(prelim_data_filtered)
+```
+
+```{r}
+#check impact scores
+
+
+# Recompute impact_score based on Q4_1 and Q4_2
+analysis_data <- analysis_data %>%
+  mutate(
+    Q4_1_clean = ifelse(grepl("3", Q4_1) & grepl("1|2", Q4_1), NA, Q4_1),
+    Q4_2_clean = ifelse(grepl("3", Q4_2) & grepl("1|2", Q4_2), NA, Q4_2),
+    impact_score = case_when(
+      Q4_1_clean == "1" & Q4_2_clean == "1" ~ "1,3",  # Been incarcerated and victim
+      Q4_1_clean == "1" & Q4_2_clean == "2" ~ "1,2",  # Been and knows incarcerated
+      Q4_1_clean == "1" ~ "1",                       # Been incarcerated
+      Q4_1_clean == "2" ~ "2",                       # Knows incarcerated
+      Q4_2_clean == "1" ~ "3",                       # Been victim
+      TRUE ~ "0"                                     # Not impacted
+    )
+  )
+
+
+table(analysis_data$impact_score, useNA = "ifany")
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+#plotting above
+# Step 1: Inspect Original Variables
+# Check the values of Q4_1 and Q4_2 to verify survey logic
+table(analysis_data$Q4_1, useNA = "ifany")
+table(analysis_data$Q4_2, useNA = "ifany")
+
+# Step 2: Recalculate `impact_score` Based on Survey Logic
+# Clean and recalculate impact_score based on Q4_1 and Q4_2
+analysis_data <- analysis_data %>%
+  mutate(
+    Q4_1_clean = ifelse(grepl("3", Q4_1) & grepl("1|2", Q4_1), NA, Q4_1),
+    Q4_2_clean = ifelse(grepl("3", Q4_2) & grepl("1|2", Q4_2), NA, Q4_2),
+    impact_score = case_when(
+      Q4_1_clean == "1" & Q4_2_clean == "1" ~ "1,3",  # Been incarcerated and victim
+      Q4_1_clean == "1" & Q4_2_clean == "2" ~ "1,2",  # Been and knows incarcerated
+      Q4_1_clean == "1" ~ "1",                       # Been incarcerated
+      Q4_1_clean == "2" ~ "2",                       # Knows incarcerated
+      Q4_2_clean == "1" ~ "3",                       # Been victim
+      is.na(Q4_1_clean) & is.na(Q4_2_clean) ~ "0",   # Not impacted
+      TRUE ~ NA_character_  # Catch unexpected cases
+    )
+  )
+
+# Step 3: Handle `NA` Values in `impact_score`
+# Replace NA values in impact_score with 0 (Not impacted)
+analysis_data <- analysis_data %>%
+  mutate(impact_score = ifelse(is.na(impact_score), 0, impact_score))
+
+# Step 4: Ensure `impact_score` is Numeric
+# Convert impact_score to numeric for model predictions
+analysis_data <- analysis_data %>%
+  mutate(impact_score = as.numeric(as.character(impact_score)))
+
+# Step 5: Generate Plot Data
+# Define the function for generating plot data
+generate_plot_data <- function(model, data, deservingness_var, impact_var) {
+  # Ensure no NA values in the data before generating new_data
+  data <- data %>%
+    filter(!is.na(data[[impact_var]]))
+  
+  # Create a grid of deservingness and impact_score values
+  new_data <- expand.grid(
+    deservingness_criminals = seq(min(data[[deservingness_var]], na.rm = TRUE), 
+                                  max(data[[deservingness_var]], na.rm = TRUE), length.out = 100),
+    impact_score = unique(data[[impact_var]])
+  )
+  
+  # Add other predictors at their means
+  new_data$racial_resentment <- mean(data$racial_resentment, na.rm = TRUE)
+  new_data$punitiveness <- mean(data$punitiveness, na.rm = TRUE)
+  
+  # Predict policy support
+  new_data$predicted_support <- predict(model, newdata = new_data)
+  
+  return(new_data)
+}
+
+# Generate plot data for Q25_2
+plot_data_q25_2 <- generate_plot_data(
+  model = q25_results$Q25_2,
+  data = analysis_data,
+  deservingness_var = "deservingness_criminals",
+  impact_var = "impact_score"
+)
+
+# Generate plot data for Q25_3
+plot_data_q25_3 <- generate_plot_data(
+  model = q25_results$Q25_3,
+  data = analysis_data,
+  deservingness_var = "deservingness_criminals",
+  impact_var = "impact_score"
+)
+
+# Step 6: Add Labels and Convert `impact_score` to Factor
+# Define levels and labels for impact_score
+impact_levels <- c(0, 1, 2, 3, "1,2", "1,3")
+impact_labels <- c(
+  "Not impacted", 
+  "Been incarcerated", 
+  "Knows incarcerated", 
+  "Been victim", 
+  "Been and knows incarcerated", 
+  "Been incarcerated and victim"
+)
+
+# Convert impact_score to factor in plot_data_q25_2
+plot_data_q25_2 <- plot_data_q25_2 %>%
+  mutate(impact_score = factor(impact_score, levels = impact_levels, labels = impact_labels))
+
+# Convert impact_score to factor in plot_data_q25_3
+plot_data_q25_3 <- plot_data_q25_3 %>%
+  mutate(impact_score = factor(impact_score, levels = impact_levels, labels = impact_labels))
+
+# Step 7: Create the Plots
+# Plot for Q25_2
+ggplot(plot_data_q25_2, aes(x = deservingness_criminals, y = predicted_support, color = impact_score)) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "Predicted Policy Support (Q25_2) by Deservingness and Impact",
+    x = "Deservingness of Criminals",
+    y = "Predicted Policy Support",
+    color = "Impact Status"
+  ) +
+  theme_minimal()
+
+# Plot for Q25_3
+ggplot(plot_data_q25_3, aes(x = deservingness_criminals, y = predicted_support, color = impact_score)) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "Predicted Policy Support (Q25_3) by Deservingness and Impact",
+    x = "Deservingness of Criminals",
+    y = "Predicted Policy Support",
+    color = "Impact Status"
+  ) +
+  theme_minimal()
+
+
+```
+
+

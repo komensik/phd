@@ -1,0 +1,17 @@
+"0","
+#in table
+sp_table_prox <- data.frame(
+  variable_prox = sp_r2_prox$variable,
+  semi_partial_R2_prox = sp_r2_prox$partial.rsq
+)
+
+# largest to smallest
+sp_table_prox <- sp_table_prox %>%
+  arrange(desc(semi_partial_R2_prox))
+
+# round for display
+sp_table_prox$semi_partial_R2_prox <- round(sp_table_prox$semi_partial_R2_prox, 4)
+
+print(sp_table_prox)
+"
+"0",""

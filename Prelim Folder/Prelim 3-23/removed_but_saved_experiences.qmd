@@ -1,0 +1,70 @@
+---
+title: "removed_but_saved_experiences"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+\*flagging below for deletion
+
+```{r}
+
+{r}
+#| eval: false
+#| include: false
+#table MAYBE DELTE OR REUSE ONCE FIXED
+
+library(gt)
+
+contact_table_gt <- contact_table %>%
+  select(contact_group, n, pct_total_sample, pct_been_incarcerated, pct_know_incarcerated, pct_been_vict) %>%
+  gt() %>%
+  cols_label(
+    contact_group = "Contact Experience",
+    n = "N",
+    pct_total_sample = "% of Total Sample",
+    pct_been_incarcerated = "% of Been Incarcerated Group",
+    pct_know_incarcerated = "% of Knows Incarcerated Group",
+    pct_been_vict = "% of Been Victim Group"
+  ) %>%
+  fmt_number(columns = where(is.numeric), decimals = 1) %>%
+  tab_header(title = "Contact Experience Distribution by Subgroup") %>%
+  tab_options(table.font.size = "small")
+
+contact_table_gt
+
+
+
+
+{r edit_codebook_experiences}
+#| eval: false
+#| include: false
+
+# Load existing codebook
+codebook <- read_csv("/Users/kristinamensik/Documents/Duke/2024-2025/902 Legislators Pre-Ananlysis Plan/Prelim Folder/Prelim 3-23/codebook_q4.csv")
+
+# Example: add new variable descriptions (you could repeat this pattern)
+new_entries <- tibble(
+ # variable_name = c("impact_score", "party_binary"),
+ # type = c("Binary (0/1)", "Binary (0/1)"),
+#  values = c("1 = impacted, 0 = not impacted", "1 = Democrat, 0 = Republican"),
+ # notes = c("Composite variable for incarceration/victimization contact", "Collapsed party ID"),
+  
+  statement_number = NA,
+  response_option_code = NA,
+  response_option = NA
+)
+
+# Combine with existing codebook
+codebook <- bind_rows(codebook, new_entries)
+
+# (Optional) save again
+write_csv(codebook, "/Users/kristinamensik/Documents/Duke/2024-2025/902 Legislators Pre-Ananlysis Plan/Prelim Folder/Prelim 3-23/codebook_q4.csv")
+
+
+```
+
+\*end flag for deletion

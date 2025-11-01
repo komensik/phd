@@ -1,0 +1,2 @@
+total_incarcerated,total_knows_incarcerated,total_no_incarcerated,total_victim,total_knows_victim,total_no_victim,incarcerated_only,incarcerated_knowsinc,inc_knowsinc_victim,inc_knowsinc_knowsvict,inc_knowsinc_victim_knowsvict,incarcerated_victim,inc_victim_knowsvict,incarcerated_knowsvict,knowsinc_only,knowsinc_victim,knowsinc_knowsvict,knowsinc_victim_knowsvict,vict_only,victim_knowsvict,knowsvict_only
+170,689,1466,277,520,1555,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

@@ -1,0 +1,8 @@
+"0",""
+"0",""
+"0","#"
+"0","count(contact_pattern)"
+"2","G1;H1;Errorh: object 'contact_pattern' not found
+Error during wrapup: not that many frames on the stack
+Error: no more error handlers available (recursive errors?); invoking 'abort' restart
+g"

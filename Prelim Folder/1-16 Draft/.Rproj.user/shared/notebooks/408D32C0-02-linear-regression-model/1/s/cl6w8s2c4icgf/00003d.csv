@@ -1,0 +1,6 @@
+"0","my.lm <- lm(trees$Volume ~ trees$Girth)"
+"0","par(mar=c(5,4,1,1))"
+"0","plot(trees$Girth, trees$Volume, ylim=c(-40,80), xlim=c(-5,30), "
+"0","     main = """","
+"0","     xlab=""Diameter of cherry trees"", ylab=""Volume of cherry trees"","
+"0","     axes=F)"

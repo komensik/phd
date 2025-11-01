@@ -1,0 +1,50 @@
+---
+project: false
+title: "April Prelim Presentation"
+author: "Kristina Mensik"
+format:
+  revealjs:
+    math: mathjax
+    embed-resources: true
+date: "2025-04-06"
+---
+
+## Title
+
+</br>
+
+::::: columns
+::: column
+-   **Time**: T/R 10:05-11:20\
+-   **Location**: Old Chemistry 201\
+-   **Instructor**: Chris Johnston\
+-   **Email**: cdj19\@duke.edu\
+-   **Office**: Gross Hall 294J\
+-   **Office hours**: by appt (send me an email to schedule)
+:::
+
+::: column
+-   **Lab**: F 1:40–2:55\
+-   **Location**: Physics 235\
+-   **TA**: Stephanie Wright\
+-   **TA email**: saw119\@duke.edu\
+-   **Office**: Cubicle 36\
+-   **Office hours**: Tuesday 12:00–1:00
+:::
+:::::
+
+------------------------------------------------------------------------
+
+## Topics
+
+::: incremental
+1.  Linear regression model and OLS estimation\
+2.  Assumptions and properties of OLS\
+3.  Making inferences about parameters\
+4.  Dealing with assumption violations\
+5.  The bias-variance tradeoff\
+6.  Time series and panel data\
+7.  Categorical data\
+:::
+
+------------------------------------------------------------------------

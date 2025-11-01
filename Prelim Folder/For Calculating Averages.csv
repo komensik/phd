@@ -1,0 +1,46 @@
+﻿sample,group,Mean,SD,Var,n
+all,Criminals,33.81,28.4,806.73,819
+know inc,Criminals,36.02,29.78,887.04,241
+been inc,Criminals,44.91,32.24,1039.54,55
+victim,Criminals,41.63,32.72,1070.8,98
+not imp,Criminals,31.1,27.23,741.41,427
+all,Criminals,32.12,26.94,725.85,814
+know inc,Criminals,33.8,26.29,691.15,247
+been inc,Criminals,40.98,28.09,789.22,55
+victim,Criminals,34.43,30.01,900.55,97
+not imp,Criminals,30.8,26.9,723.49,425
+all,Criminals,28.71,26.63,708.97,739
+know inc,Criminals,33.69,27.37,749.24,218
+been inc,Criminals,35.38,30.92,956.05,66
+victim,Criminals,33.81,28.32,802.05,93
+not imp,Criminals,25.19,24.7,609.99,403
+all,Inc Ppl/prisoners,47.7,28.21,796.06,813
+know inc,Inc Ppl/prisoners,50.63,28.9,835.17,239
+been inc,Inc Ppl/prisoners,59.82,28.13,791.04,56
+victim,Inc Ppl/prisoners,54.74,31.69,1004.32,97
+not imp,Inc Ppl/prisoners,45.18,26.89,722.85,425
+all,Inc Ppl/prisoners,47.16,27.43,752.36,808
+know inc,Inc Ppl/prisoners,51.69,24.38,594.24,244
+been inc,Inc Ppl/prisoners,54.16,26.54,704.25,55
+victim,Inc Ppl/prisoners,50.02,29.38,863.47,98
+not imp,Inc Ppl/prisoners,45.18,28.57,816.17,422
+all,Inc Ppl/prisoners,43.95,28.45,809.49,739
+know inc,Inc Ppl/prisoners,52.54,28.89,834.87,218
+been inc,Inc Ppl/prisoners,53.48,31.56,996.31,66
+victim,Inc Ppl/prisoners,48.99,30.87,952.76,93
+not imp,Inc Ppl/prisoners,38.7,26.57,705.95,403
+all,Inc women,52.36,27.12,735.63,813
+know inc,Inc women,57.42,28.3,800.83,240
+been inc,Inc women,61.11,27.6,761.73,54
+victim,Inc women,60.93,28.9,835.22,97
+not imp,Inc women,49.57,25.22,636.23,423
+all,Inc women,53.54,26.9,723.83,813
+know inc,Inc women,56.76,24.56,603.34,245
+been inc,Inc women,59.04,24.93,621.7,54
+victim,Inc women,57.16,28.63,819.49,96
+not imp,Inc women,52.06,28.16,792.93,426
+all,Inc women,51.9,28.09,788.84,739
+know inc,Inc women,57.6,228.13,791.47,218
+been inc,Inc women,60.56,28.82,830.46,66
+victim,Inc women,55.7,30.2,912.02,93
+not imp,Inc women,47.43,27.22,740.78,403

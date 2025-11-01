@@ -1,0 +1,1 @@
+"0","segments(20.6,77, 20.6,coef(my.lm)[1]+20.6*coef(my.lm)[2], col=""green"", lwd=3)"

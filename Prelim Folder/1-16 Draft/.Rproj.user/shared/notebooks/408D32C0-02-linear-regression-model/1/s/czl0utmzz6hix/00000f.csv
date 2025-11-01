@@ -1,0 +1,4 @@
+"0","library(scatterplot3d)"
+"0","plot3d <- scatterplot3d(trees$Height, trees$Girth, trees$Volume,"
+"0","angle=55, scale.y=0.7, pch=16, color =""red"", main =""Regression Plane"","
+"0","xlab = ""Height"", ylab = ""Girth"", zlab = ""Volume"")"

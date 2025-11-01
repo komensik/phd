@@ -1,0 +1,33 @@
+
+---
+title: "Test Align Block"
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: pdflatex
+    include-in-header: header.tex
+    keep-tex: true
+    toc: false
+    number-sections: false
+    cite-method: natbib
+    fig-cap-location: top
+    booktabs: true
+---
+
+# Ordinal Logistic Mixed Effects Model
+
+To evaluate whether more generous perceptions of carceral citizens' deservingness also predict more consistent support, I fit an ordinal logistic mixed effects model predicting policy support, with random intercepts for respondents.
+
+::: {=latex}
+\usepackage{amsmath}
+\begin{align}
+\text{logit}\left( \Pr(Y_{ij} \leq k) \right) 
+&= \alpha_k - \Big( 
+\beta_1 \cdot \texttt{impact}_{i} + 
+\beta_2 \cdot \texttt{prisonerdeserves}_{i} + 
+\beta_3 \cdot \texttt{pol_or}_{i} + 
+\mathbf{X}_{i}^{\prime} \boldsymbol{\beta} + 
+u_{i} + \varepsilon_{ij}
+\Big)
+\end{align}
+:::

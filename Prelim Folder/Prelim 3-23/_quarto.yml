@@ -1,0 +1,20 @@
+project:
+  type: manuscript
+
+manuscript:
+  article: index-draft.qmd
+
+resources:
+  - april-presentation.qmd
+
+format:
+  html:
+    comments:
+      hypothesis: true
+  docx: default
+  jats: default
+
+execute:
+  freeze: true
+
+editor: visual

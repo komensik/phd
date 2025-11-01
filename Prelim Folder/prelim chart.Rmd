@@ -1,0 +1,83 @@
+---
+title: "Prelim Chart"
+author: "Kristina Mensik"
+date: "2024-12-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+remove.packages("htmlwidgets")
+remove.packages("DiagrammeR")
+remove.packages("vembedr")
+
+install.packages("htmlwidgets")
+install.packages("DiagrammeR")
+install.packages("vembedr")
+
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+
+library(DiagrammeR)
+library(htmlwidgets)
+
+mermaid("
+flowchart TD
+    subgraph Traditional
+        A[Target Group] --> B{CARIN Evaluation}
+        B --> C1[Control Assessment]
+        B --> C2[Attitude Assessment]
+        B --> C3[Reciprocity Assessment]
+        B --> C4[Identity Assessment]
+        B --> C5[Need Assessment]
+        C1 & C2 & C3 & C4 & C5 --> D[Deservingness Judgment]
+        D --> E[Policy Support]
+    end
+
+    subgraph Carceral_Context
+        F[Carceral Label] --> G[Identity]
+        G --> H[Affect (Disgust)]
+        G --> I[CARIN Evaluation]
+        H --> I
+        I -.->|Blocks| J1[Control]
+        I -.->|Blocks| J2[Attitude]
+        I -.->|Blocks| J3[Reciprocity]
+        I -.->|Blocks| J4[Identity]
+        I -.->|Blocks| J5[Need]
+        J1 & J2 & J3 & J4 & J5 --> K[Deservingness Perception]
+        K --> L[Policy Opposition]
+    end
+
+    subgraph Experience_Effects
+        M[Identity Effects] --> N[Identity]
+        N -.->|Disrupts| H
+        N -.->|Disrupts| G
+        N -->|Enables| O[Secondary Judgment]
+        O -->|Allows| P[CARIN Consideration]
+    end
+
+    style Traditional fill:#f5f5f5
+    style Carceral_Context fill:#ffe6e6
+    style Experience_Effects fill:#e6ffe6
+")
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

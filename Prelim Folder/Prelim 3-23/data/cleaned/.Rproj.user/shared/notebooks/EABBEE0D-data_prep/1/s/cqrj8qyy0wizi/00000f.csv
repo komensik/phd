@@ -1,0 +1,6 @@
+"0",""
+"0","write_csv(raw_data_cleaned, ""data/cleaned/cleaned_data_consent.csv"")"
+"0",""
+"0","#light csv"
+"0","write_csv(cleaned_data_light, ""data/cleaned/cleaned_light.csv"") # main file to use going forward"
+"0",""

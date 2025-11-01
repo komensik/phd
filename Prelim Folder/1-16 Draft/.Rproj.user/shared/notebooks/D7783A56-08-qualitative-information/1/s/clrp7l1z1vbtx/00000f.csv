@@ -1,0 +1,46 @@
+"0","library(arm)"
+"2","Loading required package: MASS
+"
+"2","
+Attaching package: ‘MASS’
+
+"
+"2","The following object is masked from ‘package:dplyr’:
+
+    select
+
+"
+"2","The following object is masked from ‘package:patchwork’:
+
+    area
+
+"
+"2","Loading required package: Matrix
+"
+"2","Loading required package: lme4
+"
+"2","Warning: package ‘lme4’ was built under R version 4.3.3"
+"2","Warning: ABI version mismatch: 
+lme4 was built with Matrix ABI version 1
+Current Matrix ABI version is 0
+Please re-install lme4 from source or restore original ‘Matrix’ package"
+"2","
+arm (Version 1.14-4, built: 2024-4-1)
+
+"
+"2","Working directory is /Users/kristinamensik/Documents/Duke/2024-2025/Regression
+
+"
+"0","# get sims"
+"0","m3_sims <- sim(m3, n.sims = 10000)"
+"0",""
+"0","# new data for predictions"
+"0","nd_3 <- data.frame(decision = c(rep(0,11),rep(1,11)), know01 = seq(0,1,0.1), "
+"0","                       age01 = mean(yougov$age01, na.rm = T), "
+"0","                       black = 0, hisp = 0, educ = median(yougov$educ, na.rm = T), "
+"0","                       incomei01 = mean(yougov$incomei01, na.rm = T), "
+"0","                       relig01 = mean(yougov$relig01, na.rm = T))"
+"0","nd_3 <- cbind(1, nd_3, nd_3$decision*nd_3$know01)"
+"0",""
+"0","# calculate slopes for each sim"
+"0","know_sims <- t(sapply(1:10000, function(x) as.matrix(nd_3) %*% m3_sims@coef[x, ]))"

@@ -1,0 +1,26 @@
+---
+format:
+  pdf:
+    include-in-header: latex-toolbox.tex
+---
+
+\newcommand{\bhat}{\hat{\beta}}
+\newcommand{\bzero}{\hat{\beta}_0}
+\newcommand{\bone}{\hat{\beta}_1}
+\newcommand{\bsub}[1]{\hat{\beta}_{#1}}
+
+\newcommand{\eps}{\varepsilon}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+
+\newcommand{\regsimple}{Y_i = \beta_0 + \beta_1 X_i + u_i}
+\newcommand{\regmulti}{Y_i = \beta_0 + \beta_1 X_{1i} + \cdots + \beta_k X_{ki} + u_i}
+\newcommand{\reghat}{\hat{Y}_i = \hat{\beta}_0 + \hat{\beta}_1 X_i}
+
+\newcommand{\ols}{\hat{\beta}_1 = \frac{\sum (X_i - \bar{X})(Y_i - \bar{Y})}{\sum (X_i - \bar{X})^2}}
+\newcommand{\sebhat}{\mathrm{se}(\hat{\beta}_1) = \sqrt{\frac{\hat{\sigma}^2}{\sum (X_i - \bar{X})^2}}}
+\newcommand{\rtsq}{R^2 = 1 - \frac{\mathrm{SSR}}{\mathrm{SST}}}
+
+\newcommand{\tstat}{t = \frac{\hat{\beta}_j - \beta_{j,0}}{\mathrm{se}(\hat{\beta}_j)}}
+\newcommand{\ci}{\hat{\beta}_j \pm z_{\alpha/2} \cdot \mathrm{se}(\hat{\beta}_j)}

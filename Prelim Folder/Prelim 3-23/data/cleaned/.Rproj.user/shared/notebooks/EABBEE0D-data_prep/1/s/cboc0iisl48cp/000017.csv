@@ -1,0 +1,4 @@
+"2","G1;[1m[33mError[39m in `case_when()`:[22m
+[33m![39m Can't combine `..1 (right)` <character> and `..4 (right)` <double>.
+[90mRun `]8;;x-r-run:rlang::last_trace()rlang::last_trace()]8;;` to see where the error occurred.[39m
+g"

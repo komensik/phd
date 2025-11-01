@@ -1,0 +1,1013 @@
+---
+title: "analysis_but_for"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,       # Hide code by default
+  warning = FALSE,
+  message = FALSE
+)
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(tibble)
+library(gt)
+library(marginaleffects)
+library(mediation)
+library(naniar)
+library(rsq)
+
+```
+
+```{r}
+
+raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data_may9.csv")
+
+#view(raw_data_cleaned)
+```
+
+## Preliminary Analyses
+
+| Decision                | Notes                                        |
+|-------------------------|----------------------------------------------|
+| which version of table? | prisonerdeserves (block aware and cleaned)   |
+| NAs?                    | drop silently for plot but log               |
+| scale?                  | raw 0-100 for now                            |
+| compare subgroups?      | for now, overall distribution of just incppl |
+| summary overlays?       | mean line, kernal density, histogram bars    |
+| plot aesthetics?        | clear x-axis label                           |
+| Output                  |                                              |
+
+### 1.1. Main DV: Deservingness of Incarcerated People/Prisoners
+
+About
+
+-   mean: 46.13
+
+-   median: 50
+
+-   SD: 27.96
+
+-   variance: 782.03
+
+```{r, prechecks}
+#check counts: 
+
+#raw_data_cleaned %>% count(d_incwomen_abc)
+
+#summary:
+#summary(raw_data_cleaned$d_incwomen_abc)
+
+
+
+#histogram
+hist(raw_data_cleaned$d_incwomen_abc, breaks = 20,
+     main = "Deservingness of Incarcerated People/Prisoners",
+     xlab = "Deservingness (0–100)", col = "gray80", border = "white")
+
+
+#mean(raw_data_cleaned$d_incwomen_abc, na.rm = TRUE)
+
+#sd(raw_data_cleaned$d_incwomen_abc, na.rm = TRUE)
+
+#var(raw_data_cleaned$d_incwomen_abc, na.rm = TRUE)
+
+boxplot(raw_data_cleaned$d_incwomen_abc)
+
+```
+
+### 1.2. Control: Generalized Deservingness (desor)
+
+```{r}
+
+# Histogram for generalized deservingness control variable
+hist(raw_data_cleaned$desor_core, breaks = 20,
+     main = "Generalized Deservingness",
+     xlab = "Average Deservingness of Help-Target Groups (0–100)",
+     col = "gray80", border = "white")
+
+summary(raw_data_cleaned$desor_core)
+sd(raw_data_cleaned$desor_core, na.rm = TRUE)
+
+```
+
+### 1.3. Generalized Deservingness (desor) x
+
+### 2. Cross-Tabs of Contact Types
+
+```{r}
+library(dplyr)
+library(gt)
+library(stringr)
+
+# Optional: define custom labels for key combinations
+pattern_labels <- tibble::tibble(
+  contact_pattern = c(
+    "001001", "000000", "100000", "010000", "100100",
+    "010100", "110110", "110100", "011010", "001100"
+  ),
+  label = c(
+    "No or unsure only",
+    "Skipped all Q4 items",
+    "Been incarcerated only",
+    "Knows someone incarcerated only",
+    "Been incarcerated & victimized",
+    "Knows incarcerated & victimized",
+    "All four: incarcerated, knows, victim, knows victim",
+    "Incarcerated, knows, victim",
+    "Knows incarcerated & knows victim",
+    "Victimized only"
+  )
+)
+
+# Join with summary table
+combo_summary_labeled <- combo_summary %>%
+  left_join(pattern_labels, by = "contact_pattern") %>%
+  mutate(label = ifelse(is.na(label), "Other", label))
+```
+
+#### A. All Contact Combos
+
+pull from 2B
+
+```{r}
+
+```
+
+### 3. Regression M1: Predicting deservingness
+
+#### 3.1 Without Controls
+
+```{r}
+m1 <- lm(d_incwomen_abc ~ impact, data = raw_data_cleaned)
+summary(m1)
+
+```
+
+#### *M1 Interpretation:*
+
+-   Q: does any carceral contact or victimization change perceived deservingness of incarcerated people (`d_incwomen_abc`, 0–100 scale) compared to those without any such contact (`impact = 0`).
+
+-   Coefficients:
+
+    -   Intercept = 43.31
+
+        -   The average deservingness score of incarcerated people, for respondents with no contact (`impact = 0`), is on average 43.31 out of 100 on the deservingness scale. This is higher than I might have thought.
+
+    -   impact = 7.17
+
+        -   People who have had contact (direct, indirect, or victimization) rate incarcerated people 7.17 points higher on the 0-100 deservingness scale — on average – than those without contact.
+
+        -   Significance: The t-val is 5.881 and p is less than 0.001, suggesting this effect is significantly significant and the probability that it is due to chance is very low.
+
+        -   Model fit: The R-squared is 0.0156, meaning only 1.6% of the variation in deservingness is explained by this binary variable alone.
+
+```{r, m1plot}
+library(ggplot2)
+# Summarize means and confidence intervals
+plot_data <- raw_data_cleaned %>%
+  filter(!is.na(impact)) %>%  # <- filter out NA values
+  group_by(impact) %>%
+  summarize(
+    mean_deserving = mean(d_incwomen_abc, na.rm = TRUE),
+    se = sd(d_incwomen_abc, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    impact_label = ifelse(impact == 1, "Any Contact", "No Contact"),
+    ci_lower = mean_deserving - 1.96 * se,
+    ci_upper = mean_deserving + 1.96 * se
+  )
+
+# Plot
+ggplot(plot_data, aes(x = impact_label, y = mean_deserving)) +
+  geom_col(fill = "gray60") +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  labs(
+    x = NULL,
+    y = "Mean Deservingness Rating (0–100)",
+    title = "Deservingness of Incarcerated People by Contact Experience"
+  ) +
+  theme_minimal(base_size = 14)
+
+
+```
+
+#### 3.2 With Controls
+
+```{r}
+m2 <- lm(d_incwomen_abc ~ impact +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+summary(m2)
+```
+
+#### 3.3 Diagnostics
+
+**Variance inflation factors – multi-colinearity**
+
+```{r}
+
+library(car)
+# Run VIFs on  existing model object (replace 'm1' with your model name)
+print(vif(m2))
+
+```
+
+--\> shows everything 1-2, predictors mostly independent, EXCEPT:
+
+-   fiscal_ideology 4.4
+
+-   social_ideology 4.7
+
+-   --\> moderate correlation
+
+**Inspect for heteroskedasticity & nonlinearity**
+
+```{r}
+
+plot(m2, which = 1)
+
+```
+
+```{r}
+# Normal Q-Q plot
+plot(m2, which = 2)
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(m2, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(se = FALSE, color = "red") +
+  labs(x = "Fitted Values", y = "Residuals",
+       title = "Residuals vs Fitted (Check for Nonlinearity/Heteroskedasticity)") +
+  theme_minimal()
+
+```
+
+```{r}
+library(lmtest)
+bptest(m2)
+```
+
+BP Test suggests residuals DO NOT have constant variance – there is evidence of heteroskedasticy. Some subsets of observations have larger/smaller residual spread than others. Coefficient estimates are not biased, but **standard errors are biased.**
+
+--\> I should use robust standard errors
+
+#### 3.4 ROBUST SE's
+
+```{r}
+
+library(lmtest)
+library(sandwich)
+
+coeftest(m2, vcov = vcovHC(m2, type = "HC1"))
+```
+
+***Using standardized betas – show relative explantory strength, not total explained variance***
+
+```{r, m2s}
+
+m2s <- lm(d_incwomen_abc ~ impact + Republican + Democrat + fiscal_ideology +
+         social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
+         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         data = raw_data_cleaned)
+
+# 1. Standardized coefficients
+library(broom)
+y_sd <- sd(raw_data_cleaned$d_incwomen_abc, na.rm = TRUE)
+
+# compute sd for each predictor (binary and continuous)
+sds <- sapply(model.frame(m2s)[-1], function(x) sd(x, na.rm=TRUE))  # excludes response
+coefs <- coef(m2s)
+# standardized coef = b * sd(x) / sd(y).  For factor dummies sd(x) is the std dev of 0/1 vector.
+std_coefs <- coefs * c(1, sds / y_sd)   # note: first coef is intercept so alignment matters
+# better to use broom::tidy:
+tidy(m2s) |> 
+  mutate(std_est = estimate * c(0, sds / y_sd)) 
+```
+
+#### *3.5 M2 and M2S Interpretation:*
+
+-   N = 1,577 observations used – additional 645 deleted for missingness
+
+-   Coefficients:
+
+    -   Intercept = 2.97 (p = 0.63)
+
+        -   The predicted deservingness score when all predictors are 0, [so not particularly meaningful.]{.underline} Means respondent:
+            -   is independent or other
+            -   has the most conservative ideology
+            -   ...is not impacted
+            -   is
+            -   (add remaining)
+
+    -   impact = +4.60\* (p \< 0.001)
+
+        -   Being impacted by the CJ system (incarcerated, knows, victimized) increases the predicted deservingness rating by 4.6 points on average out of 100 (4.6%), holding all else constant.
+
+            -   Remains statistically significant, particularly because the outcome range is 0-100
+
+            -   supports H1
+
+    -   Republican = -0.25 (p = 0.90)
+
+        -   Compared to Independents/Others, Republicans rate incarcerated people just 0.39 points higher, and this is not statistically significant.
+
+        -   **No evidence** that Republican identification alone predicts harsher or more generous deservingness scores in this model (when other factors are controlled).
+
+        -   May reflect that **ideology and punitiveness** absorb more of the variance that would otherwise be attributed to party label.
+
+    -   Democrat = -0.72 (p = 0.61)
+
+        -   Compared to Independents/Others, Democrats score incarcerated people 0.72 points lower on deservingness, but this is not statistically significant.
+
+        -   There is **no reliable difference** in prisoner deservingness between Democrats and Independents/Others once we account for ideology, contact, and other controls.
+
+        -   Coupled with the Republican coefficient, this suggests **very weak direct effects of party ID per se**, which may be surprising given elite cues—but again, could reflect ideological and experiential absorption.
+
+    -   fiscal_ideology = +0.13 (p = 0.88)
+
+        -   This is the effect of being more fiscally conservative (scale reversed: higher = more conservative).
+
+        -   Not statistically significant, and the coefficient is small.
+
+        -   **Fiscal ideology appears unrelated** (ONCE SOCIAL IDEOLOGY INCLUDED) to how respondents rate the deservingness of incarcerated people, net of party, social ideology, punitiveness, and racial attitudes.
+
+        -   This aligns with your expectation that deservingness is more influenced by *social/cultural* orientations than by economic/fiscal ideology.
+
+    -   social_ideology = -2.03\* (0.017)
+
+        -   each unit increase in social conservativism predicts a 2.03 point decrease in deservingness of incarcerated people (on a 0-100 scale)
+
+        -   marginally significant (p\~0.014) and in the expected direction
+
+        -   some evidence social conservativism is associated with lower perceived deservingness
+
+        -   effect size is moderate – but this all goes into the pile of "do further testing to see which controls are meaningful
+
+    -   PenalPunitiveness = -1.15 (p \<0.0009)
+
+        -   participant view on whether purpose of incarceration is to punish or rehabilitate.
+
+        -   a one unit increase in belief that incarceration is primarily about punishment is associated with a 1.15-point decrease in the perceived deservingness of incarcerated people.
+
+        -   **substantive significance:** a full-scale shift (from 1 to 7) predicts a 6.8 point drop in deservingness on a 0-100 scale – modest but meaningful, especially in the context of other predictors.
+
+        -   this supports the claim that punitive orientations towards the purpose of incarceration shape how people evaluate the deservingness of targets.
+
+        -   **modeling implication**: it's not entirely endogenous to deservingness ratings, bc it comes from a distinct question about the penal telos. I think this tells us that deservingness ratings don't exclusively reflect beliefs about what prison is for.
+
+            -   However, I'm not sure this variable captures "punitivenness." In part, it bleeds into my questions about affective reactions versus judgement.
+
+    -   desor_core = +0.73 (p \< 0.001)
+
+        -   Interpretation:
+
+            -   For each one-point increase in the average deservingness rating of *help-target groups*, perceived deservingness of incarcerated people increases by 0.73
+
+        -   [**Substantive scale:**]{.underline}
+
+            -   ranges from 0-100, so a 10-pt increase corresponds to a 7.6 point increase in prisoner deservingness – comperable to but in opp direction of penalpun effect
+
+        -   conceptual interpretation:
+
+            -   **so far, strongest predictor in the model**. those who generally see "helping" groups as deserving also extend that view to incarcerated people.
+
+            -   captures individual-level variation in generalized generosity twoard marginalized/help needing populations.
+
+            -   inclusion seems important because it helps isolate target-specific effects, shows that prisoner deservingness is partially embedded in broader affective/moral schemas about who deserves help.
+
+        -   Modeling implication: controlling for desor might let me argue that the effect of contact on prisoner deservingness isn't just a byproduct of being generally generous – it's targeted.
+
+    -   penalpoint = -1.147 (SE 0.345, p \<0.001) – the more someone views as prison's purpose being punishment, rather than rehabilitation, the slightly less deserving (1.15 points lower) they see incarcerated people.
+
+    -   fire_rare = 0.39734 (p = 0.60)
+
+        -   agreement that racial problems are rare and isolated, so more rejection of racial minimization (racial empathy) predicts lightly higher deservingness perceptions of incarcerated people.
+
+        -   takeaway – not statistically significant, so can't rule out the possibility the relationship is due to chance. But direction aligns with theory.
+
+    -   fire_privilege = 0.05353 (p = 0.94)
+
+        -   Meaning: Agreement that white people benefit from unearned racial advantages
+
+        -   Interpretation: The near-zero, nonsignificant coefficient indicates this belief does not meaningfully predict differences in perceived deservingness of incarcerated people in this model.
+
+        -   Note: This item may be less emotionally activated than the others or more subject to social desirability bias, dampening its predictive power
+
+    -   fire_angry = 1.18110 (p = 0.16)
+
+        -   Meaning: Agreement with *“I am angry that racism exists.”*
+
+        -   Interpretation: The positive direction suggests that respondents who are more emotionally angry about racism tend to see incarcerated people as more deserving, consistent with frameworks linking racial empathy to support for equity-enhancing policies.
+
+            -   Note: While not significant, this coefficient is substantively large and may become more stable with a larger sample or better scaling.
+
+    -   fire_fear (0.30112) (P = 0.73)
+
+        -   Meaning: Agreement with *“I am fearful of people of other races.”*
+
+        -   Interpretation: Respondents who express more racial fear are (slightly) more likely to rate incarcerated people as less deserving, though the effect is small and nonsignificant
+
+        -   This aligns with theories linking racial threat or fear to punitive or exclusionary attitudes.
+
+    -   gender = -1.02 (p=0.38 )
+
+        -   men estimated to rate incarcerated people as slightly less deserving, but difference is small and not significant
+
+    -   Black = rate incarcerated people as slightly lower (3.3) than do white respondents, modest but significant group-level difference (0.045)
+
+    -   Hispanic = -3.25 (p= 0.057)
+
+        -   rate incarcerated people 3 points less deserving than non-hispanic whites, holding all else constant
+
+    -   OtherRace = dropped
+
+Residual SE: 22.6 –\> moderate dispersion, consistent with attitude data
+
+R squared: explains 34% of the variance in deservingness
+
+F = 54.1, p \< 0.001 –\> overal model highly significant.
+
+SUMMARY:
+
+Individuals with personal or proximate contact with the carceral system perceive incarcerated people as significantly more deserving of help or compassion (β = 4.60, p \< 0.001). This relationship remains robust after adjusting for partisanship, ideology, punitiveness, racial attitudes, and demographics. In contrast, more socially conservative and punitive respondents evaluate incarcerated people as substantially less deserving. General deservingness orientations exert the largest effect, suggesting that judgments about incarcerated people reflect broader moral schemas about who merits social support. Race and gender do not systematically differentiate deservingness perceptions, although Hispanic respondents express somewhat lower ratings than White respondents.
+
+BEFORE MOVING ONTO INTERPRETATION
+
+### 3.5 With Weights
+
+```{r}
+# weights don't exist yet -- would be on 
+
+# m1_w <- lm(prisonerdeserves ~ impact, data = raw_data_cleaned, weights = weight_var)
+# summary(m1_w)
+```
+
+### 3.6 Variable Check -
+
+Confounder, mediator, collider?
+
+-   missingness patterns
+
+-   variable types
+
+-   distributions
+
+-   outliers
+
+Univariate explanatory power / how much does each control explain on its own?
+
+```{r}
+
+controls <- c("impact", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+
+for (v in controls) {
+  f <- as.formula(paste("d_incwomen_abc ~", v))
+  fm <- lm(f, data = raw_data_cleaned)
+  results <- rbind(results, 
+                   data.frame(var = v, 
+                              adjR2 = summary(fm)$adj.r.squared, 
+                              AIC = AIC(fm)))
+}
+
+results <- results[order(-results$adjR2), ]
+print(results)
+
+#NEXT -- testing when adding controls in to m1 sequentially
+
+
+for(v in controls[-1])
+{
+  f <- as.formula(paste("d_incwomen_abc ~ impact +", v))
+  fm <- lm(f, data = raw_data_cleaned)
+  cat(v, "adjR2 =", summary(fm)$adj.r.squared-summary(m1)$adj.r.squared, "\n")
+}
+
+```
+
+Find from adjusted R2 (explaining spread) that:
+
+-   desor_core explains 30% of the variation in deservingness scores.
+
+-   ideology measures explain 7-8%
+
+-   FIRE variables explain 3-6%
+
+-   PID 3-4%
+
+-   impact explains very little – 1.5%
+
+AIC - mirrors fit mostly, suggests to check counts for vars
+
+```{r}
+for (v in controls) {
+  f <- as.formula(paste("d_incwomen_abc ~", v))
+  fm <- lm(f, data = raw_data_cleaned)
+  cat(v, "N =", nobs(fm), "\n")
+}
+```
+
+### By Contact - Incarcerated
+
+```{r, minc}
+
+minc <- lm(d_incwomen_abc ~ incarc +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+summary(minc)
+
+```
+
+Robust SEs
+
+```{r}
+coeftest(minc, vcov = vcovHC(minc, type = "HC1"))
+```
+
+With standardized betas
+
+```{r}
+
+minc_s <- lm(d_incwomen_abc ~ incarc + Republican + Democrat + fiscal_ideology +
+         social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
+         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         data = raw_data_cleaned)
+
+# 1. Standardized coefficients
+
+inc_sd <- sd(raw_data_cleaned$d_incwomen_abc, na.rm = TRUE)
+
+# compute sd for each predictor (binary and continuous)
+inc_sds <- sapply(model.frame(minc_s)[-1], function(x) sd(x, na.rm=TRUE))  # excludes response
+coefs <- coef(minc_s)
+# standardized coef = b * sd(x) / sd(y).  For factor dummies sd(x) is the std dev of 0/1 vector.
+inc_std_coefs <- coefs * c(1, inc_sds / inc_sd)   # note: first coef is intercept so alignment matters
+# better to use broom::tidy:
+tidy(minc_s) |> 
+  mutate(std_est = estimate * c(0, inc_sds / inc_sd)) 
+```
+
+```{r}
+
+controls_inc <- c("incarc", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+  
+results_inc <- data.frame() #to reset
+
+for (v_inc in controls_inc) {
+  f_inc <- as.formula(paste("d_incwomen_abc ~", v_inc))
+  fm_inc <- lm(f_inc, data = raw_data_cleaned)
+  results_inc <- rbind(results_inc, 
+                   data.frame(var = v_inc, 
+                              adjR2 = summary(fm_inc)$adj.r.squared, 
+                              AIC = AIC(fm_inc)))
+}
+
+results_inc <- results[order(-results_inc$adjR2), ]
+print(results_inc)
+
+#NEXT -- testing when adding controls in to minc sequentially
+
+#first make no control model version
+minc_base <- lm(d_incwomen_abc ~ incarc, data = raw_data_cleaned)
+
+for(v_inc in controls_inc[-1])
+{
+  f_inc <- as.formula(paste("d_incwomen_abc ~ incarc +", v_inc))
+  fm_inc <- lm(f_inc, data = raw_data_cleaned)
+  cat(v_inc, "adjR2 =", summary(fm_inc)$adj.r.squared-summary(minc_base)$adj.r.squared, "\n")
+}
+
+#semi-partial R2 for each model predictor (how much unique variance each predictor explains in the full model, controlling for all other variables)
+
+sp_r2 <- rsq.partial(minc, type = "sp")
+sp_r2
+
+#in table
+sp_table <- data.frame(
+  variable = sp_r2$variable,
+  semi_partial_R2 = sp_r2$partial.rsq
+)
+
+# largest to smallest
+sp_table <- sp_table %>%
+  arrange(desc(semi_partial_R2))
+
+# round for display
+sp_table$semi_partial_R2 <- round(sp_table$semi_partial_R2, 4)
+
+print(sp_table)
+
+```
+
+Variable Check
+
+Find from adjusted R2 (explaining spread) that:
+
+-   desor_core explains 30% of the variation in deservingness scores.
+
+-   ideology measures explain 7-8%
+
+-   FIRE variables explain 3-6%
+
+-   PID 3-4%
+
+-   incarceration explains very little – 0.008%
+
+AIC - mirrors fit mostly, suggests to check counts for vars
+
+```{r}
+for (v in controls) {
+  f <- as.formula(paste("d_incwomen_abc ~", v))
+  fm <- lm(f, data = raw_data_cleaned)
+  cat(v, "N =", nobs(fm), "\n")
+}
+```
+
+### By Contact - Victimized
+
+```{r, mv}
+
+#10-31 AGAIN checking that I know what I'm talking about re: counts -- YES VICT, 277
+
+mv <- lm(d_incwomen_abc ~ vict +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+summary(mv)
+```
+
+Robust SEs
+
+```{r}
+coeftest(mv, vcov = vcovHC(mv, type = "HC1"))
+```
+
+Univariate explanatory power / how much does each control explain on its own?
+
+```{r}
+
+controls_vict <- c("vict", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+
+results_vict <- data.frame()
+
+for (v_vict in controls_vict) {
+  f_vict <- as.formula(paste("d_incwomen_abc ~", v_vict))
+  fm_vict <- lm(f_vict, data = raw_data_cleaned)
+  results_vict <- rbind(results_vict, 
+                   data.frame(var = v_vict, 
+                              adjR2 = summary(fm_vict)$adj.r.squared, 
+                              AIC = AIC(fm_vict)))
+}
+
+results_vict <- results[order(-results_vict$adjR2), ]
+
+print(results_vict)
+
+#NEXT -- testing when adding controls in to m1 sequentially--needs fix
+#first make base
+mv_base <- lm(d_incwomen_abc ~ vict, data=raw_data_cleaned)
+
+for(v_v in controls_vict[-1])
+{
+  f_v <- as.formula(paste("d_incwomen_abc ~ vict +", v_v))
+  fm_v <- lm(f_v, data = raw_data_cleaned)
+  cat(v_v, "adjR2 =", summary(fm_v)$adj.r.squared-summary(mv_base)$adj.r.squared, "\n")
+}
+
+
+#semi-partial R2 for each model predictor (how much unique variance each predictor explains in the full model, controlling for all other variables)
+
+sp_r2_v <- rsq.partial(mv, type = "sp")
+sp_r2_v
+
+#in table
+sp_table_v <- data.frame(
+  variable_v = sp_r2_v$variable,
+  semi_partial_R2_v = sp_r2_v$partial.rsq
+)
+
+# largest to smallest
+sp_table_v <- sp_table_v %>%
+  arrange(desc(semi_partial_R2_v))
+
+# round for display
+sp_table_v$semi_partial_R2_v <- round(sp_table_v$semi_partial_R2_v, 4)
+
+print(sp_table_v)
+
+
+```
+
+With standardized betas
+
+```{r}
+
+mvs <- lm(d_incwomen_abc ~ vict + Republican + Democrat + fiscal_ideology +
+         social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
+         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         data = raw_data_cleaned)
+
+# 1. Standardized coefficients
+library(broom)
+y_sd_v <- sd(raw_data_cleaned$d_incwomen_abc, na.rm = TRUE)
+
+# compute sd for each predictor (binary and continuous)
+sds_v <- sapply(model.frame(mvs)[-1], function(x) sd(x, na.rm=TRUE))  # excludes response
+coefs_v <- coef(mvs)
+# standardized coef = b * sd(x) / sd(y).  For factor dummies sd(x) is the std dev of 0/1 vector.
+std_coefs_v <- coefs_v * c(0, sds_v / y_sd_v)   # note: first coef is intercept so alignment matters
+# better to use broom::tidy:
+tidy(mvs) |> 
+  mutate(std_est_v = estimate * c(0, sds_v / y_sd_v)) 
+```
+
+### By Contact - Proximate
+
+```{r}
+
+mki <- lm(d_incwomen_abc ~ knowincarc +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+summary(mki)
+```
+
+Robust SEs
+
+```{r}
+coeftest(mki, vcov = vcovHC(mki, type = "HC1"))
+```
+
+Univariate explanatory power / how much does each control explain on its own?
+
+```{r}
+
+controls_prox <- c("knowincarc","Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+
+results_prox <- data.frame()
+
+for (v_prox in controls_prox) {
+  f_prox <- as.formula(paste("d_incwomen_abc ~", v_prox))
+  fm_prox <- lm(f_prox, data = raw_data_cleaned)
+  results_prox <- rbind(results_prox, 
+                   data.frame(var = v_prox, 
+                              adjR2 = summary(fm_prox)$adj.r.squared, 
+                              AIC = AIC(fm_prox)))
+}
+
+results_prox <- results[order(-results_prox$adjR2), ]
+
+print(results_prox)
+
+#NEXT -- testing when adding controls in to m1 sequentially--needs fix
+#first make base
+mki_base <- lm(d_incwomen_abc ~ knowincarc, data=raw_data_cleaned)
+
+for(v_prox in controls_prox[-1])
+{
+  f_prox <- as.formula(paste("d_incwomen_abc ~ knowincarc +", v_prox))
+  fm_prox <- lm(f_prox, data = raw_data_cleaned)
+  cat(v_prox, "adjR2 =", summary(fm_prox)$adj.r.squared-summary(mki_base)$adj.r.squared, "\n")
+}
+
+
+#semi-partial R2 for each model predictor (how much unique variance each predictor explains in the full model, controlling for all other variables)
+
+sp_r2_prox <- rsq.partial(mki, type = "sp")
+sp_r2_prox
+
+#in table
+sp_table_prox <- data.frame(
+  variable_prox = sp_r2_prox$variable,
+  semi_partial_R2_prox = sp_r2_prox$partial.rsq
+)
+
+# largest to smallest
+sp_table_prox <- sp_table_prox %>%
+  arrange(desc(semi_partial_R2_prox))
+
+# round for display
+sp_table_prox$semi_partial_R2_prox <- round(sp_table_prox$semi_partial_R2_prox, 4)
+
+print(sp_table_prox)
+
+
+```
+
+With standardized betas
+
+```{r}
+mkis <- lm(d_incwomen_abc ~ knowincarc + Republican + Democrat + fiscal_ideology +
+         social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
+         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         data = raw_data_cleaned)
+
+# 1. Standardized coefficients
+library(broom)
+y_sd_prox <- sd(raw_data_cleaned$d_incwomen_abc, na.rm = TRUE)
+
+# compute sd for each predictor (binary and continuous)
+sds_prox <- sapply(model.frame(mkis)[-1], function(x) sd(x, na.rm=TRUE))  # excludes response
+coefs_prox <- coef(mkis)
+# standardized coef = b * sd(x) / sd(y).  For factor dummies sd(x) is the std dev of 0/1 vector.
+std_coefs_prox <- coefs_prox * c(0, sds_prox / y_sd_prox)   # note: first coef is intercept so alignment matters
+# better to use broom::tidy:
+tidy(mkis) |> 
+  mutate(std_est_prox = estimate * c(0, sds_prox / y_sd_prox))
+```
+
+
+### 4. Model 3 - Deservingness on Carceral Policy
+
+My second core hypothesis (**H2)**:
+
+more generous perceptions of carceral citizens' deservingness will predict greater and more consistent support for assistance-oriented criminal legal policies and reduced support for punitive criminal legal policies.
+
+To test this, I estimate the following outcome models for each policy index:
+
+##### Models 3 and 4: Deservingness on Carceral Policy
+
+$$
+\texttt{prisonhelp}_{i} = \delta_0 + \delta_1 \cdot \texttt{impact}_{i} + \delta_2 \cdot \texttt{prisonerdeserves}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}
+$$
+
+ie: the more someone views incarcerated people as deserving:
+
+-   the more they will support assistance-orientated CJ policy
+
+-   the more they will oppose punitive policy
+
+Variables needed:
+
+-   Mediator: deservingness scores: d_incwomen_abc
+
+-   any CJ contact vs no CJ contact
+
+    -   impact
+
+-   types of contact vs no contact
+
+    -   knowincarc
+
+    -   vict
+
+    -   incarc
+
+-   outcome indices:
+
+    -   prisonhelp
+
+        -   
+
+    -   prisonpen
+
+-   controls vector
+
+```{r, controls vector}
+var(raw_data_cleaned$prisonhelp, na.rm=TRUE)
+
+names(raw_data_cleaned)
+
+m3_0 <- lm(prisonhelp ~ Republican + Democrat , data = raw_data_cleaned)
+
+summary(m3_0)
+
+ctrls <- (Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace)
+
+```
+
+**Outcome variable: prisonhelp**
+
+Average respondent support for policy items (1-5, 5 is strongly support):
+
+-   requiring prison laborers to be paid minimum wage
+
+-   eliminating prison phone call costs
+
+-   increasing funding for GED/college in prisons
+
+-   alternative-to-prison sentencing for convicted parents
+
+-   restoring voting rights post-sentence (OG 1-3)
+
+-   for bureaucratic requirements enabling voting access while incarcerated (OG 1-3)
+
+Basic Stats:
+
+-   variance = 0.488
+
+**First Without Controls**
+
+```{r, m3_0}
+
+m3_0 <- lm(prisonhelp ~ impact)
+
+hist(raw_data_cleaned$prisonhelp)
+
+hist(raw_data_cleaned$prisonpen)
+
+```
+
+```{r, m3}
+
+m3 <- lm(prisonhelp ~ impact + d_incwomen_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+
+    data = raw_data_cleaned
+)
+
+
+summary(m3)
+
+```
+
+and on punitive policy
+
+$$
+\texttt{prisonpen}_{i} = \delta_0 + \delta_1 \cdot \texttt{impact}_{i} + \delta_2 \cdot \texttt{prisonerdeserves}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}
+$$
+
+In each model, $delta_1$ captures the association between carceral contact and policy preferences, controlling for deservingness and covariates. $delta_2$ estimates the relationship between deservingness and policy support, which directly tests H2. A positive and statistically significant $delta_2$ in the help model—and a negative $delta_2$ in the punitive model—would support the hypothesis that warmer evaluations of incarcerated people correspond to greater support for decarceral policies.
+
+```{r, m4}
+
+m4 <- lm(prisonpen ~ impact + d_incwomen_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+
+    data = raw_data_cleaned
+)
+
+
+summary(m4)
+
+
+
+```
+
+### 5 Model 4
+
+To formally test whether perceptions of deservingness mediate the effect of carceral contact on policy preferences, I first estimate a set of interaction models to examine whether the relationship between deservingness and policy views differs depending on whether respondents have been directly or proximally impacted by the criminal legal system. This approach allows me to test whether contact moderates how deservingness evaluations translate into policy preferences—i.e., whether deservingness matters more (or less) for those with lived experience.
+
+##### Model 5: Interaction for Support of Carceral Policy Help
+
+$$
+\texttt{prisonhelp}_{i} = \theta_0 + \theta_1 \cdot \texttt{Deservingness}_{i} + \theta_2 \cdot \texttt{Contact}_{i} + \theta_3 (\texttt{Deservingness}_{i} \times \texttt{Contact}_{i}) + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}
+$$
+
+##### Model 6: Interaction for Support of Carceral Policy Punishment
+
+$$
+\texttt{prisonpen}_{i} = \theta_0 + \theta_1 \cdot \texttt{Deservingness}_{i} + \theta_2 \cdot \texttt{Contact}_{i} + \theta_3 (\texttt{Deservingness}_{i} \times \texttt{Contact}_{i}) + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}
+$$
+
+A significant interaction term (\$\\theta_3\$) would indicate that the effect of deservingness on policy support varies depending on whether the respondent has had contact with the criminal legal system. These models help determine whether deservingness operates similarly across groups—or if lived experience conditions how moral evaluations shape policy preferences.
+
+```{r, m5}
+
+
+m5 <- lm(prisonhelp ~ d_incwomen_abc * impact + Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace, 
+            data = raw_data_cleaned)
+
+summary(m5)
+
+
+```
+
+```{r, m6}
+
+```

@@ -1,0 +1,1 @@
+"0","segments(80, coef(lm(trees$Volume ~ trees$Height)) %*% c(1,80), 0, coef(lm(trees$Volume ~ trees$Height)) %*% c(1,80), lty=2)"

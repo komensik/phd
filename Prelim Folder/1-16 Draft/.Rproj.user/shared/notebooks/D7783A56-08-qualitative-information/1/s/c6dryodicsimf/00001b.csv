@@ -1,0 +1,1 @@
+"0","lines(1:11, apply(know_sims[,1:11], 2, function(x) quantile(x, 0.975)), lty=3, col=""blue"")"

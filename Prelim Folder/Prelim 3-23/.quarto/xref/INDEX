@@ -1,0 +1,19 @@
+{
+  "index.qmd": {
+    "index.tex": "9c2c7b60"
+  },
+  "test.qmd": {
+    "test.embed.ipynb": "43463556",
+    "test.out.ipynb": "1d9f35fe",
+    "test-preview.html": "2bdab847"
+  },
+  "scratch.qmd": {
+    "scratch.embed.ipynb": "0700c982",
+    "scratch.out.ipynb": "483147b4",
+    "scratch-preview.html": "638aee8c"
+  },
+  "index-draft.qmd": {
+    "index-draft.tex": "b6a4f96b",
+    "index-draft.docx": "9f45c114"
+  }
+}

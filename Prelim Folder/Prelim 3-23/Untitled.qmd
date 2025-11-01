@@ -1,0 +1,5 @@
+---
+title: "p1_results"
+---
+
+In a series of bivariate regressions, I examined how much variation in deservingness perceptions of incarcerated people (`d_incppl_pris_abc`) each control variable accounted for. Adjusted R² values indicate the proportion of total outcome variance explained by each predictor. For example, baseline help orientations (`desor_core`) alone explain roughly 30% of the variance in deservingness – meaning that people’s differences in perceived deservingness align strongly with their differences in support levels. Other predictors, such as ideology or partisanship, each explain smaller portions of the variance (roughly 3–8%), while carceral impact explains little by itself.

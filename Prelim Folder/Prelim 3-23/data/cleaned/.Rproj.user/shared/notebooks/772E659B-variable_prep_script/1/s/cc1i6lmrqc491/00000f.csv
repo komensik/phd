@@ -1,0 +1,23 @@
+"0",""
+"0","combo_appendix_data %>%"
+"0","  filter(label %in% c("
+"0","    ""KI Only"","
+"0","    ""Also Vict"","
+"0","    ""Also and only Vict"""
+"0","  )) %>%"
+"0","  select(label, N, pct_total, pct_of_ki) %>%"
+"0","  arrange(desc(N)) %>%"
+"0","  gt() %>%"
+"0","  cols_label("
+"0","    label = ""Contact Combo"","
+"0","    N = ""Count"","
+"0","    pct_total = ""Percent of Sample"","
+"0","    pct_of_ki = ""Percent of Total KI Count"""
+"0","  ) %>%"
+"0","  fmt_number(columns = where(is.numeric), decimals = 1) %>%"
+"0","  tab_header(title = ""Appendix Table C. Knows Incarcerated (KI) Combos"") %>%"
+"0","  tab_options(table.font.size = ""small"")"
+"2","G1;H1;Errorh: object 'combo_appendix_data' not found
+Error during wrapup: not that many frames on the stack
+Error: no more error handlers available (recursive errors?); invoking 'abort' restart
+g"

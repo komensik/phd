@@ -1,0 +1,426 @@
+---
+title: "may8"
+format: 
+  html:
+    toc: true
+    code-fold: true
+execute: 
+  echo: false
+  message: false
+  warning: false
+---
+
+```{r}
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(tibble)
+library(gt)
+library(ggplot2)
+
+getwd()
+```
+
+About
+
+Purpose of this document:
+
+-   Public (committee/advisor)-facing, legible
+
+-   Introduce data/variables
+
+-   provide summary statistics
+
+-   Restate relationships of interest in order
+
+-   introduce preliminary models
+
+    -   summarize interpretation
+
+## Data
+
+The data are original survey data using a national sample of 2,716 US adults, collected in September 2024. The survey adapts the approach of Kreitzer and Smith's (2018) empirical mapping of power and deservingness constructions of 87 target populations. The author investigates how experiences affect attitudes.
+
+They conduct an analysis at the group level. That is, they measure (a) perceptions of target deserving (NAME_A) and (b) policy views (NAMES_B) held by groups who report having had direct experience with the criminal legal/prison system in various ways (via incarceration, social networks, or victimization), and measure differences across these groups and between these groups and those who have not had direct experiences. (this is definitely clunky and maybe inaccurate – at x level).
+
+FIRST, they regress:
+
+\(a\) NAME_A on several XYZ predictors, including ...
+
+They expect a \_\_\_ relationship between \_\_\_ and \_\_\_\_, all else equal. They use OLS. \[weights?\]\[robustness checks?\]
+
+\(b\) (come back to policy girl)
+
+SECOND (this later, Kristina, just focus on the most straightforward thing).
+
+The variables of interest are given below:
+
+-   x dummy variables:
+
+    -   impact
+
+    -   incarc
+
+    -   knowincarc
+
+    -   vict
+
+    -   (skip \_only for right now)
+
+-   ordinal policy variables:
+
+    -   death
+
+.
+
+.
+
+.
+
+....
+
+# 1. Contact Type Summary Tables
+
+Impact Dummy
+
+Table A. Impact Dummy
+
+```{r}
+
+class()
+
+```
+
+## Table B. Basic Contact Types
+
+```{r}
+table_a %>%
+  gt() %>%
+  cols_label(
+    Type = "Type",
+    Count = "Total Count",
+    Percent_of_Sample = "Percent of Sample"
+  ) %>%
+  tab_header(title = "Appendix Table A. Basic Contact Types") %>%
+  tab_options(table.font.size = "small")
+
+```
+
+## Table C. Incarcerated (Inc) Combinations
+
+```{r}
+combo_appendix_data %>%
+  filter(label %in% c(
+    "Incarcerated Only", "Also KI", "Also and only KI",
+    "Also Vict", "Also and only Vict", "Also KI and Vict",
+    "Also and only KI and Vict"
+  )) %>%
+  select(label, N, pct_total, pct_of_incarcerated) %>%
+  arrange(desc(N)) %>%
+  gt() %>%
+  cols_label(
+    label = "Contact Combo",
+    N = "Count",
+    pct_total = "Percent of Sample",
+    pct_of_incarcerated = "Percent of Total Incarcerated Count"
+  ) %>%
+  fmt_number(columns = where(is.numeric), decimals = 1) %>%
+  tab_header(title = "Appendix Table B. Incarcerated (Inc) Combos") %>%
+  tab_options(table.font.size = "small")
+
+```
+
+Table C. Knows Incarcerated (KI) Combination
+
+```{r}
+combo_appendix_data %>%
+  filter(label %in% c("KI Only", "Also Vict", "Also and only Vict")) %>%
+  select(label, N, pct_total, pct_of_ki) %>%
+  arrange(desc(N)) %>%
+  gt() %>%
+  cols_label(
+    label = "Contact Combo",
+    N = "Count",
+    pct_total = "Percent of Sample",
+    pct_of_ki = "Percent of Total KI Count"
+  ) %>%
+  fmt_number(columns = where(is.numeric), decimals = 1) %>%
+  tab_header(title = "Appendix Table C. Knows Incarcerated (KI) Combos") %>%
+  tab_options(table.font.size = "small")
+
+```
+
+## Table D. Victimization (Vict) Combinations
+
+```{r}
+combo_appendix_data %>%
+  filter(label %in% c("Victim Only", "Also KI", "Also and only KI")) %>%
+  select(label, N, pct_total, pct_of_victim) %>%
+  arrange(desc(N)) %>%
+  gt() %>%
+  cols_label(
+    label = "Contact Combo",
+    N = "Count",
+    pct_total = "Percent of Sample",
+    pct_of_victim = "Percent of Total Victim Count"
+  ) %>%
+  fmt_number(columns = where(is.numeric), decimals = 1) %>%
+  tab_header(title = "Appendix Table D. Victim (VI) Combos") %>%
+  tab_options(table.font.size = "small")
+
+```
+
+# 2. Regression Model Outputs
+
+## Model 1: No Controls
+
+```{r}
+m1 <- lm(d_incppl_pris_abc ~ impact, data = raw_data_cleaned)
+summary(m1)
+
+plot_data <- raw_data_cleaned %>%
+  filter(!is.na(impact)) %>%
+  group_by(impact) %>%
+  summarize(
+    mean_deserving = mean(d_incppl_pris_abc, na.rm = TRUE),
+    se = sd(d_incppl_pris_abc, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    impact_label = ifelse(impact == 1, "Any Contact", "No Contact"),
+    ci_lower = mean_deserving - 1.96 * se,
+    ci_upper = mean_deserving + 1.96 * se
+  )
+
+ggplot(plot_data, aes(x = impact_label, y = mean_deserving)) +
+  geom_col(fill = "gray60") +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  labs(
+    x = NULL,
+    y = "Mean Deservingness Rating (0–100)",
+    title = "Deservingness of Incarcerated People by Contact Experience"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+## Model 2: With Controls
+
+```{r}
+m2 <- lm(d_incppl_pris_abc ~ impact +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    PenalPunitiveness + desor +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+summary(m2)
+```
+
+### 3. Regression Model 1: Predicting deservingness
+
+####3.1 Without Controls
+
+```{r}
+m1 <- lm(d_incppl_pris_abc ~ impact, data = raw_data_cleaned)
+summary(m1)
+
+```
+
+#### *M1 Interpretation:*
+
+-   Q: does any carceral contact or victimization change perceived deservingness of incarcerated people (`d_incppl_pris_abc`, 0–100 scale) compared to those without any such contact (`impact = 0`).
+
+-   Coefficients:
+
+    -   Intercept = 43.31
+
+        -   The average deservingness score of incarcerated people, for respondents with no contact (`impact = 0`), is on average 43.31 out of 100 on the deservingness scale. This is higher than I might have thought.
+
+    -   impact = 7.17
+
+        -   People who have had contact (direct, indirect, or victimization) rate incarcerated people 7.17 points higher on the 0-100 deservingness scale — on average – than those without contact.
+
+        -   Significance: The t-val is 5.881 and p is less than 0.001, suggesting this effect is significantly significant and the probability that it is due to chance is very low.
+
+        -   Model fit: The R-squared is 0.0156, meaning only 1.6% of the variation in deservingness is explained by this binary variable alone.
+
+```{r, m1plot}
+library(ggplot2)
+# Summarize means and confidence intervals
+plot_data <- raw_data_cleaned %>%
+  filter(!is.na(impact)) %>%  # <- filter out NA values
+  group_by(impact) %>%
+  summarize(
+    mean_deserving = mean(d_incppl_pris_abc, na.rm = TRUE),
+    se = sd(d_incppl_pris_abc, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    impact_label = ifelse(impact == 1, "Any Contact", "No Contact"),
+    ci_lower = mean_deserving - 1.96 * se,
+    ci_upper = mean_deserving + 1.96 * se
+  )
+
+# Plot
+ggplot(plot_data, aes(x = impact_label, y = mean_deserving)) +
+  geom_col(fill = "gray60") +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  labs(
+    x = NULL,
+    y = "Mean Deservingness Rating (0–100)",
+    title = "Deservingness of Incarcerated People by Contact Experience"
+  ) +
+  theme_minimal(base_size = 14)
+
+
+```
+
+####3.2 With Controls
+
+```{r}
+m2 <- lm(d_incppl_pris_abc ~ impact +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    PenalPunitiveness + desor +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+summary(m2)
+```
+
+#### *M2 Interpretation:*
+
+-   Coefficients:
+
+    -   Intercept = 0.63 (p = 0.91)
+
+        -   The predicted deservingness score when all predictors are 0, so not particularly meaningful. Means respondent:
+            -   is independent or other
+            -   has the most conservative ideology
+            -   ...is not impacted
+            -   ...(add remaining)
+
+    -   impact = 4.70 (p \< 0.001
+
+        -   Being impacted by the CJ system (incarcerated, knows, victimized) increases the predicted deservingness rating by 4.7 points on average, holding all else constant.
+
+            -   Remains statistically significant, particularly because the outcome range is 0-100
+
+            -   supports H1
+
+    -   Republican = 0.39 (p = 0.81)
+
+        -   Compared to Independents/Others, Republicans rate incarcerated people just 0.39 points higher, and this is not statistically significant.
+
+        -   **No evidence** that Republican identification alone predicts harsher or more generous deservingness scores in this model (when other factors are controlled).
+
+        -   May reflect that **ideology and punitiveness** absorb more of the variance that would otherwise be attributed to party label.
+
+    -   Democrat = -0.49 (p = 0.72)
+
+        -   Compared to Independents/Others, Democrats score incarcerated people 0.49 points lower on deservingness, but this is not statistically significant.
+
+        -   There is **no reliable difference** in prisoner deservingness between Democrats and Independents/Others once we account for ideology, contact, and other controls.
+
+        -   Coupled with the Republican coefficient, this suggests **very weak direct effects of party ID per se**, which may be surprising given elite cues—but again, could reflect ideological and experiential absorption.
+
+    -   fiscal_ideology = 0.17 (p = 0.84)
+
+        -   This is the effect of being more fiscally conservative (scale reversed: higher = more conservative).
+
+        -   Not statistically significant, and the coefficient is small.
+
+        -   **Fiscal ideology appears unrelated** to how respondents rate the deservingness of incarcerated people, net of party, social ideology, punitiveness, and racial attitudes.
+
+        -   This aligns with your expectation that deservingness is more influenced by *social/cultural* orientations than by economic/fiscal ideology.
+
+    -   social_ideology = -1.49 (0.072)
+
+        -   each unit increase in social conservativism predicts a 1.49 point decrease in deservingness of incarcerated people (on a 0-100 scale)
+
+        -   marginally significant (p\~0.07) and in the expected direction
+
+        -   some evidence social conservativism is associated with lower perceived deservingness
+
+        -   effect size is moderate – but this all goes into the pile of "do further testing to see which controls are meaningful
+
+    -   PenalPunitiveness = -1.14 (p \<0.001)
+
+        -   participant view on whether purpose of incarceration is to punish or rehabilitate.
+
+        -   a one unit increase in belief that incarceration is primarily about punishment is associated with a 1.14-point decrease in the perceived deservingness of incarcerated people.
+
+        -   **substantive significance:** a full-scale shift (from 1 to 7) predicts a 6.8 point drop in deservingness on a 0-100 scale – modest but meaningful, especially in the context of other predictors.
+
+        -   this supports the claim that punitive orientations towards the purpose of incarceration shape how people evaluate the deservingness of targets.
+
+        -   **modeling implication**: it's not entirely endogenous to deservingness ratings, bc it comes from a distinct question about the penal telos. I think this tells us that deservingness ratings don't just reflect beliefs about what prison is for.
+
+            -   However, I'm not sure this variable captures "punitivenness." In part, it bleeds into my questions about affective reactions versus judgement.
+
+    -   desor = +0.76 (p \< 0.001)
+
+        -   Interpretation:
+
+            -   For each one-point increase in the average deservingness rating of *help-target groups*, perceived deservingness of incarcerated people increases by 0.76
+
+        -   Substantive scale:
+
+            -   ranges from 0-100, so a 10-pt increase corresponds to a 7.6 point increase in prisoner deservingness – comperable to but in opp direction of penalpun effect
+
+        -   conceptual interpretation:
+
+            -   captures individual-level variation in generalized generosity twoard marginalized/help needing populations.
+
+            -   inclusion seems important because it helps isolate target-specific effects, shows that prisoner deservingness is partially embedded in broader affective/moral schemas about who deserves help.
+
+        -   Modeling implication: controlling for desor might let me argue that the effect of contact on prisoner deservingness isn't just a byproduct of being generally generous – it's targeted.
+
+    -   fire_rare = 0.39734 (p = 0.60)
+
+        -   agreement that racial problems are rare and isolated, so more rejection of racial minimization (racial empathy) predicts lightly higher deservingness perceptions of incarcerated people.
+
+        -   takeaway – not statistically significant, so can't rule out the possibility the relationship is due to chance. But direction aligns with theory.
+
+    -   fire_privilege = 0.05353 (p = 0.94)
+
+        -   Meaning: Agreement that white people benefit from unearned racial advantages
+
+        -   Interpretation: The near-zero, nonsignificant coefficient indicates this belief does not meaningfully predict differences in perceived deservingness of incarcerated people in this model.
+
+        -   Note: This item may be less emotionally activated than the others or more subject to social desirability bias, dampening its predictive power
+
+    -   fire_angry = 1.18110 (p = 0.16)
+
+        -   Meaning: Agreement with *“I am angry that racism exists.”*
+
+        -   Interpretation: The positive direction suggests that respondents who are more emotionally angry about racism tend to see incarcerated people as more deserving, consistent with frameworks linking racial empathy to support for equity-enhancing policies.
+
+            -   Note: While not significant, this coefficient is substantively large and may become more stable with a larger sample or better scaling.
+
+    -   fire_fear (0.30112) (P = 0.73)
+
+        -   Meaning: Agreement with *“I am fearful of people of other races.”*
+
+        -   Interpretation: Respondents who express more racial fear are (slightly) more likely to rate incarcerated people as less deserving, though the effect is small and nonsignificant
+
+        -   This aligns with theories linking racial threat or fear to punitive or exclusionary attitudes.
+
+    -   gender = -0.3833 (p=0.74 )
+
+        -   men estimated to rate incarcerated people as slightly less deserving, but difference is small and not significant
+
+    -   Black = DROPPED! colinearity? (p=)
+
+    -   Hispanic = -3.03639 (p= 0.057)
+
+        -   rate incarcerated people 3 points less deserving than non-hispanic whites, holding all else constant
+
+    -   OtherRace = dropped

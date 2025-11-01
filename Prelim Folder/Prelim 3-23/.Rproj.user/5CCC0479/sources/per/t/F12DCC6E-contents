@@ -1,0 +1,63 @@
+---
+title: "r_commands"
+format: pdf
+---
+
+```{r}
+
+```
+
+| Command          | Abt                                        |
+|------------------|--------------------------------------------|
+| help()           | obtain documentation for given command     |
+| example ()       | examples on use of command                 |
+| c(), scan()      | enter data manually to a vector in R       |
+| seq()            | arithmetic progression vector              |
+| rep()            | make vector of repeated values             |
+| data()           | load built in dataset (oft in dot.frame)   |
+| view()           | view dataset in spreadsheet type format    |
+| str()            | display internal structure of object       |
+| dim()            | see dimensions (# rows/cols) of data.frame |
+| length()         | give length of a vector                    |
+| ls()             | lists memory contents                      |
+| rm()             | remove item from memory                    |
+| names()          | list names of variables in data.frame      |
+| hist()           | command for producing a histogram          |
+| histogram()      | lattice histogram command                  |
+| stem()           | make a stem plot                           |
+| table()          | list all vars with frequencies             |
+| xtabs()          | cross tabulation tables using formulas     |
+| mosaicplot()     |                                            |
+| cut()            | groups vals of a variable into larger bins |
+| mean(), median() |                                            |
+| by()             | apply funct to col split by factors        |
+| summary()        | display a 5 number summary and mean        |
+| var(), sd()      | find variance, sd of values in vector      |
+| sum()            |                                            |
+| quantile()       |                                            |
+| barplot()        |                                            |
+| boxplot9)        |                                            |
+|                  |                                            |
+|                  |                                            |
+
+
+
+
+
+
+
+
+scratch
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,2 @@
+"0","text(70, 60, paste0(""Predicted Volume = "", round(coef(lm(trees$Volume ~ trees$Height))[1], 2), "" + "", "
+"0","                    round(coef(lm(trees$Volume ~ trees$Height))[2], 2), "" * Height""))"

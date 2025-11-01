@@ -1,0 +1,36 @@
+\usepackage{setspace}
+\doublespacing
+
+\usepackage{mathpazo}
+\usepackage{amsmath}
+\usepackage{titling}
+\usepackage{etoolbox}
+\usepackage{sectsty}
+\usepackage{caption}
+\usepackage{tcolorbox}
+\usepackage{endnotes}
+
+% --- Title and Author formatting ---
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 1em}
+\preauthor{\begin{center}\large}
+\postauthor{\par\end{center}\vskip 2em}
+\predate{}
+\postdate{}
+
+% --- Page setup ---
+\setlength{\droptitle}{6em}
+\setlength\parindent{0pt}
+\setlength\parskip{6pt}
+\allsectionsfont{\rmfamily\bfseries\normalsize}
+\captionsetup{font=small, labelfont=bf}
+\tcbset{
+  colback=gray!10!white,
+  colframe=gray!50!black,
+  boxrule=0.5pt, arc=2pt,
+  left=6pt, right=6pt, top=6pt, bottom=6pt
+}
+\let\footnote=\endnote
+
+% --- Put Introduction on new page ---
+\pretocmd{\section}{\clearpage}{}{}

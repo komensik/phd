@@ -1,0 +1,8 @@
+"0","library(dplyr)"
+"0",""
+"0","yougov %>%"
+"0","  select(narcurb01, cues) %>%"
+"0","  na.omit() %>%"
+"0","  group_by(cues) %>%"
+"0","  summarise(mean_curb = mean(narcurb01)) %>%"
+"0","  mutate(curb_rel_control = mean_curb - mean_curb[1])"
