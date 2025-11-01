@@ -1,6 +1,0 @@
-"0",""
-"0","# Histogram for generalized deservingness control variable"
-"0","hist(raw_data_cleaned$desor_core, breaks = 20,"
-"0","     main = ""Generalized Deservingness"","
-"0","     xlab = ""Average Deservingness of Help-Target Groups (0–100)"","
-"0","     col = ""gray80"", border = ""white"")"

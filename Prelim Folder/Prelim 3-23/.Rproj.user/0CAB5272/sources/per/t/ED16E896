@@ -1,9 +1,9 @@
 {
     "id": "ED16E896",
-    "path": "~/Library/Mobile Documents/com~apple~CloudDocs/Documents/Duke/2024-2025/902 Legislators Pre-Ananlysis Plan/Prelim Folder/Prelim 3-23/variable_prep_script.qmd",
+    "path": "~/Documents/GitHub/phd/Prelim Folder/Prelim 3-23/variable_prep_script.qmd",
     "project_path": "variable_prep_script.qmd",
     "type": "quarto_markdown",
-    "hash": "3730515996",
+    "hash": "434779175",
     "contents": "",
     "dirty": false,
     "created": 1760474702386.0,
@@ -16,17 +16,17 @@
         "Source": "Source",
         "rmdVisualCollapsedChunks": "",
         "cursorPosition": "39,0",
-        "scrollLine": "0",
+        "scrollLine": "16",
         "docOutlineVisible": "1",
         "docOutlineSize": "289",
         "last_setup_crc32": ""
     },
     "folds": "",
-    "lastKnownWriteTime": 1760549695,
+    "lastKnownWriteTime": 1762028464,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1760549695830,
+    "last_content_update": 1762028464,
     "read_only": false,
     "read_only_alternatives": []
 }

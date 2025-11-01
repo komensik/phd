@@ -1,6 +1,6 @@
 {
     "id": "6C789B1D",
-    "path": "~/Library/Mobile Documents/com~apple~CloudDocs/Documents/Duke/2024-2025/902 Legislators Pre-Ananlysis Plan/Prelim Folder/Prelim 3-23/may8.qmd",
+    "path": "~/Documents/GitHub/phd/Prelim Folder/Prelim 3-23/may8.qmd",
     "project_path": "may8.qmd",
     "type": "quarto_markdown",
     "hash": "3509613423",
@@ -16,7 +16,7 @@
         "Source": "Source",
         "docOutlineVisible": "1",
         "rmdVisualCollapsedChunks": "",
-        "rmdVisualModeLocation": "2:0"
+        "rmdVisualModeLocation": "1581:0"
     },
     "folds": "",
     "lastKnownWriteTime": 1756838407,

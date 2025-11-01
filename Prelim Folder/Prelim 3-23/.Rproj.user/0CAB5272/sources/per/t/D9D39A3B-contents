@@ -31,14 +31,27 @@ library(haven)
 
 raw_data <- read_csv("./data/raw/scotg_results.csv")
 
-names(raw_data)
+#names(raw_data)
 
 raw_data <- clean_names(raw_data)
+
+#standardizes and cleans column names by (1) converting to lowerase, (2) replaces spaces with characters, removes accents, ensures uniqueness by adding numbers to duplicates, removing leading/trailing whitespace, creates syntatically valid names
+#checked for changes:
+
+#original_data <-read_csv("./data/raw/scotg_results.csv")
+#original_names <-names(original_data)
+
+#data.frame(
+#  original = original_names,
+#  cleaned = names(raw_data)
+#)
+
+# --main change is made lowercase
 ```
 
 ## 1. Cleaning
 
-#### a. Label Deserving & Power Blocks
+#### a. Label Deserving & Power Blocks – redefine block using column names. Used the below to create block assignments for participants in A, B, and C (to ultimately consolidate)
 
 ```{r}
 #| include: false
@@ -186,7 +199,7 @@ Objective: consolidate blocks (so only 1 Incarcerated People/Prisoners)
 #| include: false
 
 mapping <- read_csv("./data/Unified_Deserving_Power_Target_Mapping.csv")
-
+view(mapping)
 ```
 
 Prep by converting to numeric
@@ -213,7 +226,7 @@ table(raw_data_cleaned$`Deserving Group A_1`, useNA = "always")
 
 ```
 
-ALL Evals: Create consolidated variable names for deservingness — OLD(?) can remove below?
+ALL Evals: Create consolidated variable names for deservingness — OLD(?) can probably remove below because covered by excel loop.
 
 ```{r}
 #| eval: false
@@ -239,9 +252,9 @@ ALL Evals: Create consolidated variable names for deservingness — OLD(?) can r
 #}
 ```
 
-Ran new version of ABC loop to consolidate groups. Verified. After below, dataset in memory has unified variables. 
+Ran new version of ABC loop to consolidate groups. Verified. After below, dataset in memory has unified variables.
 
-```{r}
+```{r consolidation, eval=TRUE}
 library(readxl)
 library(stringr)
 library(dplyr)
@@ -251,7 +264,27 @@ library(dplyr)
 mapping <- read_excel("scratch for consolidation.xlsx")
 view(mapping)
 
+#clean first? Oc 27 6pm
+
+
+# Goal: standardize variable names in the mapping sheet so they match the names in raw_data_cleaned
 # Clean column names and values in mapping to match raw_data_cleaned
+mapping <- mapping %>%
+  rename( #rename simplifies the column name for use in this loop
+    var_a = `Deserving Group A`,
+    var_b = `Deserving Group B`,
+    var_c = `Deserving Group C`
+  ) %>%
+  mutate(
+    var_a = str_replace_all(tolower(trimws(var_a)), " ", "_"),#trim removes whitespace
+    var_b = str_replace_all(tolower(trimws(var_b)), " ", "_"),#lowercases
+    var_c = str_replace_all(tolower(trimws(var_c)), " ", "_")
+  )
+
+#view(mapping)
+
+#new section to try to make data not just variables show up
+
 mapping <- mapping %>%
   rename(
     var_a = `Deserving Group A`,
@@ -264,24 +297,95 @@ mapping <- mapping %>%
     var_c = str_replace_all(tolower(trimws(var_c)), " ", "_")
   )
 
-# Create consolidated variables
+view(mapping)
+#undiagnostic
+
+for (i in 1:nrow(mapping)) {
+  new_var <- mapping$target_slug[i]
+  var_a <- mapping$var_a[i]
+  var_b <- mapping$var_b[i]
+  var_c <- mapping$var_c[i]
+
+  # Initialize with NAs
+  raw_data_cleaned[[new_var]] <- NA_real_
+
+  # Assign A group values
+  if (!is.na(var_a) && var_a %in% names(raw_data_cleaned)) {
+    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "A"] <- 
+      as.numeric(raw_data_cleaned[[var_a]][raw_data_cleaned$block == "A"])
+  }
+
+  # Assign B group values
+  if (!is.na(var_b) && var_b %in% names(raw_data_cleaned)) {
+    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "B"] <- 
+      as.numeric(raw_data_cleaned[[var_b]][raw_data_cleaned$block == "B"])
+  }
+
+  # Assign C group values
+  if (!is.na(var_c) && var_c %in% names(raw_data_cleaned)) {
+    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "C"] <- 
+      as.numeric(raw_data_cleaned[[var_c]][raw_data_cleaned$block == "C"])
+  }
+}
+
+mapping$target_slug %in% names(raw_data_cleaned)
+summary(raw_data_cleaned[mapping$target_slug])
+view(raw_data_cleaned)
+
+
+#NEW VERSION OFdrop block specific variables -- this didn't seem to work -- nothing appears when I look at block_vars_to_drop
+# block_vars_to_drop <- grep("^(deserving_group|power_group)_[abc]_", names(raw_data_cleaned), value = TRUE)
+
+#cleaned_data_light <- raw_data_cleaned %>%
+  select(-all_of(block_vars_to_drop))
+
+
+```
+
+**Old (pre Oct 27 6pm, and pre Oct 27)**
+
+```{r}
+# DELETE FROM HERE?
+
+#full new oct 27
 for (i in 1:nrow(mapping)) {
   new_var <- mapping$target_slug[i]
   var_a <- mapping$var_a[i]
   var_b <- mapping$var_b[i]
   var_c <- mapping$var_c[i]
   
-  # Optional check
+  # Optional: diagnostic check
+  missing_vars <- c(var_a, var_b, var_c)[!c(var_a, var_b, var_c) %in% names(raw_data_cleaned)]
+  if (length(missing_vars) > 0) {
+    message("⚠️ Missing column(s) for ", new_var, ": ", paste(missing_vars, collapse = ", "))
+  }
+  
+  # Main: consolidation
+  raw_data_cleaned[[new_var]] <- with(raw_data_cleaned, case_when(
+    block == "A" & var_a %in% names(raw_data_cleaned) ~ as.numeric(get(var_a)),
+    block == "B" & var_b %in% names(raw_data_cleaned) ~ as.numeric(get(var_b)),
+    block == "C" & var_c %in% names(raw_data_cleaned) ~ as.numeric(get(var_c)),
+    TRUE ~ NA_real_
+  ))
+}
+
+
+
+# Create consolidated variables by starting to loop through each row in mapping spreadsheet. For each target group, new_var will be consolidated name, var_a etc will be the claned name of the A-block specific var
+for (i in 1:nrow(mapping)) {
+  new_var <- mapping$target_slug[i]
+  var_a <- mapping$var_a[i]
+  var_b <- mapping$var_b[i]
+  var_c <- mapping$var_c[i]
+  
+  #  check for whether any source variable names are missing from dataset
   if (!all(c(var_a, var_b, var_c) %in% names(raw_data_cleaned))) {
     warning(paste("Missing column(s) for:", new_var))
   }
 
-  raw_data_cleaned[[new_var]] <- dplyr::case_when(
-  raw_data_cleaned$block == "A" ~ as.numeric(raw_data_cleaned[[var_a]]),
-  raw_data_cleaned$block == "B" ~ as.numeric(raw_data_cleaned[[var_b]]),
-  raw_data_cleaned$block == "C" ~ as.numeric(raw_data_cleaned[[var_c]]),
-  TRUE ~ NA_real_
-)
+
+if (!all(c(var_a, var_b, var_c) %in% names(raw_data_cleaned))) {
+  print(paste("❌ Missing column(s) for:", new_var))
 }
 
 #verify: 
@@ -290,61 +394,8 @@ raw_data_cleaned %>%
   select(block, deserving_group_a_26, d_incppl_pris_abc) %>%
   filter(block == "A") %>%
   slice(1:10)
-```
 
-OLD: consolidating ABCs
-
-```{r blockspecifictargets}
-#| eval: false
-#| include: false
-# Load the spreadsheet with the mappings
-library(readxl)
-mapping <- read_excel("scratch for consolidation.xlsx")
-
-
-#CHECKING
-#view(mapping)
-#view(raw_data_cleaned)
-#colnames(raw_data_cleaned)
-
-#clean mapping col names to match raw_data_cleaned
-mapping <- mapping %>%
-  mutate(
-    `Deserving Group A` = str_replace_all(tolower(trimws(`Deserving Group A`)), " ", "_"),
-    `Deserving Group B` = str_replace_all(tolower(trimws(`Deserving Group B`)), " ", "_"),
-    `Deserving Group C` = str_replace_all(tolower(trimws(`Deserving Group C`)), " ", "_")
-  )
-
-#preview mapping to confirm fix
-mapping %>%
-  select(target_slug, `Deserving Group A`, `Deserving Group B`, `Deserving Group C`) %>%
-  head(10)
-print(
-  mapping %>%
-    select(target_slug, `Deserving Group A`, `Deserving Group B`, `Deserving Group C`) %>%
-    head(10)
-)
-
-dim(mapping)  # shows number of rows and columns
-print(mapping)
-names(mapping)
-
-# Create composite deservingness variables from the correct block column only
-for (i in 1:nrow(mapping)) {
-  new_var <- mapping$target_slug[i]
-  var_a <- mapping$`Deserving Group A`[i]
-  var_b <- mapping$`Deserving Group B`[i]
-  var_c <- mapping$`Deserving Group C`[i]
-
-  raw_data_cleaned[[new_var]] <- case_when(
-    raw_data_cleaned$block == "A" ~ raw_data_cleaned[[var_a]],
-    raw_data_cleaned$block == "B" ~ raw_data_cleaned[[var_b]],
-    raw_data_cleaned$block == "C" ~ raw_data_cleaned[[var_c]],
-    TRUE ~ NA_real_
-  )
-}
-
-names(raw_data_cleaned)
+#to here?
 
 ```
 
@@ -435,15 +486,20 @@ sapply(raw_data_cleaned[vars_to_clean], class)
 
 ```
 
-### prep for "light" version of csv without old deservingness vars (in lieu of consoldiated and renamed)
+### FOR NOW - Oct 27 7pm – skip dropping to create the light version (intended to prep for "light" version of csv without old deservingness vars (in lieu of consoldiated and renamed)
 
 ```{r}
+
+#TO SKIP: 
+  cleaned_data_light <- raw_data_cleaned
+  
+  
 #vector of old variable names
 block_vars_to_drop <- grep("^(deserving_group|power_group)_[abc]_", names(raw_data_cleaned), value = TRUE)
 
 #create version with them dropped
-cleaned_data_light <- raw_data_cleaned %>%
-  select(-all_of(block_vars_to_drop))
+#cleaned_data_light <- raw_data_cleaned %>%
+#  select(-all_of(block_vars_to_drop))
 
 view(cleaned_data_light)
 
@@ -457,6 +513,7 @@ write_csv(raw_data_cleaned, "data/cleaned/cleaned_data_consent.csv")
 
 #light csv
 write_csv(cleaned_data_light, "data/cleaned/cleaned_light.csv") # main file to use going forward
+
 
 ```
 
@@ -519,5 +576,61 @@ write_csv(cleaned_data_light, "data/cleaned/cleaned_light.csv") # main file to u
     "011100"   # Also and only KI
   )
 
+
+```
+
+OLD: consolidating ABCs
+
+```{r blockspecifictargets}
+#| eval: false
+#| include: false
+# Load the spreadsheet with the mappings
+library(readxl)
+mapping <- read_excel("scratch for consolidation.xlsx")
+
+
+#CHECKING
+#view(mapping)
+#view(raw_data_cleaned)
+#colnames(raw_data_cleaned)
+
+#clean mapping col names to match raw_data_cleaned
+mapping <- mapping %>%
+  mutate(
+    `Deserving Group A` = str_replace_all(tolower(trimws(`Deserving Group A`)), " ", "_"),
+    `Deserving Group B` = str_replace_all(tolower(trimws(`Deserving Group B`)), " ", "_"),
+    `Deserving Group C` = str_replace_all(tolower(trimws(`Deserving Group C`)), " ", "_")
+  )
+
+#preview mapping to confirm fix
+mapping %>%
+  select(target_slug, `Deserving Group A`, `Deserving Group B`, `Deserving Group C`) %>%
+  head(10)
+print(
+  mapping %>%
+    select(target_slug, `Deserving Group A`, `Deserving Group B`, `Deserving Group C`) %>%
+    head(10)
+)
+
+dim(mapping)  # shows number of rows and columns
+print(mapping)
+names(mapping)
+
+# Create composite deservingness variables from the correct block column only
+for (i in 1:nrow(mapping)) {
+  new_var <- mapping$target_slug[i]
+  var_a <- mapping$`Deserving Group A`[i]
+  var_b <- mapping$`Deserving Group B`[i]
+  var_c <- mapping$`Deserving Group C`[i]
+
+  raw_data_cleaned[[new_var]] <- case_when(
+    raw_data_cleaned$block == "A" ~ raw_data_cleaned[[var_a]],
+    raw_data_cleaned$block == "B" ~ raw_data_cleaned[[var_b]],
+    raw_data_cleaned$block == "C" ~ raw_data_cleaned[[var_c]],
+    TRUE ~ NA_real_
+  )
+}
+
+names(raw_data_cleaned)
 
 ```
