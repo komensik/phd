@@ -882,13 +882,10 @@ summary(raw_data_cleaned$prisonpen)
 
 ```
 
-
-Takeaway:
-prison pen, prison pen 1 = dpen, prison pen 5 = lwop now
--confirmed that prisonpen works -- constructed with average of death penalty and lwop
-
+Takeaway: prison pen, prison pen 1 = dpen, prison pen 5 = lwop now -confirmed that prisonpen works -- constructed with average of death penalty and lwop
 
 OPTIONAL/potentially helpful for tables: factor version
+
 ```{r, q25_1_ord}
 #OPTIONAL/potentially helpful for tables: factor version
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -900,8 +897,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
   ))
 ```
 
-
 #### Support for 'Help-Oriented' Prison Policy.
+
 These will include prison and election policies. Here, I first set up the prison policy Q's, then prison/voting Q's.
 
 ```{r, prisonhelp}
@@ -925,7 +922,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
 summary(raw_data_cleaned$q25_2_rev)
 ```
 
-OPTIONAL: Create ordered factor versions-  could be useful for plotting/tables/labeling)
+OPTIONAL: Create ordered factor versions- could be useful for plotting/tables/labeling)
+
 ```{r, prisonhelp_factor}
 
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -1035,6 +1033,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ```
 
 10-27 Diagnostics
+
 ```{r}
 names(raw_data_cleaned) %>% stringr::str_subset("q25|q23|q62|prison|help|punish|rehab")
 
@@ -1049,41 +1048,36 @@ glimpse(dplyr::select(raw_data_cleaned,
                       starts_with("penal")))
 
 ```
-Vars exist: 
-[1] "q62_1"        "q25_1"       
- [3] "q25_2"        "q25_3"       
- [5] "q25_4"        "q25_5"       
- [7] "q25_6"        "q23_1"       
- [9] "q23_2"        "q23_3"       
-[11] "q23_4"        "q23_5"       
-[13] "q23_6"        "q23_7"       
-[15] "q25_1_ord"    "prisonpen_1" 
-[17] "prisonpen_5"  "prisonpen"   
-[19] "q25_2_ord"    "q25_3_ord"   
-[21] "q25_4_ord"    "q25_6_ord"   
-[23] "q23_2_ord"    "q23_7_ord"   
-[25] "q23_2_rev"    "q23_7_rev"   
-[27] "q25_2_rev"    "q25_3_rev"   
-[29] "q25_4_rev"    "q25_6_rev"   
-[31] "prisonhelp"   "variancehelp"
-[33] "sdhelp"  
 
+Vars exist: \[1\] "q62_1" "q25_1"\
+\[3\] "q25_2" "q25_3"\
+\[5\] "q25_4" "q25_5"\
+\[7\] "q25_6" "q23_1"\
+\[9\] "q23_2" "q23_3"\
+\[11\] "q23_4" "q23_5"\
+\[13\] "q23_6" "q23_7"\
+\[15\] "q25_1_ord" "prisonpen_1" \[17\] "prisonpen_5" "prisonpen"\
+\[19\] "q25_2_ord" "q25_3_ord"\
+\[21\] "q25_4_ord" "q25_6_ord"\
+\[23\] "q23_2_ord" "q23_7_ord"\
+\[25\] "q23_2_rev" "q23_7_rev"\
+\[27\] "q25_2_rev" "q25_3_rev"\
+\[29\] "q25_4_rev" "q25_6_rev"\
+\[31\] "prisonhelp" "variancehelp" \[33\] "sdhelp"
 
-Code that gives errors: 
+Code that gives errors:
 
 # Compute index (after subcomponents exist)
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(prisonpen = rowMeans(select(., prisonpen_1, prisonpen_5), na.rm = TRUE))
 
+raw_data_cleaned \<- raw_data_cleaned %\>% mutate(prisonpen = rowMeans(select(., prisonpen_1, prisonpen_5), na.rm = TRUE))
 
 # prisonhelp index
-# Construct composite index (average of 6 items)
-# rev gives reverse version of the arguments
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(prisonhelp = rowMeans(select(., 
-    q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev, q23_2_rev, q23_7_rev
-  ), na.rm = TRUE))
 
+# Construct composite index (average of 6 items)
+
+# rev gives reverse version of the arguments
+
+raw_data_cleaned \<- raw_data_cleaned %\>% mutate(prisonhelp = rowMeans(select(., q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev, q23_2_rev, q23_7_rev ), na.rm = TRUE))
 
 ###F. FIRE controls
 

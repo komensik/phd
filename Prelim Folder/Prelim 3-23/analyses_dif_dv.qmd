@@ -29,10 +29,25 @@ library(rsq)
 ```
 
 ```{r}
-
+getwd()
 raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data_may9.csv")
 
 #view(raw_data_cleaned)
+```
+
+```{r}
+# check where R thinks the working directory is
+getwd()
+
+
+# check that the 'here' root is what you expect
+if ("here" %in% installed.packages()) {
+  here::here()
+}
+
+# check that key files exist relative to project root
+list.files("data/cleaned", pattern = "cleaned_light", recursive = TRUE)
+
 ```
 
 ## Preliminary Analyses
@@ -846,7 +861,6 @@ std_coefs_prox <- coefs_prox * c(0, sds_prox / y_sd_prox)   # note: first coef i
 tidy(mkis) |> 
   mutate(std_est_prox = estimate * c(0, sds_prox / y_sd_prox))
 ```
-
 
 ### 4. Model 3 - Deservingness on Carceral Policy
 
