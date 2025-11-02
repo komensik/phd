@@ -1,5 +1,0 @@
-"0",""
-"0","dim(mapping)  # shows number of rows and columns"
-"1","[1] 42  5
-"
-"0","print(mapping)"

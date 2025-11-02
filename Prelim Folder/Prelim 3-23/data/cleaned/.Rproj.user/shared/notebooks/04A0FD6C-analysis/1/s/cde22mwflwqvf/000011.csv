@@ -1,8 +1,0 @@
-"0",""
-"0",""
-"0","mean(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)"
-"1","[1] 46.12928
-"
-"0","sd(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)"
-"1","[1] 27.96476
-"
