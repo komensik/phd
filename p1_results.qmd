@@ -2,6 +2,145 @@
 title: "p1_results"
 ---
 
+```{r, echo=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(tibble)
+library(gt)
+library(marginaleffects)
+library(mediation)
+library(naniar)
+library(rsq)
+library(skimr)
+library(knitr)
+library(kableExtra)
+
+
+```
+
+
+## Results: Diagnostic Analyses of Contact and Deservingness
+
+### Overview
+
+These results document the exploratory and diagnostic tests used to evaluate how distinct forms of contact with the criminal legal system—**incarceration experience (`incarc`)**, **knowing someone incarcerated (`knowincarc`)**, and **victimization (`vict`)**—relate to perceived deservingness of incarcerated people (`d_incppl_pris_abc`).  
+Analyses are **unweighted** and focus on data integrity, model performance, and variable behavior rather than publication-ready estimates.
+
+```{r, echo=FALSE}
+load("data/analysis_objects.RData")
+
+```
+
+
+### I. Descriptive Diagnostics
+
+#### Table A1: Summary Statistics
+
+```{r echo=FALSE}
+#print summary table
+summary_table
+```
+
+Figure A1 shows that perceived deservingness of incarcerated people centers near 46 on a 0–100 scale (SD ≈ 28), with modest right skew. Roughly 8 % of respondents report having been incarcerated, 31 % know someone who has, and 12 % report victimization (Table A2)
+
+#### Figure A1. Density of Dependent 
+
+```{r, echo=FALSE}
+
+dv_density_data
+
+```
+
+#### Figure A2. Cross-Tabs of Contact Types
+
+### II. Bivariate Regressions
+
+```{r, echo=FALSE}
+
+kable(coef_table_incarc, caption = "Table 1. Coefficients for M2 – Incarcerated") %>%
+  kable_styling(full_width = FALSE)
+
+kbl(coef_table_vict, caption = "Table 1. Coefficients for M2 – Victimized") %>%
+  kable_styling(full_width = FALSE)
+
+kbl(coef_table_prox, caption = "Table 1. Coefficients for M2 – Victimized") %>%
+  kable_styling(full_width = FALSE)
+
+```
+
+In bivariate models, desor_core alone explains about 30 % of the variance in deservingness, dwarfing all other predictors (Table B1). Ideological measures account for 7–8 % of variance; punitiveness about 3–4 %. Carceral‐contact variables each explain < 1 % of variance individually.
+
+#### Table B1: Adjusted R² and AIC for each predictor (sorted by Adj. R²).
+
+```{r}
+
+```
+
+### III. Full Models by Contact Type
+
+#### A. M2 - Incarcerated
+
+#### Table 1. Coefficients for M2 - Incarcerated
+
+
+#### Table 2. Semi-partial R2 - Incarcerated
+
+
+#### Table 3. Standardized betas - Incarcerated
+
+#### A. M2 - Victimized
+
+#### Table 1. Coefficients for M2 - Victimized
+
+
+#### Table 2. Semi-partial R2 - Victimized
+
+
+#### Table 3. Standardized betas - Victimized
+
+
+#### A. M2 - Proximate
+
+#### Table 1. Coefficients for M2 - Proximate
+
+
+#### Table 2. Semi-partial R2 - Proximate
+
+
+#### Table 3. Standardized betas - Proximate
+
+
+
+### IV. Cross-Model Comparison
+
+Across models (Tables 1–12), generalized deservingness orientations remain the most powerful predictor of perceived deservingness of incarcerated people.
+
+A 10-point increase in desor_core predicts roughly a 7.4-point higher deservingness score.
+
+The standardized coefficient (β ≈ 0.51) indicates a half-SD shift in the outcome for each SD increase in desor_core.
+
+incarc (+8.7, p < .001) and knowincarc (+5.4, p < .001) also raise perceived deservingness, but their standardized effects are modest (β ≈ 0.08 and β ≈ 0.06, respectively).
+
+Victimization is positive but not significant (β ≈ 0.02).
+
+More socially conservative and punitive respondents view incarcerated people as less deserving (social_ideology ≈ −0.11 β; penalpoint ≈ −0.08 β).
+
+Partisan identification, FIRE items, and demographics contribute negligibly.
+
+Variance Decomposition:
+Semi-partial R² values underscore the hierarchy of explanatory power (Figure C1). General deservingness beliefs (desor_core) uniquely account for about 23 % of explained variance in deservingness judgments, whereas experiential contact adds only 0.6–1.1 %, and ideology or punitiveness add around 0.7 % each.
+
+
+These results suggest that attitudinal orientations about help and deservingness dominate, but personal contact with the carceral system still exerts an independent, substantively meaningful effect. Direct or proximate experience corresponds to more generous views of incarcerated people, while victimization does not.
+
+## written oct 31
+
+
 In a series of bivariate regressions, I examined how much variation in deservingness perceptions of incarcerated people (`d_incppl_pris_abc`) each control variable accounted for. Adjusted R² values indicate the proportion of total outcome variance explained by each predictor. For example, baseline help orientations (`desor_core`) alone explain roughly 30% of the variance in deservingness – meaning that people’s differences in perceived deservingness align strongly with their differences in support levels. Other predictors, such as ideology or partisanship, each explain smaller portions of the variance (roughly 3–8%), while carceral impact explains little by itself.
 
 In the full model, experiencing carceral impact is associated with a **4.6-point** increase in the policy support index (0–100), controlling for ideology, party ID, and deservingness. By contrast, a 10-point increase in the `desor_core` index predicts about a **7.3-point** increase. Standardized coefficients and semi-partial R² confirm that `desor_core` accounts for more of the outcome’s variance than `impact` does uniquely; however `impact` still has an independent, statistically significant association. This pattern suggests that while personal impact matters, core deservingness beliefs explain a larger portion of cross-person variation in support.

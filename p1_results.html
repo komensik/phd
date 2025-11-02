@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>p1_results</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="p1_results_files/libs/clipboard/clipboard.min.js"></script>
+<script src="p1_results_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="p1_results_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="p1_results_files/libs/quarto-html/popper.min.js"></script>
+<script src="p1_results_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="p1_results_files/libs/quarto-html/anchor.min.js"></script>
+<link href="p1_results_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="p1_results_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="p1_results_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="p1_results_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="p1_results_files/libs/bootstrap/bootstrap-81267100e462c21b3d6c0d5bf76a3417.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="p1_results_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="p1_results_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">p1_results</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'janitor'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    chisq.test, fisher.test</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: MASS</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'MASS'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dplyr':
+
+    select</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: Matrix</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'Matrix'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:tidyr':
+
+    expand, pack, unpack</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: mvtnorm</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: sandwich</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>mediation: Causal Mediation Analysis
+Version: 4.5.1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'skimr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:naniar':
+
+    n_complete</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'kableExtra'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dplyr':
+
+    group_rows</code></pre>
+</div>
+</div>
+<section id="results-diagnostic-analyses-of-contact-and-deservingness" class="level2">
+<h2 class="anchored" data-anchor-id="results-diagnostic-analyses-of-contact-and-deservingness">Results: Diagnostic Analyses of Contact and Deservingness</h2>
+<section id="overview" class="level3">
+<h3 class="anchored" data-anchor-id="overview">Overview</h3>
+<p>These results document the exploratory and diagnostic tests used to evaluate how distinct forms of contact with the criminal legal system—<strong>incarceration experience (<code>incarc</code>)</strong>, <strong>knowing someone incarcerated (<code>knowincarc</code>)</strong>, and <strong>victimization (<code>vict</code>)</strong>—relate to perceived deservingness of incarcerated people (<code>d_incppl_pris_abc</code>).<br>
+Analyses are <strong>unweighted</strong> and focus on data integrity, model performance, and variable behavior rather than publication-ready estimates.</p>
+</section>
+<section id="i.-descriptive-diagnostics" class="level3">
+<h3 class="anchored" data-anchor-id="i.-descriptive-diagnostics">I. Descriptive Diagnostics</h3>
+<section id="table-a1-summary-statistics" class="level4">
+<h4 class="anchored" data-anchor-id="table-a1-summary-statistics">Table A1: Summary Statistics</h4>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")</code></pre>
+</div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">Piped data</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">2222</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">18</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">18</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 11%">
+<col style="width: 16%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 3%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 5%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">d_incppl_pris_abc</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">0.99</td>
+<td style="text-align: right;">46.13</td>
+<td style="text-align: right;">27.96</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">25.00</td>
+<td style="text-align: right;">50.00</td>
+<td style="text-align: right;">66.00</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">▆▆▇▅▃</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">incarc</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">knowincarc</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;">0.46</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">▇▁▁▁▃</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vict</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.12</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">desor_core</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.99</td>
+<td style="text-align: right;">66.75</td>
+<td style="text-align: right;">19.20</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">52.22</td>
+<td style="text-align: right;">66.67</td>
+<td style="text-align: right;">81.11</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">▁▂▇▇▆</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fiscal_ideology</td>
+<td style="text-align: right;">565</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">2.48</td>
+<td style="text-align: right;">1.41</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">3.00</td>
+<td style="text-align: right;">3.00</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">▇▆▇▃▂</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">social_ideology</td>
+<td style="text-align: right;">565</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">2.26</td>
+<td style="text-align: right;">1.48</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">2.00</td>
+<td style="text-align: right;">3.00</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">▇▆▆▃▂</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">penalpoint</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">0.91</td>
+<td style="text-align: right;">4.08</td>
+<td style="text-align: right;">1.81</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3.00</td>
+<td style="text-align: right;">4.00</td>
+<td style="text-align: right;">6.00</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: left;">▆▅▇▅▇</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Republican</td>
+<td style="text-align: right;">618</td>
+<td style="text-align: right;">0.72</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">0.43</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">▇▁▁▁▂</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Democrat</td>
+<td style="text-align: right;">618</td>
+<td style="text-align: right;">0.72</td>
+<td style="text-align: right;">0.39</td>
+<td style="text-align: right;">0.49</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">▇▁▁▁▅</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fire_rare</td>
+<td style="text-align: right;">561</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">3.04</td>
+<td style="text-align: right;">0.89</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2.00</td>
+<td style="text-align: right;">3.00</td>
+<td style="text-align: right;">4.00</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">▁▅▁▇▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fire_privilege</td>
+<td style="text-align: right;">561</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">2.14</td>
+<td style="text-align: right;">1.02</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">2.00</td>
+<td style="text-align: right;">3.00</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">▇▇▁▅▃</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fire_angry</td>
+<td style="text-align: right;">561</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">1.69</td>
+<td style="text-align: right;">0.77</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">2.00</td>
+<td style="text-align: right;">2.00</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">▇▇▁▂▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fire_fear</td>
+<td style="text-align: right;">561</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">3.44</td>
+<td style="text-align: right;">0.70</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3.00</td>
+<td style="text-align: right;">4.00</td>
+<td style="text-align: right;">4.00</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">▁▁▁▆▇</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">gender</td>
+<td style="text-align: right;">618</td>
+<td style="text-align: right;">0.72</td>
+<td style="text-align: right;">0.47</td>
+<td style="text-align: right;">0.50</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">▇▁▁▁▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Black</td>
+<td style="text-align: right;">619</td>
+<td style="text-align: right;">0.72</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">0.36</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">▇▁▁▁▂</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hispanic</td>
+<td style="text-align: right;">619</td>
+<td style="text-align: right;">0.72</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">0.36</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">▇▁▁▁▂</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OtherRace</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="figure-a1.-density-of-dependent" class="level4">
+<h4 class="anchored" data-anchor-id="figure-a1.-density-of-dependent">Figure A1. Density of Dependent</h4>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2,189 × 1
+   d_incppl_pris_abc
+               &lt;dbl&gt;
+ 1                58
+ 2               100
+ 3                83
+ 4                50
+ 5                20
+ 6                 0
+ 7                84
+ 8                22
+ 9                50
+10                50
+# ℹ 2,179 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="figure-a2.-cross-tabs-of-contact-types" class="level4">
+<h4 class="anchored" data-anchor-id="figure-a2.-cross-tabs-of-contact-types">Figure A2. Cross-Tabs of Contact Types</h4>
+</section>
+</section>
+<section id="ii.-bivariate-regressions" class="level3">
+<h3 class="anchored" data-anchor-id="ii.-bivariate-regressions">II. Bivariate Regressions</h3>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")</code></pre>
+</div>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Table 1. Coefficients for M2 – Incarcerated</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">term</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">estimate</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">std.error</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">statistic</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">4.7544258</td>
+<td style="text-align: right;">6.1042170</td>
+<td style="text-align: right;">0.7788756</td>
+<td style="text-align: right;">0.4361710</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">incarc</td>
+<td style="text-align: right;">8.6976050</td>
+<td style="text-align: right;">2.4149822</td>
+<td style="text-align: right;">3.6015193</td>
+<td style="text-align: right;">0.0003263</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Republican</td>
+<td style="text-align: right;">-0.4663814</td>
+<td style="text-align: right;">1.6684804</td>
+<td style="text-align: right;">-0.2795247</td>
+<td style="text-align: right;">0.7798792</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Democrat</td>
+<td style="text-align: right;">-0.7256735</td>
+<td style="text-align: right;">1.4639820</td>
+<td style="text-align: right;">-0.4956847</td>
+<td style="text-align: right;">0.6201867</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fiscal_ideology</td>
+<td style="text-align: right;">0.2127949</td>
+<td style="text-align: right;">0.8273743</td>
+<td style="text-align: right;">0.2571930</td>
+<td style="text-align: right;">0.7970637</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">social_ideology</td>
+<td style="text-align: right;">-1.9809023</td>
+<td style="text-align: right;">0.8482607</td>
+<td style="text-align: right;">-2.3352516</td>
+<td style="text-align: right;">0.0196564</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">penalpoint</td>
+<td style="text-align: right;">-1.2055685</td>
+<td style="text-align: right;">0.3478478</td>
+<td style="text-align: right;">-3.4657933</td>
+<td style="text-align: right;">0.0005430</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">desor_core</td>
+<td style="text-align: right;">0.7376188</td>
+<td style="text-align: right;">0.0374672</td>
+<td style="text-align: right;">19.6870629</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fire_rare</td>
+<td style="text-align: right;">0.4964744</td>
+<td style="text-align: right;">0.8534110</td>
+<td style="text-align: right;">0.5817530</td>
+<td style="text-align: right;">0.5608171</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fire_privilege</td>
+<td style="text-align: right;">-0.2067427</td>
+<td style="text-align: right;">0.8051144</td>
+<td style="text-align: right;">-0.2567867</td>
+<td style="text-align: right;">0.7973773</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fire_angry</td>
+<td style="text-align: right;">0.6873672</td>
+<td style="text-align: right;">0.9038487</td>
+<td style="text-align: right;">0.7604892</td>
+<td style="text-align: right;">0.4470771</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fire_fear</td>
+<td style="text-align: right;">-0.2047978</td>
+<td style="text-align: right;">0.9891034</td>
+<td style="text-align: right;">-0.2070540</td>
+<td style="text-align: right;">0.8359947</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">gender</td>
+<td style="text-align: right;">-1.2442991</td>
+<td style="text-align: right;">1.1557388</td>
+<td style="text-align: right;">-1.0766265</td>
+<td style="text-align: right;">0.2818135</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Black</td>
+<td style="text-align: right;">-0.3019164</td>
+<td style="text-align: right;">1.8744224</td>
+<td style="text-align: right;">-0.1610717</td>
+<td style="text-align: right;">0.8720578</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hispanic</td>
+<td style="text-align: right;">-3.0669029</td>
+<td style="text-align: right;">1.7254155</td>
+<td style="text-align: right;">-1.7774866</td>
+<td style="text-align: right;">0.0756829</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OtherRace</td>
+<td style="text-align: right;">-1.1626656</td>
+<td style="text-align: right;">2.3454755</td>
+<td style="text-align: right;">-0.4957057</td>
+<td style="text-align: right;">0.6201718</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")</code></pre>
+</div>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Table 1. Coefficients for M2 – Victimized</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">term</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">estimate</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">std.error</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">statistic</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">4.0757569</td>
+<td style="text-align: right;">6.1525875</td>
+<td style="text-align: right;">0.6624460</td>
+<td style="text-align: right;">0.5077832</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vict</td>
+<td style="text-align: right;">1.8311316</td>
+<td style="text-align: right;">2.0491020</td>
+<td style="text-align: right;">0.8936264</td>
+<td style="text-align: right;">0.3716596</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Republican</td>
+<td style="text-align: right;">-0.2417254</td>
+<td style="text-align: right;">1.6813713</td>
+<td style="text-align: right;">-0.1437668</td>
+<td style="text-align: right;">0.8857032</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Democrat</td>
+<td style="text-align: right;">-0.8120548</td>
+<td style="text-align: right;">1.4681640</td>
+<td style="text-align: right;">-0.5531091</td>
+<td style="text-align: right;">0.5802679</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fiscal_ideology</td>
+<td style="text-align: right;">0.1746308</td>
+<td style="text-align: right;">0.8356793</td>
+<td style="text-align: right;">0.2089687</td>
+<td style="text-align: right;">0.8345000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">social_ideology</td>
+<td style="text-align: right;">-1.8930024</td>
+<td style="text-align: right;">0.8491248</td>
+<td style="text-align: right;">-2.2293572</td>
+<td style="text-align: right;">0.0259320</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">penalpoint</td>
+<td style="text-align: right;">-1.1615853</td>
+<td style="text-align: right;">0.3475277</td>
+<td style="text-align: right;">-3.3424249</td>
+<td style="text-align: right;">0.0008501</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">desor_core</td>
+<td style="text-align: right;">0.7400902</td>
+<td style="text-align: right;">0.0375803</td>
+<td style="text-align: right;">19.6935530</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fire_rare</td>
+<td style="text-align: right;">0.5040169</td>
+<td style="text-align: right;">0.8629299</td>
+<td style="text-align: right;">0.5840763</td>
+<td style="text-align: right;">0.5592534</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fire_privilege</td>
+<td style="text-align: right;">-0.2149014</td>
+<td style="text-align: right;">0.8134293</td>
+<td style="text-align: right;">-0.2641918</td>
+<td style="text-align: right;">0.7916670</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fire_angry</td>
+<td style="text-align: right;">0.6428042</td>
+<td style="text-align: right;">0.9022890</td>
+<td style="text-align: right;">0.7124150</td>
+<td style="text-align: right;">0.4763143</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fire_fear</td>
+<td style="text-align: right;">-0.0883885</td>
+<td style="text-align: right;">0.9876795</td>
+<td style="text-align: right;">-0.0894911</td>
+<td style="text-align: right;">0.9287031</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">gender</td>
+<td style="text-align: right;">-0.9467339</td>
+<td style="text-align: right;">1.1612650</td>
+<td style="text-align: right;">-0.8152609</td>
+<td style="text-align: right;">0.4150474</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Black</td>
+<td style="text-align: right;">0.1874133</td>
+<td style="text-align: right;">1.8721190</td>
+<td style="text-align: right;">0.1001076</td>
+<td style="text-align: right;">0.9202718</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hispanic</td>
+<td style="text-align: right;">-2.9739921</td>
+<td style="text-align: right;">1.7405186</td>
+<td style="text-align: right;">-1.7086816</td>
+<td style="text-align: right;">0.0877087</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OtherRace</td>
+<td style="text-align: right;">-0.8587638</td>
+<td style="text-align: right;">2.3653051</td>
+<td style="text-align: right;">-0.3630668</td>
+<td style="text-align: right;">0.7166041</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")</code></pre>
+</div>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Table 1. Coefficients for M2 – Victimized</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">term</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">estimate</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">std.error</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">statistic</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">3.2377490</td>
+<td style="text-align: right;">6.1291670</td>
+<td style="text-align: right;">0.5282527</td>
+<td style="text-align: right;">0.5973991</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">knowincarc</td>
+<td style="text-align: right;">5.3546148</td>
+<td style="text-align: right;">1.2577090</td>
+<td style="text-align: right;">4.2574353</td>
+<td style="text-align: right;">0.0000219</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Republican</td>
+<td style="text-align: right;">-0.0704740</td>
+<td style="text-align: right;">1.6726961</td>
+<td style="text-align: right;">-0.0421320</td>
+<td style="text-align: right;">0.9663989</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Democrat</td>
+<td style="text-align: right;">-0.7769671</td>
+<td style="text-align: right;">1.4644549</td>
+<td style="text-align: right;">-0.5305504</td>
+<td style="text-align: right;">0.5958058</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fiscal_ideology</td>
+<td style="text-align: right;">0.0352355</td>
+<td style="text-align: right;">0.8315015</td>
+<td style="text-align: right;">0.0423758</td>
+<td style="text-align: right;">0.9662046</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">social_ideology</td>
+<td style="text-align: right;">-1.9609376</td>
+<td style="text-align: right;">0.8476605</td>
+<td style="text-align: right;">-2.3133526</td>
+<td style="text-align: right;">0.0208327</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">penalpoint</td>
+<td style="text-align: right;">-1.1745083</td>
+<td style="text-align: right;">0.3455765</td>
+<td style="text-align: right;">-3.3986928</td>
+<td style="text-align: right;">0.0006941</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">desor_core</td>
+<td style="text-align: right;">0.7347021</td>
+<td style="text-align: right;">0.0376058</td>
+<td style="text-align: right;">19.5369498</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fire_rare</td>
+<td style="text-align: right;">0.4148532</td>
+<td style="text-align: right;">0.8536177</td>
+<td style="text-align: right;">0.4859942</td>
+<td style="text-align: right;">0.6270395</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fire_privilege</td>
+<td style="text-align: right;">-0.0513998</td>
+<td style="text-align: right;">0.8100706</td>
+<td style="text-align: right;">-0.0634510</td>
+<td style="text-align: right;">0.9494155</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fire_angry</td>
+<td style="text-align: right;">0.6068086</td>
+<td style="text-align: right;">0.8962396</td>
+<td style="text-align: right;">0.6770607</td>
+<td style="text-align: right;">0.4984678</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fire_fear</td>
+<td style="text-align: right;">0.0115221</td>
+<td style="text-align: right;">0.9921904</td>
+<td style="text-align: right;">0.0116127</td>
+<td style="text-align: right;">0.9907361</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">gender</td>
+<td style="text-align: right;">-0.9481606</td>
+<td style="text-align: right;">1.1552792</td>
+<td style="text-align: right;">-0.8207198</td>
+<td style="text-align: right;">0.4119312</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Black</td>
+<td style="text-align: right;">-0.1224413</td>
+<td style="text-align: right;">1.8729459</td>
+<td style="text-align: right;">-0.0653736</td>
+<td style="text-align: right;">0.9478849</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hispanic</td>
+<td style="text-align: right;">-3.3836311</td>
+<td style="text-align: right;">1.7201913</td>
+<td style="text-align: right;">-1.9670086</td>
+<td style="text-align: right;">0.0493591</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OtherRace</td>
+<td style="text-align: right;">-0.4743038</td>
+<td style="text-align: right;">2.3410358</td>
+<td style="text-align: right;">-0.2026042</td>
+<td style="text-align: right;">0.8394708</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="table-b1-adjusted-r²-and-aic-for-each-predictor-sorted-by-adj.-r²." class="level4">
+<h4 class="anchored" data-anchor-id="table-b1-adjusted-r²-and-aic-for-each-predictor-sorted-by-adj.-r².">Table B1: Adjusted R² and AIC for each predictor (sorted by Adj. R²).</h4>
+</section>
+</section>
+<section id="iii.-full-models-by-contact-type" class="level3">
+<h3 class="anchored" data-anchor-id="iii.-full-models-by-contact-type">III. Full Models by Contact Type</h3>
+<section id="a.-m2---incarcerated" class="level4">
+<h4 class="anchored" data-anchor-id="a.-m2---incarcerated">A. M2 - Incarcerated</h4>
+</section>
+<section id="table-1.-coefficients-for-m2---incarcerated" class="level4">
+<h4 class="anchored" data-anchor-id="table-1.-coefficients-for-m2---incarcerated">Table 1. Coefficients for M2 - Incarcerated</h4>
+</section>
+<section id="table-2.-semi-partial-r2---incarcerated" class="level4">
+<h4 class="anchored" data-anchor-id="table-2.-semi-partial-r2---incarcerated">Table 2. Semi-partial R2 - Incarcerated</h4>
+</section>
+<section id="table-3.-standardized-betas---incarcerated" class="level4">
+<h4 class="anchored" data-anchor-id="table-3.-standardized-betas---incarcerated">Table 3. Standardized betas - Incarcerated</h4>
+</section>
+<section id="a.-m2---victimized" class="level4">
+<h4 class="anchored" data-anchor-id="a.-m2---victimized">A. M2 - Victimized</h4>
+</section>
+<section id="table-1.-coefficients-for-m2---victimized" class="level4">
+<h4 class="anchored" data-anchor-id="table-1.-coefficients-for-m2---victimized">Table 1. Coefficients for M2 - Victimized</h4>
+</section>
+<section id="table-2.-semi-partial-r2---victimized" class="level4">
+<h4 class="anchored" data-anchor-id="table-2.-semi-partial-r2---victimized">Table 2. Semi-partial R2 - Victimized</h4>
+</section>
+<section id="table-3.-standardized-betas---victimized" class="level4">
+<h4 class="anchored" data-anchor-id="table-3.-standardized-betas---victimized">Table 3. Standardized betas - Victimized</h4>
+</section>
+<section id="a.-m2---proximate" class="level4">
+<h4 class="anchored" data-anchor-id="a.-m2---proximate">A. M2 - Proximate</h4>
+</section>
+<section id="table-1.-coefficients-for-m2---proximate" class="level4">
+<h4 class="anchored" data-anchor-id="table-1.-coefficients-for-m2---proximate">Table 1. Coefficients for M2 - Proximate</h4>
+</section>
+<section id="table-2.-semi-partial-r2---proximate" class="level4">
+<h4 class="anchored" data-anchor-id="table-2.-semi-partial-r2---proximate">Table 2. Semi-partial R2 - Proximate</h4>
+</section>
+<section id="table-3.-standardized-betas---proximate" class="level4">
+<h4 class="anchored" data-anchor-id="table-3.-standardized-betas---proximate">Table 3. Standardized betas - Proximate</h4>
+</section>
+</section>
+<section id="iv.-cross-model-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="iv.-cross-model-comparison">IV. Cross-Model Comparison</h3>
+</section>
+</section>
+<section id="written-oct-31" class="level2">
+<h2 class="anchored" data-anchor-id="written-oct-31">written oct 31</h2>
+<p>In a series of bivariate regressions, I examined how much variation in deservingness perceptions of incarcerated people (<code>d_incppl_pris_abc</code>) each control variable accounted for. Adjusted R² values indicate the proportion of total outcome variance explained by each predictor. For example, baseline help orientations (<code>desor_core</code>) alone explain roughly 30% of the variance in deservingness – meaning that people’s differences in perceived deservingness align strongly with their differences in support levels. Other predictors, such as ideology or partisanship, each explain smaller portions of the variance (roughly 3–8%), while carceral impact explains little by itself.</p>
+<p>In the full model, experiencing carceral impact is associated with a <strong>4.6-point</strong> increase in the policy support index (0–100), controlling for ideology, party ID, and deservingness. By contrast, a 10-point increase in the <code>desor_core</code> index predicts about a <strong>7.3-point</strong> increase. Standardized coefficients and semi-partial R² confirm that <code>desor_core</code> accounts for more of the outcome’s variance than <code>impact</code> does uniquely; however <code>impact</code> still has an independent, statistically significant association. This pattern suggests that while personal impact matters, core deservingness beliefs explain a larger portion of cross-person variation in support.</p>
+<p>When all variables are standardized, <em>desor_core</em> has by far the largest standardized coefficient (β = 0.51), indicating that respondents who rate carceral citizens as more deserving tend to express much stronger support for prison-help policies. A one–standard deviation increase in <em>desor_core</em> corresponds to roughly a half–standard deviation increase in support.</p>
+<p>The coefficient for <em>impact</em> (β = 0.08) remains positive and statistically significant, suggesting that direct or indirect experience with the carceral system is associated with higher policy support, though the magnitude is relatively modest compared with attitudinal factors.</p>
+<p><em>Social ideology</em> (β = −0.11) and <em>punitiveness</em> (β = −0.07) show smaller negative relationships, while partisan identifiers and FIRE items contribute little once these factors are controlled.</p>
+<p><strong>Incarceration on Deservingness</strong></p>
+<p>When we include both experiential exposure (<code>incarc</code>) and the attitudinal control reflecting general orientation toward help-needing groups (<code>desor_core</code>) in the same model, both predictors are statistically significant. The semi-partial R² values reveal that <code>desor_core</code> uniquely accounts for approximately <strong>23% of the variance</strong> in policy support, whereas <code>incarc</code> explains less than <strong>1% of unique variance</strong>. This indicates that generalized perceptions of deservingness are the dominant driver of support, while personal experience with incarceration contributes a smaller, though still meaningful, independent effect.</p>
+<p>Because deservingness orientations (<code>desor_core</code>) strongly predict views on incarcerated people and may correlate with experience of incarceration (<code>incarc</code>), we include <code>desor_core</code> as a control in all models. Controlling for <code>desor_core</code> allows us to estimate the independent association of incarceration experience with policy support, net of respondents’ attitudinal differences. The semi-partial R² results highlight the relative explanatory contributions of each predictor, confirming that attitudes toward carceral citizens are far more influential than demographic or ideological controls.</p>
+<p>These results demonstrate that while attitudes about deservingness dominate variance in policy support, experiential exposure to the criminal legal system has a measurable, independent effect — which aligns with our experimental interest in whether incarceration shapes perceptions of carceral citizens (<code>d_incppl_pris_abc</code>).</p>
+<p>When we include both experiential exposure (<code>incarc</code>) and the control for generalized deservingness attitudes (<code>desor_core</code>) in the same model predicting policy support, both predictors are statistically significant. The unstandardized coefficient for <code>incarc</code> indicates that respondents who have experienced incarceration score roughly <strong>8.7 points higher</strong> on the policy support scale (0–100), holding other variables constant. By comparison, a one-unit increase in <code>desor_core</code> is associated with a <strong>0.74-point increase</strong>, though the 0–100 scale of this composite makes direct comparisons challenging.</p>
+<p>Standardized coefficients place all predictors on the same scale and clarify relative influence: a <strong>1 SD increase in <code>desor_core</code> corresponds to a 0.51 SD increase</strong> in policy support, whereas a change from 0 to 1 in <code>incarc</code> corresponds to only a <strong>0.079 SD increase</strong>. Similarly, semi-partial R² values show that <code>desor_core</code> uniquely explains <strong>~23% of the variance</strong>, while <code>incarc</code> explains less than <strong>1%</strong>, confirming that generalized attitudes about deservingness are the dominant driver of support.</p>
+<p>Including <code>desor_core</code> as a control allows us to isolate the independent association of incarceration experience with policy support, net of respondents’ broader attitudinal dispositions. Taken together, these results indicate that while attitudes toward deservingness strongly predict policy support, personal experience with the criminal legal system exerts a smaller but meaningful effect — which aligns with our experimental interest in whether incarceration shapes perceptions of carceral citizens (<code>d_incppl_pris_abc</code>).</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

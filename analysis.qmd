@@ -70,7 +70,7 @@ About
 
 
 #histogram
-hist(raw_data_cleaned$d_incppl_pris_abc, breaks = 20,
+incarc_ppl_hist <- hist(raw_data_cleaned$d_incppl_pris_abc, breaks = 20,
      main = "Deservingness of Incarcerated People/Prisoners",
      xlab = "Deservingness (0–100)", col = "gray80", border = "white")
 
@@ -83,6 +83,11 @@ hist(raw_data_cleaned$d_incppl_pris_abc, breaks = 20,
 
 boxplot(raw_data_cleaned$d_incppl_pris_abc)
 
+#density plot
+dv_density_data <- raw_data_cleaned %>%
+  dplyr::select(d_incppl_pris_abc) %>%
+  filter(!is.na(d_incppl_pris_abc))
+
 ```
 
 ### 1.2. Control: Generalized Deservingness (desor)
@@ -90,8 +95,8 @@ boxplot(raw_data_cleaned$d_incppl_pris_abc)
 ```{r}
 
 # Histogram for generalized deservingness control variable
-hist(raw_data_cleaned$desor_core, breaks = 20,
-     main = "Generalized Deservingness",
+desor_core_hist <- hist(raw_data_cleaned$desor_core, breaks = 20,
+     main = "'Needy' Deservingness Orientation",
      xlab = "Average Deservingness of Help-Target Groups (0–100)",
      col = "gray80", border = "white")
 
@@ -108,6 +113,15 @@ sd(raw_data_cleaned$desor_core, na.rm = TRUE)
 library(dplyr)
 library(gt)
 library(stringr)
+
+#basic
+contact_crosstab <- raw_data_cleaned %>%
+  summarise(
+    incarc_yes = sum(incarc == 1, na.rm=TRUE),
+    knowincarc_yes = sum(knowincarc == 1, na.rm=TRUE),
+    vict_yes = sum(vict == 1, na.rm=TRUE)
+  )
+
 
 # Optional: define custom labels for key combinations
 pattern_labels <- tibble::tibble(
@@ -501,6 +515,12 @@ for(v in controls[-1])
   cat(v, "adjR2 =", summary(fm)$adj.r.squared-summary(m1)$adj.r.squared, "\n")
 }
 
+#AIC - mirrors fit mostly, suggests to check counts for vars
+
+for (v in controls) {
+  f <- as.formula(paste("d_incppl_pris_abc ~", v))
+  fm <- lm(f, data = raw_data_cleaned)
+  cat(v, "N =", nobs(fm), "\n")
 ```
 
 Find from adjusted R2 (explaining spread) that:
@@ -515,17 +535,7 @@ Find from adjusted R2 (explaining spread) that:
 
 -   impact explains very little – 1.5%
 
-AIC - mirrors fit mostly, suggests to check counts for vars
-
-```{r}
-for (v in controls) {
-  f <- as.formula(paste("d_incppl_pris_abc ~", v))
-  fm <- lm(f, data = raw_data_cleaned)
-  cat(v, "N =", nobs(fm), "\n")
-}
-```
-
-### By Contact - Incarcerated
+### M2 - Incarcerated
 
 ```{r, minc}
 
@@ -544,7 +554,7 @@ summary(minc)
 Robust SEs
 
 ```{r}
-coeftest(minc, vcov = vcovHC(minc, type = "HC1"))
+coef_table_incarc <- coeftest(minc, vcov = vcovHC(minc, type = "HC1", cluster = NULL)) %>% broom::tidy()
 ```
 
 With standardized betas
@@ -563,11 +573,14 @@ inc_sd <- sd(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
 # compute sd for each predictor (binary and continuous)
 inc_sds <- sapply(model.frame(minc_s)[-1], function(x) sd(x, na.rm=TRUE))  # excludes response
 coefs <- coef(minc_s)
+
 # standardized coef = b * sd(x) / sd(y).  For factor dummies sd(x) is the std dev of 0/1 vector.
-inc_std_coefs <- coefs * c(1, inc_sds / inc_sd)   # note: first coef is intercept so alignment matters
+inc_std_coefs <- coefs * c(NA, inc_sds / inc_sd)   # note: first coef is intercept so alignment matters
 # better to use broom::tidy:
 tidy(minc_s) |> 
-  mutate(std_est = estimate * c(0, inc_sds / inc_sd)) 
+  mutate(std_est = estimate * c(NA, inc_sds / inc_sd)) 
+
+table_std_incarc <- tidy(minc_s) |> mutate(std_est = estimate * c(NA, inc_sds / inc_sd))
 ```
 
 ```{r}
@@ -585,7 +598,7 @@ for (v_inc in controls_inc) {
                               AIC = AIC(fm_inc)))
 }
 
-results_inc <- results[order(-results_inc$adjR2), ]
+results_inc <- results_inc[order(-results_inc$adjR2), ]
 print(results_inc)
 
 #NEXT -- testing when adding controls in to minc sequentially
@@ -593,7 +606,7 @@ print(results_inc)
 #first make no control model version
 minc_base <- lm(d_incppl_pris_abc ~ incarc, data = raw_data_cleaned)
 
-for(v_inc in controls_inc[-1])
+minc_incr2 <- for(v_inc in controls_inc[-1])
 {
   f_inc <- as.formula(paste("d_incppl_pris_abc ~ incarc +", v_inc))
   fm_inc <- lm(f_inc, data = raw_data_cleaned)
@@ -606,17 +619,17 @@ sp_r2 <- rsq.partial(minc, type = "sp")
 sp_r2
 
 #in table
-sp_table <- data.frame(
+sp_table_inc <- data.frame(
   variable = sp_r2$variable,
   semi_partial_R2 = sp_r2$partial.rsq
 )
 
 # largest to smallest
-sp_table <- sp_table %>%
+sp_table_inc <- sp_table %>%
   arrange(desc(semi_partial_R2))
 
 # round for display
-sp_table$semi_partial_R2 <- round(sp_table$semi_partial_R2, 4)
+sp_table_inc$semi_partial_R2 <- round(sp_table_inc$semi_partial_R2, 4)
 
 print(sp_table)
 
@@ -639,14 +652,14 @@ Find from adjusted R2 (explaining spread) that:
 AIC - mirrors fit mostly, suggests to check counts for vars
 
 ```{r}
-for (v in controls) {
+for (v in controls_inc) {
   f <- as.formula(paste("d_incppl_pris_abc ~", v))
   fm <- lm(f, data = raw_data_cleaned)
   cat(v, "N =", nobs(fm), "\n")
 }
 ```
 
-### By Contact - Victimized
+### M2 - Victimized
 
 ```{r, mv}
 
@@ -666,7 +679,7 @@ summary(mv)
 Robust SEs
 
 ```{r}
-coeftest(mv, vcov = vcovHC(mv, type = "HC1"))
+coef_table_vict <- coeftest(mv, vcov = vcovHC(mv, type = "HC1"))%>% broom::tidy()
 ```
 
 Univariate explanatory power / how much does each control explain on its own?
@@ -686,7 +699,7 @@ for (v_vict in controls_vict) {
                               AIC = AIC(fm_vict)))
 }
 
-results_vict <- results[order(-results_vict$adjR2), ]
+results_vict <- results_vict[order(-results_vict$adjR2), ]
 
 print(results_vict)
 
@@ -694,7 +707,7 @@ print(results_vict)
 #first make base
 mv_base <- lm(d_incppl_pris_abc ~ vict, data=raw_data_cleaned)
 
-for(v_v in controls_vict[-1])
+mvict_incr2 <-for(v_v in controls_vict[-1])
 {
   f_v <- as.formula(paste("d_incppl_pris_abc ~ vict +", v_v))
   fm_v <- lm(f_v, data = raw_data_cleaned)
@@ -741,14 +754,18 @@ y_sd_v <- sd(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
 # compute sd for each predictor (binary and continuous)
 sds_v <- sapply(model.frame(mvs)[-1], function(x) sd(x, na.rm=TRUE))  # excludes response
 coefs_v <- coef(mvs)
+
 # standardized coef = b * sd(x) / sd(y).  For factor dummies sd(x) is the std dev of 0/1 vector.
-std_coefs_v <- coefs_v * c(0, sds_v / y_sd_v)   # note: first coef is intercept so alignment matters
+std_coefs_v <- coefs_v * c(NA, sds_v / y_sd_v)   
+
 # better to use broom::tidy:
 tidy(mvs) |> 
-  mutate(std_est_v = estimate * c(0, sds_v / y_sd_v)) 
+  mutate(std_est_v = estimate * c(NA, sds_v / y_sd_v)) 
+
+table_std_vict   <- tidy(mvs)    |> mutate(std_est_v = estimate * c(NA, sds_v / y_sd_v))
 ```
 
-### By Contact - Proximate
+### M2 - Proximate
 
 ```{r}
 
@@ -766,7 +783,7 @@ summary(mki)
 Robust SEs
 
 ```{r}
-coeftest(mki, vcov = vcovHC(mki, type = "HC1"))
+coef_table_prox <- coeftest(mki, vcov = vcovHC(mki, type = "HC1"))%>% broom::tidy()
 ```
 
 Univariate explanatory power / how much does each control explain on its own?
@@ -786,7 +803,7 @@ for (v_prox in controls_prox) {
                               AIC = AIC(fm_prox)))
 }
 
-results_prox <- results[order(-results_prox$adjR2), ]
+results_prox <- results_prox[order(-results_prox$adjR2), ]
 
 print(results_prox)
 
@@ -794,7 +811,7 @@ print(results_prox)
 #first make base
 mki_base <- lm(d_incppl_pris_abc ~ knowincarc, data=raw_data_cleaned)
 
-for(v_prox in controls_prox[-1])
+mprox_incr2<-for(v_prox in controls_prox[-1])
 {
   f_prox <- as.formula(paste("d_incppl_pris_abc ~ knowincarc +", v_prox))
   fm_prox <- lm(f_prox, data = raw_data_cleaned)
@@ -841,11 +858,109 @@ y_sd_prox <- sd(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
 sds_prox <- sapply(model.frame(mkis)[-1], function(x) sd(x, na.rm=TRUE))  # excludes response
 coefs_prox <- coef(mkis)
 # standardized coef = b * sd(x) / sd(y).  For factor dummies sd(x) is the std dev of 0/1 vector.
-std_coefs_prox <- coefs_prox * c(0, sds_prox / y_sd_prox)   # note: first coef is intercept so alignment matters
+std_coefs_prox <- coefs_prox * c(NA, sds_prox / y_sd_prox)   # note: first coef is intercept so alignment matters
 # better to use broom::tidy:
 tidy(mkis) |> 
-  mutate(std_est_prox = estimate * c(0, sds_prox / y_sd_prox))
+  mutate(std_est_prox = estimate * c(NA, sds_prox / y_sd_prox))
+
+table_std_prox   <- tidy(mkis)   |> mutate(std_est_prox = estimate * c(NA, sds_prox / y_sd_prox))
 ```
+
+### Tables: Impact
+```{r}
+
+key_vars <- c("d_incppl_pris_abc","incarc","knowincarc","vict","desor_core",
+              "fiscal_ideology","social_ideology","penalpoint",
+              "Republican","Democrat","fire_rare","fire_privilege",
+              "fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+
+summary_table <- raw_data_cleaned %>%
+  dplyr::select(all_of(key_vars)) %>%
+  skimr::skim()
+
+
+#count N in each
+# M2 - Incarcerated variable Ns
+ncheck_inc <- sapply(controls_inc, function(v) 
+  nobs(lm(as.formula(paste("d_incppl_pris_abc ~", v)), data = raw_data_cleaned))
+) |> 
+  tibble::enframe(name = "variable", value = "N")
+
+# M3 - Victimized variable Ns
+ncheck_vict <- sapply(controls_vict, function(v)
+  nobs(lm(as.formula(paste("d_incppl_pris_abc ~", v)), data = raw_data_cleaned))
+) |>
+  tibble::enframe(name = "variable", value = "N")
+
+# M4 - Proximate variable Ns
+ncheck_prox <- sapply(controls_prox, function(v)
+  nobs(lm(as.formula(paste("d_incppl_pris_abc ~", v)), data = raw_data_cleaned))
+) |>
+  tibble::enframe(name = "variable", value = "N")
+
+
+
+
+#model comparison
+contact_model_summary <- bind_rows(
+  table_std_incarc %>% dplyr::select(term, std_est) %>% mutate(model = "Incarcerated"),
+  table_std_vict   %>% dplyr::select(term, std_est_v) %>% mutate(model = "Victimized"),
+  table_std_prox   %>% dplyr::select(term, std_est_prox) %>% mutate(model = "Proximate")
+)
+
+
+save(
+  #summary
+  summary_table, dv_density_data, contact_crosstab, incarc_ppl_hist,
+  desor_core_hist,
+  #model coefs
+     coef_table_incarc, coef_table_vict, coef_table_prox,
+  #semi-partial r2
+     sp_table_inc, sp_table_v, sp_table_prox,
+  #standardized betas
+     table_std_incarc, table_std_vict, table_std_prox, 
+  #univar and incremental fit diagnostics
+  results_inc,results_vict,results_prox,
+  minc_incr2,mvict_incr2, mprox_incr2,
+  #N for each
+  ncheck_inc, ncheck_vict, ncheck_prox,
+  #model comparison table
+  contact_model_summary, 
+     file = "data/analysis_objects.RData")
+
+summary_table
+dv_density_data
+contact_crosstab
+incarc_ppl_hist
+desor_core_hist
+  #model coefs
+  coef_table_incarc
+coef_table_vict
+coef_table_prox
+  sp_table_inc
+  sp_table_v
+  sp_table_prox
+  #standardized betas
+    table_std_incarc
+    table_std_vict
+    table_std_prox
+  #univar and incremental fit diagnostics
+  results_inc
+  results_vict
+  results_prox
+  minc_incr2
+  mvict_incr2
+  mprox_incr2
+  #N for each
+  ncheck_inc
+  ncheck_vict
+  ncheck_prox
+  #model comparison table
+  contact_model_summary
+
+```
+
+
 
 ### 4. Model 3 - Deservingness on Carceral Policy
 
