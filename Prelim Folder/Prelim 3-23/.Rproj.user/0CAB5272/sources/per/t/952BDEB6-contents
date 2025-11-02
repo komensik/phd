@@ -308,36 +308,36 @@ This project also takes seriously the role of interpretation in shaping the poli
 
 ### A: Variable Dictionary
 
-| Variable Name | Type | Description |
-|----|----|----|
-| `impact` | Binary | Any carceral or victimization contact |
-| `incarc` | Binary | Has been incarcerated |
-| `knowincarc` | Binary | Knows someone incarcerated |
-| `vict` | Binary | Has been victim of violent crime |
-| `prisonerdeserves` | Continuous | Centered deservingness of incarcerated people |
-| `prisonhelp` | Index | Support for prison-assistance policies |
-| `prisonpen` | Index | Support for punitive carceral policies |
-| `variance_help` | Continuous | Variance across prison-help policy support items |
-| `sd_help` | Continuous | Standard deviation of help-policy support items |
-| `polorientation` / `pol-or` | Index | General orientation toward social policy help |
-| `desor` | Continuous | Centered deservingness of help-receiving groups |
-| `Republican` | Dummy | Identifies as Republican |
-| `Democrat` | Dummy | Identifies as Democrat |
-| `ideology` | Index | Political ideology (0 = liberal, 1 = conservative) |
-| `Punitive` | Index | General punitive orientation |
-| `PenalPunitiveness` | Ordinal / Rescaled | Beliefs about punishment vs rehabilitation |
-| `PolicyDisposition` | Index | Support for redistributive and social help policies |
-| `fire_rare` | Likert (1–4) | Belief that racial problems are rare and isolated |
-| `fire_privilege` | Likert (1–4) | Belief that white people benefit from racial privilege |
-| `fire_angry` | Likert (1–4) | Anger about the existence of racism |
-| `fire_fear` | Likert (1–4) | Fear of people of other races |
-| `gender` | Dummy | 0 = woman/other, 1 = man |
-| `education` | Ordinal | Educational attainment level |
-| `Black`, `Hispanic`, `OtherRace` | Dummy | Racial group identifiers |
-| `impact × ideology` | Interaction | Tests moderation by ideology |
-| `impact × race` | Interaction | Tests moderation by race |
-| `Deservingness × Contact` | Interaction | Moderation of deservingness effect |
-| `X_{i}' x controls` | Vector | Full vector of demographic and attitudinal controls |
+| Variable Name | Type | Description |   |
+|----|----|----|----|
+| `impact` | Binary | Any carceral or victimization contact |  |
+| `incarc` | Binary | Has been incarcerated |  |
+| `knowincarc` | Binary | Knows someone incarcerated |  |
+| `vict` | Binary | Has been victim of violent crime |  |
+| `prisonerdeserves` | Continuous | Centered deservingness of incarcerated people |  |
+| `prisonhelp` | Index | Support for prison-assistance policies |  |
+| `prisonpen` | Index | Support for punitive carceral policies |  |
+| `variance_help` | Continuous | Variance across prison-help policy support items |  |
+| `sd_help` | Continuous | Standard deviation of help-policy support items |  |
+| `polorientation` / `pol-or` | Index | General orientation toward social policy help |  |
+| `desor` | Continuous | Centered deservingness of help-receiving groups |  |
+| `Republican` | Dummy | Identifies as Republican |  |
+| `Democrat` | Dummy | Identifies as Democrat |  |
+| `ideology` | Index | Political ideology (0 = liberal, 1 = conservative) |  |
+| `Punitive` | Index | General punitive orientation |  |
+| `PenalPunitiveness` | Ordinal / Rescaled | Beliefs about punishment vs rehabilitation |  |
+| `PolicyDisposition` | Index | Support for redistributive and social help policies |  |
+| `fire_rare` | Likert (1–4) | Belief that racial problems are rare and isolated |  |
+| `fire_privilege` | Likert (1–4) | Belief that white people benefit from racial privilege |  |
+| `fire_angry` | Likert (1–4) | Anger about the existence of racism |  |
+| `fire_fear` | Likert (1–4) | Fear of people of other races |  |
+| `gender` | Dummy | 0 = woman/other, 1 = man |  |
+| `education` | Ordinal | Educational attainment level |  |
+| `Black`, `Hispanic`, `OtherRace` | Dummy | Racial group identifiers |  |
+| `impact × ideology` | Interaction | Tests moderation by ideology |  |
+| `impact × race` | Interaction | Tests moderation by race |  |
+| `Deservingness × Contact` | Interaction | Moderation of deservingness effect |  |
+| `X_{i}' x controls` | Vector | Full vector of demographic and attitudinal controls |  |
 
 ### Appendix B: Robustness Checks and Conditional Effects
 

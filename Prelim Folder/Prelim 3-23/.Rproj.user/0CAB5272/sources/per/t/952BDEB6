@@ -3,7 +3,7 @@
     "path": "~/Documents/GitHub/phd/Prelim Folder/Prelim 3-23/index-draft.qmd",
     "project_path": "index-draft.qmd",
     "type": "quarto_markdown",
-    "hash": "3213776336",
+    "hash": "268870890",
     "contents": "",
     "dirty": false,
     "created": 1760475465180.0,
@@ -16,16 +16,16 @@
         "Source": "Source",
         "docOutlineVisible": "1",
         "rmdVisualCollapsedChunks": "",
-        "rmdVisualModeLocation": "2:0",
+        "rmdVisualModeLocation": "997:445",
         "cursorPosition": "308,0",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1760900434,
+    "lastKnownWriteTime": 1762043193,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1760900434725,
+    "last_content_update": 1762043193137,
     "read_only": false,
     "read_only_alternatives": []
 }

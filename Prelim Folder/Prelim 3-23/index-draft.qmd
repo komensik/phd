@@ -309,7 +309,7 @@ This project also takes seriously the role of interpretation in shaping the poli
 ### A: Variable Dictionary
 
 | Variable Name | Type | Description |   |
-|------------------------|-------------|------------------------|-------------|
+|----|----|----|----|
 | `impact` | Binary | Any carceral or victimization contact |  |
 | `incarc` | Binary | Has been incarcerated |  |
 | `knowincarc` | Binary | Knows someone incarcerated |  |
