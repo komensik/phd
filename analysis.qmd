@@ -29,7 +29,7 @@ library(rsq)
 ```
 
 ```{r}
-
+here::here()
 raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data_may9.csv")
 
 #view(raw_data_cleaned)
