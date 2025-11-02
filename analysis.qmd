@@ -1153,7 +1153,7 @@ car::avPlots(m4_basic, terms = ~ desor_core + d_incppl_pris_abc + penalpoint + s
 Pairwise interpretation:
 
 | Relationship | Interpretation |   |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | desor_core & inc ppl | strong shared variance, likely suppression |  |
 | desorcore & ideo -0.37 | expected liberal/conservative |  |
 | desorcore & penalpoint: -0.19 | mild relationship |  |
@@ -1289,6 +1289,57 @@ The coefficient on the interaction term is -0.0003483
 
 ### M5_C : Interaction for Support of Carceral Policy Help with Mean-Centered Deservingness
 
+Centering by subtracting deservingness's mean from each observation so the new mean is 0. This should simplify interpretation of coefficients in the interaction model: the main-effect coefficient for deservingness will represent the effect of deservingness for the average respondent who is not impacted rather than at a value of 0 in the original 0-100 scale.
+
+```{r}
+
+x_data <- raw_data_cleaned |>
+  mutate(
+    d_inc_c = d_incppl_pris_abc - mean(d_incppl_pris_abc, na.rm = TRUE),
+    impact = as.integer(impact == 1)
+  )
+hist(x_data$d_inc_c)
+```
+
+Rerunning M5 with Mean-Centered Deservingness
+
+```{r}
+
+m5_c<-lm(prisonhelp ~ d_inc_c*impact + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+summary(m5_c)
+
+```
+
+M5_c Interpretation
+
+-   For non-impacted respondents, each 1 point increase in deservingness on a 0-100 scale is associated with 0.004 more support for prison help policies, on a 1-5 scale. To put in a larger scale, this also means a 10 point increase in incarcerated people deservingness scores predicts 0.04 more support. However, because deservingness scores for incarcerated people are fairly clustered around the mean, this does not mean a ton. However, it is highly significant (p \<0.001).
+
+-   Impacted respondents don't differ significantly in their baseline view of help policy from non-impacted people when deservingness scores for incarcerated people are held at their mean.
+
+-   The interaction (-0.00034, p = 0.76) says that the slope of deservingness scores does not differ significantly between impacted and non impacted groups. Deservingness scores predicts help policy support about the same as they do for impacted and non-impacted respondents.
+
+-   Penal point: a one unit change means a respondent sees the purpose of prison as more about punishment (7) than rehabilitation (1). A one unit change corresponds with a -0.03 increase in support ...this has to be wrongbut significant decrease in support for punitive policy.
+
+Takaway: Deservingness has a positive effect on help-oriented carceral policies, and this effect doesn't vary meaningfully between impacted and non impacted people.
+
+Simple Slopes
+
+```{r}
+
+slopes_m5c <- slopes(m5_c, variables = "d_inc_c", by = "impact")
+slopes_m5c
+
+pred_m5c <- predictions(m5_c, 
+                        newdata = datagrid(d_inc_c = seq(min(x_data$d_inc_c, na.rm = TRUE),
+                                                          max(x_data$d_inc_c, na.rm = TRUE),length = 100),
+                          impact = c(0,1)
+                        ))
+```
+
 ### Model 6: Interaction for Support of Carceral Policy Punishment
 
 $$
@@ -1299,6 +1350,57 @@ A significant interaction term (\$\\theta_3\$) would indicate that the effect of
 
 ```{r, m6}
 
+m6a<- lm(prisonpen ~ d_incppl_pris_abc * impact,
+            data = raw_data_cleaned)
+
+summary(m6a)
+
+m6b <- lm(prisonpen ~ d_incppl_pris_abc * impact,
+            data = raw_data_cleaned)
+
+m6 <- lm(prisonpen ~ d_incppl_pris_abc * impact + Republican + Democrat + fiscal_ideology + social_ideology + penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace, 
+            data = raw_data_cleaned)
+
+summary(m6)
 ```
 
 ### M6_C : Interaction for Support of Carceral Policy Punishment with Mean-Centered Deservingness
+
+Centering by subtracting deservingness's mean from each observation so the new mean is 0. This should simplify interpretation of coefficients in the interaction model: the main-effect coefficient for deservingness will represent the effect of deservingness for the average respondent who is not impacted rather than at a value of 0 in the original 0-100 scale.
+
+Rerunning M5 with Mean-Centered Deservingness
+
+```{r}
+
+m6c <- lm(prisonpen ~ d_inc_c*impact + Republican +
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+    
+summary(m6c)
+
+```
+
+M6c Interpretation
+
+-   For non-impacted respondents, each 1 point increase in deservingness on a 0-100 scale is associated with 0.005 more support for prison help policies, on a 1-5 scale. To put in a larger scale, this also means a 10 point increase in incarcerated people deservingness scores predicts 0.04 more support. However, because deservingness scores for incarcerated people are fairly clustered around the mean, this does not mean a ton. However, it is highly significant (p \<0.001).
+
+-   Impacted respondents don't differ significantly (0.009) in their baseline view of help policy from non-impacted people when deservingness scores for incarcerated people are held at their mean.
+
+-   The interaction (0.002, p = 0.84) says that the slope of deservingness scores does not differ significantly between impacted and non impacted groups. Deservingness scores predicts help policy support about the same as they do for impacted and non-impacted respondents.
+
+-   Penal point: a one unit change means a respondent sees the purpose of prison as more about punishment (7) than rehabilitation (1). A one unit change corresponds with a very small but significant decrease in support for punitive policy.
+
+Takaway: Deservingness has a positive effect on help-oriented carceral policies, and this effect doesn't vary meaningfully between impacted and non impacted people.
+
+```{r}
+slopes_m6c <- slopes(m6c, variables = "d_inc_c", by = "impact")
+slopes_m6c
+
+#predicted
+pred_m6c <- predictions(m6c, 
+                        newdata = datagrid(d_inc_c = seq(min(x_data$d_inc_c, na.rm = TRUE),
+                                                          max(x_data$d_inc_c, na.rm = TRUE),length = 100),
+                          impact = c(0,1)
+                        ))
+```
