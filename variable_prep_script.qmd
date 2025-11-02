@@ -994,7 +994,7 @@ print(var(c_across(all_of(prisonhelp)))
       
 ```
 
-####D1. Variance and Stand Dev why do I reconstruct?
+#### D1. Variance and Stand Dev why do I reconstruct?
 
 ```{r}
 #don't need to redo this
@@ -1012,7 +1012,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-###E. Prison Policy Orientation (polor) control
+### E. Prison Policy Orientation (polor) control
 
 ```{r}
 #| eval: false
@@ -1079,7 +1079,7 @@ raw_data_cleaned \<- raw_data_cleaned %\>% mutate(prisonpen = rowMeans(select(.,
 
 raw_data_cleaned \<- raw_data_cleaned %\>% mutate(prisonhelp = rowMeans(select(., q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev, q23_2_rev, q23_7_rev ), na.rm = TRUE))
 
-###F. FIRE controls
+### F. FIRE controls
 
 ```{r}
 
@@ -1115,7 +1115,7 @@ summary(raw_data_cleaned$fire_rare)
 
 ```
 
-###G. Race
+### G. Race
 
 ```{r}
 
@@ -1172,7 +1172,7 @@ table(
 
 Diagnosed problem in model where Black + Other dropped - Oct 27 Suggests all Black respondents had missing data so were dropped
 
-###H. Party + Ideology controls
+### H. Party + Ideology controls
 
 ```{r}
 
@@ -1188,7 +1188,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
     Republican = ifelse(dem101 == 1, 1, 0),
     Democrat = ifelse(dem101 == 2, 1, 0)
   )
-
+(raw_data_cleaned$Republican)
 
 #clean ideology
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -1206,7 +1206,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-###I. Gender
+### I. Gender
 
 ```{r, gender}
 #raw_data_cleaned %>% count(q55)

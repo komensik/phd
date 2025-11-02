@@ -4,47 +4,315 @@ format: pdf
 editor: visual
 ---
 
+---
+title: "Memo: Contact → Deservingness Diagnostics"
+format: pdf
+---
+
 ## Purpose
 
-This memo documents the analytic logic behind tests used to evaluate how distinct forms of contact with the criminal legal system—**incarceration experience (`incarc`)**, **knowing someone incarcerated (`impact`)**, and **victimization (`vict`)**—relate to attitudes toward carceral citizens (`d_incppl_pris_abc`).\
-Models account for ideology, punitiveness, race, and a control for generalized deservingness attitudes (`desor_core`).
-
-Each diagnostic test clarifies a different feature of model fit, explanatory power, or robustness.
+This memo documents the diagnostic analyses evaluating how distinct forms of contact with the criminal legal system—**incarceration experience** (`incarc`), **proximate contact** (`knowincarc`), and **victimization** (`vict`)—relate to perceived deservingness of incarcerated people (**DV:** `d_incppl_pris_abc`, 0–100).\
+Models include party ID, ideology, punitiveness, FIRE items, demographics, and a **generalized deservingness** control (`desor_core`). Analyses are unweighted and emphasize *model behavior*, *explanatory power*, and *unique variance*, not publication-ready estimates.
 
 ------------------------------------------------------------------------
 
-## 1. Base and Full Regression Models
+## Data Snapshot
 
-\`\`\`r lm(d_incppl_pris_abc \~ incarc + controls, data = raw_data_cleaned) coeftest(model, vcov = vcovHC(model, type = "HC1")) Purpose: Estimate the association between experiential exposure and policy attitudes, adjusting for covariates. Why: Baseline coefficients quantify direction and magnitude; robust SEs confirm inference stability under heteroskedasticity.
-
-2.  Univariate Explanatory Power r Copy code lm(d_incppl_pris_abc \~ each_variable) Purpose: Evaluate how much outcome variance each variable explains alone. Metrics: Adjusted R² (fit adjusted for model size) and AIC (model parsimony). Why: Identifies the most powerful standalone predictors. Finding: desor_core explains ≈ 30% of variance; experiential variables \< 1%.
-
-3.  Incremental Δ Adjusted R² Tests r Copy code base \<- lm(d_incppl_pris_abc \~ incarc) expanded \<- lm(d_incppl_pris_abc \~ incarc + control) ΔR2 \<- summary(expanded)$adj.r.squared - summary(base)$adj.r.squared Purpose: Quantify additional variance explained when each control is added beyond the focal contact variable. Why: Distinguishes variables that materially improve model fit from those that do not. Finding: Adding desor_core raises Adj R² \~ +0.24; other controls negligible.
-
-4.  Semi-Partial R² (Unique Variance) r Copy code library(rsq) rsq.partial(full_model, type = "sp") Purpose: Measure each predictor’s unique contribution within the full model. Why: Shows which variables independently account for outcome variance. Finding: desor_core ≈ 0.23 (23% unique variance); incarc ≈ 0.009; vict ≈ 0.0006—attitudes dominate, contact adds a small independent effect.
-
-5.  Standardized Coefficients r Copy code sd_y \<- sd(outcome) sd_x \<- sapply(model.frame(model)\[-1\], sd, na.rm=TRUE) std_beta \<- coef(model) \* (sd_x / sd_y) Purpose: Put predictors on a common SD scale to compare relative magnitude. Why: Reveals effect size independent of measurement units. Finding: desor_core β ≈ 0.50; incarc β ≈ 0.08; vict β ≈ 0.02—deservingness has the strongest standardized influence.
-
-6.  Robustness & Missingness Models report “( n obs deleted due to missingness )” confirming listwise deletion only.
-
-All summary statistics computed with na.rm = TRUE.
-
-vict has smaller effective n (277 “yes” responses), consistent with survey structure.
-
-Why: Confirms differences in N are expected and not due to coding loss.
-
-7.  Key Interpretive Logic Statistic What It Tests How It Informs Decisions AIC Model fit + parsimony Compare models’ overall adequacy Adjusted R² Total variance explained Gauge overall explanatory power Δ Adj R² Added variance from new control Identify influential covariates Semi-partial R² Unique variance per predictor Quantify independent contribution Standardized β Effect size comparability Rank predictors’ substantive strength Robust SEs Heteroskedasticity check Validate significance robustness Missingness checks Data integrity Verify sample comparability
-
-8.  Core Findings & Modeling Decisions desor_core (general deservingness attitudes) overwhelmingly predicts support for carceral-citizen policies.
-
-incarc shows a small but statistically significant independent effect; vict does not.
-
-Because desor_core strongly correlates with both policy support and contact, it is retained as a control in all models to isolate the independent impact of experiential exposure.
-
-This memo encapsulates the analytic logic so a reviewer or future collaborator (or ChatGPT session) immediately understands why each statistic is used and what inferential role it plays.
-
-yaml Copy code
+-   N (rows used across sections): \~2,222; all variables numeric.\
+-   DV distribution: mean ≈ **46**, SD ≈ **28**, modest right skew (0–100).\
+-   Contact prevalence: **8%** `incarc`, **31%** `knowincarc`, **12%** `vict` (expected imbalance).\
+-   Missingness: ideology has more missing than other covariates; models use listwise deletion.
 
 ------------------------------------------------------------------------
 
-That version will render cleanly in Quarto or Markdown; if you drop it in a `.qmd` or `.md`, it will preserve headers, code blocks, and tables exactly.
+## Tests and What Each Tells Us
+
+### 1. Base and Full Models (with HC1 robust SEs)
+
+```{r}
+lm(d_incppl_pris_abc ~ contact + controls)
+coeftest(model, vcov = vcovHC(model, type = "HC1"))
+```
+
+**Purpose:** Estimate direction and magnitude of associations; inference robust to heteroskedasticity.
+
+**Key coefficients (full models):**
+
+| Predictor | Estimate | SE | p-value | Interpretation |
+|----|----|----|----|----|
+| `incarc` | +8.70 | 2.31 | \<.001 | Direct incarceration → higher deservingness |
+| `knowincarc` | +5.35 | 1.25 | \<.001 | Knowing someone incarcerated → higher deservingness |
+| `vict` | +1.83 | 1.84 | n.s. | Victimization effect small / unreliable |
+| `desor_core` | +0.74 | 0.035 | ≪ .001 | Strong positive relationship |
+| `social_ideology` | −1.96 | 0.85 | .02 | Conservative orientation → lower deservingness |
+| `penalpoint` | −1.18 | 0.35 | \<.001 | Punitiveness → lower deservingness |
+
+------------------------------------------------------------------------
+
+### 2. Univariate Explanatory Power (Adj. R² and AIC)
+
+Writing
+
+------------------------------------------------------------------------
+
+lm(d_incppl_pris_abc \~ each_variable)
+
+Text
+
+**Purpose:** Evaluate how much outcome variance each variable explains alone.\
+
+**Metric:** Adjusted R² (fit adjusted for model size) and AIC (parsimony).
+
+**Findings (sorted by Adj. R²):**
+
+| Variable          | Adj. R²     | Interpretation                   |
+|-------------------|-------------|----------------------------------|
+| `desor_core`      | 0.30        | Explains 30% of outcome variance |
+| `social_ideology` | 0.08        | Moderate relationship            |
+| `fiscal_ideology` | 0.076       | Moderate relationship            |
+| FIRE items        | 0.045–0.057 | Smaller                          |
+| `penalpoint`      | 0.036       | Smaller                          |
+| Partisanship      | 0.034–0.035 | Smaller                          |
+| Contact vars      | \< 0.02     | Minimal alone                    |
+
+------------------------------------------------------------------------
+
+### 3. Incremental Δ Adjusted R² Tests
+
+Writing
+
+------------------------------------------------------------------------
+
+ΔR2 \<- summary(expanded)\$adj.r.squared - summary(base)\$adj.r.squared
+
+Text
+
+**Purpose:** Quantify added variance from each control beyond a contact-only model.\
+
+**Finding:** Adding `desor_core` raises Adj. R² by ≈ **+0.24**; other controls negligible.\
+
+**Note:** Sensitive to listwise N differences—use descriptively.
+
+------------------------------------------------------------------------
+
+### 4. Semi-Partial R² (Unique Variance in Full Model)
+
+Writing
+
+------------------------------------------------------------------------
+
+library(rsq)\
+rsq.partial(full_model, type = "sp")
+
+Text
+
+**Purpose:** Measure each predictor’s unique contribution within the full model.
+
+**Unique Variance (Semi-partial R²):**
+
+| Variable          | Incarcerated | Victimized | Proximate |
+|-------------------|--------------|------------|-----------|
+| `desor_core`      | 0.2266       | 0.2263     | 0.2252    |
+| Contact           | 0.0090       | 0.0006     | 0.0115    |
+| `penalpoint`      | 0.0073       | 0.0066     | 0.0070    |
+| `social_ideology` | 0.0036       | 0.0033     | 0.0036    |
+
+**Takeaway:** Attitudes ≫ contact ≫ ideology/punitiveness.
+
+------------------------------------------------------------------------
+
+### 5. Standardized Coefficients (β\*)
+
+Writing
+
+------------------------------------------------------------------------
+
+β\* = β \* sd(X) / sd(Y)
+
+Text
+
+**Purpose:** Put predictors on a common SD scale to compare magnitudes.\
+
+(Intercept not standardized.)
+
+| Predictor         | β\*   | Interpretation      |
+|-------------------|-------|---------------------|
+| `desor_core`      | 0.51  | Strongest predictor |
+| `incarc`          | 0.08  | Modest, positive    |
+| `knowincarc`      | 0.06  | Modest, positive    |
+| `vict`            | 0.02  | Small, not sig.     |
+| `social_ideology` | −0.11 | Negative            |
+| `penalpoint`      | −0.08 | Negative            |
+
+------------------------------------------------------------------------
+
+## Core Conclusions
+
+1.  
+
+2.  
+
+    **Generalized deservingness (`desor_core`) dominates** perceived deservingness of incarcerated people (≈30% total, ≈23% unique, β\*≈0.51).
+
+3.  
+
+4.  
+
+    **Contact variables** have positive, independent, but modest effects: incarceration and proximate contact are significant; victimization is not.
+
+5.  
+
+6.  
+
+    **Attitudinal and ideological controls** (punitiveness, social ideology) are consistent but smaller.
+
+7.  
+
+8.  
+
+    **Party ID, FIRE items, and demographics** are negligible once attitudes are controlled.
+
+## Modeling Decisions
+
+-   
+
+-   
+
+    Retain `desor_core` as a control in all subsequent models (major confounder).
+
+-   
+
+-   
+
+    Continue to policy outcomes (`prisonhelp`, `prisonpen`) using the same control set.
+
+-   
+
+-   
+
+    Test **mediation:** `contact → desor_core → policy attitude`.
+
+-   
+
+-   
+
+    Add robustness: weights, block-restricted, and alternative racial-attitudes batteries.
+
+-   
+
+------------------------------------------------------------------------
+
+## Figures and Tables (Committee-Facing)
+
+| Element         | Description                                         |
+|-----------------|-----------------------------------------------------|
+| **Figure A1**   | DV density (mean ≈ 46, SD ≈ 28)                     |
+| **Table A2**    | Cross-tabs of contact types                         |
+| **Table B1**    | Univariate Adj. R² (sorted)                         |
+| **Tables 1–12** | Model coefficients, semi-partial R², standardized β |
+| **Figure C1**   | Semi-partial R² bars: `desor_core` ≫ others         |
+| **Figure C2**   | ΔAdj. R² gain when adding `desor_core`              |
+
+stored objects for reference
+
+```{r}
+# Descriptives
+summary_table; dv_density_data; contact_crosstab
+
+# Model Coefficients
+coef_table_incarc; coef_table_vict; coef_table_prox
+
+# Unique Variance
+sp_table_inc; sp_table_v; sp_table_prox
+
+# Standardized Betas
+table_std_incarc; table_std_vict; table_std_prox
+
+# Bivariate Diagnostics
+results_inc; results_vict; results_prox
+
+# Incremental Fit
+minc_incr2; mvict_incr2; mprox_incr2
+
+# N Checks
+ncheck_inc; ncheck_vict; ncheck_prox
+
+# Cross-Model Summary
+contact_model_summary
+
+```
+
+## Bridge to Next Phase: Policy + Mediation
+
+Next analyses will shift to **policy outcomes** (`prisonhelp`, `prisonpen`) to examine whether contact influences support for criminal-justice policies directly and/or indirectly through deservingness perceptions.
+
+**Planned analyses:**
+
+1.  
+
+2.  
+
+    **Direct effects:**
+
+    ```         
+    lm(prisonhelp ~ contact + desor_core + controls)
+    lm(prisonpen  ~ contact + desor_core + controls)
+    ```
+
+3.  
+
+4.  
+
+    **Mediation:**
+
+    ```         
+    mediation::mediate(model_m, model_y, treat = "contact", mediator = "desor_core")
+    ```
+
+5.  
+
+6.  
+
+    **Robustness checks:**
+
+    -   
+
+    -   
+
+        Weighted models
+
+    -   
+
+    -   
+
+        Block-restricted subsets
+
+    -   
+
+    -   
+
+        Alternative racial-attitudes controls
+
+    -   
+
+7.  
+
+8.  
+
+    **Outputs:**\
+
+    Report standardized β and semi-partial R² for all policy and mediation models to parallel this stage.
+
+9.  
+
+------------------------------------------------------------------------
+
+## Quick Glossary
+
+| Statistic | What It Tests | Use |
+|----|----|----|
+| **Adj. R²** | Overall model fit | Assess explanatory power |
+| **ΔAdj. R²** | Incremental fit from added variable | Descriptive variable importance |
+| **Semi-partial R²** | Unique variance | Primary “importance” metric |
+| **Standardized β** | Scaled effect size | Compare across predictors |
+| **HC1 SEs** | Robust inference | Validate significance under heteroskedasticity |

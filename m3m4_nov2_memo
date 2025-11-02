@@ -1,0 +1,135 @@
+Summary of M3/M4 and Nov 2nd Analyses
+
+Session Summary: Nov 2 — Policy Models (M3–M5)
+Purpose
+
+We analyzed how perceptions of incarcerated people’s deservingness and contact with the criminal legal system relate to support for carceral policy outcomes.
+Models 3–5 build directly on Hypothesis 2 (H2): more generous perceptions of carceral citizens’ deservingness predict greater support for help-oriented policies and lower support for punitive ones.
+
+✅ Models Covered
+M3: Help-policy model (prisonhelp)
+lm(prisonhelp ~ d_incppl_pris_abc + impact +
+    Republican + Democrat + fiscal_ideology + social_ideology +
+    penalpoint + desor_core + fire_rare + fire_privilege +
+    fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+    data = raw_data_cleaned)
+
+
+Findings
+
+d_incppl_pris_abc → positive, significant (b = 0.004, p < .001).
+A 10-point increase in deservingness ≈ 0.04-point increase on the 1–5 help-support scale.
+
+impact → small, n.s.
+
+Partisanship (Rep/Dem) → lower support vs. Independents.
+
+penalpoint → negative, highly significant.
+
+desor_core → slightly negative, n.s.
+
+Adj R² ≈ 0.13.
+
+Diagnostics
+
+VIFs all < 5 → no multicollinearity.
+
+Cook’s D → no major outliers.
+
+Semi-partial R²: d_incppl_pris_abc ≈ 0.02 (largest unique share).
+
+Δ Adj R² when adding desor_core ≈ +0.005 → negligible.
+
+Correlations show desor_core and d_incppl_pris_abc r = 0.55, confirming overlap.
+Residualized desor_core → r ≈ 0.07 with prisonhelp → redundancy, not suppression.
+
+M4: Punitive-policy model (prisonpen)
+
+Same specification as M3.
+
+Findings
+
+d_incppl_pris_abc → negative, significant (b = –0.005, p < .001).
+
+impact → positive, significant (b ≈ 0.10, p ≈ .02).
+
+Fiscal/social ideology → negative, significant.
+
+penalpoint → negative, p < .001.
+
+FIRE items: fire_privilege and fire_angry reduce punitiveness; fire_fear positive (.05 level).
+
+Adj R² ≈ 0.16.
+
+⚙️ Control Variable: desor_core
+
+Constructed as the mean deservingness rating (0–100) for “help-needing” groups: TANF, SNAP, Medicaid, Medicare, unemployed, poor families, homeless, immigrants, undocumented.
+High = more generous orientation.
+Reliability: α ≈ 0.91.
+
+Role: included to isolate effects specific to incarcerated-group deservingness.
+Empirical result: strongly correlated with d_incppl_pris_abc (r = .55) but adds < 0.1 % unique variance; effect of incarcerated-specific deservingness remains robust.
+
+Interpretation paragraph (already finalized):
+
+To isolate the unique relationship between respondents’ perceptions of incarcerated people and their policy preferences, both models include a control for general deservingness orientation (desor_core) … [paragraph as finalized above].
+
+⚖️ Diagnostic Summary
+Test	Result	Takeaway
+VIFs	all < 5	No collinearity issue
+Cook’s D	none > 4/n	No influential outliers
+Semi-partial R²	d_incppl_pris_abc ≈ 0.02 → dominant	Specific deservingness most explanatory
+Δ Adj R² (add desor_core)	≈ +0.005	Minimal additional fit
+Correlations	desor_core ~ d_incppl_pris_abc = 0.55; both ~ ideology ≈ –0.35	Shared attitudinal base
+Residual check	Residualized desor_core r ≈ 0.07 with prisonhelp	Redundancy, not suppression
+🧩 Model 5: Interaction (Deservingness × Impact)
+m5 <- lm(prisonhelp ~ d_incppl_pris_abc * impact +
+          Republican + Democrat + fiscal_ideology + social_ideology +
+          penalpoint + desor_core + fire_rare + fire_privilege +
+          fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+          data = raw_data_cleaned)
+
+
+Model logic
+
+Tests whether the effect of deservingness on policy support differs by contact (impact).
+
+Interaction term d_incppl_pris_abc:impact → not significant (p ≈ 0.40 no-controls; p ≈ 0.76 with controls).
+
+Interpretation: the positive effect of deservingness on help-policy support is statistically similar across contact groups.
+
+🪜 Model Progression Overview
+Model	Focus	Role in framework
+M3 & M4	Main effects	Baseline test of H2 (deservingness → policy)
+M5 & M6	Interaction (Deservingness × Contact)	Tests moderation — does contact condition the effect?
+M7 & M8	Mediation	Tests indirect path Contact → Deservingness → Policy
+M9 & M10	Robustness/consistency	Extends to general help orientation & response variance
+🧾 Nov 2 To-Do List (for continuation)
+
+Re-run M5–M6 analyses with centered deservingness (mean-center to improve interpretability).
+
+Plot interactions (interactions::interact_plot).
+
+Compute simple slopes (marginaleffects::slopes) for each contact group.
+
+Confirm coding of impact, desor_core, penalpoint (direction & scaling).
+
+Run mediation models (M7–M8) once M5–M6 are finalized.
+
+Optional robustness:
+
+Drop one of the ideology measures (high r = 0.87).
+
+Weighted models or block-restricted subsets.
+
+Draft transition text: “While M3–M4 establish the baseline relationship … M5–M6 test whether this relationship varies by contact experience …”
+
+💡 Key Takeaway for Future You / New Session
+
+d_incppl_pris_abc = main attitudinal driver of both help and punishment policy preferences.
+
+desor_core serves as a conceptual control, not an explanatory factor.
+
+Contact (impact) has negligible direct effects, no moderating effect yet, and will next be examined as a mediator.
+
+Diagnostics confirm model stability, appropriate scaling, and no multicollinearity.

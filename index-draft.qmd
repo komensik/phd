@@ -196,7 +196,10 @@ While not central to my theoretical framework, I also explore whether the effect
 
 To I distinguish among types of contact (H1, H1A,H1B), I estimate separate models in which the impact variable is disaggregated into binary indicators for each type (e.g., been incarcerated, knows someone incarcerated, victim of violent crime). This allows me to test which forms of contact are associated with more generous perceptions, and whether the effects differ in magnitude or direction.
 
-##### Model 2: Incarcerated, Know Incarcerated, Victimized on Deservingness
+**in analyses, M1 is without controls and M1c is with controls Nov 2**
+
+##### Model 2: Incarcerated, Know Incarcerated, Victimized on Deservingness (minc, mki, mv)
+
 
 $$
 \texttt{prisonerdeserves}_{i} = \beta_0 + \beta_1 \cdot \texttt{incarc}_{i} + \beta_2 \cdot \texttt{knowincarc}_{i} + \beta_3 \cdot \text{vict}_{i} + \beta_4 \cdot \texttt{des\_or}_{i} + \beta_5 \cdot \texttt{controls}_{i} + u_{i}
