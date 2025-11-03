@@ -535,7 +535,7 @@ Find from adjusted R2 (explaining spread) that:
 
 -   impact explains very little – 1.5%
 
-**Penal Point Variable – Keeping This Here because this Var Keeps on tripping you out – the correlation is -1 so it is in fact reverse coded! You will keep doubting this! Nov 2**
+**Penal Point Variable – Keeping This Here because this Var Keeps on tripping you out – the correlation is -1 so it is in fact reverse coded! You will keep doubting this! Nov 2.**
 
 ```{r, echo=FALSE}
 }
@@ -575,6 +575,18 @@ hist(8 - raw_data_cleaned$q62_1, main="What a Reverse Looks Like")
 
 
 ```
+
+**Prisonhelp and Prisonpen were more problematic after verification. The takeaway (Nov 2) is:**
+
+-   Both prisonhelp and prisonpen now have "don't know" as Prisonhelp is constucted with both 1-5 (5 originally don't know) and 1-3.
+
+Support for punitive and help-oriented criminal justice policies were measured using items from the Q25 and Q23 survey batteries. Each item was originally presented on a four-point Likert scale ranging from *Strongly favor (1)* to *Strongly oppose (4)*, with an additional *Don’t know / No opinion (5)* option. Consistent with conventions in survey research on ambivalence and policy preferences (e.g., Ansolabehere, Rodden, & Snyder 2008; Bartels 2016), “Don’t know” responses were recoded to the midpoint (2.5) to represent a neutral position rather than treated as missing. This approach preserves respondents with low political engagement or weak opinions and aligns the indices with other continuous measures that center on a neutral midpoint (e.g., 0–100 deservingness scales).
+
+The **punitive policy index** (`prisonpen`) averages responses to support for the *death penalty* and *life without parole* (Q25_1, Q25_5). Higher values indicate greater opposition to punitive policy (i.e., a less punitive orientation).
+
+The **help-oriented policy index** (`prisonhelp`) averages six items: four prison policy questions (Q25_2, Q25_3, Q25_4, Q25_6) and two election-related questions (Q23_2, Q23_7) concerning voting rights for currently or formerly incarcerated people. All items were reverse-coded so that higher values reflect stronger support for help-oriented or rehabilitative policies.
+
+Both indices range from 1 (strongly oppose) to 4 (strongly favor), with 2.5 representing a neutral midpoint. Each index thus provides a continuous measure of policy support, facilitating direct comparison across respondents and between punitive and rehabilitative domains.
 
 ## 3. M2: by Impact
 

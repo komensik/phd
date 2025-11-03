@@ -812,7 +812,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #### "Punitiveness" - Prison for punishment or rehab?
 
 ```{r, punishorrehab}
-#for 62_1, originally 1 was punish and 7 was rehabilitate people
+#Originally 62_1 with 1  punish and 7  rehabilitate people
 
 # Renamed raw column to a more intuitive name
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -847,40 +847,36 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #### Support for Punitive Prison Policy (death penalty and LWOP) - prisonpen
 
 ```{r, prisonpen}
-#Q25_1 and Q25_5, death penalty and LWOP
- #raw_data_cleaned %>% count(Q25_1)
+#ORIGINALLY Q25_1 and Q25_5, death penalty and LWOP (1 = strongly favor 4 = strongly oppose, 5 = don't know)
 
-#recode Q25_1:  -99 (na_if converts to numeric)
+#recode Q25_1 and Q25_5:  -99 (na_if converts to numeric)
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(q25_1 = na_if(as.numeric(q25_1), -99))
-
-# Recode Q25_5 the same way
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(q25_5 = na_if(as.numeric(q25_5), -99))
-
-# Code prisonpen subitems (dpen, lwop), NA if "Don't know" (5)
+  mutate(q25_1 = na_if(as.numeric(q25_1), -99),
+         q25_5 = na_if(as.numeric(q25_5), -99)
+                )
+         
+# Code prisonpen subitems (dpen, lwop),  "Don't know" becomes midpoint
 # Create cleaned subcomponents
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    prisonpen_1 = case_when(q25_1 %in% 1:4 ~ q25_1, TRUE ~ NA_integer_),
-    prisonpen_5 = case_when(q25_5 %in% 1:4 ~ q25_5, TRUE ~ NA_integer_)
+    prisonpen_1 = case_when(
+      q25_1 %in% 1:4 ~ q25_1,
+      q25_1 == 5 ~ 2.5,
+      TRUE ~ NA_real_
+    ),
+    prisonpen_5 = case_when(
+      q25_5 %in% 1:4 ~ q25_5,
+      q25_5 == 5 ~ 2.5,
+      TRUE ~ NA_real_
+    )
   )
 
 # Compute index (after subcomponents exist)
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(prisonpen = rowMeans(select(., prisonpen_1, prisonpen_5), na.rm = TRUE))
-
-#unsure if above worked
-
-#different way to confirm that prison pen was constructed right -- confirmed that summary of new prison pen is same as old version. Keep using prisonpen.
-mutate(prisonpen = rowMeans(select(., c(prisonpen_1, prisonpen_5)), na.rm = TRUE))
 
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(prisonpen_redo = rowMeans(across(c(prisonpen_1, prisonpen_5)), na.rm = TRUE))
-
-summary(raw_data_cleaned$prisonpen_1)
-summary(raw_data_cleaned$prisonpen_5)
-summary(raw_data_cleaned$prisonpen)
+  rowwise() %>%  # tells dplyr to treat eaach row as own group so c_across() can return row level vector of cols for that row
+  mutate(prisonpen = mean(c_across(c(prisonpen_1, prisonpen_5)), na.rm = TRUE)) %>%
+  ungroup()
 
 ```
 
@@ -904,6 +900,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 These will include prison and election policies. Here, I first set up the prison policy Q's, then prison/voting Q's.
 
 ```{r, prisonhelp}
+# Originally 1 = strong favor, 4 = strong oppose, 5 = don't know
 # Define Q25 help-oriented items
 q25_help_items <- c("q25_2", "q25_3", "q25_4", "q25_6")
 
@@ -911,11 +908,18 @@ q25_help_items <- c("q25_2", "q25_3", "q25_4", "q25_6")
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(all_of(q25_help_items), ~ na_if(as.numeric(.), -99)))
 
-# Step 2: Create reverse-coded versions (1 = strong favor → 4 = strong oppose becomes 4 → 1)
+# Step 2: Create reverse-coded versions (1 = strong favor → 4 = strong oppose becomes 4 → 1 so higher means more support for help oriented policyaQ                                                 )
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
     all_of(q25_help_items),
-    ~ ifelse(. %in% 1:4, 5 - ., .),  # note: we skip 5 = DK
+    ~ case_when(
+    . == 1 ~ 4,           # strongly favor → strongly support help
+    . == 2 ~ 3,
+    . == 3 ~ 2,
+    . == 4 ~ 1,
+    . == 5 ~ 2.5,         # DK = neutral midpoint
+    TRUE ~ NA_real_
+  ),  # note: we skip 5 = DK
     .names = "{.col}_rev"
   ))
 
@@ -940,47 +944,48 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 Delivers: q25_help_items
 
-##### Add Prison/Election (q23) questions to Above
+##### Add Election (q23) questions to Above
 
 ```{r, electionhelpqs}
 
-# Step 1: Recode -99 to NA and ensure numeric
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(all_of(q25_help_items), ~ na_if(as.numeric(.), -99)))
+names(raw_data_cleaned) %>% stringr::str_subset("q25|q23")
 
-# Step 2: Create reverse-coded versions (1 = strong favor → 4 = strong oppose becomes 4 → 1)
+# Define Q23 help-oriented items (election - q23_2 is elects_reenfranchise and q23_7 is voting in jail (Requiring that jail and election officers ensure that people who are eligible to vote while incarcerated are able to exercise that right.) OG 1 = favor, 2 = oppose, 3 = DK
+
+q23_help_items <- c("q23_2", "q23_7")
+
+#recode -99 and ensure numeric
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(all_of(q23_help_items), ~ na_if(as.numeric(.), -99)))
+
+#recode 1-3 scale to match direction of prison help items 
+# here, 1 = favor, 2 = oppose, 3 = DK
+# we want higher = more support for help-oriented policy so 1-> 3, 2-> 1, 3 -> NA
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
-    all_of(q25_help_items),
-    ~ ifelse(. %in% 1:4, 5 - ., .),  # note: we skip 5 = DK
+    all_of(q23_help_items),
+    ~ case_when(
+      . == 1 ~ 4,
+      . == 2 ~ 1,
+      . == 3 ~ 2.5,
+      TRUE ~ NA_real_
+    ),
     .names = "{.col}_rev"
   ))
 
-# Step 3: Create ordered factor versions (optional, if needed for plotting or labeling)
+# Rescale the 1–3 items (after reversing) to 1–4 range
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(
-    all_of(q25_help_items),
-    ~ factor(.,
-             levels = 1:5,
-             labels = c("Strongly favor", "Favor", "Oppose", "Strongly oppose", "Don't know"),
-             ordered = TRUE),
-    .names = "{.col}_ord"
-  ))
+  mutate(across(c(q23_2_rev, q23_7_rev),
+                ~ scales::rescale(., to = c(1, 4))))
 
+# now -- prisonhelp composite index (average of 6 items)
 
-names(raw_data_cleaned) %>% stringr::str_subset("q25|q23")
-
-# Define Q23 help-oriented items (election)
-
-
-# prisonhelp index
-
-# Construct composite index (average of 6 items)
 # rev gives reverse version of the arguments
+
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(prisonhelp = rowMeans(select(., 
-    q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev, q23_2_rev, q23_7_rev
-  ), na.rm = TRUE))
+  rowwise() %>%  # tells dplyr to treat eaach row as own group so c_across() can return row level vector of cols for that row
+  mutate(prisonhelp = mean(c_across(c(q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev, q23_2_rev, q23_7_rev)), na.rm = TRUE)) %>%
+  ungroup()
 
 
 #checking that above (construction of prisonhelp) worked even though codechunk won't re-run. 
