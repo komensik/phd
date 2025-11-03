@@ -425,6 +425,7 @@ table_a %>%
   tab_header(title = "Appendix Table A. Basic Contact Types") %>%
   tab_options(table.font.size = "small")
 
+write
 ```
 
 ```{r}
@@ -1257,6 +1258,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```{r}
 write_csv(raw_data_cleaned, "data/cleaned/coded_data_may9.csv")
+
 ```
 
 # ARCHIVED

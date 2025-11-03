@@ -23,19 +23,17 @@ library(kableExtra)
 
 ```
 
-
 ## Results: Diagnostic Analyses of Contact and Deservingness
 
 ### Overview
 
-These results document the exploratory and diagnostic tests used to evaluate how distinct forms of contact with the criminal legal system—**incarceration experience (`incarc`)**, **knowing someone incarcerated (`knowincarc`)**, and **victimization (`vict`)**—relate to perceived deservingness of incarcerated people (`d_incppl_pris_abc`).  
+These results document the exploratory and diagnostic tests used to evaluate how distinct forms of contact with the criminal legal system—**incarceration experience (`incarc`)**, **knowing someone incarcerated (`knowincarc`)**, and **victimization (`vict`)**—relate to perceived deservingness of incarcerated people (`d_incppl_pris_abc`).\
 Analyses are **unweighted** and focus on data integrity, model performance, and variable behavior rather than publication-ready estimates.
 
 ```{r, echo=FALSE}
 load("data/analysis_objects.RData")
 
 ```
-
 
 ### I. Descriptive Diagnostics
 
@@ -48,7 +46,7 @@ summary_table
 
 Figure A1 shows that perceived deservingness of incarcerated people centers near 46 on a 0–100 scale (SD ≈ 28), with modest right skew. Roughly 8 % of respondents report having been incarcerated, 31 % know someone who has, and 12 % report victimization (Table A2)
 
-#### Figure A1. Density of Dependent 
+#### Figure A1. Density of Dependent
 
 ```{r, echo=FALSE}
 
@@ -73,7 +71,7 @@ kbl(coef_table_prox, caption = "Table 1. Coefficients for M2 – Victimized") %>
 
 ```
 
-In bivariate models, desor_core alone explains about 30 % of the variance in deservingness, dwarfing all other predictors (Table B1). Ideological measures account for 7–8 % of variance; punitiveness about 3–4 %. Carceral‐contact variables each explain < 1 % of variance individually.
+In bivariate models, desor_core alone explains about 30 % of the variance in deservingness, dwarfing all other predictors (Table B1). Ideological measures account for 7–8 % of variance; punitiveness about 3–4 %. Carceral‐contact variables each explain \< 1 % of variance individually.
 
 #### Table B1: Adjusted R² and AIC for each predictor (sorted by Adj. R²).
 
@@ -87,9 +85,7 @@ In bivariate models, desor_core alone explains about 30 % of the variance in des
 
 #### Table 1. Coefficients for M2 - Incarcerated
 
-
 #### Table 2. Semi-partial R2 - Incarcerated
-
 
 #### Table 3. Standardized betas - Incarcerated
 
@@ -97,24 +93,17 @@ In bivariate models, desor_core alone explains about 30 % of the variance in des
 
 #### Table 1. Coefficients for M2 - Victimized
 
-
 #### Table 2. Semi-partial R2 - Victimized
 
-
 #### Table 3. Standardized betas - Victimized
-
 
 #### A. M2 - Proximate
 
 #### Table 1. Coefficients for M2 - Proximate
 
-
 #### Table 2. Semi-partial R2 - Proximate
 
-
 #### Table 3. Standardized betas - Proximate
-
-
 
 ### IV. Cross-Model Comparison
 
@@ -124,7 +113,7 @@ A 10-point increase in desor_core predicts roughly a 7.4-point higher deservingn
 
 The standardized coefficient (β ≈ 0.51) indicates a half-SD shift in the outcome for each SD increase in desor_core.
 
-incarc (+8.7, p < .001) and knowincarc (+5.4, p < .001) also raise perceived deservingness, but their standardized effects are modest (β ≈ 0.08 and β ≈ 0.06, respectively).
+incarc (+8.7, p \< .001) and knowincarc (+5.4, p \< .001) also raise perceived deservingness, but their standardized effects are modest (β ≈ 0.08 and β ≈ 0.06, respectively).
 
 Victimization is positive but not significant (β ≈ 0.02).
 
@@ -132,14 +121,11 @@ More socially conservative and punitive respondents view incarcerated people as 
 
 Partisan identification, FIRE items, and demographics contribute negligibly.
 
-Variance Decomposition:
-Semi-partial R² values underscore the hierarchy of explanatory power (Figure C1). General deservingness beliefs (desor_core) uniquely account for about 23 % of explained variance in deservingness judgments, whereas experiential contact adds only 0.6–1.1 %, and ideology or punitiveness add around 0.7 % each.
-
+Variance Decomposition: Semi-partial R² values underscore the hierarchy of explanatory power (Figure C1). General deservingness beliefs (desor_core) uniquely account for about 23 % of explained variance in deservingness judgments, whereas experiential contact adds only 0.6–1.1 %, and ideology or punitiveness add around 0.7 % each.
 
 These results suggest that attitudinal orientations about help and deservingness dominate, but personal contact with the carceral system still exerts an independent, substantively meaningful effect. Direct or proximate experience corresponds to more generous views of incarcerated people, while victimization does not.
 
 ## written oct 31
-
 
 In a series of bivariate regressions, I examined how much variation in deservingness perceptions of incarcerated people (`d_incppl_pris_abc`) each control variable accounted for. Adjusted R² values indicate the proportion of total outcome variance explained by each predictor. For example, baseline help orientations (`desor_core`) alone explain roughly 30% of the variance in deservingness – meaning that people’s differences in perceived deservingness align strongly with their differences in support levels. Other predictors, such as ideology or partisanship, each explain smaller portions of the variance (roughly 3–8%), while carceral impact explains little by itself.
 
@@ -165,41 +151,75 @@ Standardized coefficients place all predictors on the same scale and clarify rel
 
 Including `desor_core` as a control allows us to isolate the independent association of incarceration experience with policy support, net of respondents’ broader attitudinal dispositions. Taken together, these results indicate that while attitudes toward deservingness strongly predict policy support, personal experience with the criminal legal system exerts a smaller but meaningful effect — which aligns with our experimental interest in whether incarceration shapes perceptions of carceral citizens (`d_incppl_pris_abc`).
 
-## Results: M3 & M4
+## Results: M3 & M4 -- REWRITE AFTER HAVING FIXED SCALES
 
-My second core hypothesis (**H2)** is that more generous perceptions of carceral citizens' deservingness will predict greater and more consistent support for assistance-oriented criminal legal policies and reduced support for punitive criminal legal policies. 
+My second core hypothesis (**H2)** is that more generous perceptions of carceral citizens' deservingness will predict greater and more consistent support for assistance-oriented criminal legal policies and reduced support for punitive criminal legal policies.
+
+### Model 3: Help-Oriented Policy Support
+
+After estimating the outcome model for the help-policy index, I find that perceptions of incarcerated people’s deservingness are a consistent and statistically significant predictor of support for assistance-oriented criminal legal policies. Each one-point increase on the 0–100 deservingness scale corresponds to a 0.005-point increase on the 1–4 policy-support scale (p \< .001). Although substantively modest, this relationship is highly robust and in the expected direction—respondents who view incarcerated people as more deserving are more supportive of policies that expand rehabilitation, education, and family contact.
+
+In this specification, respondents with any form of carceral contact—whether through direct incarceration, knowing someone who has been incarcerated, or victimization—express significantly greater support for help-oriented policies (b = 0.17, p \< .001). This finding departs from earlier models where the contact effect attenuated once attitudes were controlled, suggesting that contact and deservingness perceptions now operate as complementary rather than competing predictors. The pattern is consistent with the possibility that contact influences help-policy support both directly and indirectly through its effect on deservingness, a mechanism tested explicitly in subsequent mediation models (M7–M8).
+
+Among covariates, a more punitive view of the purpose of prisons (penalpoint) is associated with lower support for help policies (p \< .001), and social conservatism also predicts reduced support (p \< .001). General generosity toward help-needing groups (`desor_core`) likewise increases help-policy support (p = .001), suggesting that both domain-specific and broad moral orientations matter for rehabilitative policy preferences. Racial attitudes exert expected effects: disagreement that racial problems are rare and disagreement with fear of other races predict greater support for help policies, while denying White privilege and expressing less anger about racism predict lower support. The model explains roughly 37 percent of the variance in help-policy support (Adj. R² = .37), a substantial improvement from earlier specifications and consistent with expectations that attitudinal factors—particularly deservingness perceptions—dominate these evaluations.
+
+### Model 4: Opposition to Punitive Policies
+
+Turning to opposition to punitive policies, the relationship between perceived deservingness of incarcerated people and policy preferences remains strong and in the expected direction. Each one-point increase in deservingness corresponds to a 0.005-point increase in opposition to punitive policies (p \< .001). Thus, respondents who see incarcerated people as more deserving are less supportive of punitive measures such as the death penalty or life without parole. Individuals with carceral contact also express greater opposition to punitive policies (b = 0.08, p = .03), indicating that lived experience with the criminal legal system corresponds to less punitive attitudes.
+
+Fiscal and social conservatism are both negatively associated with opposition to punitive policies, while a punitive view of the prison’s purpose (penalpoint) again predicts greater support for punitive measures (p \< .001). Among the FIRE items, acknowledging White privilege (p = .007) and expressing anger about racism (p = .019) each correspond to greater opposition to punitive policies, whereas racial fear predicts stronger punitiveness (p = .024). Other demographic variables are statistically indistinguishable from zero. The model explains roughly 16 percent of the variance in opposition to punitive policies (Adj. R² = .16), indicating that deservingness and punitive orientation remain the principal attitudinal anchors of criminal legal policy opinion.
+
+### Distinguishing General and Carceral Deservingness
+
+Because generosity toward incarcerated people may reflect a broader prosocial orientation, I include a control for respondents’ **general deservingness orientation** (`desor_core`), measured as the mean of deservingness ratings for help-needing groups such as welfare recipients, the homeless, and immigrants. This variable captures an underlying disposition toward helping others. Diagnostic tests show that `desor_core` and incarcerated-group deservingness are moderately correlated (r = .55), but the shared variance is conceptually meaningful rather than problematic. In the help-policy model, `desor_core` contributes additional explanatory power (ΔAdj. R² ≈ .05), whereas in the punitive-policy model, its contribution is negligible (ΔAdj. R² ≈ .001). These patterns indicate that while general generosity reinforces support for assistance-oriented carceral policies, opposition to punitive policies is driven primarily by attitudes specific to the incarcerated population.
+
+START OLD old M3M4
 
 M3
 
-After estimating the outcome model for the help policy index, I find that perceptions of incarcerated people’s deservingness are a consistent and statistically significant predictor of support for assistance-oriented criminal legal policies. Each one-point increase on the 0–100 deservingness scale corresponds to a 0.004-point increase on the 1–5 policy-support scale (p < .001). Although modest in magnitude, this relationship is robust and in the theoretically expected direction. 
+After estimating the outcome model for the help policy index, I find that perceptions of incarcerated people’s deservingness are a consistent and statistically significant predictor of support for assistance-oriented criminal legal policies. Each one-point increase on the 0–100 deservingness scale corresponds to a 0.004-point increase on the 1–5 policy-support scale (p \< .001). Although modest in magnitude, this relationship is robust and in the theoretically expected direction.
 
 Contrary to my expectations, carceral contact itself—whether through direct experience, knowing someone incarcerated, or victimization—has no statistically discernible effect on support for help policies once attitudes and ideology are accounted for. Although direct carceral contact does not predict help-policy support once deservingness is included, this attenuation is consistent with the possibility that contact’s influence operates indirectly through shifts in deservingness perceptions—a question tested directly in later mediation models (M7–M8).
 
-Both Republican and Democratic identifiers express lower support for such policies relative to independents, and a more punitive orientation toward the purpose of prisons is strongly associated with reduced support (p < .001). Social and fiscal ideology are statistically indistinguishable from zero in this model, suggesting that specific penal and deservingness attitudes are more relevant than broad ideological self-placement. The model explains approximately 13 percent of the variance in policy support (Adj. R² = .13), indicating that while the predictors collectively matter, most of the variance lies beyond the attitudinal and demographic factors captured here.
+Both Republican and Democratic identifiers express lower support for such policies relative to independents, and a more punitive orientation toward the purpose of prisons is strongly associated with reduced support (p \< .001). Social and fiscal ideology are statistically indistinguishable from zero in this model, suggesting that specific penal and deservingness attitudes are more relevant than broad ideological self-placement. The model explains approximately 13 percent of the variance in policy support (Adj. R² = .13), indicating that while the predictors collectively matter, most of the variance lies beyond the attitudinal and demographic factors captured here.
 
-### M4
-Turning to the model predicting support for punitive policies, the relationship between perceived deservingness of incarcerated people and policy preferences remains strong and in the expected negative direction. Each one-point increase in deservingness corresponds to a 0.005-point decrease in support for punitive policies on the 1–5 scale (p < .001), indicating that respondents who view incarcerated people as more deserving are less supportive of punitive measures. In contrast to the help-policy model, individuals with any carceral contact report higher punitiveness (b = 0.095, p = .019), suggesting a modest tendency toward more punitive views among those directly or indirectly affected by the system. Fiscal and social conservatism are both negatively associated with support for punitive reforms, while a punitive orientation toward the purpose of prisons (penalpoint) again strongly predicts favoring tougher policies (p < .001). Among the racial-attitudes measures, believing that White privilege exists (fire_privilege) and feeling anger about racism (fire_angry) each relate to lower punitiveness, whereas fear of other races shows a marginal positive relationship (p = .051). Other demographic variables are statistically indistinguishable from zero. The model explains roughly 17 percent of the variance in punitive policy preferences (Adj. R² = .16), underscoring that carceral-specific deservingness and punitive orientation remain the primary attitudinal foundations of support for these policies.
+M4
 
+Turning to the model predicting support for punitive policies, the relationship between perceived deservingness of incarcerated people and policy preferences remains strong and in the expected negative direction. Each one-point increase in deservingness corresponds to a 0.005-point decrease in support for punitive policies on the 1–5 scale (p \< .001), indicating that respondents who view incarcerated people as more deserving are less supportive of punitive measures. In contrast to the help-policy model, individuals with any carceral contact report higher punitiveness (b = 0.095, p = .019), suggesting a modest tendency toward more punitive views among those directly or indirectly affected by the system. Fiscal and social conservatism are both negatively associated with support for punitive reforms, while a punitive orientation toward the purpose of prisons (penalpoint) again strongly predicts favoring tougher policies (p \< .001). Among the racial-attitudes measures, believing that White privilege exists (fire_privilege) and feeling anger about racism (fire_angry) each relate to lower punitiveness, whereas fear of other races shows a marginal positive relationship (p = .051). Other demographic variables are statistically indistinguishable from zero. The model explains roughly 17 percent of the variance in punitive policy preferences (Adj. R² = .16), underscoring that carceral-specific deservingness and punitive orientation remain the primary attitudinal foundations of support for these policies.
 
-Because attitudes toward incarcerated people may partly reflect broader social attitudes towards help-needing groups, I include a control for general deservingness orientation to ensure the observed effects are not artifacts of a general helping disposition. I isolate the unique relationship between respondents’ perceptions of incarcerated people and their policy preferences in both models using this control(desor_core), constructed as the mean of respondents’ deservingness ratings for conventionally “help-needing” groups (e.g., the homeless, welfare recipients, and immigrants). This variable captures an underlying generosity disposition toward social assistance targets, allowing estimation of whether the effect of incarcerated-group deservingness persists above and beyond general helping attitudes. Diagnostic tests indicate that desor_core and incarcerated-group deservingness are moderately correlated (r = .55), but desor_core contributes negligible unique variance once the specific deservingness measure is included (semi-partial R² < .001; ΔAdj R² ≈ .005). These results suggest that while general deservingness orientation and incarcerated-group deservingness are closely related, the association between the latter and policy support reflects attitudes specific to the carceral context rather than a broad disposition toward help-needing groups. 
+Because attitudes toward incarcerated people may partly reflect broader social attitudes towards help-needing groups, I include a control for general deservingness orientation to ensure the observed effects are not artifacts of a general helping disposition. I isolate the unique relationship between respondents’ perceptions of incarcerated people and their policy preferences in both models using this control(desor_core), constructed as the mean of respondents’ deservingness ratings for conventionally “help-needing” groups (e.g., the homeless, welfare recipients, and immigrants). This variable captures an underlying generosity disposition toward social assistance targets, allowing estimation of whether the effect of incarcerated-group deservingness persists above and beyond general helping attitudes. Diagnostic tests indicate that desor_core and incarcerated-group deservingness are moderately correlated (r = .55), but desor_core contributes negligible unique variance once the specific deservingness measure is included (semi-partial R² \< .001; ΔAdj R² ≈ .005). These results suggest that while general deservingness orientation and incarcerated-group deservingness are closely related, the association between the latter and policy support reflects attitudes specific to the carceral context rather than a broad disposition toward help-needing groups.
+
+***end old M3M4***
 
 ## Results: M5 & 6
-My third core hypothesis (**H3)** is that perceptions of incarcerated people's deservingness mediate the relationship between carceral contact and support for criminal legal policies. Specifically, I expect that direct or indirect experience with the carceral system influences deservingness perceptions, which in turn shape policy preferences.
 
-M5 -- Mediation + Help Oriented Policy
+My third core hypothesis (H3) is that perceptions of incarcerated people’s deservingness mediate the relationship between carceral contact and support for criminal legal policies. Specifically, I expect that direct or indirect experience with the carceral system influences deservingness perceptions, which in turn shape policy preferences.
+Before turning to the mediation tests, Models 5 and 6 first evaluate whether contact moderates the effect of deservingness on policy support—that is, whether deservingness operates differently across those with and without criminal-legal experience.
 
+Model 5: Deservingness × Contact on Help-Oriented Policy
 To assess whether the relationship between perceptions of incarcerated people’s deservingness and support for assistance-oriented carceral policies varies by personal contact with the criminal legal system, I estimated an interaction model in which deservingness (0–100 scale) and a binary indicator of carceral contact jointly predict the prisonhelp index (1–5 scale). Both variables were mean-centered to facilitate interpretation, such that the main effect of deservingness represents the slope for non-impacted respondents at the average level of deservingness.
 
-$$
-\texttt{prisonhelp}_{i} = \theta_0 + \theta_1 \cdot \texttt{Deservingness}_{i} + \theta_2 \cdot \texttt{Contact}_{i} + \theta_3 (\texttt{Deservingness}_{i} \times \texttt{Contact}_{i}) + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}
-$$
+\[add latex formula\]
 
-The interaction term is small and statistically indistinguishable from zero ( $b_{Des\times Cont}=-0.00035$, SE = 0.00117, $p=0.76$ ). The absence of a significant interaction indicates that the positive effect of deservingness on policy support does not vary meaningfully between respondents who have experienced or witnessed carceral contact and those who have not.
+After correcting the coding of help-policy items, both deservingness and contact exert independent, positive effects on support for assistance-oriented prison policies. Deservingness remains a strong predictor (\$b = 0.0054\$, SE = 0.0007, \$p \< .001\$): a 10-point increase in deservingness corresponds to roughly a 0.05-point rise on the five-point prisonhelp index. Respondents who have experienced or witnessed criminal-legal contact express markedly higher baseline support for such policies (\$b = 0.17\$, SE = 0.03, \$p \< .001\$), even when controlling for partisanship, ideology, punitiveness, and generalized deservingness.
 
-Simple-slope estimates confirm the similarity of effects across groups. Among non-impacted respondents ($\texttt{impact}=0$), each one-point increase in deservingness predicts a 0.0042-point rise in help-policy support (SE = 0.00082, $p<.001$; 95 % CI [0.0026, 0.0058]). Among impacted respondents ($\texttt{impact}=1$), the slope is 0.0038 (SE = 0.00099, $p<.001$; 95 % CI [0.0019, 0.0057]). The difference between these slopes is substantively trivial and statistically negligible. Expressed in more intuitive terms, a 10-point increase in perceived deservingness corresponds to roughly a 0.04-point increase in support for help-oriented policies—an effect of similar magnitude for both contact groups.
+The interaction between deservingness and contact is small and statistically indistinguishable from zero (\$b = –0.0014\$, \$p = .16\$), indicating that the positive effect of deservingness is comparable across groups. Both impacted and non-impacted respondents increase in policy support at roughly the same rate as deservingness rises. Simple-slope estimates confirm that the relationship is slightly stronger for non-impacted respondents (+0.005 vs. +0.004 per deservingness point), but the difference is not statistically meaningful. Predicted values show parallel upward-sloping lines: support increases from about 2.7 to 3.3 as deservingness rises, with impacted respondents consistently about 0.17 points more supportive across the range. These results indicate that contact raises baseline support but does not moderate the influence of deservingness.
 
-Predicted-value plots (Appendix Figure A3) show nearly parallel upward-sloping lines for impacted and non-impacted respondents, with average predicted support levels around 3.1 on the five-point scale. This visual pattern reinforces that contact status neither amplifies nor dampens the influence of deservingness.
+Among the controls, conservative social ideology and a punitive view of incarceration’s purpose strongly depress help-policy support, while broader prosocial orientations (desor_core, fire_rare) enhance it. The full model explains about 37 % of the variance in help-policy support (Adj. \$R\^2 = 0.37\$), more than double the fit of the earlier specification.
 
-The full model (including partisanship, ideology, punitiveness, generalized deservingness, and FIRE items) explains roughly 13 % of the variance in prisonhelp (Adj. $R^2$ = 0.13). Deservingness remains among the strongest unique predictors (semi-partial $R^2≈0.02$), while contact itself shows no direct association ( $b=-0.04$, $p=0.26$ ). Diagnostics reveal no multicollinearity (all VIF < 5), homoscedastic residuals, and no influential outliers by Cook’s D > 4/n.
+Model 6: Deservingness × Contact on Opposition to Punitive Policy
 
-Overall, these results indicate that warmer perceptions of incarcerated people’s deservingness robustly increase support for policies assisting them, and this relationship is statistically equivalent across respondents with and without direct or proximate contact with the criminal legal system. The effect of deservingness thus appears to operate as a general moral orientation rather than one conditioned by lived experience.
+Model 6 evaluates whether the association between perceptions of incarcerated people’s deservingness and opposition to punitive carceral policies varies by contact with the criminal legal system. Following the corrected coding of the punitive index (higher values = greater opposition to punitive policy), both deservingness and contact exhibit independent, positive effects. Deservingness predicts significantly greater opposition to punitive policies (\$b = 0.0052\$, SE = 0.0009, \$p \< .001\$): each 10-point increase in perceived deservingness corresponds to roughly a 0.05-point rise on the five-point prisonpen index, indicating a less punitive orientation. Respondents with carceral contact are modestly less punitive overall (\$b = 0.076\$, SE = 0.035, \$p = .03\$), though the effect size is smaller than for help-policy support.
+
+The interaction between deservingness and contact is negligible (\$b = –0.0002\$, \$p = .89\$), demonstrating that the de-punitive effect of deservingness operates similarly across groups. Simple-slope analyses confirm this pattern: among non-impacted respondents, a one-point increase in deservingness predicts 0.0052 greater opposition to punitive policy (SE = 0.0009, \$p \< .001\$), and among impacted respondents 0.0050 (SE = 0.0011, \$p \< .001\$). Predicted values range from roughly 1.9 to 2.5 across the observed deservingness distribution, with lines for impacted and non-impacted respondents nearly parallel and separated by about 0.07 points—contact elevates overall decarceral sentiment but does not alter the slope of deservingness.
+
+Conservative fiscal and social ideology continue to predict greater punitiveness, while a punitive conception of the prison’s purpose (penalpoint) strongly decreases opposition to punitive policies. The FIRE items again differentiate affective dimensions of racial attitudes: anger increases punitiveness, whereas privilege and fear reduce it modestly. The model explains 16.8 % of variance in punitive-policy opposition (Adj. \$R\^2 = 0.16\$).
+
+Joint Interpretation of Models 5 and 6
+Across both help- and punitive-policy domains, deservingness and contact exhibit consistent, independent effects. Individuals who perceive incarcerated people as more deserving are simultaneously more supportive of rehabilitative policies and more opposed to punitive ones, and these effects are statistically indistinguishable across contact groups. Personal experience with the carceral system primarily shifts the baseline level of policy support upward rather than conditioning how deservingness translates into attitudes.
+
+Semi-partial R² comparisons reinforce this pattern. In the help-policy model, deservingness accounts for 3.6 % of unique variance compared to 2.3 % for contact; in the punitive-opposition model, deservingness explains 2.2 % and contact only 0.3 %. Thus, moral evaluations of incarcerated individuals explain substantially more of the variance in policy preferences than does lived experience itself. Taken together, Models 5 and 6 provide strong evidence that perceptions of deservingness are the dominant attitudinal mechanism shaping citizens’ responses to carceral policy, while personal contact functions mainly as a general decarceral disposition.
+
+## Results M7 M8 (Mediation
+
+Causal mediation analyses indicate that deservingness perceptions partially mediate the effect of carceral contact on policy attitudes. For help-oriented policies, the indirect effect of contact through deservingness (ACME = 0.022, 95% CI \[0.010, 0.036\]) accounts for roughly 12% of the total effect. For punitive policies, the indirect pathway is similarly significant (ACME = 0.024, 95% CI \[0.010, 0.040\]), explaining approximately 24% of the total effect. In both domains, contact also retains a positive direct effect, suggesting that while deservingness plays a meaningful role, experiential exposure influences policy orientations through additional mechanisms as well.

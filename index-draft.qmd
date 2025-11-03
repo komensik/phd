@@ -200,7 +200,6 @@ To I distinguish among types of contact (H1, H1A,H1B), I estimate separate model
 
 ##### Model 2: Incarcerated, Know Incarcerated, Victimized on Deservingness (minc, mki, mv)
 
-
 $$
 \texttt{prisonerdeserves}_{i} = \beta_0 + \beta_1 \cdot \texttt{incarc}_{i} + \beta_2 \cdot \texttt{knowincarc}_{i} + \beta_3 \cdot \text{vict}_{i} + \beta_4 \cdot \texttt{des\_or}_{i} + \beta_5 \cdot \texttt{controls}_{i} + u_{i}
 $$

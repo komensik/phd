@@ -173,7 +173,7 @@ summary(m1)
 
 -   Coefficients:
 
-    -   Intercept = 43.31
+    -   Intercept = 43.39
 
         -   The average deservingness score of incarcerated people, for respondents with no contact (`impact = 0`), is on average 43.31 out of 100 on the deservingness scale. This is higher than I might have thought.
 
@@ -493,6 +493,8 @@ Univariate explanatory power / how much does each control explain on its own?
 
 controls <- c("impact", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
 
+results <- data.frame() 
+
 for (v in controls) {
   f <- as.formula(paste("d_incppl_pris_abc ~", v))
   fm <- lm(f, data = raw_data_cleaned)
@@ -602,6 +604,7 @@ minc <- lm(d_incppl_pris_abc ~ incarc +
     gender + Black + Hispanic + OtherRace,
   data = raw_data_cleaned
 )
+
 summary(minc)
 
 ```
@@ -1064,9 +1067,9 @@ Variables needed:
 
     -   prisonhelp
 
-        -   
+        -   continuous 1-4 index with 2.5 as neutral midpoint. 4 = STRONGLY SUPPORT help oriented prison policy
 
-    -   prisonpen
+    -   prisonpen: continuous 1-4 index with 2.5 as neutral midpoint. 4 = STRONGLY OPPOSE punitive prison policy (lwop and death penalty)
 
 -   controls vector
 
@@ -1101,15 +1104,61 @@ Basic Stats:
 
 -   variance = 0.488
 
-**Variable logic check**
+### 4.\_ Preliminary **Variable check**
 
 First, checking how respondents who identify as Republican vs Democrat differ on average support for help policies (Republican and Democrat are both dummy variables, with Independent/Other as the reference group). Confirmed that Democrats are more supportive of help policies than Republicans on average.
 
 ```{r}
 prisonhelp_by_party <- lm(prisonhelp ~ Republican + Democrat, data = raw_data_cleaned)
+prisonpen_by_party <- lm(prisonpen ~ Republican + Democrat, data = raw_data_cleaned)
 
 summary(prisonhelp_by_party)
+summary(prisonpen_by_party)
 ```
+
+Second, looking at (a) beliefs in purpose of prison (penalpoint, 1 means you think prison is for rehabilitation 7 for punishment), (b) FIRE variables.
+
+```{r}
+prisonhelp_by_penalpoint <- lm(prisonhelp ~ penalpoint, data = raw_data_cleaned)
+prisonpen_by_penalpoitn <- lm(prisonpen ~ penalpoint, data = raw_data_cleaned)
+
+prison_help_by_fire_rare <- lm(prisonhelp ~ fire_rare, data = raw_data_cleaned)
+prison_pen_by_fire_rare <- lm(prisonpen ~ fire_rare, data = raw_data_cleaned)
+
+prison_help_by_fire_privilege <- lm(prisonhelp ~ fire_privilege, data = raw_data_cleaned)
+prison_pen_by_fire_privilege <- lm(prisonpen ~ fire_privilege, data = raw_data_cleaned)
+
+prison_help_by_fire_angry <- lm(prisonhelp ~ fire_angry, data = raw_data_cleaned)
+prison_pen_by_fire_angry <- lm(prisonpen ~ fire_angry, data = raw_data_cleaned)
+
+prison_help_by_fire_fear <- lm(prisonhelp ~fire_fear, data = raw_data_cleaned)
+prison_pen_by_fire_fear <- lm(prisonpen ~fire_fear, data = raw_data_cleaned)
+
+prison_help_by_fire_rare
+prison_pen_by_fire_rare
+
+prison_help_by_fire_privilege
+prison_pen_by_fire_privilege
+
+prison_help_by_fire_angry
+prison_pen_by_fire_angry
+
+prison_help_by_fire_fear
+prison_pen_by_fire_fear
+
+prisonhelp_by_penalpoint
+prisonpen_by_penalpoitn
+```
+
+Penalpoint – unit increase (see prison as more for punishment) leads to 0.06 decrease in opposition to punitive policy; unit increase (sees prison as more for punishment) leads to unit decrease in support for help policy.
+
+FIRE_Rare – unit increase in disagreement that racial problems are rare (ie, agreement that they are not rare) has 0.25 increase in opposition to punitive policy; a unit increase...ie agreement that racial problems are not rare corresponds to 0.132 increase in support for help policy.
+
+FIRE Privilege - disagreement with white privilege decreases support for prison help policies; decreases opposition to punitive policies.
+
+FIRE Angry - disagreement with anger that racism exists decreases support for prison help policy; decreases opposition to punitive policies.
+
+FIRE Fear – disagreement with being afraid of other raises increases support for prison help policy; slightly increases opposition to punitive prison policies.
 
 ### 4.\_ Preliminary M3 & M4 Models with Controls
 
@@ -1148,13 +1197,35 @@ m4_basic <- lm(m4_controls_formula, data = raw_data_cleaned)
 summary(m3_basic)
 ```
 
-The intercept indicates that, holding all controls at 0, the average support for help policies is 2.9 (on a 1-5 scale). This is not super substantive because many predictors are scaled starting at 1. Still, this reflects respondents who: -give incarcerated people either 0 or 50?? deservingness scores (are on a 0-100 scale) -are not impacted (0= no carceral contact) -who are political independents -have 0 fiscal ideology scores so most conservative fiscal ideology I think) - have 0 social ideology scores (also I think most conservative) - have 0 penalpoint scores (see prison as primarily for rehabilitation -- should I un-reverse code this so it is in same expected direction as conservative to liberal?) - have 0? desor_core scores (general orientation is to see help-needing groups as undeserving) (is constructed by average of deservingness scores that are 0-100) - strongly disagree that racial problems are rare (1-4 scale) - strongly agree that white people benefit from unearned racial advantages (1-4 scale) - strongly agree that they are angry that racism exists (1-4 scale) - strongly disagree that they are fearful of other races (1-4) - are women or other? codebook says 1= man - are white (Black, Hispanic, OtherRace are all 0)
+The intercept indicates that, holding all controls at 0, the average support for help policies is 2.8 (on a 1-5 scale). This is not super substantive because many predictors are scaled starting at 1.
 
-...are 2.9 out of 5 (most supportive) so medium support or are slightly supportive of prison help policies. I'm not sure what the t and p value here mean for the intercept.
+Coefficients:
 
-Coefficients: -having one unit warmer deservingness perceptions of incarcerated people increases support for help policies by 0.004 points, holding all else constant. So a 10-point increase in deservingness corresponds to a 0.04 point increase in help policy support. This is statistically significant (p\<0.001) but substantively small. -being impacted in some way decreases support for help policies by 0.037 points, holding all else constant. P=0.25 means this is statistically indistinguishable from 0 or likely due to chance. -being republican or democrat instead of independent both decrease support for help policies (by 0.12 points for democrats and 0.13 points for republicans. These effects are significant. Ideology is insignificant. - penalpoint: each one unit increase (1-7 scale, sees the purpose of prison more about punishment) decreases support for prison help policies decreases support for help policies by 0.039 points, holding all else constant. This is significant (p\<0.001) -on desor_core: each one unit increase (0-100 scale, more general orientation to see help-needing groups as deserving) decreases support for help policies by 0.007 points, holding all else constant. This is not significant.
+-   having one unit warmer deservingness perceptions of incarcerated people increases support for help policies by 0.004 points, holding all else constant. So a 10-point increase in deservingness corresponds to a 0.04 point increase in help policy support. This is statistically significant (p\<0.001) but substantively small.
 
-Fit Statistics -- the model explains about 13% of variance in help policy support (R2 is 0.129) after adjusting for the number of predictors.
+-   being impacted in some way increases support for help policies by 0.16 points, holding all else constant. This effect is significant.
+
+-   seems funny: being republican instead of independent increases support for help policies. and being a democrat instead of independent decreases support (by 0.12 points for democrats and 0.0005 points for republicans). These effects are not significant.
+
+-   fiscal ideology is insignificant.
+
+-   social ideology: a unit increase in social policy support decreases support for prison help policies, and the effect is significant.
+
+-   penalpoint: each one unit increase (1-7 scale, sees the purpose of prison more about punishment) decreases support for prison help policies decreases support for help policies by 0.05 points, holding all else constant. This is significant (p\<0.001)
+
+-   on desor_core: each one unit increase (0-100 scale, more general orientation to see help-needing groups as deserving) decreases support for help policies by 0.003 points, holding all else constant. This is significant.
+
+-   All of the FIRE (1-4) questions are statistically significant:
+
+    -   a unit increase in *disagreement* that racial problems are rare corresponds with a 0.04 increase in support for help-oriented policy
+
+    -   a unit increase in *disagreement* that white people have advantages because of their race corresponds with a 0.07 unit decrease in support for help policy.
+
+    -   a unit increase in disagreement that 'I am angry that racism exists' corresponds with a 0.069 decrese in support for help policy
+
+    -   a unit increase in disagreement with "I am fearful of people of other races" (ie, respondent is not fearful of other racs) corresponds with an increase in support for prison help policies by 0.075.
+
+Fit Statistics -- the model explains about 37% of variance in help policy support (R2 is 0.3737, adjusted R2 is 0.3373) after adjusting for the number of predictors.
 
 The F-stat and p-val confirm that, collectively, the predictors explain more variance than an intercept only model.
 
@@ -1256,6 +1327,7 @@ summary(full_m4)$adj.r.squared - summary(base_m4)$adj.r.squared
 
 ```{r, m3_0}
 
+
 m3_0 <- lm(prisonhelp ~ impact)
 
 hist(raw_data_cleaned$prisonhelp)
@@ -1306,6 +1378,43 @@ summary(m4)
 
 ```
 
+Coefficients:
+
+-   having one unit warmer deservingness perceptions of incarcerated people increases opposition to punitive prison policy, holding all else constant, by 0.005 points. Alternatively: a 10-point increase in deservingness corresponds to a 0.05 decrease in support. This is statistically significant (p\<0.001) but substantively small.
+
+-   being impacted in some way *increases* *opposition to punitive policy* by 0.08 points, holding all else constant. This effect is significant at that level (0.029)
+
+-   being republican instead of independent decreases opposition to punitive policy by 0.05. Being a democrat instead of independent decreases opposition by 0.04 points for democrats. These effects are not significant.
+
+-   fiscal ideology - a unit increase in fiscal liberalness decreases opposition – increases support for – punitive prison policy by 0.06 and the effect is significant.
+
+-   social ideology: a unit increase in social policy liberalness decreases opposition – increases support for - punitive prison policy, and the effect is significant.
+
+-   penalpoint: each one unit increase (1-7 scale, sees the purpose of prison more about punishment) decreases opposition to (increases support for) punitive prison policies holding all else constant. This is significant (p\<0.001). This makes sense: If you think prison is for punishment, you're okay with the death penalty etc.
+
+-   on desor_core: each one unit increase (0-100 scale, more general orientation to see help-needing groups as deserving) decreases opposition to punitive prison policy by 0.001 but this isn't significant.
+
+-   3 of the FIRE (1-4) questions are statistically significant:
+
+    -   not significant: a unit increase in *disagreement* that racial problems are rare corresponds with a 0.001 decrease in opposition to punitive policy. Ie: the more you agree that racial problems are rare, the more you support punitive policy. But this is not significant.
+
+    -   a unit increase in *disagreement* that white people have advantages because of their race (deny white privilege) corresponds with a 0.05 unit *decrease* in opposition to punitive policy – those who agree that white privilege exists are more opposed to punitive policy (p = 0.007)
+
+    -   a unit increase in disagreement that 'I am angry that racism exists' corresponds with a 0.05 increase in *opposition* to punitive policy.
+
+        -   try this another way: if someone moves towards not being angry that racism exists, their opposition to punitive policy increases. if someone moves towards being angry that racism exist, their opposition to punitive policy goes down. this is surprising.
+
+    -   a unit increase in disagreement with "I am fearful of people of other races" (ie, respondent is not fearful of other races) corresponds with 0.05 more support for punitive policy (significant).
+
+Fit Statistics -- the model explains about 16% of variance in help policy support (R2 is 0.1678 adjusted R2 is 0.1593) after adjusting for the number of predictors.
+
+The F-stat is highly significant.
+
+```{r}
+cor(raw_data_cleaned$fire_angry, raw_data_cleaned$prisonpen, use="pairwise.complete.obs")
+
+```
+
 ## 5 M5 & M6
 
 To formally test whether perceptions of deservingness mediate the effect of carceral contact on policy preferences, I first estimate a set of interaction models to examine whether the relationship between deservingness and policy views differs depending on whether respondents have been directly or proximally impacted by the criminal legal system. This approach allows me to test whether contact moderates how deservingness evaluations translate into policy preferences—i.e., whether deservingness matters more (or less) for those with lived experience.
@@ -1338,7 +1447,7 @@ summary(m5)
 
 The intercept is still n
 
-The coefficient on the interaction term is -0.0003483
+The coefficient on the interaction term is -0.001
 
 ### M5_C : Interaction for Support of Carceral Policy Help with Mean-Centered Deservingness
 
@@ -1367,24 +1476,33 @@ summary(m5_c)
 
 ```
 
-M5_c Interpretation
+### M5_c Interpretation
 
--   For non-impacted respondents, each 1 point increase in deservingness on a 0-100 scale is associated with 0.004 more support for prison help policies, on a 1-5 scale. To put in a larger scale, this also means a 10 point increase in incarcerated people deservingness scores predicts 0.04 more support. However, because deservingness scores for incarcerated people are fairly clustered around the mean, this does not mean a ton. However, it is highly significant (p \<0.001).
+-   *Main effect of deservingness: 0.005 (p\<0.001*) – For non-impacted respondents, each 1 point increase in deservingness on a 0-100 scale is associated with 0.005 more support for prison help policies, on a 1-5 scale. To put in a larger scale, this also means a 10 point increase in incarcerated people deservingness scores predicts 0.04 more support. However, because deservingness scores for incarcerated people are fairly clustered around the mean, this does not mean a ton. However, it is highly significant (p \<0.001).
 
--   Impacted respondents don't differ significantly in their baseline view of help policy from non-impacted people when deservingness scores for incarcerated people are held at their mean.
+-   *Main effect of impact (contact)* – Impacted respondents are 0.169 points more supportive of help oriented policy differ significantly in their baseline view of help policy from non-impacted people when deservingness scores for incarcerated people are held at their mean. This effect is significant (p \<0.001)
 
--   The interaction (-0.00034, p = 0.76) says that the slope of deservingness scores does not differ significantly between impacted and non impacted groups. Deservingness scores predicts help policy support about the same as they do for impacted and non-impacted respondents.
+-   Main effect of the interaction – the slope of deservingness scores does not differ significantly between impacted and non impacted groups. Deservingness scores predicts help policy support about the same as they do for impacted and non-impacted respondents.
 
--   Penal point: a one unit change means a respondent sees the purpose of prison as more about punishment (7) than rehabilitation (1). A one unit change corresponds with a -0.03 increase in support ...this has to be wrongbut significant decrease in support for punitive policy.
+-   On controls:
 
-Takaway: Deservingness has a positive effect on help-oriented carceral policies, and this effect doesn't vary meaningfully between impacted and non impacted people.
+    -   Penal point: a one unit change means a respondent sees the purpose of prison as more about punishment (7) than rehabilitation (1). A one unit change corresponds with a -0.04 decrease in support for helping policies, and it is significant.
 
-Validation
+    -   Ideology: the more conservative, the less supportive of help policy (significant).
+
+    -   Desor_core: respondents who tend to view help needing groups as more deserving are somewhat more supportive of prison help policy. This is significant.
+
+The model explains 36-37% of the variance.
+
+Takaway: Deservingness has a positive effect on help-oriented carceral policies, and contact directly increases help-policy support.
+
+### Post-Estimation Validation
 
 ```{r}
 
 slopes_m5c <- slopes(m5_c, variables = "d_inc_c", by = "impact")
 slopes_m5c
+
 #predict values
 pred_m5c <- predictions(m5_c, 
                         newdata = datagrid(d_inc_c = seq(min(x_data$d_inc_c, na.rm = TRUE),
@@ -1392,14 +1510,22 @@ pred_m5c <- predictions(m5_c,
                           impact = c(0,1)
                         ))
 
-pred_m5c
+print(pred_m5c)
+
+# Semi-partial R² for each predictor
+spr_m5<-rsq.partial(m5_c, adj = FALSE)   # help-policy model
+
 ```
 
-*Simple Slopes* – confirms that for both contact groups deservingness has a positive and significant relationship with help policy support. Among non-impacted respondents, each one point increase in deservingness predicts 0.004. 0.002 less predictive for non impacted. Nearly identical and significant slopes confimrs the previous conclusion.
+Nov 2: these are now old but not hugely changed (signifcance is the big difference post re-run)
+
+*Simple Slopes* – confirms that for both contact groups deservingness has a positive and significant relationship with help policy support. Among non-impacted respondents, each one point increase in deservingness predicts 0.00537. 0.004 (less predictive) for non impacted. Nearly identical and significant slopes confimrs the previous conclusion.
 
 *Predicted Values* – The predicted mean support is 3.1 on a 1-5 scale regardless of contact type. Across the full range of deservingness scores, predicted lines for impacted and non impacted respondents are basically parallel. Basically confirms no interaction.
 
 Both impacted and non-impacted respondents show a statistically identical positive relationship between perceived deservingness of incarcerated people and support for assistance-oriented policies. Each 10-point increase in deservingness corresponds to roughly a 0.04-point rise in policy support (on a 1–5 scale). Contact with the criminal legal system does not alter this association
+
+*SPR2* - deservingness scores account uniquely for 3.6% of prisonhelp; contact adds 2.3% of unique variance,
 
 ### Model 6: Interaction for Support of Carceral Policy Punishment
 
@@ -1444,15 +1570,25 @@ summary(m6c)
 
 M6c Interpretation
 
--   For non-impacted respondents, each 1 point increase in deservingness on a 0-100 scale is associated with 0.005 more support for punitive policies (LWOP and the death penalty), on a 1-5 scale. To put in a larger scale, this also means a 10 point increase in incarcerated people deservingness scores predicts 0.05 more support. However, because deservingness scores for incarcerated people are fairly clustered around the mean, this does not mean a ton. However, it is highly significant (p \<0.001). It is also not the relationship expected.
+-   For non-impacted respondents, each 1 point increase in deservingness on a 0-100 scale is associated with 0.005 more opposition to punitive policies (LWOP and the death penalty), on a 1-5 scale. To put in a larger scale, this also means a 10 point increase in incarcerated people deservingness scores predicts 0.05 more opposition. However, because deservingness scores for incarcerated people are fairly clustered around the mean, this does not mean a ton. However, it is highly significant (p \<0.001). It is also not the relationship expected.
 
--   Impacted respondents don't differ significantly (0.009) in their baseline view of help policy from non-impacted people when deservingness scores for incarcerated people are held at their mean.
+-   Impacted respondents are 0.076 points more opposed to punitive policy and this effect is significant (when deservingness scores held at mean).
 
--   The interaction (0.002, p = 0.84) says that the slope of deservingness scores does not differ significantly between impacted and non impacted groups. Deservingness scores predicts help policy support about the same as they do for impacted and non-impacted respondents.
+-   The interaction (-0.00017, p = 0.89) says that the slope of deservingness scores does not differ significantly between impacted and non impacted groups. Deservingness scores predicts help policy support about the same as they do for impacted and non-impacted respondents.
 
--   Penal point: a one unit change means a respondent sees the purpose of prison as more about punishment (7) than rehabilitation (1). A one unit change corresponds with a very small but significant decrease in support for punitive policy.
+-   Controls:
+
+    -   Penal point: a one unit change means a respondent sees the purpose of prison as more about punishment (7) than rehabilitation (1). A one unit change corresponds with a very small but significant decrease in opposition to punitive policy (-0.046) and this effect is significant.
+
+    -   Fire_privilege: a unit increase in disagreement with white privilege corresponds with a 0.055 unit decrease in opposition to punitive policy: respondents who discount white privilege are more supportive of punitive policy. This effect is significant.
+
+    -   Fire_angry: a unit increase in disagreement with the statement "I am angry racism exists" (ie, not angry) corresponds with a 0.05 increase in opposition to punitive policy. Surprising but significant.
+
+    -   Fire_fear: a unit increase in disagreement with being afraid of other races corresponds to a 0.05 decrease in opposition to punitive policy, and this effect is significant.
 
 Takaway: Deservingness has a positive effect on help-oriented carceral policies, and this effect doesn't vary meaningfully between impacted and non impacted people.
+
+### Post-Estimation Validation
 
 ```{r}
 
@@ -1466,4 +1602,134 @@ pred_m6c <- predictions(m6c,
                           impact = c(0,1)
                         ))
 pred_m6c
+
+#semi-partial r2 comparisons
+library(rsq)
+
+# Semi-partial R² for each predictor
+spr_m6<- rsq.partial(m6c, adj = FALSE)   # punitive-opposition model
+
 ```
+
+*Simple slopes –* both contact groups rise in their opposition to punitive policy as deservingness increases, but impacted groups are 0.07 points higher. The lines seem parallel indicateing similar slopes, no interaction.
+
+*Predicted values* show
+
+SPR2 -
+
+PUTTING SPR2 from both models in table:
+
+```{r}
+
+tibble(variable = spr_m5$variable, partial_r2 = round(spr_m5$partial.rsq, 3))
+tibble(variable = spr_m6$variable, partial_r2 = round(spr_m6$partial.rsq, 3))
+```
+
+## 6 M7 & M8
+
+These models let me test how much of the total effect of carceral contact on policy support is indirect via deservingness perceptions.
+
+I decompose the effect of contact on policy attitudes into:
+
+-   direct effect (ADE) = effect on policy holding deservingness constant
+
+-   indirect effect (ACME) = effect of contact through deservingness
+
+-   total effect (TE) = ADE +ACME
+
+### Variable Prep/Check
+
+-   mediator (M) = d_incppl_pris_abc (0-100)
+
+-   treatment (T) is "impact" (0,1)
+
+-   outcomes (Y): prisonhelp, prisonpen
+
+-   controls (X) – vector
+
+For each policy domain, will a mediator model and then an outcome model (have these already m1c and m3 m4).
+
+Checks: don't want impact, d\_, prisonhelp and prisonpen to have missing values on the same rows. Checked and I should have 2011 observations going into
+
+```{r}
+summary(is.na(raw_data_cleaned$impact))
+summary(is.na(raw_data_cleaned$d_incppl_pris_abc))
+summary(is.na(raw_data_cleaned$prisonhelp))
+summary(is.na(raw_data_cleaned$prisonpen))
+
+sum(complete.cases(raw_data_cleaned[, c("impact", "d_incppl_pris_abc", "prisonhelp", "prisonpen","Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")]))
+
+#this suggests I would drop about 30% of sample, down to 1577. Worried about the dropped respondents falling evenly ish on both sides of impact. 
+
+#complete case flag
+raw_data_cleaned$complete_case <-
+  complete.cases(raw_data_cleaned[, c(
+    "impact", "d_incppl_pris_abc", "prisonhelp", "prisonpen",
+    "Republican", "Democrat", "fiscal_ideology", "social_ideology",
+    "penalpoint", "desor_core", "fire_rare", "fire_privilege",
+    "fire_angry", "fire_fear", "gender", "Black", "Hispanic", "OtherRace"
+  )])
+
+table(raw_data_cleaned$impact, raw_data_cleaned$complete_case)
+prop.table(table(raw_data_cleaned$impact, raw_data_cleaned$complete_case), 1)
+#chisq to test whether being a complete case is independent of treatment status, get yes/I can reject the null
+chisq.test(table(raw_data_cleaned$impact, raw_data_cleaned$complete_case))
+
+```
+
+Complete-case analysis yielded 1,577 observations. A chi-square test indicated that missingness was not evenly distributed across impact status (p = .002), suggesting potential non-random attrition. Robustness checks with imputed data are warranted.
+
+### M7
+
+s
+
+##### Model 7: Mediation Outcome Model - Support for Assistance Oriented Policy (Second Stage for Mediation Analysis)
+
+$$
+y_{i}^{\texttt{prisonhelp}} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{des\_or}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + u_{i}
+$$
+
+##### Model 8: Mediation Outcome Model - Support for Punishment Oriented Policy (Second Stage for Mediation Analysis)
+
+$$
+y_{i}^{\texttt{prisonpen}} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{des\_or}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + u_{i}
+$$
+
+where $y_{i}^{\texttt{prisonhelp}}$ is support for assistance-oriented or and $y_{i}^{\texttt{prisonpen}}$ is support for punitive policies. A statistically significant indirect effect would indicate that deservingness mediates part of the relationship between carceral contact and policy preferences.
+
+```{r}
+
+m7 <- mediate(m1c, m3, treat = "impact", mediator = "d_incppl_pris_abc",
+              boot = TRUE, sims = 5000)
+
+m8 <- mediate(m1c, m4, treat = "impact", mediator = "d_incppl_pris_abc",
+              boot = TRUE, sims = 5000)
+
+summary(m8)
+
+m7_sens <- medsens(m7, rho.by = 0.1)
+m8_sens <- medsens(m8, rho.by = 0.1)
+
+summary(m7_sens)
+summary(m8_sens)
+```
+
+The ACME (Average causal Mediation Effect) is the indirect effect of carceral contact on policy support through deservingness perceptions. For m7, it's 0.022 and is statistically significant and positive. That means respondents who are impacted show about 0.02 more support for help policy items on the 1-4 scale via higher deservingness perceptions. For m8, it's 0.0236 and significant: contact increases opposition to punitive policies via higher deservingness perceptions.
+
+The ADE (Average Direct Effect) is the direct effect of contact on policy support, holding deservingness scores constant. For m7, it's 0.168 and is significant, so means that contact independent raises support for help oriented policies, even controlling for deservingness. For m8, it's 0.76 and is less significant but still statistically significant, suggesting there's a connection between direct contact and opposition to punitive policies beyond deservingness.
+
+The total effect (combined direct and indirect) for m7 is 0.19 and is significant. For m8 it's 0.099 and significant.
+
+The proportion mediation is the share of total effect explained by the mediator. For m7 it's 0.117. Roughly 12% of contact's effect on help-policy support operates through increased deservingness perceptions. For m8 it's 0.238 and significant. that means about 24% of the effect of impact on punitive policy views passes through deservingness. The CI here is a little wide though.
+
+For m7: Contact with the carceral system significantly increases support for help-oriented policies. About **one-eighth of that total effect** occurs *because* contact makes people see incarcerated individuals as more deserving, while the remaining \~88% is a direct shift in policy orientation not explained by deservingness. For m8: Contact predicts less punitive attitudes, and nearly **a quarter of that effect** works indirectly through deservingness. The rest reflects a direct reduction in punitiveness not fully captured by changes in perceived deservingness.
+
+Sensitivity analyses using the `medsens()` procedure indicate that the indirect effects are moderately robust to violations of sequential ignorability. For both help-oriented and punitive-policy outcomes, the estimated ACME would be reduced to zero only if the residual correlation between the mediator and outcome equations exceeded approximately ρ = 0.20, corresponding to an unobserved confounder jointly explaining about 4 % of residual variance in both models. This suggests the mediation findings are reasonably stable to modest unmeasured confounding.
+
+(ie: these results are moderately robust to unmeasured confounding)
+
+### M10 – Variance
+
+Goal: test whether deservingness perceptions also predict consistency of support across policy help items.
+
+Need:
