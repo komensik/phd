@@ -1733,3 +1733,57 @@ Sensitivity analyses using the `medsens()` procedure indicate that the indirect 
 Goal: test whether deservingness perceptions also predict consistency of support across policy help items.
 
 Need:
+
+-   Regular predictors (use centered? d_inc_c) + impact
+
+    -   controls
+
+-   Individual help policy items, variance per respondent
+
+    -   higher less consistent, lower more consistent
+
+    -   should also probably record SD for interpretation, and mean(help) to diagnose mean-variance coupling
+
+-   decide missing data rule – minimum number of answers. document exclusion count, probably chisquared.
+
+-   distribution checks – expect skew.
+
+    -   use raw variance, log(variance+error), or SD?
+
+    -   choose 1 DV?
+
+Estimation choices
+
+-   model: OLS on variance (maybe on log variance) with HC robust SE's
+
+-   weights (for now unweighted)
+
+-   diagnostics
+
+    -   check residual/skew heavy tails. if severe use log variance + e or SD as the DV
+
+    -   inspect relation of mean(help) to variance. if strong, include mean as covariate
+
+    -   influence (Cook's D), multicolinearity (VIF)
+
+-   Interpretation
+
+    -   negative beta -\> higher deservingness -\> lower variance -\> more consistent support
+
+-   Reporting
+
+    -   Main table: coefficients for DV = variance (or log-variance), robust SEs, adj. R².
+
+    -   Brief text: magnitude for a **10-point deservingness change** and percent change in variance (if using log scale).
+
+    -   Appendix:
+
+        -   Alternative DV (SD or log-variance) + with/without mean(help).
+
+        -   Weighted version.
+
+        -   Plot of variance vs. mean(help) with LOWESS to justify the mean covariate.
+
+            -   maybe not needed: entropy dispersion, reliability tie in (Cronbachs alpha, consistency analysis that complements reliability by focusing on individual level dispersion)
+
+                -   heterogeneity: interact\
