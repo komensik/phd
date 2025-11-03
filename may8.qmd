@@ -24,7 +24,7 @@ library(gt)
 library(ggplot2)
 
 getwd()
-here::here()
+here::
 ```
 
 About

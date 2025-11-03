@@ -812,6 +812,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #### "Punitiveness" - Prison for punishment or rehab?
 
 ```{r, punishorrehab}
+#for 62_1, originally 1 was punish and 7 was rehabilitate people
 
 # Renamed raw column to a more intuitive name
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -819,7 +820,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(penalpoint = 8 - q62_1) #reverse coded so 7 = most punitive
-
 
 # Create ordered factor version of the reverse-coded scale (7 = most punitive)
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -839,6 +839,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 # Count how many times -99 appears in the whole dataset
 #sum(raw_data_cleaned == -99, na.rm = TRUE)
+
+
 
 ```
 
@@ -917,8 +919,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
     .names = "{.col}_rev"
   ))
 
-#CHECK -- created?
-
 summary(raw_data_cleaned$q25_2_rev)
 ```
 
@@ -970,8 +970,11 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 names(raw_data_cleaned) %>% stringr::str_subset("q25|q23")
 
+# Define Q23 help-oriented items (election)
+
 
 # prisonhelp index
+
 # Construct composite index (average of 6 items)
 # rev gives reverse version of the arguments
 raw_data_cleaned <- raw_data_cleaned %>%

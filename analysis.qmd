@@ -535,6 +535,47 @@ Find from adjusted R2 (explaining spread) that:
 
 -   impact explains very little – 1.5%
 
+**Penal Point Variable – Keeping This Here because this Var Keeps on tripping you out – the correlation is -1 so it is in fact reverse coded! You will keep doubting this! Nov 2**
+
+```{r, echo=FALSE}
+}
+#unedited data
+d <- read_csv("./data/raw/scotg_results.csv")
+
+table(raw_data_cleaned$q62_1, raw_data_cleaned$penalpoint, useNA = "ifany")
+
+library(ggplot2)
+
+# Convert to a data frame for ggplot
+tab_df <- as.data.frame(table(
+  Original = raw_data_cleaned$q62_1,
+  Reversed = raw_data_cleaned$penalpoint
+))
+
+ggplot(tab_df, aes(x = Original, y = Reversed, fill = Freq)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  theme_minimal() +
+  labs(title = "Cross-tab of Original vs. Reversed Values",
+       fill = "Count")
+
+
+mean(raw_data_cleaned$q62_1, na.rm = TRUE)
+mean(raw_data_cleaned$penalpoint, na.rm = TRUE)
+
+cor(raw_data_cleaned$q62_1, raw_data_cleaned$penalpoint, use = "pairwise.complete.obs")
+
+par(mfrow = c(1,2))
+hist(raw_data_cleaned$q62_1, main="Original")
+hist(raw_data_cleaned$penalpoint, main="Reversed")
+
+par(mfrow = c(1,2))
+hist(raw_data_cleaned$q62_1, main="Original (Q62_1)")
+hist(8 - raw_data_cleaned$q62_1, main="What a Reverse Looks Like")
+
+
+```
+
 ## 3. M2: by Impact
 
 ### 3.1 Incarcerated
@@ -1298,7 +1339,7 @@ x_data <- raw_data_cleaned |>
     d_inc_c = d_incppl_pris_abc - mean(d_incppl_pris_abc, na.rm = TRUE),
     impact = as.integer(impact == 1)
   )
-hist(x_data$d_inc_c)
+
 ```
 
 Rerunning M5 with Mean-Centered Deservingness
@@ -1326,19 +1367,27 @@ M5_c Interpretation
 
 Takaway: Deservingness has a positive effect on help-oriented carceral policies, and this effect doesn't vary meaningfully between impacted and non impacted people.
 
-Simple Slopes
+Validation
 
 ```{r}
 
 slopes_m5c <- slopes(m5_c, variables = "d_inc_c", by = "impact")
 slopes_m5c
-
+#predict values
 pred_m5c <- predictions(m5_c, 
                         newdata = datagrid(d_inc_c = seq(min(x_data$d_inc_c, na.rm = TRUE),
                                                           max(x_data$d_inc_c, na.rm = TRUE),length = 100),
                           impact = c(0,1)
                         ))
+
+pred_m5c
 ```
+
+*Simple Slopes* – confirms that for both contact groups deservingness has a positive and significant relationship with help policy support. Among non-impacted respondents, each one point increase in deservingness predicts 0.004. 0.002 less predictive for non impacted. Nearly identical and significant slopes confimrs the previous conclusion.
+
+*Predicted Values* – The predicted mean support is 3.1 on a 1-5 scale regardless of contact type. Across the full range of deservingness scores, predicted lines for impacted and non impacted respondents are basically parallel. Basically confirms no interaction.
+
+Both impacted and non-impacted respondents show a statistically identical positive relationship between perceived deservingness of incarcerated people and support for assistance-oriented policies. Each 10-point increase in deservingness corresponds to roughly a 0.04-point rise in policy support (on a 1–5 scale). Contact with the criminal legal system does not alter this association
 
 ### Model 6: Interaction for Support of Carceral Policy Punishment
 
@@ -1383,7 +1432,7 @@ summary(m6c)
 
 M6c Interpretation
 
--   For non-impacted respondents, each 1 point increase in deservingness on a 0-100 scale is associated with 0.005 more support for prison help policies, on a 1-5 scale. To put in a larger scale, this also means a 10 point increase in incarcerated people deservingness scores predicts 0.04 more support. However, because deservingness scores for incarcerated people are fairly clustered around the mean, this does not mean a ton. However, it is highly significant (p \<0.001).
+-   For non-impacted respondents, each 1 point increase in deservingness on a 0-100 scale is associated with 0.005 more support for punitive policies (LWOP and the death penalty), on a 1-5 scale. To put in a larger scale, this also means a 10 point increase in incarcerated people deservingness scores predicts 0.05 more support. However, because deservingness scores for incarcerated people are fairly clustered around the mean, this does not mean a ton. However, it is highly significant (p \<0.001). It is also not the relationship expected.
 
 -   Impacted respondents don't differ significantly (0.009) in their baseline view of help policy from non-impacted people when deservingness scores for incarcerated people are held at their mean.
 
@@ -1394,6 +1443,7 @@ M6c Interpretation
 Takaway: Deservingness has a positive effect on help-oriented carceral policies, and this effect doesn't vary meaningfully between impacted and non impacted people.
 
 ```{r}
+
 slopes_m6c <- slopes(m6c, variables = "d_inc_c", by = "impact")
 slopes_m6c
 
@@ -1403,4 +1453,5 @@ pred_m6c <- predictions(m6c,
                                                           max(x_data$d_inc_c, na.rm = TRUE),length = 100),
                           impact = c(0,1)
                         ))
+pred_m6c
 ```
