@@ -2131,4 +2131,144 @@ $$
 
 Vars to construct or check:
 
--   policy disposition: support for medicaid, unemployment assistance, views on mimum wage and government support for the poor, and agreement with the importance of helping refugees. 
+-   policy disposition: support for medicaid (q20), unemployment assistance (q19), views on mimum wage and government support for the poor, and agreement with the importance of helping refugees. 
+
+Medicaid, Unemployment Questions -- here, I find and look into odd coding of responses based on survey pdf export that suggests a coding scheme that needs the following recode:
+1 = much more assistance
+2 = more assistance
+3 = the right amount
+then
+4 = much less assistance
+5 = don't know
+6 = less assistance
+to
+1 = much more assistance
+2 = more assistance
+3 = the right amount
+then
+4 --> 5 = much less assistance
+5 --> drop = don't know
+6 --> 4= less assistance
+
+ie. it is a 1-5 scale with 5 being least assistance, but the original coding has 4 and 6 flipped and 5 as don't know.
+```{r}
+
+# policy - medicaid and unemployment original coding: much more assistance (1), more assistance (2), about the right about (3), less assistance (6), much less assistnatce (4), don't know (5)
+
+summary(x_data$q20)
+summary(x_data$q19)
+
+hist(x_data$q20)
+hist(x_data$q19)
+
+table(x_data$q20)
+table(x_data$q19)
+
+# looking at relationship with fiscal ideology which is coded 0 very conservative to 5 very liberal
+cor(x_data$q19, x_data$fiscal_ideology, use = "pairwise.complete.obs")
+cor(x_data$q20, x_data$fiscal_ideology, use = "pairwise.complete.obs")
+
+# checking that counts match expected by party
+table(x_data$q19, x_data$Republican)
+table(x_data$q19, x_data$Democrat)
+
+table(x_data$q20, x_data$Republican)
+table(x_data$q20, x_data$Democrat)
+
+#recode
+x_data <- x_data %>%
+  mutate(
+    q19_recoded = case_when(
+      q19 == 1 ~ 1, 
+      q19 == 2 ~ 2,
+      q19 == 3 ~ 3,
+      q19 == 4 ~ 5,
+      q19 == 5 ~ NA_real_,
+      q19 == 6 ~ 4 
+    ),
+    q20_recoded = case_when(
+      q20 == 1 ~ 1,
+      q20 == 2 ~ 2,
+      q20 == 3 ~ 3,
+      q20 == 4 ~ 5,
+      q20 == 5 ~ NA_real_,
+      q20 == 6 ~ 4
+    )
+  )
+
+```
+
+Next policy question (q74_3) is how important do you think it is for the US to "Taking in civilian refugees trying to escape violence and war." Raw coding:
+not very important (1), not important (2), important (3), very important (4), don't know (5). Here, I'm going to recode 5 to be the middle value so this is also on a 1-5 scale:
+1->1
+2->2
+3->4
+4->5
+5->3
+```{r}
+x_data <- x_data %>%
+  mutate(
+    q74_3_recoded = case_when(
+      q74_3 == 1 ~ 1,
+      q74_3 == 2 ~ 2,
+      q74_3 == 3 ~ 4,
+      q74_3 == 4 ~ 5,
+      q74_3 == 5 ~ 3
+    )
+  )
+
+```
+Next, I am going to flip the scale so that it matches the direction of q19 and q20, before averaging respondent answers to these questions to create a composite.
+```{r}
+
+x_data <- x_data %>%
+  mutate(
+    q74_3_recoded_flipped = 6 - q74_3_recoded
+  ) %>%
+  rowwise() %>%
+  mutate(
+    policydisposition = mean(c_across(c("q19_recoded", "q20_recoded", "q74_3_recoded_flipped")), na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+```
+Thus, the scale for policydisposition is:
+1 = much more assistance + taking in more refugees very important = most liberal
+2 = more assistance
+3 = the right amount
+4 = less assistance
+5 = much less assistance + taking in refugees unimportant = most conservative
+
+I explore whether the effect of carceral contact on deservingness varies across ideological groups. This analysis addresses concerns that the relationship between contact and deservingness may simply reflect underlying political ideology. More broadly, prior work suggests that while ideology is a powerful predictor of attitudes toward marginalized groups, it may also obscure important conditional variation in how individuals interpret personal or vicarious experiences with the criminal legal system. Thus, I test the possibility that respondents with different ideological orientations may interpret contact differently.
+
+I model criminal legal contact’s effect on other forms of policy help by regressing aggregated attitudes towards those policies on impact.
+y_i^"polorientation" =β_0+β_1⋅〖"impact" 〗_i+β_2⋅〖"desor" 〗_i+X_i'⋅"controlsvector"+u_i
+```{r}
+
+rc_1 <- lm(policydisposition ~ impact + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+rc_1_inc <- lm(policydisposition ~ incarc + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+rc_1_vict <- lm(policydisposition ~ vict + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+rc_1_knowincarc <- lm(policydisposition ~ knowincarc + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace, data = x_data)
+
+summary(rc_1)
+summary(rc_1_inc)
+summary(rc_1_vict)
+summary(rc_1_knowincarc)
+```
+The results indicate that carceral contact significantly predicts a more conservative policy disposition (β₁ = -0.14 , p \< 0.01), even after controlling for political affiliation, ideology, and other relevant covariates. This suggests that individuals with personal or vicarious experience with the criminal legal system tend to favor less assistance-oriented policies overall.
+
+

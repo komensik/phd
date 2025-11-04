@@ -1,8 +1,10 @@
 ---
 title: "p1_results"
+format: html
 ---
 
 ```{r, echo=FALSE, warning=FALSE}
+suppressPackageStartupMessages({
 library(dplyr)
 library(tidyr)
 library(readr)
@@ -19,7 +21,7 @@ library(rsq)
 library(skimr)
 library(knitr)
 library(kableExtra)
-
+})
 
 ```
 

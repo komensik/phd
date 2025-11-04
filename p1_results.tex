@@ -1,0 +1,1139 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={p1\_results},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{p1\_results}
+\author{}
+\date{}
+\begin{document}
+\maketitle
+
+\renewcommand*\contentsname{Table of contents}
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+
+\section{Results: Diagnostic Analyses of Contact and
+Deservingness}\label{results-diagnostic-analyses-of-contact-and-deservingness}
+
+\subsection{Overview}\label{overview}
+
+These results document the exploratory and diagnostic tests used to
+evaluate how distinct forms of contact with the criminal legal
+system---\textbf{incarceration experience (\texttt{incarc})},
+\textbf{knowing someone incarcerated (\texttt{knowincarc})}, and
+\textbf{victimization (\texttt{vict})}---relate to perceived
+deservingness of incarcerated people (\texttt{d\_incppl\_pris\_abc}).\\
+Analyses are \textbf{unweighted} and focus on data integrity, model
+performance, and variable behavior rather than publication-ready
+estimates.
+
+\subsection{I. Descriptive
+Diagnostics}\label{i.-descriptive-diagnostics}
+
+\subsubsection{Table A1: Summary
+Statistics}\label{table-a1-summary-statistics}
+
+\begin{verbatim}
+Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Data summary}\tabularnewline
+\toprule\noalign{}
+\endfirsthead
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Name & Piped data \\
+Number of rows & 2222 \\
+Number of columns & 18 \\
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ & \\
+Column type frequency: & \\
+numeric & 18 \\
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ & \\
+Group variables & None \\
+\end{longtable}
+
+\textbf{Variable type: numeric}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.2093}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.1163}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.1628}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0698}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0698}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0349}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0698}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0698}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0698}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0581}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0698}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+skim\_variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+n\_missing
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+complete\_rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+mean
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+sd
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p0
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p50
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p75
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p100
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+hist
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+d\_incppl\_pris\_abc & 33 & 0.99 & 46.13 & 27.96 & 0 & 25.00 & 50.00 &
+66.00 & 100 & ▆▆▇▅▃ \\
+incarc & 0 & 1.00 & 0.08 & 0.27 & 0 & 0.00 & 0.00 & 0.00 & 1 & ▇▁▁▁▁ \\
+knowincarc & 0 & 1.00 & 0.31 & 0.46 & 0 & 0.00 & 0.00 & 1.00 & 1 &
+▇▁▁▁▃ \\
+vict & 0 & 1.00 & 0.12 & 0.33 & 0 & 0.00 & 0.00 & 0.00 & 1 & ▇▁▁▁▁ \\
+desor\_core & 16 & 0.99 & 66.75 & 19.20 & 0 & 52.22 & 66.67 & 81.11 &
+100 & ▁▂▇▇▆ \\
+fiscal\_ideology & 565 & 0.75 & 2.48 & 1.41 & 0 & 1.00 & 3.00 & 3.00 & 5
+& ▇▆▇▃▂ \\
+social\_ideology & 565 & 0.75 & 2.26 & 1.48 & 0 & 1.00 & 2.00 & 3.00 & 5
+& ▇▆▆▃▂ \\
+penalpoint & 190 & 0.91 & 4.08 & 1.81 & 1 & 3.00 & 4.00 & 6.00 & 7 &
+▆▅▇▅▇ \\
+Republican & 618 & 0.72 & 0.25 & 0.43 & 0 & 0.00 & 0.00 & 0.00 & 1 &
+▇▁▁▁▂ \\
+Democrat & 618 & 0.72 & 0.39 & 0.49 & 0 & 0.00 & 0.00 & 1.00 & 1 &
+▇▁▁▁▅ \\
+fire\_rare & 561 & 0.75 & 3.04 & 0.89 & 1 & 2.00 & 3.00 & 4.00 & 4 &
+▁▅▁▇▇ \\
+fire\_privilege & 561 & 0.75 & 2.14 & 1.02 & 1 & 1.00 & 2.00 & 3.00 & 4
+& ▇▇▁▅▃ \\
+fire\_angry & 561 & 0.75 & 1.69 & 0.77 & 1 & 1.00 & 2.00 & 2.00 & 4 &
+▇▇▁▂▁ \\
+fire\_fear & 561 & 0.75 & 3.44 & 0.70 & 1 & 3.00 & 4.00 & 4.00 & 4 &
+▁▁▁▆▇ \\
+gender & 618 & 0.72 & 0.47 & 0.50 & 0 & 0.00 & 0.00 & 1.00 & 1 &
+▇▁▁▁▇ \\
+Black & 619 & 0.72 & 0.15 & 0.36 & 0 & 0.00 & 0.00 & 0.00 & 1 & ▇▁▁▁▂ \\
+Hispanic & 619 & 0.72 & 0.15 & 0.36 & 0 & 0.00 & 0.00 & 0.00 & 1 &
+▇▁▁▁▂ \\
+OtherRace & 0 & 1.00 & 0.04 & 0.19 & 0 & 0.00 & 0.00 & 0.00 & 1 &
+▇▁▁▁▁ \\
+\end{longtable}
+
+Figure A1 shows that perceived deservingness of incarcerated people
+centers near 46 on a 0--100 scale (SD ≈ 28), with modest right skew.
+Roughly 8 \% of respondents report having been incarcerated, 31 \% know
+someone who has, and 12 \% report victimization (Table A2)
+
+\subsubsection{Figure A1. Density of
+Dependent}\label{figure-a1.-density-of-dependent}
+
+\begin{verbatim}
+# A tibble: 2,189 x 1
+   d_incppl_pris_abc
+               <dbl>
+ 1                58
+ 2               100
+ 3                83
+ 4                50
+ 5                20
+ 6                 0
+ 7                84
+ 8                22
+ 9                50
+10                50
+# i 2,179 more rows
+\end{verbatim}
+
+\subsubsection{Figure A2. Cross-Tabs of Contact
+Types}\label{figure-a2.-cross-tabs-of-contact-types}
+
+\subsection{II. Bivariate Regressions}\label{ii.-bivariate-regressions}
+
+\begin{verbatim}
+Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{verbatim}
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{verbatim}
+Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{verbatim}
+Warning in attr(x, "format"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{longtable}[t]{lrrrr}
+\caption{\label{tab:unnamed-chunk-5}Table 1. Coefficients for M2 – Incarcerated}\\
+\toprule
+term & estimate & std.error & statistic & p.value\\
+\midrule
+(Intercept) & 4.7544258 & 6.1042170 & 0.7788756 & 0.4361710\\
+incarc & 8.6976050 & 2.4149822 & 3.6015193 & 0.0003263\\
+Republican & -0.4663814 & 1.6684804 & -0.2795247 & 0.7798792\\
+Democrat & -0.7256735 & 1.4639820 & -0.4956847 & 0.6201867\\
+fiscal\_ideology & 0.2127949 & 0.8273743 & 0.2571930 & 0.7970637\\
+\addlinespace
+social\_ideology & -1.9809023 & 0.8482607 & -2.3352516 & 0.0196564\\
+penalpoint & -1.2055685 & 0.3478478 & -3.4657933 & 0.0005430\\
+desor\_core & 0.7376188 & 0.0374672 & 19.6870629 & 0.0000000\\
+fire\_rare & 0.4964744 & 0.8534110 & 0.5817530 & 0.5608171\\
+fire\_privilege & -0.2067427 & 0.8051144 & -0.2567867 & 0.7973773\\
+\addlinespace
+fire\_angry & 0.6873672 & 0.9038487 & 0.7604892 & 0.4470771\\
+fire\_fear & -0.2047978 & 0.9891034 & -0.2070540 & 0.8359947\\
+gender & -1.2442991 & 1.1557388 & -1.0766265 & 0.2818135\\
+Black & -0.3019164 & 1.8744224 & -0.1610717 & 0.8720578\\
+Hispanic & -3.0669029 & 1.7254155 & -1.7774866 & 0.0756829\\
+\addlinespace
+OtherRace & -1.1626656 & 2.3454755 & -0.4957057 & 0.6201718\\
+\bottomrule
+\end{longtable}
+
+\begin{verbatim}
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{verbatim}
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{verbatim}
+Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{verbatim}
+Warning in attr(x, "format"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{table}
+\centering
+\caption{\label{tab:unnamed-chunk-5}Table 1. Coefficients for M2 – Victimized}
+\centering
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+term & estimate & std.error & statistic & p.value\\
+\hline
+(Intercept) & 4.0757569 & 6.1525875 & 0.6624460 & 0.5077832\\
+\hline
+vict & 1.8311316 & 2.0491020 & 0.8936264 & 0.3716596\\
+\hline
+Republican & -0.2417254 & 1.6813713 & -0.1437668 & 0.8857032\\
+\hline
+Democrat & -0.8120548 & 1.4681640 & -0.5531091 & 0.5802679\\
+\hline
+fiscal\_ideology & 0.1746308 & 0.8356793 & 0.2089687 & 0.8345000\\
+\hline
+social\_ideology & -1.8930024 & 0.8491248 & -2.2293572 & 0.0259320\\
+\hline
+penalpoint & -1.1615853 & 0.3475277 & -3.3424249 & 0.0008501\\
+\hline
+desor\_core & 0.7400902 & 0.0375803 & 19.6935530 & 0.0000000\\
+\hline
+fire\_rare & 0.5040169 & 0.8629299 & 0.5840763 & 0.5592534\\
+\hline
+fire\_privilege & -0.2149014 & 0.8134293 & -0.2641918 & 0.7916670\\
+\hline
+fire\_angry & 0.6428042 & 0.9022890 & 0.7124150 & 0.4763143\\
+\hline
+fire\_fear & -0.0883885 & 0.9876795 & -0.0894911 & 0.9287031\\
+\hline
+gender & -0.9467339 & 1.1612650 & -0.8152609 & 0.4150474\\
+\hline
+Black & 0.1874133 & 1.8721190 & 0.1001076 & 0.9202718\\
+\hline
+Hispanic & -2.9739921 & 1.7405186 & -1.7086816 & 0.0877087\\
+\hline
+OtherRace & -0.8587638 & 2.3653051 & -0.3630668 & 0.7166041\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{verbatim}
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{verbatim}
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{verbatim}
+Warning in attr(x, "align"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{verbatim}
+Warning in attr(x, "format"): 'xfun::attr()' is deprecated.
+Use 'xfun::attr2()' instead.
+See help("Deprecated")
+\end{verbatim}
+
+\begin{table}
+\centering
+\caption{\label{tab:unnamed-chunk-5}Table 1. Coefficients for M2 – Victimized}
+\centering
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+term & estimate & std.error & statistic & p.value\\
+\hline
+(Intercept) & 3.2377490 & 6.1291670 & 0.5282527 & 0.5973991\\
+\hline
+knowincarc & 5.3546148 & 1.2577090 & 4.2574353 & 0.0000219\\
+\hline
+Republican & -0.0704740 & 1.6726961 & -0.0421320 & 0.9663989\\
+\hline
+Democrat & -0.7769671 & 1.4644549 & -0.5305504 & 0.5958058\\
+\hline
+fiscal\_ideology & 0.0352355 & 0.8315015 & 0.0423758 & 0.9662046\\
+\hline
+social\_ideology & -1.9609376 & 0.8476605 & -2.3133526 & 0.0208327\\
+\hline
+penalpoint & -1.1745083 & 0.3455765 & -3.3986928 & 0.0006941\\
+\hline
+desor\_core & 0.7347021 & 0.0376058 & 19.5369498 & 0.0000000\\
+\hline
+fire\_rare & 0.4148532 & 0.8536177 & 0.4859942 & 0.6270395\\
+\hline
+fire\_privilege & -0.0513998 & 0.8100706 & -0.0634510 & 0.9494155\\
+\hline
+fire\_angry & 0.6068086 & 0.8962396 & 0.6770607 & 0.4984678\\
+\hline
+fire\_fear & 0.0115221 & 0.9921904 & 0.0116127 & 0.9907361\\
+\hline
+gender & -0.9481606 & 1.1552792 & -0.8207198 & 0.4119312\\
+\hline
+Black & -0.1224413 & 1.8729459 & -0.0653736 & 0.9478849\\
+\hline
+Hispanic & -3.3836311 & 1.7201913 & -1.9670086 & 0.0493591\\
+\hline
+OtherRace & -0.4743038 & 2.3410358 & -0.2026042 & 0.8394708\\
+\hline
+\end{tabular}
+\end{table}
+
+In bivariate models, desor\_core alone explains about 30 \% of the
+variance in deservingness, dwarfing all other predictors (Table B1).
+Ideological measures account for 7--8 \% of variance; punitiveness about
+3--4 \%. Carceral‐contact variables each explain \textless{} 1 \% of
+variance individually.
+
+\subsubsection{Table B1: Adjusted R² and AIC for each predictor (sorted
+by Adj.
+R²).}\label{table-b1-adjusted-ruxb2-and-aic-for-each-predictor-sorted-by-adj.-ruxb2.}
+
+\subsection{III. Full Models by Contact
+Type}\label{iii.-full-models-by-contact-type}
+
+\subsubsection{A. M2 - Incarcerated}\label{a.-m2---incarcerated}
+
+\subsubsection{Table 1. Coefficients for M2 -
+Incarcerated}\label{table-1.-coefficients-for-m2---incarcerated}
+
+\subsubsection{Table 2. Semi-partial R2 -
+Incarcerated}\label{table-2.-semi-partial-r2---incarcerated}
+
+\subsubsection{Table 3. Standardized betas -
+Incarcerated}\label{table-3.-standardized-betas---incarcerated}
+
+\subsubsection{A. M2 - Victimized}\label{a.-m2---victimized}
+
+\subsubsection{Table 1. Coefficients for M2 -
+Victimized}\label{table-1.-coefficients-for-m2---victimized}
+
+\subsubsection{Table 2. Semi-partial R2 -
+Victimized}\label{table-2.-semi-partial-r2---victimized}
+
+\subsubsection{Table 3. Standardized betas -
+Victimized}\label{table-3.-standardized-betas---victimized}
+
+\subsubsection{A. M2 - Proximate}\label{a.-m2---proximate}
+
+\subsubsection{Table 1. Coefficients for M2 -
+Proximate}\label{table-1.-coefficients-for-m2---proximate}
+
+\subsubsection{Table 2. Semi-partial R2 -
+Proximate}\label{table-2.-semi-partial-r2---proximate}
+
+\subsubsection{Table 3. Standardized betas -
+Proximate}\label{table-3.-standardized-betas---proximate}
+
+\subsection{IV. Cross-Model
+Comparison}\label{iv.-cross-model-comparison}
+
+Across models (Tables 1--12), generalized deservingness orientations
+remain the most powerful predictor of perceived deservingness of
+incarcerated people.
+
+A 10-point increase in desor\_core predicts roughly a 7.4-point higher
+deservingness score.
+
+The standardized coefficient (β ≈ 0.51) indicates a half-SD shift in the
+outcome for each SD increase in desor\_core.
+
+incarc (+8.7, p \textless{} .001) and knowincarc (+5.4, p \textless{}
+.001) also raise perceived deservingness, but their standardized effects
+are modest (β ≈ 0.08 and β ≈ 0.06, respectively).
+
+Victimization is positive but not significant (β ≈ 0.02).
+
+More socially conservative and punitive respondents view incarcerated
+people as less deserving (social\_ideology ≈ −0.11 β; penalpoint ≈ −0.08
+β).
+
+Partisan identification, FIRE items, and demographics contribute
+negligibly.
+
+Variance Decomposition: Semi-partial R² values underscore the hierarchy
+of explanatory power (Figure C1). General deservingness beliefs
+(desor\_core) uniquely account for about 23 \% of explained variance in
+deservingness judgments, whereas experiential contact adds only 0.6--1.1
+\%, and ideology or punitiveness add around 0.7 \% each.
+
+These results suggest that attitudinal orientations about help and
+deservingness dominate, but personal contact with the carceral system
+still exerts an independent, substantively meaningful effect. Direct or
+proximate experience corresponds to more generous views of incarcerated
+people, while victimization does not.
+
+\section{written oct 31}\label{written-oct-31}
+
+In a series of bivariate regressions, I examined how much variation in
+deservingness perceptions of incarcerated people
+(\texttt{d\_incppl\_pris\_abc}) each control variable accounted for.
+Adjusted R² values indicate the proportion of total outcome variance
+explained by each predictor. For example, baseline help orientations
+(\texttt{desor\_core}) alone explain roughly 30\% of the variance in
+deservingness -- meaning that people's differences in perceived
+deservingness align strongly with their differences in support levels.
+Other predictors, such as ideology or partisanship, each explain smaller
+portions of the variance (roughly 3--8\%), while carceral impact
+explains little by itself.
+
+In the full model, experiencing carceral impact is associated with a
+\textbf{4.6-point} increase in the policy support index (0--100),
+controlling for ideology, party ID, and deservingness. By contrast, a
+10-point increase in the \texttt{desor\_core} index predicts about a
+\textbf{7.3-point} increase. Standardized coefficients and semi-partial
+R² confirm that \texttt{desor\_core} accounts for more of the outcome's
+variance than \texttt{impact} does uniquely; however \texttt{impact}
+still has an independent, statistically significant association. This
+pattern suggests that while personal impact matters, core deservingness
+beliefs explain a larger portion of cross-person variation in support.
+
+When all variables are standardized, \emph{desor\_core} has by far the
+largest standardized coefficient (β = 0.51), indicating that respondents
+who rate carceral citizens as more deserving tend to express much
+stronger support for prison-help policies. A one--standard deviation
+increase in \emph{desor\_core} corresponds to roughly a half--standard
+deviation increase in support.
+
+The coefficient for \emph{impact} (β = 0.08) remains positive and
+statistically significant, suggesting that direct or indirect experience
+with the carceral system is associated with higher policy support,
+though the magnitude is relatively modest compared with attitudinal
+factors.
+
+\emph{Social ideology} (β = −0.11) and \emph{punitiveness} (β = −0.07)
+show smaller negative relationships, while partisan identifiers and FIRE
+items contribute little once these factors are controlled.
+
+\textbf{Incarceration on Deservingness}
+
+When we include both experiential exposure (\texttt{incarc}) and the
+attitudinal control reflecting general orientation toward help-needing
+groups (\texttt{desor\_core}) in the same model, both predictors are
+statistically significant. The semi-partial R² values reveal that
+\texttt{desor\_core} uniquely accounts for approximately \textbf{23\% of
+the variance} in policy support, whereas \texttt{incarc} explains less
+than \textbf{1\% of unique variance}. This indicates that generalized
+perceptions of deservingness are the dominant driver of support, while
+personal experience with incarceration contributes a smaller, though
+still meaningful, independent effect.
+
+Because deservingness orientations (\texttt{desor\_core}) strongly
+predict views on incarcerated people and may correlate with experience
+of incarceration (\texttt{incarc}), we include \texttt{desor\_core} as a
+control in all models. Controlling for \texttt{desor\_core} allows us to
+estimate the independent association of incarceration experience with
+policy support, net of respondents' attitudinal differences. The
+semi-partial R² results highlight the relative explanatory contributions
+of each predictor, confirming that attitudes toward carceral citizens
+are far more influential than demographic or ideological controls.
+
+These results demonstrate that while attitudes about deservingness
+dominate variance in policy support, experiential exposure to the
+criminal legal system has a measurable, independent effect --- which
+aligns with our experimental interest in whether incarceration shapes
+perceptions of carceral citizens (\texttt{d\_incppl\_pris\_abc}).
+
+When we include both experiential exposure (\texttt{incarc}) and the
+control for generalized deservingness attitudes (\texttt{desor\_core})
+in the same model predicting policy support, both predictors are
+statistically significant. The unstandardized coefficient for
+\texttt{incarc} indicates that respondents who have experienced
+incarceration score roughly \textbf{8.7 points higher} on the policy
+support scale (0--100), holding other variables constant. By comparison,
+a one-unit increase in \texttt{desor\_core} is associated with a
+\textbf{0.74-point increase}, though the 0--100 scale of this composite
+makes direct comparisons challenging.
+
+Standardized coefficients place all predictors on the same scale and
+clarify relative influence: a \textbf{1 SD increase in
+\texttt{desor\_core} corresponds to a 0.51 SD increase} in policy
+support, whereas a change from 0 to 1 in \texttt{incarc} corresponds to
+only a \textbf{0.079 SD increase}. Similarly, semi-partial R² values
+show that \texttt{desor\_core} uniquely explains
+\textbf{\textasciitilde23\% of the variance}, while \texttt{incarc}
+explains less than \textbf{1\%}, confirming that generalized attitudes
+about deservingness are the dominant driver of support.
+
+Including \texttt{desor\_core} as a control allows us to isolate the
+independent association of incarceration experience with policy support,
+net of respondents' broader attitudinal dispositions. Taken together,
+these results indicate that while attitudes toward deservingness
+strongly predict policy support, personal experience with the criminal
+legal system exerts a smaller but meaningful effect --- which aligns
+with our experimental interest in whether incarceration shapes
+perceptions of carceral citizens (\texttt{d\_incppl\_pris\_abc}).
+
+\section{Results: M3 \& M4 -- REWRITE AFTER HAVING FIXED
+SCALES}\label{results-m3-m4-rewrite-after-having-fixed-scales}
+
+My second core hypothesis (\textbf{H2)} is that more generous
+perceptions of carceral citizens' deservingness will predict greater and
+more consistent support for assistance-oriented criminal legal policies
+and reduced support for punitive criminal legal policies.
+
+\subsection{Model 3: Help-Oriented Policy
+Support}\label{model-3-help-oriented-policy-support}
+
+After estimating the outcome model for the help-policy index, I find
+that perceptions of incarcerated people's deservingness are a consistent
+and statistically significant predictor of support for
+assistance-oriented criminal legal policies. Each one-point increase on
+the 0--100 deservingness scale corresponds to a 0.005-point increase on
+the 1--4 policy-support scale (p \textless{} .001). Although
+substantively modest, this relationship is highly robust and in the
+expected direction---respondents who view incarcerated people as more
+deserving are more supportive of policies that expand rehabilitation,
+education, and family contact.
+
+In this specification, respondents with any form of carceral
+contact---whether through direct incarceration, knowing someone who has
+been incarcerated, or victimization---express significantly greater
+support for help-oriented policies (b = 0.17, p \textless{} .001). This
+finding departs from earlier models where the contact effect attenuated
+once attitudes were controlled, suggesting that contact and
+deservingness perceptions now operate as complementary rather than
+competing predictors. The pattern is consistent with the possibility
+that contact influences help-policy support both directly and indirectly
+through its effect on deservingness, a mechanism tested explicitly in
+subsequent mediation models (M7--M8).
+
+Among covariates, a more punitive view of the purpose of prisons
+(penalpoint) is associated with lower support for help policies (p
+\textless{} .001), and social conservatism also predicts reduced support
+(p \textless{} .001). General generosity toward help-needing groups
+(\texttt{desor\_core}) likewise increases help-policy support (p =
+.001), suggesting that both domain-specific and broad moral orientations
+matter for rehabilitative policy preferences. Racial attitudes exert
+expected effects: disagreement that racial problems are rare and
+disagreement with fear of other races predict greater support for help
+policies, while denying White privilege and expressing less anger about
+racism predict lower support. The model explains roughly 37 percent of
+the variance in help-policy support (Adj. R² = .37), a substantial
+improvement from earlier specifications and consistent with expectations
+that attitudinal factors---particularly deservingness
+perceptions---dominate these evaluations.
+
+\subsection{Model 4: Opposition to Punitive
+Policies}\label{model-4-opposition-to-punitive-policies}
+
+Turning to opposition to punitive policies, the relationship between
+perceived deservingness of incarcerated people and policy preferences
+remains strong and in the expected direction. Each one-point increase in
+deservingness corresponds to a 0.005-point increase in opposition to
+punitive policies (p \textless{} .001). Thus, respondents who see
+incarcerated people as more deserving are less supportive of punitive
+measures such as the death penalty or life without parole. Individuals
+with carceral contact also express greater opposition to punitive
+policies (b = 0.08, p = .03), indicating that lived experience with the
+criminal legal system corresponds to less punitive attitudes.
+
+Fiscal and social conservatism are both negatively associated with
+opposition to punitive policies, while a punitive view of the prison's
+purpose (penalpoint) again predicts greater support for punitive
+measures (p \textless{} .001). Among the FIRE items, acknowledging White
+privilege (p = .007) and expressing anger about racism (p = .019) each
+correspond to greater opposition to punitive policies, whereas racial
+fear predicts stronger punitiveness (p = .024). Other demographic
+variables are statistically indistinguishable from zero. The model
+explains roughly 16 percent of the variance in opposition to punitive
+policies (Adj. R² = .16), indicating that deservingness and punitive
+orientation remain the principal attitudinal anchors of criminal legal
+policy opinion.
+
+\subsection{Distinguishing General and Carceral
+Deservingness}\label{distinguishing-general-and-carceral-deservingness}
+
+Because generosity toward incarcerated people may reflect a broader
+prosocial orientation, I include a control for respondents'
+\textbf{general deservingness orientation} (\texttt{desor\_core}),
+measured as the mean of deservingness ratings for help-needing groups
+such as welfare recipients, the homeless, and immigrants. This variable
+captures an underlying disposition toward helping others. Diagnostic
+tests show that \texttt{desor\_core} and incarcerated-group
+deservingness are moderately correlated (r = .55), but the shared
+variance is conceptually meaningful rather than problematic. In the
+help-policy model, \texttt{desor\_core} contributes additional
+explanatory power (ΔAdj. R² ≈ .05), whereas in the punitive-policy
+model, its contribution is negligible (ΔAdj. R² ≈ .001). These patterns
+indicate that while general generosity reinforces support for
+assistance-oriented carceral policies, opposition to punitive policies
+is driven primarily by attitudes specific to the incarcerated
+population.
+
+START OLD old M3M4
+
+M3
+
+After estimating the outcome model for the help policy index, I find
+that perceptions of incarcerated people's deservingness are a consistent
+and statistically significant predictor of support for
+assistance-oriented criminal legal policies. Each one-point increase on
+the 0--100 deservingness scale corresponds to a 0.004-point increase on
+the 1--5 policy-support scale (p \textless{} .001). Although modest in
+magnitude, this relationship is robust and in the theoretically expected
+direction.
+
+Contrary to my expectations, carceral contact itself---whether through
+direct experience, knowing someone incarcerated, or victimization---has
+no statistically discernible effect on support for help policies once
+attitudes and ideology are accounted for. Although direct carceral
+contact does not predict help-policy support once deservingness is
+included, this attenuation is consistent with the possibility that
+contact's influence operates indirectly through shifts in deservingness
+perceptions---a question tested directly in later mediation models
+(M7--M8).
+
+Both Republican and Democratic identifiers express lower support for
+such policies relative to independents, and a more punitive orientation
+toward the purpose of prisons is strongly associated with reduced
+support (p \textless{} .001). Social and fiscal ideology are
+statistically indistinguishable from zero in this model, suggesting that
+specific penal and deservingness attitudes are more relevant than broad
+ideological self-placement. The model explains approximately 13 percent
+of the variance in policy support (Adj. R² = .13), indicating that while
+the predictors collectively matter, most of the variance lies beyond the
+attitudinal and demographic factors captured here.
+
+M4
+
+Turning to the model predicting support for punitive policies, the
+relationship between perceived deservingness of incarcerated people and
+policy preferences remains strong and in the expected negative
+direction. Each one-point increase in deservingness corresponds to a
+0.005-point decrease in support for punitive policies on the 1--5 scale
+(p \textless{} .001), indicating that respondents who view incarcerated
+people as more deserving are less supportive of punitive measures. In
+contrast to the help-policy model, individuals with any carceral contact
+report higher punitiveness (b = 0.095, p = .019), suggesting a modest
+tendency toward more punitive views among those directly or indirectly
+affected by the system. Fiscal and social conservatism are both
+negatively associated with support for punitive reforms, while a
+punitive orientation toward the purpose of prisons (penalpoint) again
+strongly predicts favoring tougher policies (p \textless{} .001). Among
+the racial-attitudes measures, believing that White privilege exists
+(fire\_privilege) and feeling anger about racism (fire\_angry) each
+relate to lower punitiveness, whereas fear of other races shows a
+marginal positive relationship (p = .051). Other demographic variables
+are statistically indistinguishable from zero. The model explains
+roughly 17 percent of the variance in punitive policy preferences (Adj.
+R² = .16), underscoring that carceral-specific deservingness and
+punitive orientation remain the primary attitudinal foundations of
+support for these policies.
+
+Because attitudes toward incarcerated people may partly reflect broader
+social attitudes towards help-needing groups, I include a control for
+general deservingness orientation to ensure the observed effects are not
+artifacts of a general helping disposition. I isolate the unique
+relationship between respondents' perceptions of incarcerated people and
+their policy preferences in both models using this control(desor\_core),
+constructed as the mean of respondents' deservingness ratings for
+conventionally ``help-needing'' groups (e.g., the homeless, welfare
+recipients, and immigrants). This variable captures an underlying
+generosity disposition toward social assistance targets, allowing
+estimation of whether the effect of incarcerated-group deservingness
+persists above and beyond general helping attitudes. Diagnostic tests
+indicate that desor\_core and incarcerated-group deservingness are
+moderately correlated (r = .55), but desor\_core contributes negligible
+unique variance once the specific deservingness measure is included
+(semi-partial R² \textless{} .001; ΔAdj R² ≈ .005). These results
+suggest that while general deservingness orientation and
+incarcerated-group deservingness are closely related, the association
+between the latter and policy support reflects attitudes specific to the
+carceral context rather than a broad disposition toward help-needing
+groups.
+
+\textbf{\emph{end old M3M4}}
+
+\textbf{\emph{M3M4 By Impact}}
+
+\section{Results: M5 \& 6}\label{results-m5-6}
+
+My third core hypothesis (H3) is that perceptions of incarcerated
+people's deservingness mediate the relationship between carceral contact
+and support for criminal legal policies. Specifically, I expect that
+direct or indirect experience with the carceral system influences
+deservingness perceptions, which in turn shape policy preferences.
+Before turning to the mediation tests, Models 5 and 6 first evaluate
+whether contact moderates the effect of deservingness on policy
+support---that is, whether deservingness operates differently across
+those with and without criminal-legal experience.
+
+Model 5: Deservingness × Contact on Help-Oriented Policy To assess
+whether the relationship between perceptions of incarcerated people's
+deservingness and support for assistance-oriented carceral policies
+varies by personal contact with the criminal legal system, I estimated
+an interaction model in which deservingness (0--100 scale) and a binary
+indicator of carceral contact jointly predict the prisonhelp index (1--5
+scale). Both variables were mean-centered to facilitate interpretation,
+such that the main effect of deservingness represents the slope for
+non-impacted respondents at the average level of deservingness.
+
+{[}add latex formula{]}
+
+After correcting the coding of help-policy items, both deservingness and
+contact exert independent, positive effects on support for
+assistance-oriented prison policies. Deservingness remains a strong
+predictor (\$b = 0.0054\$, SE = 0.0007, \$p \textless{} .001\$): a
+10-point increase in deservingness corresponds to roughly a 0.05-point
+rise on the five-point prisonhelp index. Respondents who have
+experienced or witnessed criminal-legal contact express markedly higher
+baseline support for such policies (\$b = 0.17\$, SE = 0.03, \$p
+\textless{} .001\$), even when controlling for partisanship, ideology,
+punitiveness, and generalized deservingness.
+
+The interaction between deservingness and contact is small and
+statistically indistinguishable from zero (\$b = --0.0014\$, \$p =
+.16\$), indicating that the positive effect of deservingness is
+comparable across groups. Both impacted and non-impacted respondents
+increase in policy support at roughly the same rate as deservingness
+rises. Simple-slope estimates confirm that the relationship is slightly
+stronger for non-impacted respondents (+0.005 vs.~+0.004 per
+deservingness point), but the difference is not statistically
+meaningful. Predicted values show parallel upward-sloping lines: support
+increases from about 2.7 to 3.3 as deservingness rises, with impacted
+respondents consistently about 0.17 points more supportive across the
+range. These results indicate that contact raises baseline support but
+does not moderate the influence of deservingness.
+
+Among the controls, conservative social ideology and a punitive view of
+incarceration's purpose strongly depress help-policy support, while
+broader prosocial orientations (desor\_core, fire\_rare) enhance it. The
+full model explains about 37 \% of the variance in help-policy support
+(Adj. \$R\^{}2 = 0.37\$), more than double the fit of the earlier
+specification.
+
+Model 6: Deservingness × Contact on Opposition to Punitive Policy
+
+Model 6 evaluates whether the association between perceptions of
+incarcerated people's deservingness and opposition to punitive carceral
+policies varies by contact with the criminal legal system. Following the
+corrected coding of the punitive index (higher values = greater
+opposition to punitive policy), both deservingness and contact exhibit
+independent, positive effects. Deservingness predicts significantly
+greater opposition to punitive policies (\$b = 0.0052\$, SE = 0.0009,
+\$p \textless{} .001\$): each 10-point increase in perceived
+deservingness corresponds to roughly a 0.05-point rise on the five-point
+prisonpen index, indicating a less punitive orientation. Respondents
+with carceral contact are modestly less punitive overall (\$b = 0.076\$,
+SE = 0.035, \$p = .03\$), though the effect size is smaller than for
+help-policy support.
+
+The interaction between deservingness and contact is negligible (\$b =
+--0.0002\$, \$p = .89\$), demonstrating that the de-punitive effect of
+deservingness operates similarly across groups. Simple-slope analyses
+confirm this pattern: among non-impacted respondents, a one-point
+increase in deservingness predicts 0.0052 greater opposition to punitive
+policy (SE = 0.0009, \$p \textless{} .001\$), and among impacted
+respondents 0.0050 (SE = 0.0011, \$p \textless{} .001\$). Predicted
+values range from roughly 1.9 to 2.5 across the observed deservingness
+distribution, with lines for impacted and non-impacted respondents
+nearly parallel and separated by about 0.07 points---contact elevates
+overall decarceral sentiment but does not alter the slope of
+deservingness.
+
+Conservative fiscal and social ideology continue to predict greater
+punitiveness, while a punitive conception of the prison's purpose
+(penalpoint) strongly decreases opposition to punitive policies. The
+FIRE items again differentiate affective dimensions of racial attitudes:
+anger increases punitiveness, whereas privilege and fear reduce it
+modestly. The model explains 16.8 \% of variance in punitive-policy
+opposition (Adj. \$R\^{}2 = 0.16\$).
+
+Joint Interpretation of Models 5 and 6 Across both help- and
+punitive-policy domains, deservingness and contact exhibit consistent,
+independent effects. Individuals who perceive incarcerated people as
+more deserving are simultaneously more supportive of rehabilitative
+policies and more opposed to punitive ones, and these effects are
+statistically indistinguishable across contact groups. Personal
+experience with the carceral system primarily shifts the baseline level
+of policy support upward rather than conditioning how deservingness
+translates into attitudes.
+
+Semi-partial R² comparisons reinforce this pattern. In the help-policy
+model, deservingness accounts for 3.6 \% of unique variance compared to
+2.3 \% for contact; in the punitive-opposition model, deservingness
+explains 2.2 \% and contact only 0.3 \%. Thus, moral evaluations of
+incarcerated individuals explain substantially more of the variance in
+policy preferences than does lived experience itself. Taken together,
+Models 5 and 6 provide strong evidence that perceptions of deservingness
+are the dominant attitudinal mechanism shaping citizens' responses to
+carceral policy, while personal contact functions mainly as a general
+decarceral disposition.
+
+\section{Results M7 M8 (Mediation}\label{results-m7-m8-mediation}
+
+Causal mediation analyses indicate that deservingness perceptions
+partially mediate the effect of carceral contact on policy attitudes.
+For help-oriented policies, the indirect effect of contact through
+deservingness (ACME = 0.022, 95\% CI {[}0.010, 0.036{]}) accounts for
+roughly 12\% of the total effect. For punitive policies, the indirect
+pathway is similarly significant (ACME = 0.024, 95\% CI {[}0.010,
+0.040{]}), explaining approximately 24\% of the total effect. In both
+domains, contact also retains a positive direct effect, suggesting that
+while deservingness plays a meaningful role, experiential exposure
+influences policy orientations through additional mechanisms as well.
+
+
+
+
+\end{document}
