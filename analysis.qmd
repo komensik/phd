@@ -1414,6 +1414,57 @@ The F-stat is highly significant.
 cor(raw_data_cleaned$fire_angry, raw_data_cleaned$prisonpen, use="pairwise.complete.obs")
 
 ```
+### 4_ by Incarc
+
+```{r}
+m3_inc <- lm(prisonhelp ~ incarc + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+
+    data = raw_data_cleaned
+)
+
+m4_inc <- lm(prisonpen ~ incarc + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,data = raw_data_cleaned)
+
+summary(m3_inc)
+summary(m4_inc)
+```
+
+### 4_ by Vict
+
+```{r}
+m3_vict <- lm(prisonhelp ~ vict + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,data = raw_data_cleaned
+)
+
+m4_vict <- lm(prisonpen ~ vict + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,data = raw_data_cleaned
+)
+
+summary(m3_vict)
+summary(m4_vict)
+```
+
+
+### 4_ by Knowincarc
+
+```{r}
+
+m3_prox <- lm(prisonhelp ~ knowincarc + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+    data = raw_data_cleaned
+)
+
+m4_prox <- lm(prisonpen ~ knowincarc + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+    data = raw_data_cleaned
+)
+
+summary(m3_prox)
+summary(m4_prox)
+
+```
+
 
 ## 5 M5 & M6
 
@@ -1722,13 +1773,13 @@ The total effect (combined direct and indirect) for m7 is 0.19 and is significan
 
 The proportion mediation is the share of total effect explained by the mediator. For m7 it's 0.117. Roughly 12% of contact's effect on help-policy support operates through increased deservingness perceptions. For m8 it's 0.238 and significant. that means about 24% of the effect of impact on punitive policy views passes through deservingness. The CI here is a little wide though.
 
-For m7: Contact with the carceral system significantly increases support for help-oriented policies. About **one-eighth of that total effect** occurs *because* contact makes people see incarcerated individuals as more deserving, while the remaining \~88% is a direct shift in policy orientation not explained by deservingness. For m8: Contact predicts less punitive attitudes, and nearly **a quarter of that effect** works indirectly through deservingness. The rest reflects a direct reduction in punitiveness not fully captured by changes in perceived deservingness.
+For m7: Contact with the carceral system significantly increases support for help-oriented policies. **About one-eighth of that total effect occurs *because* contact makes people see incarcerated individuals as more deserving, while the remaining \~88% is a direct shift in policy orientation not explained by deservingness.** For m8: Contact predicts less punitive attitudes, and nearly **a quarter of that effect** works indirectly through deservingness. The rest reflects a direct reduction in punitiveness not fully captured by changes in perceived deservingness.
 
 Sensitivity analyses using the `medsens()` procedure indicate that the indirect effects are moderately robust to violations of sequential ignorability. For both help-oriented and punitive-policy outcomes, the estimated ACME would be reduced to zero only if the residual correlation between the mediator and outcome equations exceeded approximately ρ = 0.20, corresponding to an unobserved confounder jointly explaining about 4 % of residual variance in both models. This suggests the mediation findings are reasonably stable to modest unmeasured confounding.
 
 (ie: these results are moderately robust to unmeasured confounding)
 
-### M10 – Variance
+## 7 M10 – Variance
 
 Goal: test whether deservingness perceptions also predict consistency of support across policy help items.
 
@@ -1786,4 +1837,298 @@ Estimation choices
 
             -   maybe not needed: entropy dispersion, reliability tie in (Cronbachs alpha, consistency analysis that complements reliability by focusing on individual level dispersion)
 
-                -   heterogeneity: interact\
+            -   heterogeneity: interact
+
+#### Individual Help Policy Items, Variance, SD Prep
+
+```{r}
+help_policy_items[!help_policy_items %in% names(x_data)]
+
+help_policy_items <- c("q25_2_rev", "q25_3_rev", "q25_4_rev", "q25_6_rev", "q23_2_rev", "q23_7_rev")
+
+# Check distributions and means
+summary(x_data[, c("q25_2_rev","q25_3_rev","q25_4_rev","q25_6_rev","q23_2_rev","q23_7_rev")])
+cor(x_data$q23_2_rev, x_data$q23_7_rev, use="pairwise.complete.obs")
+
+# checking if variance changes much when excluding q23s
+x_data <- x_data %>%
+  rowwise() %>%
+  mutate(var_help_no_q23 = var(c_across(c("q25_2_rev","q25_3_rev","q25_4_rev","q25_6_rev")), na.rm = TRUE))
+cor(x_data$variancehelp, x_data$var_help_no_q23, use="pairwise.complete.obs")
+
+var_help_no_q23
+
+# CONFIRM MISSINGNESS & SET MIN VALID ITEM RULE
+x_data <- x_data %>%
+  rowwise() %>%
+  mutate(valid_help_items = sum(!is.na(c_across(all_of(help_policy_items))))) %>%
+  ungroup()
+
+table(x_data$valid_help_items)
+
+#FOUND MISSINGNESS -- TESTING TO SEE DISTRIBUTION X TREATMENT
+table(x_data$impact, x_data$valid_help_items < 4)
+chisq.test(table(x_data$impact, x_data$valid_help_items < 4))
+
+table(x_data$incarc, x_data$valid_help_items < 4)
+chisq.test(table(x_data$incarc, x_data$valid_help_items < 4))
+
+table(x_data$vict, x_data$valid_help_items < 4)
+chisq.test(table(x_data$vict, x_data$valid_help_items < 4))
+
+table(x_data$knowincarc, x_data$valid_help_items < 4)
+chisq.test(table(x_data$knowincarc, x_data$valid_help_items < 4))
+
+# DISTRIBUTION CHECKS
+table(x_data$valid_help_items)
+
+```
+
+**Testing Missingness When Help Policy Excludes Election Items**
+
+```{r}
+
+
+```
+
+Note:
+
+-   My coding of the election related questions (jail voting, rights restoration) may artificially have inflated support for these issues.
+
+    -   there's only moderate correlation (r \~ 0.43) between the two election items – they're internally consistent but still measure distinct domains.
+
+-   The prison policy items (help) are low correlation (r\~0.3) between the overall variance measure and the 4 item prison only variance. Ie: including election items materially changes how variance behaves.
+
+-   --\> the combined variance reflects cross-domain inconsistency
+
+-   #option is to report both variance without election items and with election items (latter in analysis plan)
+
+-   Missingness: Problems abound! (I Think?) (Maybe not? I get so confused by chi2 interp.
+
+    -   Missing Counts
+
+        -   1,690 respondents completed all answers, 345 completed four of the six
+
+        -   suggests set the rule to 4 or more responses in order to be included -\> 2,035
+
+    -   Chi squared:
+
+        -   **The null hypothesis (H₀)**: Missingness (\<4 items completed) **IS independent** of treatment (impact)
+
+        -   **The alternative hypothesis (H₁)**: Missingness **IS dependent** on treatment
+
+        -   With p = 0.1033 \> 0.05, **fail to reject** the null hypothesis
+
+        -   This means
+
+            -   I do **not** have sufficient evidence that missingness is related to treatment
+
+            -   The data are consistent with missingness being independent of (unrelated to) treatment
+
+            -   This actually **supports** the safety of dropping incomplete responses, not the opposite
+
+        -   BUT marginal significance is not far from 0.05. combined with counts, potential problem still.
+
+        -   x Impact – most missing for know incarc
+
+        -   SO:
+
+            -   test additional patterns (loop this back up)
+
+            -   sensitivity analysis
+
+            -   IMPUTATION
+
+***This prompts me to check missingness for each combination of help items***
+
+```{r}
+# binary missing indicator where 1 is missing 0 is answered
+missing_indicators <- x_data[help_policy_items]
+missing_indicators <- is.na(missing_indicators)*1
+
+# make string pattern for pattern of missing questions - ie: 000011 means just election ones missing
+x_data$missing_pattern <- apply(missing_indicators, 1, function(x){paste0(x, collapse = "")})
+
+#count questions answered per respondent
+x_data$n_answered <- 6 - rowSums(missing_indicators)
+
+total_patterns <- x_data %>%
+  group_by(missing_pattern, n_answered) %>%
+  summarise(
+    n = n(),
+    pct = n()/nrow(x_data) * 100
+  ) %>%
+  arrange(desc(n))
+
+print(total_patterns)
+
+patterns_by_impact <- x_data %>%
+  group_by(impact, missing_pattern, n_answered) %>%
+  summarise(
+    n = n()
+  ) %>%
+  group_by(impact) %>%
+  mutate(
+    pct_within_group = n/sum(n) * 100
+  ) %>%
+  arrange(impact, desc(n))
+
+print(patterns_by_impact)
+
+patterns_by_incarc <- x_data %>%
+  group_by(incarc, missing_pattern, n_answered) %>%
+  summarise(
+    n = n()
+  ) %>%
+  group_by(incarc) %>%
+  mutate(
+    pct_within_group = n/sum(n) * 100
+  ) %>%
+  arrange(incarc, desc(n))
+
+print(patterns_by_incarc)
+
+patterns_by_vict <- x_data %>%
+  group_by(vict, missing_pattern, n_answered) %>%
+  summarise(
+    n = n()
+  ) %>%
+  group_by(vict) %>%
+  mutate(
+    pct_within_group = n/sum(n) * 100
+  ) %>%
+  arrange(vict, desc(n))
+
+print(patterns_by_vict)
+
+patterns_by_knowincarc <- x_data %>%
+  group_by(knowincarc, missing_pattern, n_answered) %>%
+  summarise(
+    n = n()
+  ) %>%
+  group_by(knowincarc) %>%
+  mutate(
+    pct_within_group = n/sum(n) * 100
+  ) %>%
+  arrange(knowincarc, desc(n))
+
+print(patterns_by_knowincarc)
+```
+
+#### Variance Test
+
+```{r}
+# OK picking up here with excluding respondents with less than 4 items answered (mostly people who didn't hang on until the elections questions in the survey)
+
+x_data <- x_data %>% filter(valid_help_items>=4)
+
+```
+
+Distribution checks
+
+```{r}
+
+hist(x_data$variancehelp, breaks = 30)
+hist(log(x_data$variancehelp + .001), breaks = 30)
+```
+
+--\> won't use the log as my DV
+
+Compare mean & SD
+
+```{r}
+x_data <- x_data %>%
+  rowwise() %>%
+  mutate(meanhelp = mean(c_across(all_of(help_policy_items)), na.rm = TRUE)) %>%
+  ungroup()
+
+cor(x_data$meanhelp, x_data$variancehelp, use = "pairwise.complete.obs")
+
+```
+
+This shows a mild mean-variance correlation. It's kind of right on the cusp in absolute terms – the concern threshold is usually \|0.3-0.4\|. However, it's also conceptually logical that respondents with higher average support might systematically have less variance – that's kind of the thing I'm interested in. Don't need to use meanhelp as a control (but added potential check on this later).
+
+Next Diagnostic: Checking different distributions to figure out what to use
+
+```{r}
+
+x_data$variancehelp_log <- log(x_data$variancehelp + 0.001)
+x_data$sdhelp <- sqrt(x_data$variancehelp)
+
+summary(x_data$variancehelp)
+summary(x_data$variancehelp_log)
+summary(x_data$sdhelp)
+
+hist(x_data$variancehelp, breaks = 30, main = "Variance of Help Items")
+hist(x_data$variancehelp_log, breaks = 30, main = "Log Variance of Help Items")
+hist(x_data$sdhelp, breaks = 30, main = "Standard Deviation of Help Items")
+
+library(e1071)
+skewness(raw_data_cleaned$variancehelp, na.rm = TRUE)
+skewness(raw_data_cleaned$variancehelp_log, na.rm = TRUE)
+skewness(raw_data_cleaned$sdhelp, na.rm = TRUE)
+```
+
+### OLS with variancehelp as DV (also running log and SD)
+
+```{r}
+#using centered deservingness 
+m10 <- lm(variancehelp ~ d_inc_c + impact + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+m10_vlog <- lm(variancehelp_log ~ d_inc_c + impact + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+m10_sd <- lm(sdhelp ~ d_inc_c + impact + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+coeftest(m10, vcov = vcovHC(m10, type = "HC1"))
+coeftest(m10_vlog, vcov = vcovHC(m10, type = "HC1"))
+coeftest(m10_sd, vcov = vcovHC(m10, type = "HC1"))
+```
+
+FOR LATER - Sensitivity check to find out or show results aren't (tbd) sensitive to mean-variance coupling. If coefficients on `d_inc_c` and `impact` are similar across models, can say that results are robust to controlling for average support across policy items; the mild mean-variance correlation (-0.215) does not meaningfully alter the main findings.
+
+```{r}
+# Model 1: main specification
+m10_log <- lm(variancehelp_log ~ d_inc_c + impact + controls..., data = x_data)
+
+# Model 2: robustness check including meanhelp
+m10_mean <- lm(variancehelp_log ~ d_inc_c + impact + meanhelp + controls..., data = x_data)
+
+# Compare side by side
+library(stargazer)
+stargazer(m10_log, m10_mean, type = "text",
+          title = "Robustness Check: Controlling for Average Support (meanhelp)",
+          dep.var.labels = "Log Variance of Help Policy Responses",
+          covariate.labels = c("Deservingness (centered)", "Impact", "Mean Help Support", "Controls"),
+          omit.stat = c("f", "ser"),
+          notes = "Models estimated with HC1 robust standard errors.")
+
+```
+
+# Robustness Checks
+
+## rc_1
+
+-   whether the effect of carceral contact on deservingness varies across ideological groups
+
+-   addresses concerns that the relationship between contact and deservingness may simply reflect underlying political ideology
+
+-   prior work suggests that while ideology is a powerful predictor of attitudes toward marginalized groups, it may also obscure important conditional variation in how individuals interpret personal or vicarious experiences with the criminal legal system
+
+-   Thus, I test the possibility that respondents with different ideological orientations may interpret contact differently
+
+$$
+\texttt{prisonerdeserves}_{i} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{gender}_{i} + \beta_3 \cdot \texttt{race}_{i} + \beta_4 \cdot \texttt{education}_{i} + \beta_5 \cdot \texttt{urban}_{i} + \beta_6 \cdot \texttt{party}_{i} + \beta_7 \cdot \texttt{ideology}_{i} + \beta_8 \cdot \texttt{racialresentment}_{i} + \beta_9 \cdot \texttt{desor}_{i} + \beta_{10} \cdot \texttt{policydisposition}_{i} + \beta_{11} \cdot (\texttt{impact}_{i} \times \texttt{ideology}_{i}) + \beta_{12} \cdot (\texttt{impact}_{i} \times \texttt{race}_{i}) + u_{i}
+$$
+
+Vars to construct or check:
+
+-   policy disposition: support for medicaid, unemployment assistance, views on mimum wage and government support for the poor, and agreement with the importance of helping refugees. 

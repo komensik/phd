@@ -1,0 +1,303 @@
+---
+title: "Generalized M3 & M4 (Impact vs. Incarc/Vict/KnowIncarc)"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+editor: visual
+---
+
+## 0) Setup
+
+```{r}
+#| message: false
+#| warning: false
+
+# Packages
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(purrr)
+  library(broom)
+  library(car)
+  library(rsq)
+  library(lmtest)
+  library(sandwich)
+  library(readr)
+  library(stringr)
+})
+ 
+raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data_may9.csv")
+
+
+# Core controls shared across all runs (do NOT include any treatment here)
+controls_base <- c(
+  "d_incppl_pris_abc",
+  "Republican", "Democrat",
+  "fiscal_ideology", "social_ideology",
+  "penalpoint", "desor_core",
+  "fire_rare", "fire_privilege", "fire_angry", "fire_fear",
+  "gender", "Black", "Hispanic", "OtherRace"
+)
+
+# Treatments to cycle through
+treatments <- c("impact", "incarc", "vict", "knowincarc")
+
+# Outcomes
+outcomes <- c("prisonhelp", "prisonpen")
+
+# For pairwise and partial plots
+terms_to_check <- c("desor_core", "d_incppl_pris_abc", "penalpoint", "social_ideology", "fiscal_ideology")
+
+# Helper: check all variables exist before fitting models
+vars_exist <- function(df, vars) {
+  all(vars %in% names(df))
+}
+
+# Helper: make formula
+make_formula <- function(outcome, treatment, controls) {
+  # Ensure treatment is not duplicated in the control set
+  controls_clean <- setdiff(controls, treatment)
+  rhs <- paste(c(treatment, controls_clean), collapse = " + ")
+  as.formula(paste(outcome, "~", rhs))
+}
+
+# Helper: robust (HC1) tidy
+tidy_hc1 <- function(model) {
+  coeftest(model, vcov = vcovHC(model, type = "HC1")) %>%
+    broom::tidy(conf.int = TRUE)
+}
+```
+
+## 1) Sanity checks and sample sizes
+
+```{r}
+#| echo: false
+needed <- unique(c(controls_base, treatments, outcomes, terms_to_check))
+
+missing <- setdiff(needed, names(raw_data_cleaned))
+if (length(missing) > 0) {
+  message("Warning: These variables are missing from `raw_data_cleaned`: ",
+          paste(missing, collapse = ", "))
+}
+
+summary_stats <- tibble(
+  variable = needed,
+  present = variable %in% names(raw_data_cleaned)
+)
+
+summary_stats
+```
+
+## 2) Fit models for each treatment × outcome
+
+```{r}
+# Container for results
+all_models <- list()
+all_diagnostics <- list()
+
+for (treat in treatments) {
+  for (y in outcomes) {
+
+    needed_vars <- unique(c(y, treat, controls_base))
+    if (!vars_exist(raw_data_cleaned, needed_vars)) {
+      message(sprintf("Skipping %s ~ %s: missing variables.", y, treat))
+      next
+    }
+
+    # Basic (no controls): y ~ treat
+    f_basic <- as.formula(paste(y, "~", treat))
+    m_basic <- lm(f_basic, data = raw_data_cleaned)
+
+    # Full (controls): y ~ treat + controls_base
+    f_full <- make_formula(y, treat, controls_base)
+    m_full <- lm(f_full, data = raw_data_cleaned)
+
+    # Save model objects
+    key <- paste(y, treat, sep = "__")
+    all_models[[key]] <- list(
+      basic = m_basic,
+      full = m_full,
+      formula_basic = f_basic,
+      formula_full = f_full
+    )
+
+    # Robust summaries
+    tidy_basic <- tryCatch(tidy_hc1(m_basic) %>% mutate(model = "basic", outcome = y, treatment = treat),
+                           error = function(e) NULL)
+    tidy_full  <- tryCatch(tidy_hc1(m_full) %>% mutate(model = "full", outcome = y, treatment = treat),
+                           error = function(e) NULL)
+
+    # VIF (only for full model)
+    vif_df <- tryCatch({
+      data.frame(term = names(vif(m_full)), vif = as.numeric(vif(m_full)), row.names = NULL)
+    }, error = function(e) NULL)
+
+    # Partial/semi-partial R2
+    partial_r2 <- tryCatch({
+      pr <- rsq::rsq.partial(m_full, type = "sp")
+      tibble(term = names(pr), semi_partial_R2 = as.numeric(pr))
+    }, error = function(e) NULL)
+
+    # Adjusted R2 gain of desor_core over base: y ~ d_incppl_pris_abc + treat (+ desor_core)
+    adj_gain <- tryCatch({
+      base_f <- as.formula(paste(y, "~ d_incppl_pris_abc +", treat))
+      m_base <- lm(base_f, data = raw_data_cleaned)
+      m_plus <- update(m_base, . ~ . + desor_core)
+      delta  <- summary(m_plus)$adj.r.squared - summary(m_base)$adj.r.squared
+      tibble(metric = "AdjR2_gain_desor_core", value = as.numeric(delta))
+    }, error = function(e) NULL)
+
+    # Pairwise correlations among key attitudinal predictors (once per outcome/treatment for provenance)
+    cor_mat <- tryCatch({
+      raw_data_cleaned %>%
+        dplyr::select(all_of(terms_to_check)) %>%
+        cor(use = "pairwise.complete.obs") %>%
+        round(3)
+    }, error = function(e) NULL)
+
+    # Influence diagnostics — save plots
+    try({
+      dir.create("m3m4_diagnostics", showWarnings = FALSE)
+      # Cook's distance plot
+      png(file.path("m3m4_diagnostics", paste0("cooks_", y, "_", treat, "_full.png")), width = 900, height = 600, res = 120)
+      plot(m_full, which = 4)
+      dev.off()
+
+      # Added-variable plots for select terms (silently skip if any terms missing)
+      av_terms <- intersect(c("desor_core", "d_incppl_pris_abc", "penalpoint", "social_ideology"), names(coef(m_full)))
+      if (length(av_terms) > 0) {
+        png(file.path("m3m4_diagnostics", paste0("avplots_", y, "_", treat, "_full.png")), width = 1200, height = 900, res = 120)
+        car::avPlots(m_full, terms = as.formula(paste("~", paste(av_terms, collapse = " + "))))
+        dev.off()
+      }
+    }, silent = TRUE)
+
+    # Store diagnostics bundle
+    all_diagnostics[[key]] <- list(
+      tidy_basic = tidy_basic,
+      tidy_full  = tidy_full,
+      vif        = vif_df,
+      partial_r2 = partial_r2,
+      adj_r2_gain_desor = adj_gain,
+      cor_mat    = cor_mat
+    )
+  }
+}
+
+# Collate coefficient tables (robust HC1) for easy comparison
+coef_table <- bind_rows(
+  purrr::map(all_diagnostics, "tidy_basic") %>% compact(),
+  purrr::map(all_diagnostics, "tidy_full") %>% compact()
+) %>%
+  mutate(term = as.character(term)) %>%
+  relocate(outcome, treatment, model, term)
+
+# Model fit summary
+fit_table <- imap_dfr(all_models, function(x, key) {
+  tibble(
+    key = key,
+    outcome = strsplit(key, "__")[[1]][1],
+    treatment = strsplit(key, "__")[[1]][2],
+    n_basic = length(na.omit(residuals(x$basic))) + length(coef(x$basic)), # rough N used
+    n_full  = length(na.omit(residuals(x$full))) + length(coef(x$full)),
+    r2_basic = summary(x$basic)$r.squared,
+    adj_r2_basic = summary(x$basic)$adj.r.squared,
+    r2_full = summary(x$full)$r.squared,
+    adj_r2_full = summary(x$full)$adj.r.squared
+  )
+})
+
+list(
+  coef_table_preview = coef_table %>% filter(term != "(Intercept)") %>% head(20),
+  fit_table_preview = fit_table %>% arrange(outcome, treatment) %>% head(10)
+)
+```
+
+### Notes on interpretation
+
+-   Each treatment (`impact`, `incarc`, `vict`, `knowincarc`) is entered **separately** as the focal predictor with an identical control set.
+-   The **reference category** is the non-impacted group for the treatment being used (e.g., `incarc = 0` are those not incarcerated).
+-   The table `fit_table` provides quick comparability of N and (Adj.) R² by outcome and treatment.
+-   The `coef_table` (robust HC1 SEs) lets you compare the magnitude and significance of each treatment across outcomes.
+
+## 3) Diagnostics by treatment × outcome
+
+### 3.1 VIF (full models)
+
+```{r}
+vif_tables <- imap(all_diagnostics, ~{ d <- .x$vif; if (!is.null(d)) d <- d %>% mutate(key = .y); d }) %>% bind_rows()
+vif_tables
+```
+
+### 3.2 Semi-partial R² (full models)
+
+```{r}
+spr2_tables <- imap(all_diagnostics, ~{ d <- .x$partial_r2; if (!is.null(d)) d <- d %>% mutate(key = .y); d }) %>% bind_rows()
+spr2_tables
+```
+
+### 3.3 Adj. R² gain from adding `desor_core` beyond `d_incppl_pris_abc + treatment`
+
+```{r}
+adj_gain_tables <- imap(all_diagnostics, ~{ d <- .x$adj_r2_gain_desor; if (!is.null(d)) d <- d %>% mutate(key = .y); d }) %>% bind_rows()
+adj_gain_tables
+```
+
+### 3.4 Pairwise correlations among key attitudinal predictors
+
+```{r}
+# Show one representative matrix (they will be identical across keys since they don't depend on treatment/outcome)
+if (length(all_diagnostics) > 0 && !is.null(all_diagnostics[[1]]$cor_mat)) {
+  all_diagnostics[[1]]$cor_mat
+} else {
+  "Correlation matrix unavailable."
+}
+```
+
+### 3.5 Influence plots saved
+
+-   Cook’s distance and added-variable plots are saved under the `m3m4_diagnostics/` folder as PNGs:
+    -   `cooks_<outcome>_<treatment>_full.png`
+    -   `avplots_<outcome>_<treatment>_full.png`
+
+## 4) Clean comparison tables
+
+### 4.1 Treatment coefficients (robust HC1) from full models only
+
+```{r}
+coef_full_treat <- coef_table %>%
+  filter(model == "full", term %in% treatments | term == "(Intercept)") %>%
+  mutate(outcome = factor(outcome, levels = c("prisonhelp","prisonpen")),
+         model_label = paste(outcome, treatment, sep = "_")) %>%
+  arrange(outcome, treatment, term)
+
+coef_full_treat %>%
+  select(outcome, treatment, term, estimate, std.error, statistic, p.value, conf.low, conf.high) %>%
+  head(30)
+```
+
+### 4.2 Model fit summary by outcome × treatment
+
+```{r}
+fit_table %>%
+  arrange(outcome, treatment)
+```
+
+## 5) Optional: Export tidy CSVs
+
+```{r}
+dir.create("m3m4_outputs", showWarnings = FALSE)
+if (exists("coef_table"))   write_csv(coef_table, "m3m4_outputs/coef_table_all_models.csv")
+if (exists("fit_table"))    write_csv(fit_table, "m3m4_outputs/fit_table.csv")
+if (exists("vif_tables"))   write_csv(vif_tables, "m3m4_outputs/vif_tables.csv")
+if (exists("spr2_tables"))  write_csv(spr2_tables, "m3m4_outputs/semi_partial_r2_tables.csv")
+if (exists("adj_gain_tables")) write_csv(adj_gain_tables, "m3m4_outputs/adj_r2_gain_desor.csv")
+```
+
+## 6) Minimal narrative scaffold (for your paper)
+
+-   Re-estimated M3/M4 with three alternative operationalizations of **policy contact**: incarceration (`incarc`), victimization (`vict`), and knowing someone incarcerated (`knowincarc`). Each treatment is introduced independently as the focal regressor with a common control vector.
+-   Coefficients are reported with **heteroskedasticity-robust (HC1)** SEs and compared across outcomes (`prisonhelp`, `prisonpen`).
+-   Diagnostics mirror the original M3/M4: **VIF**, **Cook’s distance**, **added-variable plots**, **pairwise correlations**, **semi-partial R²**, and the **Adjusted R² gain** from introducing `desor_core` beyond a base model with `d_incppl_pris_abc` and the treatment.
+-   Outputs are collated into tidy tables (`coef_table`, `fit_table`) and exportable CSVs for appendix tables. \`\`\`

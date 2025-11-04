@@ -274,7 +274,9 @@ $$
 {\texttt{variancehelp}}_{i} = \beta_0 + \beta_1 \cdot {\texttt{impact}}_{i} + \beta_2 \cdot {\texttt{prisonerdeserves}}_{i} + \beta_3 \cdot {\texttt{polor}}_{i} + X_i^{\prime} \cdot {\texttt{controls}} + u_i
 $$
 
-Finally, to assess heterogeneity by contact type, I re-estimate the above models using individual dummy variables for each form of impact (e.g., been incarcerated, known someone, victim of crime). In exploratory models, I restrict the sample to respondents who report only one form of contact to reduce overlap and isolate effects.
+Finally, to assess heterogeneity by contact type, I re-estimate the above models using individual dummy variables for each form of impact (e.g., been incarcerated, known someone, victim of crime).
+
+In exploratory models, I restrict the sample to respondents who report only one form of contact to reduce overlap and isolate effects.
 
 ------------------------------------------------------------------------
 
@@ -311,7 +313,7 @@ This project also takes seriously the role of interpretation in shaping the poli
 ### A: Variable Dictionary
 
 | Variable Name | Type | Description |   |
-|----|----|----|----|
+|------------------|------------------|------------------|------------------|
 | `impact` | Binary | Any carceral or victimization contact |  |
 | `incarc` | Binary | Has been incarcerated |  |
 | `knowincarc` | Binary | Knows someone incarcerated |  |
@@ -348,6 +350,10 @@ This section reports additional models assessing whether the relationship betwee
 Although not a core hypothesis, I explore whether the effect of carceral contact on deservingness varies across ideological groups. This analysis addresses concerns that the relationship between contact and deservingness may simply reflect underlying political ideology. More broadly, prior work suggests that while ideology is a powerful predictor of attitudes toward marginalized groups, it may also obscure important conditional variation in how individuals interpret personal or vicarious experiences with the criminal legal system.[^14] Thus, I test the possibility that respondents with different ideological orientations may interpret contact differently. Specifically, I estimate:
 
 [^14]: While general ideology can be blunt instruments for understanding attitudes in complex or racialized policy domains (Kreitzer, Maltby, and Smith 2022), and while partisans may agree on many group evaluations, intra-partisan disagreements reflect deep symbolic divides with important implications for policy design (Kreitzer and Smith 2024).
+
+I use standardized survey items on relevant policies to create a policy dispositional index, including support for Mediaid and unemployment assisstence, views on minimum wage and government support for the poor, and the agreement with the importance of accepting refugees –\>
+
+THIS IS OLD NOT RIGHT YIKES:
 
 $$
 \texttt{prisonerdeserves}_{i} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{gender}_{i} + \beta_3 \cdot \texttt{race}_{i} + \beta_4 \cdot \texttt{education}_{i} + \beta_5 \cdot \texttt{urban}_{i} + \beta_6 \cdot \texttt{party}_{i} + \beta_7 \cdot \texttt{ideology}_{i} + \beta_8 \cdot \texttt{racialresentment}_{i} + \beta_9 \cdot \texttt{desor}_{i} + \beta_{10} \cdot \texttt{policydisposition}_{i} + \beta_{11} \cdot (\texttt{impact}_{i} \times \texttt{ideology}_{i}) + \beta_{12} \cdot (\texttt{impact}_{i} \times \texttt{race}_{i}) + u_{i}

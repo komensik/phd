@@ -1,0 +1,72 @@
+Note on Missingness Analysis
+Key Findings
+Our missingness analysis reveals several important patterns relevant to the variance analysis:
+1. Independence from Treatment Variables
+Chi-squared tests indicate that having fewer than 4 valid responses appears independent of all impact-related variables:
+
+Overall impact: χ² = 2.65, p = 0.103
+Incarceration: χ² = 0.003, p = 0.956
+Victimization: χ² = 0.939, p = 0.333
+Know someone incarcerated: χ² = 2.471, p = 0.116
+
+None reach conventional significance, suggesting missingness is not systematically related to treatment status. The "know incarcerated" variable shows the weakest independence (p = 0.116), warranting attention in subgroup analyses.
+2. Systematic Pattern in Item-Level Missingness
+The missingness patterns reveal a clear structure rather than random dropout:
+
+76-78% complete all 6 items (pattern "000000")
+13-15% skip only the last question (pattern "000001")
+7-10% skip all questions (pattern "111111")
+<0.1% skip the last 4 questions (pattern "001111")
+Other partial patterns are essentially absent
+
+This suggests two primary mechanisms:
+
+Survey fatigue: The last question has disproportionate missingness (~15% skip only this item)
+Complete non-response: A subset (~8-10%) doesn't engage with this battery at all
+
+3. Consistency Across Subgroups
+The missingness patterns are remarkably stable across impact subcategories, with the "last question only" pattern ranging narrowly from 13.8% to 15.1% across all groups.
+Implications for Current Analysis
+For the immediate variance analysis, you can likely proceed with dropping respondents with <4 valid items because:
+
+Statistical tests support independence of missingness from treatment
+You're only losing ~8.4% of the sample (187/2222)
+The patterns suggest these are mostly complete non-responders rather than selective item skipping
+
+However, consider running sensitivity analyses comparing results with and without these cases.
+Recommendations for Subgroup Analyses
+When examining differences across impact subcategories (incarc/vict/knowincarc), implement the following:
+1. Enhanced Monitoring
+
+Track missingness rates by subgroup in all analyses
+Note that "know incarcerated" showed marginal association (p = 0.116) with missingness
+
+2. Item-Specific Attention
+
+Consider analyzing the last question separately given its unique missingness pattern
+Test whether dropping this item affects your composite's psychometric properties
+Examine if the last question's content differs meaningfully (e.g., more sensitive, complex, or redundant)
+
+3. Robustness Checks
+
+Primary analysis: Use ≥4 valid responses criterion
+Sensitivity analysis 1: Require all 6 responses
+Sensitivity analysis 2: Use ≥3 valid responses
+Sensitivity analysis 3: Drop the problematic last item entirely and use 5-item composite
+
+4. Reporting Strategy
+Document that:
+
+Missingness shows a systematic pattern (primarily last-item dropout and complete non-response)
+Tests found no significant association with treatment variables
+Results are robust to different handling of missing data (pending sensitivity analyses)
+
+5. Consider Multiple Imputation
+Given the systematic pattern, consider imputation for the last question only (not full non-responders) as these cases likely represent survey fatigue rather than meaningful non-response.
+Next Steps
+
+Investigate why the last question has differential missingness
+Test composite reliability with and without the last item
+Run main analyses with current approach (≥4 items)
+Conduct sensitivity analyses as outlined
+Report any substantive differences in findings across approaches
