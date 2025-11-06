@@ -1,0 +1,25 @@
+---
+title: "prospectus"
+author: 
+  Kristina Mensik  
+  Department of Political Science, Duke University
+abstract: |
+  
+format:
+  pdf:
+    pdf-engine: pdflatex
+    include-in-header: header.tex
+    keep-tex: true
+    toc: false
+    number-sections: false
+    fig-cap-location: top
+    booktabs: true
+  docx: 
+    reference-doc: reference.docx
+    toc: false
+    number-sections: true
+bibliography: references_repaired.bib
+csl: apsr.csl
+---
+
+## 
