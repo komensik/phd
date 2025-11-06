@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-install.packages(janitor)
+install.packages("janitor")
 # Load necessary libraries
 library(tidyverse)
 library(readr)
@@ -20,7 +20,7 @@ library(ggplot2)
 library(dplyr)
 
 # Load the data
-prelim_data <- read.csv("/Users/kristinamensik/Documents/Duke/2024-2025/902 Legislators Pre-Ananlysis Plan/Prelim Folder/prelimdata1.csv", stringsAsFactors = FALSE)
+prelim_data <- read.csv("/phd/Prelim Folder/prelimdata1.csv", stringsAsFactors = FALSE)
 
 view(prelim_data)
 ```

@@ -25,6 +25,7 @@ library(marginaleffects)
 library(mediation)
 library(naniar)
 library(rsq)
+library(patchwork)
 
 ```
 
@@ -213,6 +214,184 @@ ggplot(plot_data, aes(x = impact_label, y = mean_deserving)) +
   ) +
   theme_minimal(base_size = 14)
 
+```
+
+```{r}
+
+
+# Function to create plot comparing no contact vs specific contact type
+create_comparison_plot_data <- function(data, contact_var, 
+                                       contact_label = "Has Contact") {
+  
+  # Create two groups: 
+  # 1. No contact at all (impact == 0)
+  # 2. Has this specific type of contact (contact_var == 1)
+  
+  no_contact <- data %>%
+    filter(impact == 0) %>%
+    summarize(
+      mean_deserving = mean(d_incppl_pris_abc, na.rm = TRUE),
+      se = sd(d_incppl_pris_abc, na.rm = TRUE) / sqrt(n()),
+      n = n(),
+      .groups = "drop"
+    ) %>%
+    mutate(group = "No Contact")
+  
+  has_contact <- data %>%
+    filter(!!sym(contact_var) == 1) %>%
+    summarize(
+      mean_deserving = mean(d_incppl_pris_abc, na.rm = TRUE),
+      se = sd(d_incppl_pris_abc, na.rm = TRUE) / sqrt(n()),
+      n = n(),
+      .groups = "drop"
+    ) %>%
+    mutate(group = contact_label)
+  
+  # Combine the two groups
+  plot_data <- bind_rows(no_contact, has_contact) %>%
+    mutate(
+      ci_lower = mean_deserving - 1.96 * se,
+      ci_upper = mean_deserving + 1.96 * se
+    )
+  
+  return(plot_data)
+}
+
+# Function to create the plot
+create_plot <- function(plot_data, title, y_limits = c(0, 100)) {
+  # Ensure the order is consistent
+  plot_data$group <- factor(plot_data$group, 
+                           levels = c("No Contact", 
+                                    setdiff(unique(plot_data$group), "No Contact")))
+  
+  ggplot(plot_data, aes(x = group, y = mean_deserving)) +
+    geom_col(fill = "gray60") +
+    geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+    geom_text(aes(label = paste0("n=", n)), vjust = -2, size = 3) +
+    labs(
+      x = NULL,
+      y = "Mean Deservingness Rating (0–100)",
+      title = title
+    ) +
+    ylim(y_limits) +
+    theme_minimal(base_size = 12)
+}
+
+# Create plot data for each comparison
+# 1. Overall impact comparison (your original plot)
+impact_data <- raw_data_cleaned %>%
+  filter(!is.na(impact)) %>%
+  group_by(impact) %>%
+  summarize(
+    mean_deserving = mean(d_incppl_pris_abc, na.rm = TRUE),
+    se = sd(d_incppl_pris_abc, na.rm = TRUE) / sqrt(n()),
+    n = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    group = ifelse(impact == 1, "Any Contact", "No Contact"),
+    ci_lower = mean_deserving - 1.96 * se,
+    ci_upper = mean_deserving + 1.96 * se
+  )
+
+# 2. No contact vs. has been incarcerated
+incarc_data <- create_comparison_plot_data(
+  raw_data_cleaned, 
+  "incarc", 
+  "Has Been Incarcerated"
+)
+
+# 3. No contact vs. has been victimized
+vict_data <- create_comparison_plot_data(
+  raw_data_cleaned, 
+  "vict", 
+  "Has Been Victimized"
+)
+
+# 4. No contact vs. knows someone incarcerated
+knowincarc_data <- create_comparison_plot_data(
+  raw_data_cleaned, 
+  "knowincarc", 
+  "Knows Someone Incarcerated"
+)
+
+# Calculate common y-axis limits
+all_data <- list(impact_data, incarc_data, vict_data, knowincarc_data)
+all_ci_upper <- unlist(lapply(all_data, function(x) x$ci_upper))
+all_ci_lower <- unlist(lapply(all_data, function(x) x$ci_lower))
+y_limits <- c(
+  min(0, min(all_ci_lower, na.rm = TRUE) - 5),
+  max(100, max(all_ci_upper, na.rm = TRUE) + 5)
+)
+
+# Create all plots
+plot1 <- create_plot(impact_data, "Overall Impact", y_limits)
+plot2 <- create_plot(incarc_data, "No Contact vs. Has Been Incarcerated", y_limits)
+plot3 <- create_plot(vict_data, "No Contact vs. Has Been Victimized", y_limits)
+plot4 <- create_plot(knowincarc_data, "No Contact vs. Knows Someone Incarcerated", y_limits)
+
+# Display individual plots
+print(plot1)
+print(plot2)
+print(plot3)
+print(plot4)
+
+# Combine all plots
+combined_plot <- (plot1 | plot2) / (plot3 | plot4)
+combined_plot <- combined_plot + 
+  plot_annotation(
+    title = "Deservingness Ratings: No Contact vs. Specific Contact Types",
+    subtitle = "Comparing baseline (no contact) with different forms of contact"
+  )
+print(combined_plot)
+
+#  Fifth plot comparing all groups with multiple contact types
+# This shows people with combinations of contact types
+#multi_contact_data <- raw_data_cleaned %>%
+ # mutate(
+  #  contact_combo = case_when(
+   #   impact == 0 ~ "No Contact",
+    #  incarc == 1 & vict == 1 & knowincarc == 1 ~ "All Three Types",
+     # incarc == 1 & vict == 1 ~ "Incarcerated + Victimized",
+      #incarc == 1 & knowincarc == 1 ~ "Incarcerated + Knows Someone",
+      #vict == 1 & knowincarc == 1 ~ "Victimized + Knows Someone",
+      #incarc == 1 ~ "Only Incarcerated",
+      #vict == 1 ~ "Only Victimized",
+      #knowincarc == 1 ~ "Only Knows Someone",
+      #TRUE ~ "Other"
+    #)
+  #) %>%
+ # filter(contact_combo != "Other") %>%
+#  group_by(contact_combo) %>%
+#  summarize(
+#    mean_deserving = mean(d_incppl_pris_abc, na.rm = TRUE),
+#    se = sd(d_incppl_pris_abc, na.rm = TRUE) / sqrt(n()),
+#    n = n(),
+#    .groups = "drop"
+#  ) %>%
+#  mutate(
+#    ci_lower = mean_deserving - 1.96 * se,
+#    ci_upper = mean_deserving + 1.96 * se
+ # )
+
+# Plot for multiple contact types
+#multi_plot <- ggplot(multi_contact_data, 
+              #       aes(x = reorder(contact_combo, mean_deserving), 
+                #         y = mean_deserving)) +
+#  geom_col(fill = "gray60") +
+#  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+#  geom_text(aes(label = paste0("n=", n)), hjust = -0.2, size = 3) +
+#  labs(
+#    x = NULL,
+#    y = "Mean Deservingness Rating (0–100)",
+#    title = "Deservingness by Combination of Contact Types"
+#  ) +
+#  ylim(y_limits) +
+#  coord_flip() +
+#  theme_minimal(base_size = 12)
+
+#print(multi_plot)
+
 
 ```
 
@@ -227,6 +406,39 @@ m1c <- lm(d_incppl_pris_abc ~ impact +
     gender + Black + Hispanic + OtherRace,
   data = raw_data_cleaned
 )
+
+m1c_incarc <- lm(d_incppl_pris_abc ~ incarc +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+
+m1c_vict <- lm(d_incppl_pris_abc ~ vict +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+
+m1c_knowincarc <- lm(d_incppl_pris_abc ~ knowincarc +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+
+
+summary(m1c_inc)
+summary(m1c_vict)
+summary(m1c_knowinc)
+
 summary(m1c)
 ```
 
@@ -242,7 +454,7 @@ print(vif(m1c))
 
 ```
 
---\> shows everything 1-2, predictors mostly independent, EXCEPT:
+--\> shows (for all groups) everything 1-2, predictors mostly independent, EXCEPT:
 
 -   fiscal_ideology 4.4
 
@@ -250,18 +462,39 @@ print(vif(m1c))
 
 -   --\> moderate correlation
 
+```{r}
+print(vif(m1c_incarc))
+print(vif(m1c_vict))
+print(vif(m1c_knowincarc))
+```
+
 **Inspect for heteroskedasticity & nonlinearity**
 
 ```{r}
 
 plot(m1c, which = 1)
 
+plot(m1c_incarc, which = 1)
+
+plot(m1c_vict, which = 1)
+
+plot(m1c_knowincarc, which = 1)
 ```
 
 ```{r}
 # Normal Q-Q plot
 plot(m1c, which = 2)
+
+plot(m1c_incarc, which = 2)
+
+plot(m1c_vict, which = 2)
+
+plot(m1c_knowincarc, which = 2)
+
+qqnorm(raw_data_cleaned$d_incppl_pris_abc)
 ```
+
+The above suggests skewness is afoot.
 
 ```{r}
 library(ggplot2)
@@ -278,6 +511,10 @@ ggplot(m1c, aes(x = .fitted, y = .resid)) +
 ```{r}
 library(lmtest)
 bptest(m1c)
+bptest(m1c_incarc)
+bptest(m1c_vict)
+bptest(m1c_knowincarc)
+
 ```
 
 BP Test suggests residuals DO NOT have constant variance – there is evidence of heteroskedasticy. Some subsets of observations have larger/smaller residual spread than others. Coefficient estimates are not biased, but **standard errors are biased.**
@@ -292,6 +529,12 @@ library(lmtest)
 library(sandwich)
 
 coeftest(m1c, vcov = vcovHC(m1c, type = "HC1"))
+
+coeftest(m1c_incarc, vcov = vcovHC(m1c_incarc, type = "HC1"))
+
+coeftest(m1c_vict, vcov = vcovHC(m1c_vict, type = "HC1"))
+
+coeftest(m1c_knowincarc, vcov = vcovHC(m1c_knowincarc, type = "HC1"))
 ```
 
 ***Using standardized betas – show relative explantory strength, not total explained variance***
@@ -315,6 +558,10 @@ std_coefs <- coefs * c(1, sds / y_sd)   # note: first coef is intercept so align
 # better to use broom::tidy:
 tidy(m1cs) |> 
   mutate(std_est = estimate * c(0, sds / y_sd)) 
+```
+
+```{r}
+
 ```
 
 #### 2.6 Interpretation
@@ -1414,7 +1661,8 @@ The F-stat is highly significant.
 cor(raw_data_cleaned$fire_angry, raw_data_cleaned$prisonpen, use="pairwise.complete.obs")
 
 ```
-### 4_ by Incarc
+
+### 4\_ by Incarc
 
 ```{r}
 m3_inc <- lm(prisonhelp ~ incarc + d_incppl_pris_abc +
@@ -1430,7 +1678,7 @@ summary(m3_inc)
 summary(m4_inc)
 ```
 
-### 4_ by Vict
+### 4\_ by Vict
 
 ```{r}
 m3_vict <- lm(prisonhelp ~ vict + d_incppl_pris_abc +
@@ -1445,8 +1693,7 @@ summary(m3_vict)
 summary(m4_vict)
 ```
 
-
-### 4_ by Knowincarc
+### 4\_ by Knowincarc
 
 ```{r}
 
@@ -1464,7 +1711,6 @@ summary(m3_prox)
 summary(m4_prox)
 
 ```
-
 
 ## 5 M5 & M6
 
@@ -2131,26 +2377,12 @@ $$
 
 Vars to construct or check:
 
--   policy disposition: support for medicaid (q20), unemployment assistance (q19), views on mimum wage and government support for the poor, and agreement with the importance of helping refugees. 
+-   policy disposition: support for medicaid (q20), unemployment assistance (q19), views on mimum wage and government support for the poor, and agreement with the importance of helping refugees.
 
-Medicaid, Unemployment Questions -- here, I find and look into odd coding of responses based on survey pdf export that suggests a coding scheme that needs the following recode:
-1 = much more assistance
-2 = more assistance
-3 = the right amount
-then
-4 = much less assistance
-5 = don't know
-6 = less assistance
-to
-1 = much more assistance
-2 = more assistance
-3 = the right amount
-then
-4 --> 5 = much less assistance
-5 --> drop = don't know
-6 --> 4= less assistance
+Medicaid, Unemployment Questions -- here, I find and look into odd coding of responses based on survey pdf export that suggests a coding scheme that needs the following recode: 1 = much more assistance 2 = more assistance 3 = the right amount then 4 = much less assistance 5 = don't know 6 = less assistance to 1 = much more assistance 2 = more assistance 3 = the right amount then 4 --\> 5 = much less assistance 5 --\> drop = don't know 6 --\> 4= less assistance
 
 ie. it is a 1-5 scale with 5 being least assistance, but the original coding has 4 and 6 flipped and 5 as don't know.
+
 ```{r}
 
 # policy - medicaid and unemployment original coding: much more assistance (1), more assistance (2), about the right about (3), less assistance (6), much less assistnatce (4), don't know (5)
@@ -2198,13 +2430,8 @@ x_data <- x_data %>%
 
 ```
 
-Next policy question (q74_3) is how important do you think it is for the US to "Taking in civilian refugees trying to escape violence and war." Raw coding:
-not very important (1), not important (2), important (3), very important (4), don't know (5). Here, I'm going to recode 5 to be the middle value so this is also on a 1-5 scale:
-1->1
-2->2
-3->4
-4->5
-5->3
+Next policy question (q74_3) is how important do you think it is for the US to "Taking in civilian refugees trying to escape violence and war." Raw coding: not very important (1), not important (2), important (3), very important (4), don't know (5). Here, I'm going to recode 5 to be the middle value so this is also on a 1-5 scale: 1-\>1 2-\>2 3-\>4 4-\>5 5-\>3
+
 ```{r}
 x_data <- x_data %>%
   mutate(
@@ -2218,7 +2445,9 @@ x_data <- x_data %>%
   )
 
 ```
+
 Next, I am going to flip the scale so that it matches the direction of q19 and q20, before averaging respondent answers to these questions to create a composite.
+
 ```{r}
 
 x_data <- x_data %>%
@@ -2232,17 +2461,13 @@ x_data <- x_data %>%
   ungroup()
 
 ```
-Thus, the scale for policydisposition is:
-1 = much more assistance + taking in more refugees very important = most liberal
-2 = more assistance
-3 = the right amount
-4 = less assistance
-5 = much less assistance + taking in refugees unimportant = most conservative
+
+Thus, the scale for policydisposition is: 1 = much more assistance + taking in more refugees very important = most liberal 2 = more assistance 3 = the right amount 4 = less assistance 5 = much less assistance + taking in refugees unimportant = most conservative
 
 I explore whether the effect of carceral contact on deservingness varies across ideological groups. This analysis addresses concerns that the relationship between contact and deservingness may simply reflect underlying political ideology. More broadly, prior work suggests that while ideology is a powerful predictor of attitudes toward marginalized groups, it may also obscure important conditional variation in how individuals interpret personal or vicarious experiences with the criminal legal system. Thus, I test the possibility that respondents with different ideological orientations may interpret contact differently.
 
-I model criminal legal contact’s effect on other forms of policy help by regressing aggregated attitudes towards those policies on impact.
-y_i^"polorientation" =β_0+β_1⋅〖"impact" 〗_i+β_2⋅〖"desor" 〗_i+X_i'⋅"controlsvector"+u_i
+I model criminal legal contact’s effect on other forms of policy help by regressing aggregated attitudes towards those policies on impact. y_i\^"polorientation" =β_0+β_1⋅〖"impact" 〗\_i+β_2⋅〖"desor" 〗\_i+X_i'⋅"controlsvector"+u_i
+
 ```{r}
 
 rc_1 <- lm(policydisposition ~ impact + Republican + 
@@ -2269,6 +2494,5 @@ summary(rc_1_inc)
 summary(rc_1_vict)
 summary(rc_1_knowincarc)
 ```
+
 The results indicate that carceral contact significantly predicts a more conservative policy disposition (β₁ = -0.14 , p \< 0.01), even after controlling for political affiliation, ideology, and other relevant covariates. This suggests that individuals with personal or vicarious experience with the criminal legal system tend to favor less assistance-oriented policies overall.
-
-
