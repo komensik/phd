@@ -1524,7 +1524,7 @@ car::avPlots(m4_basic, terms = ~ desor_core + d_incppl_pris_abc + penalpoint + s
 Pairwise interpretation:
 
 | Relationship | Interpretation |   |
-|------------------------|------------------------|------------------------|
+|----|----|----|
 | desor_core & inc ppl | strong shared variance, likely suppression |  |
 | desorcore & ideo -0.37 | expected liberal/conservative |  |
 | desorcore & penalpoint: -0.19 | mild relationship |  |
