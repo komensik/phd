@@ -29,7 +29,9 @@ library(kableExtra)
 
 ### Overview
 
-These results document the exploratory and diagnostic tests used to evaluate how distinct forms of contact with the criminal legal system—**incarceration experience (`incarc`)**, **knowing someone incarcerated (`knowincarc`)**, and **victimization (`vict`)**—relate to perceived deservingness of incarcerated people (`d_incppl_pris_abc`).\
+First I present results of the exploratory and diagnostic tests used to evaluate how distinct forms of contact with the criminal legal system—**incarceration experience (`incarc`)**, **knowing someone incarcerated (`knowincarc`)**, and **victimization (`vict`)**—relate to perceived deservingness of incarcerated people (`d_incppl_pris_abc`).
+
+\
 Analyses are **unweighted** and focus on data integrity, model performance, and variable behavior rather than publication-ready estimates.
 
 ```{r, echo=FALSE}
@@ -197,11 +199,9 @@ Because attitudes toward incarcerated people may partly reflect broader social a
 
 ## Results: M5 & 6
 
-My third core hypothesis (H3) is that perceptions of incarcerated people’s deservingness mediate the relationship between carceral contact and support for criminal legal policies. Specifically, I expect that direct or indirect experience with the carceral system influences deservingness perceptions, which in turn shape policy preferences.
-Before turning to the mediation tests, Models 5 and 6 first evaluate whether contact moderates the effect of deservingness on policy support—that is, whether deservingness operates differently across those with and without criminal-legal experience.
+My third core hypothesis (H3) is that perceptions of incarcerated people’s deservingness mediate the relationship between carceral contact and support for criminal legal policies. Specifically, I expect that direct or indirect experience with the carceral system influences deservingness perceptions, which in turn shape policy preferences. Before turning to the mediation tests, Models 5 and 6 first evaluate whether contact moderates the effect of deservingness on policy support—that is, whether deservingness operates differently across those with and without criminal-legal experience.
 
-Model 5: Deservingness × Contact on Help-Oriented Policy
-To assess whether the relationship between perceptions of incarcerated people’s deservingness and support for assistance-oriented carceral policies varies by personal contact with the criminal legal system, I estimated an interaction model in which deservingness (0–100 scale) and a binary indicator of carceral contact jointly predict the prisonhelp index (1–5 scale). Both variables were mean-centered to facilitate interpretation, such that the main effect of deservingness represents the slope for non-impacted respondents at the average level of deservingness.
+Model 5: Deservingness × Contact on Help-Oriented Policy To assess whether the relationship between perceptions of incarcerated people’s deservingness and support for assistance-oriented carceral policies varies by personal contact with the criminal legal system, I estimated an interaction model in which deservingness (0–100 scale) and a binary indicator of carceral contact jointly predict the prisonhelp index (1–5 scale). Both variables were mean-centered to facilitate interpretation, such that the main effect of deservingness represents the slope for non-impacted respondents at the average level of deservingness.
 
 \[add latex formula\]
 
@@ -219,8 +219,7 @@ The interaction between deservingness and contact is negligible (\$b = –0.0002
 
 Conservative fiscal and social ideology continue to predict greater punitiveness, while a punitive conception of the prison’s purpose (penalpoint) strongly decreases opposition to punitive policies. The FIRE items again differentiate affective dimensions of racial attitudes: anger increases punitiveness, whereas privilege and fear reduce it modestly. The model explains 16.8 % of variance in punitive-policy opposition (Adj. \$R\^2 = 0.16\$).
 
-Joint Interpretation of Models 5 and 6
-Across both help- and punitive-policy domains, deservingness and contact exhibit consistent, independent effects. Individuals who perceive incarcerated people as more deserving are simultaneously more supportive of rehabilitative policies and more opposed to punitive ones, and these effects are statistically indistinguishable across contact groups. Personal experience with the carceral system primarily shifts the baseline level of policy support upward rather than conditioning how deservingness translates into attitudes.
+Joint Interpretation of Models 5 and 6 Across both help- and punitive-policy domains, deservingness and contact exhibit consistent, independent effects. Individuals who perceive incarcerated people as more deserving are simultaneously more supportive of rehabilitative policies and more opposed to punitive ones, and these effects are statistically indistinguishable across contact groups. Personal experience with the carceral system primarily shifts the baseline level of policy support upward rather than conditioning how deservingness translates into attitudes.
 
 Semi-partial R² comparisons reinforce this pattern. In the help-policy model, deservingness accounts for 3.6 % of unique variance compared to 2.3 % for contact; in the punitive-opposition model, deservingness explains 2.2 % and contact only 0.3 %. Thus, moral evaluations of incarcerated individuals explain substantially more of the variance in policy preferences than does lived experience itself. Taken together, Models 5 and 6 provide strong evidence that perceptions of deservingness are the dominant attitudinal mechanism shaping citizens’ responses to carceral policy, while personal contact functions mainly as a general decarceral disposition.
 
