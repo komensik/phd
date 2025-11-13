@@ -1,0 +1,176 @@
+---
+title: "Mensik Replication"
+format: pdf
+editor: visual
+---
+
+I propose to use to complete the analyses for my own project examining how experiences with the carceral state and with victimization influence perspectives on criminal legal policy, broadly.
+
+Since beginning the analyses, I have realized issues with the paper's empirical design, and also discovered the following issues with data and models that will need to be better diagnosed an addressed:
+
+-   survey lacks weights, has population-of-interest mismatch, potential bias
+
+-   undersample of "treated" and groups of interests (controls), or substantive imbalance in key independent variables
+
+    -   survey dropoff of the "treated" group by the point in the survey where the DV measure is asked about
+
+-   apparent multicolinearity in models
+
+This 'replication' will thus involve identification of problems with my empirical design, ideally diagnoses for improvements and steps to that end (especially, constructing survey weights which I haven't done before), and also identify improvements that would fall outside the scope of this immediate replication or that present larger empirical challenges to studying matters of carceral state politics (endogeneity, for one). It will also allow me to produce results to make key determinations vis-a-vis next steps for my prospectus.
+
+#### *Modeling Approach*
+
+To formally evaluate my hypotheses, I fit a series of Ordinary Least Squares (OLS) models examining the relationship between carceral contact, deservingness perceptions, and support for criminal legal policies. Unless otherwise stated, all models include relevant demographic and attitudinal covariates, denoted in vector form as $X_{i}^{\prime} \cdot \texttt{controls}$,. In all models, $i$ indexes individual respondents, and $\texttt{impact}_{i}$ captures whether a respondent has been directly or proximally impacted (included via victimization). In models where all key variables are measured within the same experimental block, standard errors are not clustered. Where appropriate (e.g., models pooled across blocks or with repeated measures), I cluster standard errors by respondent. I interpret coefficients of interest using two-tailed hypothesis tests at the $\alpha = 0.05$ level. I report 95% confidence intervals and standard errors throughout.
+
+##### Deservingness Models
+
+My first main hypothesis (**H1)** predicts that individuals with direct or proximate experiences with the criminal legal system (e.g., incarceration, knowing someone incarcerated, or victimization) will perceive incarcerated people as more deserving. I test this by regressing each respondent's 0-100 deservingness scores for incarcerated people on a binary indicator for carceral impact status, controlling for demographic and attitudinal factors. Specifically, I estimate:
+
+##### Model 1: Any Carceral Impact on Deservingness
+
+$$
+{\texttt{prisonerdeserves}}_{i} = \beta_0 + \beta_1 \cdot {\texttt{impact}}_{i} + \beta_2 \cdot {\texttt{desor}}_{i} + X_i^{\prime} \cdot {\texttt{controls}} + u_i
+$$
+
+where $prisonerdeserves_i$ is respondent $i$'s deservingness score for incarcerated people, $impact_i$ is a binary indicator for whether the respondent has been impacted in any of the stated ways, and $X_i'$ includes demographic data. The variable $desor_i$ captures each respondent’s general orientation toward help-seeking populations. The key coefficient of interest is $\beta_1$, which estimates the average difference in deservingness perception between those with and without carceral contact, holding other covariates constant. A positive and statistically significant $\beta_1$ would support H1.
+
+While not central to my theoretical framework, I also explore whether the effect of contact on deservingness perceptions varies by political ideology. This model is reported in Appendix Table A2.
+
+To I distinguish among types of contact (H1, H1A,H1B), I estimate separate models in which the impact variable is disaggregated into binary indicators for each type (e.g., been incarcerated, knows someone incarcerated, victim of violent crime). This allows me to test which forms of contact are associated with more generous perceptions, and whether the effects differ in magnitude or direction.
+
+**in analyses, M1 is without controls and M1c is with controls Nov 2**
+
+##### Model 2: Incarcerated, Know Incarcerated, Victimized on Deservingness (minc, mki, mv)
+
+$$
+\texttt{prisonerdeserves}_{i} = \beta_0 + \beta_1 \cdot \texttt{incarc}_{i} + \beta_2 \cdot \texttt{knowincarc}_{i} + \beta_3 \cdot \text{vict}_{i} + \beta_4 \cdot \texttt{des\_or}_{i} + \beta_5 \cdot \texttt{controls}_{i} + u_{i}
+$$
+
+##### Policy Models
+
+My second core hypothesis (**H2)** is more generous perceptions of carceral citizens' deservingness will predict greater and more consistent support for assistance-oriented criminal legal policies and reduced support for punitive criminal legal policies. To test this, I estimate the following outcome models for each policy index:
+
+##### Models 3 and 4: Deservingness on Carceral Policy
+
+$$
+\texttt{prisonhelp}_{i} = \delta_0 + \delta_1 \cdot \texttt{impact}_{i} + \delta_2 \cdot \texttt{prisonerdeserves}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}
+$$
+
+and on punitive policy
+
+$$
+\texttt{prisonpen}_{i} = \delta_0 + \delta_1 \cdot \texttt{impact}_{i} + \delta_2 \cdot \texttt{prisonerdeserves}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}
+$$
+
+In each model, $delta_1$ captures the association between carceral contact and policy preferences, controlling for deservingness and covariates. $delta_2$ estimates the relationship between deservingness and policy support, which directly tests H2. A positive and statistically significant $delta_2$ in the help model—and a negative $delta_2$ in the punitive model—would support the hypothesis that warmer evaluations of incarcerated people correspond to greater support for decarceral policies.
+
+To formally test whether perceptions of deservingness mediate the effect of carceral contact on policy preferences, I first estimate a set of interaction models to examine whether the relationship between deservingness and policy views differs depending on whether respondents have been directly or proximally impacted by the criminal legal system. This approach allows me to test whether contact moderates how deservingness evaluations translate into policy preferences—i.e., whether deservingness matters more (or less) for those with lived experience.
+
+##### Model 5: Interaction for Support of Carceral Policy Help
+
+$$
+\texttt{prisonhelp}_{i} = \theta_0 + \theta_1 \cdot \texttt{Deservingness}_{i} + \theta_2 \cdot \texttt{Contact}_{i} + \theta_3 (\texttt{Deservingness}_{i} \times \texttt{Contact}_{i}) + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}
+$$
+
+##### Model 6: Interaction for Support of Carceral Policy Punishment
+
+$$
+\texttt{prisonpen}_{i} = \theta_0 + \theta_1 \cdot \texttt{Deservingness}_{i} + \theta_2 \cdot \texttt{Contact}_{i} + \theta_3 (\texttt{Deservingness}_{i} \times \texttt{Contact}_{i}) + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}
+$$
+
+A significant interaction term (\$\\theta_3\$) would indicate that the effect of deservingness on policy support varies depending on whether the respondent has had contact with the criminal legal system. These models help determine whether deservingness operates similarly across groups—or if lived experience conditions how moral evaluations shape policy preferences.
+
+Building on the interaction models, I next, I assess whether deservingness perceptions partially mediate the relationship between contact and policy preferences. This directly follows from my theoretical framework: if contact within the criminal legal system influences how individuals perceive the deservingness of incarcerated people, and if those perceptions in turn shape policy support, deservingness should function as a mediating mechanism.
+
+I estimate causal mediation using the 'mediation' package in R, estimating average indirect effects and confidence intervals via bootstrapping. This involves first estimating a model in which deservingness is regressed on contact, and then a second-stage model in which policy preferences are regressed on both contact and deservingness. These models include the same attitudinal and demographic controls used throughout the analysis. The resulting estimates of the average causal mediation effect (ACME) help evaluate whether contact shapes policy views in part through its effect on perceptions of deservingness.
+
+For both the prison help and prison penalty indices, I estimate:
+
+##### Model 7: Mediation Outcome Model - Support for Assistance Oriented Policy (Second Stage for Mediation Analysis)
+
+$$
+y_{i}^{\texttt{prisonhelp}} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{des\_or}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + u_{i}
+$$
+
+##### Model 8: Mediation Outcome Model - Support for Punishment Oriented Policy (Second Stage for Mediation Analysis)
+
+$$
+y_{i}^{\texttt{prisonpen}} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{des\_or}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + u_{i}
+$$
+
+where $y_{i}^{\texttt{prisonhelp}}$ is support for assistance-oriented or and $y_{i}^{\texttt{prisonpen}}$ is support for punitive policies. A statistically significant indirect effect would indicate that deservingness mediates part of the relationship between carceral contact and policy preferences.
+
+I model criminal legal contact's effect on other forms of policy help by regressing aggregated attitudes towards those policies on impact:
+
+##### Model 9: Robustness Check: General Policy Help Orientation (OLS regression of composite non-carceral help policy support on contact)
+
+$$
+y_{i}^{\texttt{polorientation}} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{des\_or}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + u_{i}
+$$
+
+To evaluate whether **(H2)** more generous perceptions of carceral citizens' deservingness also predict more consistent *consistent* support for offering policy help to carceral citizens, I conduct an additional analysis focusing on response consistency. First, I calculate the variance of each respondent's responses across all six help-oriented policy questions (with higher values indicating less consistent responses). I then use this variance measure as the dependent variable in a regression model with the same predictors as my main policy analysis.
+
+##### Model 10: Explanatory Model: Variance in Support for Assistance Oriented Policies (OLS regression of within-respondent variance across decarceral or help policy items)
+
+$$
+{\texttt{variancehelp}}_{i} = \beta_0 + \beta_1 \cdot {\texttt{impact}}_{i} + \beta_2 \cdot {\texttt{prisonerdeserves}}_{i} + \beta_3 \cdot {\texttt{polor}}_{i} + X_i^{\prime} \cdot {\texttt{controls}} + u_i
+$$
+
+Finally, to assess heterogeneity by contact type, I re-estimate the above models using individual dummy variables for each form of impact (e.g., been incarcerated, known someone, victim of crime).
+
+In exploratory models, I restrict the sample to respondents who report only one form of contact to reduce overlap and isolate effects.
+
+### Appendix B: Robustness Checks and Conditional Effects
+
+This section reports additional models assessing whether the relationship between contact, deservingness, and policy views varies across key individual-level characteristics. Although not central to my theoretical framework, these checks address common concerns that ideological predispositions or social group membership may condition the observed effects.
+
+Although not a core hypothesis, I explore whether the effect of carceral contact on deservingness varies across ideological groups. This analysis addresses concerns that the relationship between contact and deservingness may simply reflect underlying political ideology. More broadly, prior work suggests that while ideology is a powerful predictor of attitudes toward marginalized groups, it may also obscure important conditional variation in how individuals interpret personal or vicarious experiences with the criminal legal system.[^1] Thus, I test the possibility that respondents with different ideological orientations may interpret contact differently. Specifically, I estimate:
+
+[^1]: While general ideology can be blunt instruments for understanding attitudes in complex or racialized policy domains (Kreitzer, Maltby, and Smith 2022), and while partisans may agree on many group evaluations, intra-partisan disagreements reflect deep symbolic divides with important implications for policy design (Kreitzer and Smith 2024).
+
+I use standardized survey items on relevant policies to create a policy dispositional index, including support for Mediaid and unemployment assisstence, views on minimum wage and government support for the poor, and the agreement with the importance of accepting refugees –\>
+
+THIS IS OLD NOT RIGHT YIKES:
+
+$$
+\texttt{prisonerdeserves}_{i} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{gender}_{i} + \beta_3 \cdot \texttt{race}_{i} + \beta_4 \cdot \texttt{education}_{i} + \beta_5 \cdot \texttt{urban}_{i} + \beta_6 \cdot \texttt{party}_{i} + \beta_7 \cdot \texttt{ideology}_{i} + \beta_8 \cdot \texttt{racialresentment}_{i} + \beta_9 \cdot \texttt{desor}_{i} + \beta_{10} \cdot \texttt{policydisposition}_{i} + \beta_{11} \cdot (\texttt{impact}_{i} \times \texttt{ideology}_{i}) + \beta_{12} \cdot (\texttt{impact}_{i} \times \texttt{race}_{i}) + u_{i}
+$$
+
+A positive and statistically significant $\beta_3$ would indicate that contact increases deservingness more among liberal respondents than conservative ones.
+
+In an exploratory analysis, I examine whether the relationship between criminal legal contact and deservingness differs by respondent race and racial attitudes. Although not predicted by my core theoretical framework, this test allows for the possibility that lived experience and racialized constructions of criminality may moderate how individuals interpret contact. Race is central to matters of carceral policy [@michener2019] as are racial "attitudes" to punitiveness in the American context [@fresh]. I estimate the following model:
+
+$$
+\text{prisonerdeserves}_i = \beta_0 + \beta_1 \cdot \text{impact}_i + \beta_2 \cdot \text{race}_i + \beta_3 \cdot (\text{impact}_i \times \text{race}_i) + \beta_4 \cdot \text{FIRE}_i + \mathbf{X}_i' \boldsymbol{\beta} + u_i
+$$
+
+Although presented in simplified form above, each component of the model is entered separately in estimation. Specifically, $\text{race}_i$ represents a set of three mutually exclusive indicator variables for racial self-identification (non-Hispanic Black, Hispanic/Latino/a/e, and “Other,” with non-Hispanic white as the reference category). The interaction term $\text{impact}_i \times \text{race}_i$ refers to separate interaction terms between carceral contact and each racial group. $\text{FIRE}_i$ refers to the four-item battery capturing racial fear, institutional racism acknowledgment, and racial empathy, with each item entered individually to preserve its theoretical distinctiveness. $\mathbf{X}_i'$ includes standard demographic and attitudinal controls.
+
+### Appendix B: Exploratory Models of Policy Response Consistency
+
+While my primary tests of H2 focus on average support for assistance- and penalty-oriented policies, this section explores whether criminal legal contact is also associated with greater consistency in support across multiple decarceral policy items. Social construction theory suggests that personal connection to stigmatized policy targets may reduce reliance on stereotypes, potentially leading to more coherent or unconditional policy preferences. The models below assess this possibility by estimating the variance and standard deviation of respondents’ support for help-oriented policies, as well as fitting a mixed effects model to evaluate within-respondent consistency.
+
+To confirm my findings with an alternative measure of consistency, I also calculate the standard deviation of each person's responses across the already standardized help policy items. This provides a normalized measure of response dispersion:
+
+$$
+\texttt{sdhelp}_{i} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{prisonerdeserves}_{i} + \beta_3 \cdot \texttt{polor}_{i} + X^{\prime}_{i} \cdot \texttt{controls} + u_{i}
+$$
+
+I expect that $\beta_1$ will be negative in both models, indicating that individuals with direct or proximate experiences with incarceration (impact =1) show more consistent support across different decarceral policies, even after controlling for deservingness attitudes and other demographic factors. This would support my hypothesis that personal connection leads to more coherent or unconditional policy preferences, rather than simply higher average support.
+
+Because aggregate measures may obscure underlying variation, I fit an ordinal logistic mixed effects model predicting policy support, with random intercepts for respondents. The model includes fixed effects for policy experience (impact), deservingness perceptions, attitudinal and remaining controls:
+
+::: {=latex}
+\[ \begin{align}
+\text{logit}\left( \Pr(Y_{ij} \leq k) \right)
+&= \alpha_k - \Big(
+\beta_1 \cdot \text{impact}_i +
+\beta_2 \cdot \text{prisonerdeserves}_i +
+\beta_3 \cdot \text{pol\_or}_i +
+\mathbf{X}_i^{\prime} \boldsymbol{\beta} +
+u_i + \varepsilon_{ij}
+\Big)
+\end{align} \]
+:::
+
+Here, $\beta_1$ estimates the average effect of contact on policy preferences; $\beta_2$ captures how much perceived deservingness of incarcerated people influences policy support; and $\beta_3$ reflects policy help attitudes. The term $\mathbf{X}_{i}^{\prime}\boldsymbol{\beta}$ represents control covariates, while $u_{i}$ allows for respondent-specific baseline support levels. This enables me to model individual-level responses across all policy items simultaneously, and assess both the average effect of experience on policy support (through the fixed effect coefficient) and the consistency of support across policies (through the random effects variance).
