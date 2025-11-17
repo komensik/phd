@@ -29,7 +29,9 @@ library(kableExtra)
 
 ### Overview
 
-These results document the exploratory and diagnostic tests used to evaluate how distinct forms of contact with the criminal legal system—**incarceration experience (`incarc`)**, **knowing someone incarcerated (`knowincarc`)**, and **victimization (`vict`)**—relate to perceived deservingness of incarcerated people (`d_incppl_pris_abc`).\
+First I present results of the exploratory and diagnostic tests used to evaluate how distinct forms of contact with the criminal legal system—**incarceration experience (`incarc`)**, **knowing someone incarcerated (`knowincarc`)**, and **victimization (`vict`)**—relate to perceived deservingness of incarcerated people (`d_incppl_pris_abc`).
+
+\
 Analyses are **unweighted** and focus on data integrity, model performance, and variable behavior rather than publication-ready estimates.
 
 ```{r, echo=FALSE}
