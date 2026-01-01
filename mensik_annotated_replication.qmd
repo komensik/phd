@@ -1,0 +1,45 @@
+---
+title: "mensik_annotated_replication"
+author: 
+  Kristina Mensik  
+  Department of Political Science, Duke University
+format:
+  pdf:
+    pdf-engine: pdflatex
+    include-in-header: header.tex
+    keep-tex: true
+    toc: false
+    number-sections: false
+    fig-cap-location: top
+    booktabs: true
+  docx: 
+    reference-doc: reference.docx
+    toc: false
+    number-sections: true
+bibliography: references_repaired.bib
+csl: apsr.csl
+---
+
+## About
+
+I proposed "replicating" my prelim paper for the replication assignment. In starting analyses, I'd run into data/analysis \[word - specification?\] problems that reflect/connect to foundational causal inference issues \[word/explanation – specification?\]. As such, this is not a true replication. Moreover, it is more of an "annotated" replication, as I note \[takeaways\] throughout.
+
+Further note: theorizing and seeing evidence that "victims" and "the incarcerated" need not be disaggregated, my original proposal looked at three "experience" or "identity" groups: those who have been incarcerated, those who have close ties to people who have been incarcerated, and people who have been victimized – and consider people who's only tie to the carceral state is through knowing people who have been victimized part of the "unimpacted." My committee I advised I turn this into two papers, seperating the matter of victimization and policy feedback (my contention is that "victims" not only overlap with the direct/proximally impacted, but that they have discrete experiences with the state/policy that may shape perceptions of state and target legitimacy, and policy. \*In my analyses, tho, I still include victimization, as ultimately the analyses may look similar and that paper will need to establish differences between victims and other groups.
+
+This paper thus asks:
+
+## **Introduction** 
+
+Personal experience with carceral policy in the United States is extensive. By year-end 2001, more than 5.6 million U.S. adults had served time in a state or federal prison (BOP 2003), and by 2010, an estimated 8 % had a felony conviction and 3 % had served or were serving prison time (Shannon et al 2017). While systematized data on non-felony convictions remain, as Stenson and Mayson (2018) put it, "absurdly, embarassingly" (p. 732) elusive, they estimate 13.2 million such cases are filed annually. Many millions more experience incarceration indirectly – through proximal contact – as family, friends, or neighbors of those incarcerated. While the interests of these two groups are regularly presented as oppositional, we actually know very little about how these experiences – incarceration, proximal carceral contact, and victimization – shape how people think about criminal legal policy.
+
+Scholars have shown that an important driver of public support for state intervention across other domains is people's beliefs about whether a given target group is *deserving* of policy help or punishment [@desante2013; @ellis2020a]. Further still, such deservingness perceptions often predict state policy outcomes [@kreitzer2022]. These perceptions of deservingness are not purely personal – they are shaped by myriad factors including policy designs themselves [@schneider2019]. Yet, while scholars have shown that deservingness perceptions inform opinions about social welfare, immigration, and even gun policy [@oorschot2000; @kreitzer2022a], the role of deservingness in the criminal legal context remains less well-developed. In particular, **we do not know how people’s experiences with the carceral state—either through direct or proximal contact—shape perceptions of carceral state target deservingness, criminal justice policy, and whether \[when?\] deservingness perceptions in this context determine criminal justice policy views.**
+
+\[ do I need policy feedback paragraph here? or frame as "on the other hand" - policy feedback shows that . . . \]
+
+Recent work [@sorelle2024] suggests that experience with policy may condition the logics people use to assess deservingness – and that the role of personal experience in deservingness remains underexplored. At the same time, a growing body of scholarship demonstrates how contact with the carceral state shapes people's political attitudes [@weaver2010], political identities [@owens2014], and political engagement [@white2019]. Through what these scholars term policy feedback effects, policies, once enacted, reshape politics by redistributing resources and sending interpretive signals that affect how individuals understand their – and other's – relationship to the state [@skocpol1992; @pierson1993a; @mettler2023a].
+
+This paper brings deservingness and policy feedback frameworks together to understand **how direct and proximate experiences of incarceration shape perceptions of the deservingness of incarcerated people, and how these perceptions translate to opinions on prison policy.** I start with the contention that people form views about policy by quickly judging social constructions of that policy's target group [@schneider1993]. **Drawing on findings that carceral contact can drive perceptions of carceral state illegitimacy and contact group solidarity, I suggest that it may too generate perceptions of carceral targets as more deserving.** Moreover, impacted groups learn these political messages by interacting with policy design. They may in turn have different reference points for carceral policy, and the conditions and consequences of imprisonment. In turn, I expect that carceral contact will translate to more generous perceptions of deservingness of, and consistent support for policy that helps carceral citizens.
+
+I **test** these propositions using original 2024 survey data capturing Americans' experiences with the carceral system, their perceptions of a range of policy targets, and their attitudes towards prison-related policy reforms. **\[Big hedge here?\]** The data allow for a unique empirical examination of how deservingness judgements may vary across direct and indirect experiences with incarceration – and how these judgements structure policy preferences.
+
+-   core point from CARIN para isn't CARIN, but that we would expect

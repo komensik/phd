@@ -1,0 +1,29 @@
+---
+title: "victimization"
+author: 
+  Kristina Mensik  
+  Department of Political Science, Duke University
+format:
+  pdf:
+    pdf-engine: pdflatex
+    include-in-header: header.tex
+    keep-tex: true
+    toc: false
+    number-sections: false
+    fig-cap-location: top
+    booktabs: true
+  docx: 
+    reference-doc: reference.docx
+    toc: false
+    number-sections: true
+bibliography: references_repaired.bib
+csl: apsr.csl
+---
+
+## Introduction
+
+\[Literature\]
+
+While many carceral citizens and their networks internalize the clear “undeserving” messages conveyed by criminal legal policy, research increasingly shows that such contact can also shape political attitudes towards the state – fomenting perceptions of institutional illegitimacy [@anoll2019; @anoll2022; @walker2020a; @lerman2014]. As such, I propose that interactions with the carceral system should also shape attitudes towards *targets of the state* – and their legitimacy or deservingness in relation to it. While some work finds that targets of policy can internalize negative or undeserving constructions [@soss1999a], much of the work on criminal legal contact stresses that demobilization is a product of resource effects or interpretive effects *distinct* from an “undeserving” self-conception (Lerman and Weaver 2014, White 2019). Instead, scholars emphasize that direct contact with the criminal legal system can heighten in-group solidarity and mobilize in spite of resource and interpretive feedbacks that should be demobilizing. (Walker 2020, Owens 2014). T**his is specifically the case when policy targets reject policy “teachings” about their lower civic status as part of a sense of systemic injustice – suggesting a reappraisal of both the system and those criminalized by it (Walker 2020).** Among family of the incarcerated, Anoll (2022) suggests that higher rates of voting in states specifically with most stringent carceral disenfranchisement policies suggests “surrogate” mobilization, or a motivation to act on behalf a “deserving” incarcerated citizen, is at work. Thus, mobilization in response to both direct and proximal contact involve meaning-making processes that wed social solidarity with dampened perceptions of institutional legitimacy and trust.
+
+But interaction with the carceral system may facilitate not just political, but also policy learning. Targets and their networks come to learn policy messages by experiencing policy burdens. Lee et al. (2014), for example, find that demobilizing 'spillover effects" are trace to family and loved ones of the incarcerated experiences with and reaction to policies whose costs they incur, like those of visitation, expensive phone calls, and paying off fines and fees. That the experiences producing political responses are grounded in personal experience with policy suggest that contact may reorient how individuals think about policy, as it changes what they think (for example, what consequences to policy they imagine) when they think about policy.
