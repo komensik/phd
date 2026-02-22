@@ -1,0 +1,31 @@
+---
+title: "candidate_states"
+format: html
+editor: visual
+---
+
+## Candidate States
+
+Quarto enables you to weave together content and executable code into a finished document.
+
+```{r}
+library(readxl)
+library(dplyr)
+
+df <- read_excel("carnes_legislators.xlsx")
+
+View(df)
+
+df %>%
+  filter(!is.na(YearBorn)) %>%
+  group_by(StateAbbrev) %>%
+  summarise(n_legislators = n())
+
+#making state_counts own data frame
+state_counts <- df %>%
+  filter(!is.na(YearBorn)) %>%
+  count(StateAbbrev, name = "n_legislators")
+
+#saving as csv
+write.csv(state_counts, "state_counts.csv", row.names = FALSE)
+```
