@@ -29,3 +29,8 @@ state_counts <- df %>%
 #saving as csv
 write.csv(state_counts, "state_counts.csv", row.names = FALSE)
 ```
+
+```{r}
+df <- read_excel("prosp_draft_data")
+
+```
