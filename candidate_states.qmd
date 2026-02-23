@@ -63,6 +63,8 @@ public_safety_table_total <- public_safety_table %>%
   )
 
 public_safety_table_total
+
+write.csv(public_safety_table_total, "pub_safety_w_total.csv", row.names = FALSE)
 ```
 
 ```{r}
