@@ -30,7 +30,48 @@ state_counts <- df %>%
 write.csv(state_counts, "state_counts.csv", row.names = FALSE)
 ```
 
+Work in Public Safety
+
+-SAFTY
+
 ```{r}
-df <- read_excel("prosp_draft_data")
+
+library(dplyr)
+
+public_safety_table <- df %>%
+  filter(SAFTY == 1) %>%
+  group_by(StateAbbrev) %>%
+  summarise(
+    n_public_safety = n(),
+    safety_details = paste(
+      paste(JobTitle, JobOrgName, sep = " — "),
+      collapse = "; "
+    ),
+    .groups = "drop"
+  ) %>%
+  arrange(StateAbbrev)
+
+
+public_safety_table_total <- public_safety_table %>%
+  bind_rows(
+    summarise(
+      public_safety_table,
+      StateAbbrev = "Total",
+      n_public_safety = sum(n_public_safety, na.rm = TRUE),
+      safety_details = NA_character_
+    )
+  )
+
+public_safety_table_total
+```
+
+```{r}
+df_1 <- read_excel("prosp_draft_data.xlsx")
+
+View(df_1)
+
+df_1 %>%
+  count(eligibility_rule_felony, .drop = FALSE) %>%
+  arrange(eligibility_rule_felony)
 
 ```
