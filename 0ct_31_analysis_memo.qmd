@@ -150,53 +150,37 @@ Text
 
 1.  
 
-2.  
-
-    **Generalized deservingness (`desor_core`) dominates** perceived deservingness of incarcerated people (≈30% total, ≈23% unique, β\*≈0.51).
+2.  **Generalized deservingness (`desor_core`) dominates** perceived deservingness of incarcerated people (≈30% total, ≈23% unique, β\*≈0.51).
 
 3.  
 
-4.  
-
-    **Contact variables** have positive, independent, but modest effects: incarceration and proximate contact are significant; victimization is not.
+4.  **Contact variables** have positive, independent, but modest effects: incarceration and proximate contact are significant; victimization is not.
 
 5.  
 
-6.  
-
-    **Attitudinal and ideological controls** (punitiveness, social ideology) are consistent but smaller.
+6.  **Attitudinal and ideological controls** (punitiveness, social ideology) are consistent but smaller.
 
 7.  
 
-8.  
-
-    **Party ID, FIRE items, and demographics** are negligible once attitudes are controlled.
+8.  **Party ID, FIRE items, and demographics** are negligible once attitudes are controlled.
 
 ## Modeling Decisions
 
 -   
 
--   
-
-    Retain `desor_core` as a control in all subsequent models (major confounder).
+-   Retain `desor_core` as a control in all subsequent models (major confounder).
 
 -   
 
--   
-
-    Continue to policy outcomes (`prisonhelp`, `prisonpen`) using the same control set.
+-   Continue to policy outcomes (`prisonhelp`, `prisonpen`) using the same control set.
 
 -   
 
--   
-
-    Test **mediation:** `contact → desor_core → policy attitude`.
+-   Test **mediation:** `contact → desor_core → policy attitude`.
 
 -   
 
--   
-
-    Add robustness: weights, block-restricted, and alternative racial-attitudes batteries.
+-   Add robustness: weights, block-restricted, and alternative racial-attitudes batteries.
 
 -   
 
@@ -250,9 +234,7 @@ Next analyses will shift to **policy outcomes** (`prisonhelp`, `prisonpen`) to e
 
 1.  
 
-2.  
-
-    **Direct effects:**
+2.  **Direct effects:**
 
     ```         
     lm(prisonhelp ~ contact + desor_core + controls)
@@ -261,9 +243,7 @@ Next analyses will shift to **policy outcomes** (`prisonhelp`, `prisonpen`) to e
 
 3.  
 
-4.  
-
-    **Mediation:**
+4.  **Mediation:**
 
     ```         
     mediation::mediate(model_m, model_y, treat = "contact", mediator = "desor_core")
@@ -271,35 +251,25 @@ Next analyses will shift to **policy outcomes** (`prisonhelp`, `prisonpen`) to e
 
 5.  
 
-6.  
-
-    **Robustness checks:**
+6.  **Robustness checks:**
 
     -   
 
-    -   
-
-        Weighted models
+    -   Weighted models
 
     -   
 
-    -   
-
-        Block-restricted subsets
+    -   Block-restricted subsets
 
     -   
 
-    -   
-
-        Alternative racial-attitudes controls
+    -   Alternative racial-attitudes controls
 
     -   
 
 7.  
 
-8.  
-
-    **Outputs:**\
+8.  **Outputs:**\
 
     Report standardized β and semi-partial R² for all policy and mediation models to parallel this stage.
 

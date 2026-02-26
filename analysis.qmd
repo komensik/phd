@@ -33,6 +33,7 @@ library(patchwork)
 here::here()
 raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data_may9.csv")
 
+raw_data_cleaned
 #view(raw_data_cleaned)
 ```
 
@@ -47,6 +48,122 @@ raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data_may9.csv")
 | summary overlays?       | mean line, kernal density, histogram bars    |
 | plot aesthetics?        | clear x-axis label                           |
 | Output                  |                                              |
+
+### 1.0 Counts
+
+```{r}
+
+nrow(raw_data_cleaned)
+
+race_counts <- raw_data_cleaned %>%
+  summarise(
+    White = sum(White == 1, na.rm = TRUE),
+    Black = sum(Black == 1, na.rm = TRUE),
+    Hispanic = sum(Hispanic == 1, na.rm = TRUE),
+    OtherRace = sum(OtherRace == 1, na.rm = TRUE)
+  )
+
+race_counts
+
+raw_data_cleaned %>%
+  count(block)
+
+raw_data_cleaned %>%
+  count(gender)
+
+
+```
+
+### 1.01 Policy Questions Doing Cronback's Alpha Late
+
+```{r}
+library(psych)
+library(dplyr)
+
+names(raw_data_cleaned)
+
+pen_items <- raw_data_cleaned %>%
+  dplyr::select(prisonpen_1, prisonpen_5)
+
+# Quick look
+psych::describe(pen_items)
+
+# Correlation (more interpretable than alpha for 2 items)
+cor(pen_items, use = "pairwise.complete.obs")
+
+# Cronbach's alpha (fine to report, but remember it's 2 items)
+psych::alpha(pen_items, check.keys = FALSE)
+
+```
+
+### Key results
+
+-   
+
+-   
+
+    The **correlation** between the two items is **r = 0.238**.
+
+-   
+
+-   
+
+    With only two items, Cronbach’s alpha is essentially a rescaled version of that correlation. (So don’t oversell alpha here; the correlation is the clean summary.)
+
+-   
+
+### Interpretation you can actually stand behind
+
+-   
+
+-   
+
+    **These two punitive items are positively related, but only weak-to-moderately so.** People who favor the death penalty are *somewhat* more likely to favor LWOP, but plenty of respondents don’t treat them as interchangeable.
+
+-   
+
+-   
+
+    That’s not necessarily a “problem.” Death penalty and LWOP are conceptually related (punitive severity), but they can tap **different moral/legal intuitions** (irreversibility, innocence risk, retribution vs incapacitation), so moderate association is plausible.
+
+-   
+
+-   
+
+    The response distribution shows a **nontrivial chunk of “Don’t know”** recoded to 2.5 (15–17%) and about **8% missing** for each item. The DK-to-midpoint choice can slightly inflate apparent consistency by shrinking variance, so reliability is a conservative-ish check but not definitive.
+
+-   
+
+### What I’d do next (briefly)
+
+-   
+
+-   
+
+    Keep the 2-item average as a *simple punitive severity index*, but be transparent that it’s two items with modest correlation.
+
+-   
+
+-   
+
+    As a robustness check later: re-run the correlation/alpha **excluding DK** (treat DK as NA) and confirm the relationship is similar.
+
+### Alpha for Prison Help
+
+```{r}
+help_items <- raw_data_cleaned %>%
+  select()
+
+psych::describe(help_items)
+
+help_items <- raw_data_cleaned %>%
+  dplyr::select(q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev, q23_2_rev, q23_7_rev)
+
+help_alpha <- psych::alpha(help_items, check.keys = FALSE)
+help_alpha$total$raw_alpha      # the alpha value
+help_alpha$item.stats           # item stats
+help_alpha$alpha.drop           # alpha if item dropped
+```
 
 ### 1.1. Main DV: Deservingness of Incarcerated People/Prisoners
 
@@ -148,6 +265,8 @@ pattern_labels <- tibble::tibble(
 combo_summary_labeled <- combo_summary %>%
   left_join(pattern_labels, by = "contact_pattern") %>%
   mutate(label = ifelse(is.na(label), "Other", label))
+
+combo_summary_labeled
 ```
 
 #### A. All Contact Combos
@@ -1407,6 +1526,37 @@ FIRE Angry - disagreement with anger that racism exists decreases support for pr
 
 FIRE Fear – disagreement with being afraid of other raises increases support for prison help policy; slightly increases opposition to punitive prison policies.
 
+### 4.\_ Preliminary M3 & M4 Models without Controls
+
+```{r}
+
+
+#Help
+
+
+mh1_no_cont <- lm(q25_2_rev ~ impact, data = raw_data_cleaned)
+mh2_no_cont <- lm(q25_3_rev ~ impact, data = raw_data_cleaned)
+mh3_no_cont <- lm(q25_4_rev ~ impact, data = raw_data_cleaned)
+mh4_no_cont <- lm(q25_6_rev ~ impact, data = raw_data_cleaned)
+mh5_no_cont <- lm(q23_2_rev ~ impact, data = raw_data_cleaned)
+mh6_no_cont <- lm(q23_7_rev ~ impact, data = raw_data_cleaned)
+
+
+
+
+mpen1_no_control <- lm(prisonpen_1 ~ impact, data = raw_data_cleaned)
+
+mpen2_no_control <- lm(prisonpen_5 ~ impact, data = raw_data_cleaned)
+
+summary(mh1_no_cont)
+summary(mh2_no_cont)
+summary(mh3_no_cont)
+summary(mh4_no_cont)
+summary(mh5_no_cont)
+summary(mh6_no_cont)
+
+```
+
 ### 4.\_ Preliminary M3 & M4 Models with Controls
 
 ```{r}
@@ -1524,7 +1674,7 @@ car::avPlots(m4_basic, terms = ~ desor_core + d_incppl_pris_abc + penalpoint + s
 Pairwise interpretation:
 
 | Relationship | Interpretation |   |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | desor_core & inc ppl | strong shared variance, likely suppression |  |
 | desorcore & ideo -0.37 | expected liberal/conservative |  |
 | desorcore & penalpoint: -0.19 | mild relationship |  |

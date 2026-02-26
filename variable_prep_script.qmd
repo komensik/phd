@@ -120,7 +120,7 @@ library(psych)
 
 
 # reliability -- Core
-psych::alpha(select(raw_data_cleaned, all_of(core_vars)))
+psych::alpha(select(all_of(core_vars)))
 
 core_mat <- dplyr::select(raw_data_cleaned, dplyr::all_of(core_vars))
 core_keep <- rowSums(!is.na(core_mat)) >= 5        # match your ≥5 rule
@@ -845,6 +845,28 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
+
+# Doing Cronback's Alpha Late
+
+```{r}
+
+library(psych)
+library(dplyr)
+
+pen_items <- raw_data_cleaned %>%
+  select(prisonpen_1, prisonpen_5)
+
+# Quick look
+psych::describe(pen_items)
+
+# Correlation (more interpretable than alpha for 2 items)
+cor(pen_items, use = "pairwise.complete.obs")
+
+# Cronbach's alpha (fine to report, but remember it's 2 items)
+psych::alpha(pen_items, check.keys = FALSE)
+
+```
+
 #### Support for Punitive Prison Policy (death penalty and LWOP) - prisonpen
 
 ```{r, prisonpen}
@@ -882,6 +904,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ```
 
 Takeaway: prison pen, prison pen 1 = dpen, prison pen 5 = lwop now -confirmed that prisonpen works -- constructed with average of death penalty and lwop
+
+
 
 OPTIONAL/potentially helpful for tables: factor version
 
