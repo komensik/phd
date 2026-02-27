@@ -119,22 +119,32 @@ Keep justice-adjacent targets out of both composites.
 library(psych)
 
 
-# reliability -- Core
-psych::alpha(select(all_of(core_vars)))
+# keep only vars that exist
+core_vars <- intersect(desor_core_vars, names(raw_data_cleaned))
 
+# build item matrix/dataframe
 core_mat <- dplyr::select(raw_data_cleaned, dplyr::all_of(core_vars))
-core_keep <- rowSums(!is.na(core_mat)) >= 5        # match your ≥5 rule
+
+# apply your completeness rule (>= 5 answered out of 9)
+core_keep <- rowSums(!is.na(core_mat)) >= 5
+
+# Cronbach's alpha on respondents who meet the rule
 core_alpha <- psych::alpha(core_mat[core_keep, ], check.keys = TRUE)
 
-core_alpha$total$raw_alpha   # Cronbach’s alpha (raw)
-core_alpha$total$std.alpha   # Alpha based on standardized items
-core_alpha$total$average_r   # Average inter-item correlation
-core_alpha$n.obs             # N used after listwise deletion
-core_alpha$alpha.drop        # “if item deleted” table
-core_alpha$item.stats        # item means, sd, r.drop, etc.
+# key outputs
+print(core_alpha$total$raw_alpha)
+print(core_alpha$total$std.alpha)
+print(core_alpha$total$average_r)
+print(core_alpha$n.obs)
+print(core_alpha$alpha.drop)
+print(core_alpha$item.stats)
+
+
 ```
 
 Interpretation: raw_alpha: 0.9078 and 0.9142 internal consistency -- suggests items hang together well. average_r = 0.5422 -- high inter-item correlation. cor: fairly strong correlation to the DV (0.547) R\^2 = 0.30 bivariately. Soaks up general generosity toward assistance-framed groups. Should justify use of control for testing whether contact predicts deservingness of incarcerated people, above and beyond that general orientation.
+
+
 
 ```{r}
 # reliability -- EXT
@@ -950,6 +960,11 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 summary(raw_data_cleaned$q25_2_rev)
 ```
+
+
+
+
+
 
 OPTIONAL: Create ordered factor versions- could be useful for plotting/tables/labeling)
 
