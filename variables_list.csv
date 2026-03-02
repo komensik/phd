@@ -1,0 +1,62 @@
+variable,direction,description,paper_area,democracy_area,area,collector,long_description,in_vdem,liberalism,input,years_complete,url,url2,most_important,keep
+incarcerate,-,incarceration rate,Liberal,Egalitarianism,Socioeconomic Outcomes,BJS,% of pop incarcerated,,,0,,,,0,1
+econ_opinion_residual,-,Opinion-policy difference (economic),Electoral,Representation,Responsiveness,Caughey and Warshaw 2018,Squared difference in mass econ liberalism and econ policy liberalism,,,1,,,,0,1
+social_opinion_residual,-,Opinion-policy difference (social),Electoral,Representation,Responsiveness,Caughey and Warshaw 2018,Squared difference in mass social liberalism and social policy liberalism,,,1,,,,0,1
+website_pollingplace,+,website with polling place,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+website_reg_status,+,website for registration status,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+website_precinct_ballot,+,website for precinct ballot,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+website_absentee_status,+,website for absentee status,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+website_provisional_status,+,website for provisional ballot check,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+reg_rej,-,registrations rejected,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+prov_partic,-,provisional ballots cast,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+prov_rej_all,-,provisional ballots rejected,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+uocava_rej,-,military and overseas ballots rejected,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+uocava_nonret,-,military and overseas ballots not returned,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+eavs_completeness,+,data completeness,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+post_election_audit,+,postelection audit required,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+nonvoter_illness_onyear_pct,-,voters deterred because of disability or illness (on-year),Electoral,Electoral,Election Performance,Elections Performance Index,degree to which voters are deterred from voting because of disability or illness,,,1,,,,0,1
+nonvoter_illness_offyear_pct,-,voters deterred because of disability or illness (off-year),Electoral,Electoral,Election Performance,Elections Performance Index,degree to which voters are deterred from voting because of disability or illness,,,1,,,,,1
+nonvoter_reg_onyear_pct,-,registration or absentee ballot problems (on-year),Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+nonvoter_reg_offyear_pct,-,registration or absentee ballot problems (off-year),Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,,1
+online_reg,+,online registration,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+wait,-,voting wait times,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,1,1
+residual,-,under- and over-votes cast in an election,Electoral,Electoral,Election Performance,Elections Performance Index,"number of under- and over-votes cast in an election, as a percentage of voter turnout.",,,1,,,,0,1
+pct_reg_of_vep_vrs,+,percent of eligible voters who register,Electoral,Electoral,Election Performance,Elections Performance Index,,,,1,,,,0,1
+death_penalty,+,Repealed death penalty,Liberal,Civil Liberties,Criminal Justice,Grossmann and Jordan,,,,0,,,,0,1
+shield,+,Protections Against Compelling Reporters to Disclose Sources,Liberal,Civil Liberties,Free Press,Grossmann and Jordan,Did State adopt Protections Against Compelling Reporters to Disclose Sources in Court?,1,,1,,,,1,1
+nofelons,-,number of felons ineligible to vote as percent of state population,Electoral,Electoral,Voting Rights,Grossmann and Jordan,,1,,0,,,,0,1
+w_felon_disenfranchise,-,felony disenfranchisement,Electoral,Electoral,Voting Rights,Grossmann and Jordan,(Grumbach interval measure 0-2),1,,1,,,,0,1
+absvot,+,absentee voting,Electoral,Electoral,Voting Rights,Grossmann and Jordan,,,,1,,,,0,1
+earlvot,+,early voting,Electoral,Electoral,Voting Rights,Grossmann and Jordan,,,,1,,,,0,1
+det_sentencing,-,Determinate sentencing,Liberal,Civil Liberties,Criminal Justice,Grumbach 2018,,,,0,,,,0,1
+postdna,+,DNA exoneration,Liberal,Civil Liberties,Criminal Justice,Grumbach 2018,,,,0,,,,0,1
+threestrikes,-,Three strikes,Liberal,Civil Liberties,Criminal Justice,Grumbach 2018,,,,0,,,,0,1
+tiss,-,Truth in sentencing,Liberal,Civil Liberties,Criminal Justice,Grumbach 2018,,,,0,,,,0,1
+voterid_strict,-,voter ID (strict),Electoral,Electoral,Voting Rights,Grumbach 2018,,,,1,,,,1,1
+voterid_any,-,voter ID (any),Electoral,Electoral,Voting Rights,Grumbach 2018,,,,1,,,,1,1
+sdr,+,Same day registration,Electoral,Electoral,Voting Rights,Grumbach and Hill 2018,,,,1,,,,1,1
+avr_any,+,Automatic Voter Registration (any),Electoral,Electoral,Voting Rights,Grumbach and Hill 2018,,,,1,,,,1,1
+avr_backend,+,Automatic Voter Registration (back end),Electoral,Electoral,Voting Rights,"McGhee, Hill, and Romero 2021",,,,,,,,,1
+asset_forfeit_grade,+,Asset forfeiture grade,Liberal,Civil Liberties,Criminal Justice,Institute for Justice,,,,0,,,,0,1
+compactness,+,District compactness,Electoral,Electoral,Gerrymandering,"Kaufman, King, and Komisarchik 2019",,,,1,,,,0,1
+prisoner_vote,+,State allows currently incarcerated to vote,Electoral,Electoral,Election Performance,National Conference of State Legislatures,,,,1,,http://www.ncsl.org/research/elections-and-campaigns/felon-voting-rights.aspx,,1,1
+protest_crime,-,Criminalization of forms of protest,Liberal,Civil Liberties,Civil Rights,,,Grumbach,,1,,http://www.icnl.org/usprotestlawtracker/?location=&status=enacted&issue=&date=custom&date_to=2018-12-31&type=legislative,,0,1
+youth_preregistration,+,Youth preregistration,Electoral,Electoral,Voting Rights,,"following Cost of Voting Index: 0=none, 1=<.5 year, 2=.5 year, 3=1 year, 4=2 years",Grumbach,,1,,http://www.ncsl.org/research/elections-and-campaigns/preregistration-for-young-voters.aspx,https://www.acslaw.org/wp-content/uploads/2018/05/Registration-general-1.pdf,0,1
+registration_drive_restriction,-,Restrictions on voter reg. drives,Electoral,Electoral,Voting Rights,,Interval: mandatory training; reporting penalties; deadline penalties,Grumbach,,1,,https://www.brennancenter.org/sites/default/files/2019-08/ReportState%20Restrictions%20on%20Voter%20Registration%20Drives.pdf,,0,1
+mean_median_s,-,Gerrymandering: mean-median difference (state leg.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+symmetry_s,-,Gerrymandering: partisan symmetry (state leg.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+EG_c,-,Gerrymandering: Efficiency gap (Cong.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+EG_s,-,Gerrymandering: Efficiency gap (state leg.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+declination2_s,-,Gerrymandering: declination (state leg.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+declination2_c,-,Gerrymandering: declination (Cong.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+EG_pres_s,-,Gerrymandering: Efficiency gap (state leg.-pres.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+mean_median_pres_s,-,Gerrymandering: mean-median difference (state leg.-pres.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+declination2_pres_s,-,Gerrymandering: declination (state leg.-pres.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+symmetry_pres_s,-,Gerrymandering: partisan symmetry (state leg.-pres.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+mean_median_c,-,Gerrymandering: mean-median difference (Cong.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+symmetry_c,-,Gerrymandering: partisan symmetry (Cong.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+EG_pres_c,-,Gerrymandering: Efficiency gap (Cong.-Pres.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+mean_median_pres_c,-,Gerrymandering: mean-median difference (Cong.-Pres.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+declination2_pres_c,-,Gerrymandering: declination (Cong.-Pres.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+symmetry_pres_c,-,Gerrymandering: partisan symmetry (Cong.-Pres.),Electoral,Electoral,Gerrymandering,,,Stephanopoulos & Warshaw 2019,,1,,,,,1
+blackincarcerate,-,Black Incarceration Rate,Liberal,Racial Equity,,,,,,1,,,,,1
