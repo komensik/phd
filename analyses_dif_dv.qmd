@@ -96,7 +96,19 @@ hist(raw_data_cleaned$d_incwomen_abc, breaks = 20,
 
 #var(raw_data_cleaned$d_incwomen_abc, na.rm = TRUE)
 
+
+#incarcerated women
 boxplot(raw_data_cleaned$d_incwomen_abc)
+
+
+
+
+#histogram
+hist(raw_data_cleaned$d_incwomen_abc, breaks = 20,
+     main = "Deservingness of Incarcerated People/Prisoners",
+     xlab = "Deservingness (0–100)", col = "gray80", border = "white")
+
+
 
 ```
 

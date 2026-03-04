@@ -277,11 +277,170 @@ pull from 2B
 
 ## 2. M1: Predicting deservingness
 
+### 2.0 Means
+
+```{r}
+impact
+incarc
+knowincarc
+vict
+
+tapply(raw_data_cleaned$d_incppl_pris_abc,
+       raw_data_cleaned$impact,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+
+#incarc
+tapply(raw_data_cleaned$d_incppl_pris_abc,
+       raw_data_cleaned$incarc,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+
+
+#knowincarc
+tapply(raw_data_cleaned$d_incppl_pris_abc,
+       raw_data_cleaned$knowincarc,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+
+#vict
+tapply(raw_data_cleaned$d_incppl_pris_abc,
+       raw_data_cleaned$vict,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+
+
+
+### criminals
+tapply(raw_data_cleaned$d_crim_abc,
+       raw_data_cleaned$impact,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+
+#incarc
+tapply(raw_data_cleaned$d_crim_abc,
+       raw_data_cleaned$incarc,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+
+
+#knowincarc
+tapply(raw_data_cleaned$d_crim_abc,
+       raw_data_cleaned$knowincarc,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+
+#vict
+tapply(raw_data_cleaned$d_crim_abc,
+       raw_data_cleaned$vict,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+
+### incarcerated women
+tapply(raw_data_cleaned$d_incwomen_abc,
+       raw_data_cleaned$impact,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+
+#incarc
+tapply(raw_data_cleaned$d_incwomen_abc,
+       raw_data_cleaned$incarc,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+
+
+#knowincarc
+tapply(raw_data_cleaned$d_incwomen_abc,
+       raw_data_cleaned$knowincarc,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+
+#vict
+tapply(raw_data_cleaned$d_incwomen_abc,
+       raw_data_cleaned$vict,
+       function(x) c(mean = mean(x, na.rm = TRUE),
+                     var  = var(x, na.rm = TRUE),
+                     sd   = sd(x, na.rm = TRUE)))
+```
+
+### 2.01 Policy Means
+
+```{r}
+help_items <- c("q25_2_rev", "q25_3_rev", "q25_4_rev", "q25_6_rev")
+
+group_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+summ_by_group <- function(df, y, g){
+  tapply(df[[y]], df[[g]], function(x) c(
+    mean = mean(x, na.rm = TRUE),
+    var  = var(x, na.rm = TRUE),
+    sd   = sd(x, na.rm = TRUE)
+  ))
+}
+
+for (y in help_items) {
+  cat("\n==============================\n")
+  cat("Policy item:", y, "\n")
+  cat("==============================\n")
+  
+  for (g in group_vars) {
+    cat("\n--- Grouped by:", g, "---\n")
+    print(summ_by_group(raw_data_cleaned, y, g))
+  }
+}
+
+
+## punitive policy
+
+# punitive items (cleaned versions)
+pun_items <- c("q25_1", "q25_5")
+
+# grouping variables
+group_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+# helper function: mean/var/sd by group
+summ_by_group <- function(df, y, g){
+  tapply(df[[y]], df[[g]], function(x) c(
+    mean = mean(x, na.rm = TRUE),
+    var  = var(x, na.rm = TRUE),
+    sd   = sd(x, na.rm = TRUE)
+  ))
+}
+
+# quick sanity check (should print character(0) twice)
+setdiff(pun_items, names(raw_data_cleaned))
+setdiff(group_vars, names(raw_data_cleaned))
+
+# run and print
+for (y in pun_items) {
+  cat("\n==============================\n")
+  cat("Punitive item:", y, "\n")
+  cat("==============================\n")
+  
+  for (g in group_vars) {
+    cat("\n--- Grouped by:", g, "---\n")
+    print(summ_by_group(raw_data_cleaned, y, g))
+  }
+}
+```
+
 #### 2.1 Without Controls
 
 ```{r}
 m1 <- lm(d_incppl_pris_abc ~ impact, data = raw_data_cleaned)
 summary(m1)
+
 
 ```
 
