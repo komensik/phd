@@ -374,6 +374,210 @@ tapply(raw_data_cleaned$d_incwomen_abc,
                      sd   = sd(x, na.rm = TRUE)))
 ```
 
+```{r}
+# tables
+
+raw_data_cleaned$deserve_bin <- cut(
+  raw_data_cleaned$d_incppl_pris_abc,
+  breaks = c(0,20,40,60,80,100),
+  include.lowest = TRUE,
+  labels = c("0–20","21–40","41–60","61–80","81–100")
+)
+
+prop.table(
+  table(raw_data_cleaned$deserve_bin, raw_data_cleaned$impact),
+  margin = 2
+)
+
+prop.table(
+  table(raw_data_cleaned$deserve_bin, raw_data_cleaned$incarc),
+  margin = 2
+)
+
+prop.table(
+  table(raw_data_cleaned$deserve_bin, raw_data_cleaned$knowincarc),
+  margin = 2
+)
+prop.table(
+  table(raw_data_cleaned$deserve_bin, raw_data_cleaned$vict),
+  margin = 2
+)
+round(
+  prop.table(table(raw_data_cleaned$deserve_bin, raw_data_cleaned$impact), 2) * 100,
+  1
+)
+tab <- prop.table(
+  table(raw_data_cleaned$deserve_bin, raw_data_cleaned$impact),
+  2
+)
+
+tab <- round(tab * 100, 1)
+
+tab
+
+
+## histogram
+library(ggplot2)
+
+ggplot(raw_data_cleaned, aes(x = d_incppl_pris_abc, fill = factor(impact))) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 20) +
+  labs(
+    x = "Deservingness toward Incarcerated People",
+    y = "Count",
+    fill = "Impact",
+    title = "Distribution of Deservingness toward Incarcerated People by Carceral Impact"
+  ) +
+  theme_minimal()
+
+ggplot(raw_data_cleaned, aes(x = d_incppl_pris_abc, fill = factor(incarc))) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 20) +
+  labs(
+    x = "Deservingness toward Incarcerated People",
+    y = "Count",
+    fill = "Incarcerated",
+    title = "Distribution of Deservingness by Personal Incarceration"
+  ) +
+  theme_minimal()
+
+ggplot(raw_data_cleaned, aes(x = d_incppl_pris_abc, fill = factor(knowincarc))) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 20) +
+  labs(
+    x = "Deservingness toward Incarcerated People",
+    y = "Count",
+    fill = "Knows Incarcerated",
+    title = "Distribution of Deservingness by Knowing Someone Incarcerated"
+  ) +
+  theme_minimal()
+
+ggplot(raw_data_cleaned, aes(x = d_incppl_pris_abc, fill = factor(vict))) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 20) +
+  labs(
+    x = "Deservingness toward Incarcerated People",
+    y = "Count",
+    fill = "Victim",
+    title = "Distribution of Deservingness by Victimization Experience"
+  ) +
+  theme_minimal()
+
+ggplot(raw_data_cleaned, aes(x = d_incppl_pris_abc, color = factor(impact))) +
+  geom_density(size = 1.2) +
+  labs(
+    x = "Deservingness toward Incarcerated People",
+    y = "Density",
+    color = "Impact",
+    title = "Distribution of Deservingness toward Incarcerated People by Impact"
+  ) +
+  theme_minimal()
+
+
+#as one plot
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+plot_df <- raw_data_cleaned %>%
+  transmute(
+    d = d_incppl_pris_abc,
+    baseline_impact0 = impact == 0,
+    incarc1 = incarc == 1,
+    knowincarc1 = knowincarc == 1,
+    vict1 = vict == 1
+  ) %>%
+  pivot_longer(
+    cols = c(baseline_impact0, incarc1, knowincarc1, vict1),
+    names_to = "group",
+    values_to = "in_group"
+  ) %>%
+  filter(in_group, !is.na(d)) %>%
+  mutate(
+    group = recode(group,
+      baseline_impact0 = "Not impacted (impact = 0)",
+      incarc1 = "Ever incarcerated (incarc = 1)",
+      knowincarc1 = "Knows incarcerated (knowincarc = 1)",
+      vict1 = "Victim (vict = 1)"
+    )
+  )
+
+ggplot(plot_df, aes(x = d, color = group)) +
+  geom_density(linewidth = 1.1) +
+  labs(
+    x = "Deservingness toward Incarcerated People",
+    y = "Density",
+    color = NULL,
+    title = "Deservingness Distributions: Not Impacted vs Impact Subgroups"
+  ) +
+  theme_minimal()
+
+#side by side
+
+xlim_common <- range(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
+
+density_compare <- function(df, subgroup_var, subgroup_label, xvar = "d_incppl_pris_abc", xlim = c(0,100)) {
+  
+  plot_df <- df %>%
+    transmute(
+      d = .data[[xvar]],
+      group = case_when(
+        impact == 0 ~ "Not impacted (impact = 0)",
+        .data[[subgroup_var]] == 1 ~ subgroup_label,
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    filter(!is.na(group), !is.na(d))
+  
+  # compute means for vertical lines
+  means_df <- plot_df %>%
+    group_by(group) %>%
+    summarise(mean_val = mean(d, na.rm = TRUE))
+  
+  ggplot(plot_df, aes(x = d, color = group)) +
+    geom_density(linewidth = 1.1) +
+    
+    # ADD MEAN LINES
+    geom_vline(data = means_df,
+               aes(xintercept = mean_val, color = group),
+               linetype = "dashed",
+               linewidth = 0.9) +
+    
+    coord_cartesian(xlim = xlim) +
+    labs(
+      x = "Deservingness toward incarcerated people",
+      y = "Density",
+      color = NULL,
+      title = subgroup_label
+    ) +
+    theme_minimal()
+}
+
+p_impact  <- density_compare(raw_data_cleaned, "impact",
+                            "Impacted (impact = 1)", xlim = xlim_common)
+
+p_incarc  <- density_compare(raw_data_cleaned, "incarc",
+                            "Ever incarcerated (incarc = 1)", xlim = xlim_common)
+
+p_know    <- density_compare(raw_data_cleaned, "knowincarc",
+                            "Knows incarcerated (knowincarc = 1)", xlim = xlim_common)
+
+p_vict    <- density_compare(raw_data_cleaned, "vict",
+                            "Victim (vict = 1)", xlim = xlim_common)
+
+# combine plots
+combined_plot <- (p_impact | p_incarc | p_know | p_vict) +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+
+combined_plot
+
+# save and export
+ggsave(
+  filename = "deservingness_density_by_contact.png",
+  plot = combined_plot,
+  width = 14,
+  height = 4,
+  dpi = 300
+)
+```
+
 ### 2.01 Policy Means
 
 ```{r}
@@ -711,7 +915,7 @@ m1c_knowincarc <- lm(d_incppl_pris_abc ~ knowincarc +
 )
 
 
-summary(m1c_inc)
+summary(m1c_incarc)
 summary(m1c_vict)
 summary(m1c_knowinc)
 
