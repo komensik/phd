@@ -144,8 +144,6 @@ print(core_alpha$item.stats)
 
 Interpretation: raw_alpha: 0.9078 and 0.9142 internal consistency -- suggests items hang together well. average_r = 0.5422 -- high inter-item correlation. cor: fairly strong correlation to the DV (0.547) R\^2 = 0.30 bivariately. Soaks up general generosity toward assistance-framed groups. Should justify use of control for testing whether contact predicts deservingness of incarcerated people, above and beyond that general orientation.
 
-
-
 ```{r}
 # reliability -- EXT
 
@@ -855,7 +853,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-
 # Doing Cronback's Alpha Late
 
 ```{r}
@@ -915,8 +912,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 Takeaway: prison pen, prison pen 1 = dpen, prison pen 5 = lwop now -confirmed that prisonpen works -- constructed with average of death penalty and lwop
 
-
-
 OPTIONAL/potentially helpful for tables: factor version
 
 ```{r, q25_1_ord}
@@ -960,11 +955,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 summary(raw_data_cleaned$q25_2_rev)
 ```
-
-
-
-
-
 
 OPTIONAL: Create ordered factor versions- could be useful for plotting/tables/labeling)
 

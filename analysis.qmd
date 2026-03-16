@@ -163,6 +163,57 @@ help_alpha$item.stats           # item stats
 help_alpha$alpha.drop           # alpha if item dropped
 ```
 
+### 1.02. Diagnostics on Lack on Survey Weights
+
+```{r}
+
+table(raw_data_cleaned$impact)
+prop.table(table(raw_data_cleaned$impact))
+
+table(raw_data_cleaned$incarc)
+prop.table(table(raw_data_cleaned$incarc))
+
+table(raw_data_cleaned$vict)
+prop.table(table(raw_data_cleaned$vict))
+
+table(raw_data_cleaned$knowincarc)
+prop.table(table(raw_data_cleaned$knowincarc))
+
+#is one group dominated by a demographic that is underrepresented int he survey overall? 
+
+table(raw_data_cleaned$impact, raw_data_cleaned$Black)
+table(raw_data_cleaned$impact, raw_data_cleaned$Hispanic)
+table(raw_data_cleaned$impact, raw_data_cleaned$White)
+table(raw_data_cleaned$impact, raw_data_cleaned$OtherRace)
+table(raw_data_cleaned$impact, raw_data_cleaned$Republican)
+table(raw_data_cleaned$impact, raw_data_cleaned$Democrat)
+table(raw_data_cleaned$impact, raw_data_cleaned$gender)
+
+table(raw_data_cleaned$incarc, raw_data_cleaned$Black)
+table(raw_data_cleaned$incarc, raw_data_cleaned$Hispanic)
+table(raw_data_cleaned$incarc, raw_data_cleaned$White)
+table(raw_data_cleaned$incarc, raw_data_cleaned$OtherRace)
+table(raw_data_cleaned$incarc, raw_data_cleaned$Republican)
+table(raw_data_cleaned$incarc, raw_data_cleaned$Democrat)
+table(raw_data_cleaned$incarc, raw_data_cleaned$gender)
+
+table(raw_data_cleaned$knowincarc, raw_data_cleaned$Black)
+table(raw_data_cleaned$knowincarc, raw_data_cleaned$Hispanic)
+table(raw_data_cleaned$knowincarc, raw_data_cleaned$White)
+table(raw_data_cleaned$knowincarc, raw_data_cleaned$OtherRace)
+table(raw_data_cleaned$knowincarc, raw_data_cleaned$Republican)
+table(raw_data_cleaned$knowincarc, raw_data_cleaned$Democrat)
+table(raw_data_cleaned$knowincarc, raw_data_cleaned$gender)
+
+table(raw_data_cleaned$vict, raw_data_cleaned$Black)
+table(raw_data_cleaned$vict, raw_data_cleaned$Hispanic)
+table(raw_data_cleaned$vict, raw_data_cleaned$White)
+table(raw_data_cleaned$vict, raw_data_cleaned$OtherRace)
+table(raw_data_cleaned$vict, raw_data_cleaned$Republican)
+table(raw_data_cleaned$vict, raw_data_cleaned$Democrat)
+table(raw_data_cleaned$vict, raw_data_cleaned$gender)
+```
+
 ### 1.1. Main DV: Deservingness of Incarcerated People/Prisoners
 
 About
