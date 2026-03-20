@@ -192,7 +192,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ### A. Deservingness and Power consolidation
 
-Objective: consolidate blocks (so only 1 Incarcerated People/Prisoners)
+Objective: consolidate blocks (i.e. so only 1 Incarcerated People/Prisoners)
 
 ```{r}
 #| eval: false
