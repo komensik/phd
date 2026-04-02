@@ -128,7 +128,7 @@ psych::alpha(pen_items, check.keys = FALSE)
 
 -   
 
-### Interpretation you can actually stand behind
+### Interpretation to stand behind
 
 -   **These two punitive items are positively related, but only weak-to-moderately so.** People who favor the death penalty are *somewhat* more likely to favor LWOP, but plenty of respondents don’t treat them as interchangeable.
 
@@ -331,10 +331,10 @@ pull from 2B
 ### 2.0 Means
 
 ```{r}
-impact
-incarc
-knowincarc
-vict
+#impact
+#incarc
+#knowincarc
+#vict
 
 tapply(raw_data_cleaned$d_incppl_pris_abc,
        raw_data_cleaned$impact,
@@ -2308,7 +2308,7 @@ car::avPlots(m4_basic, terms = ~ desor_core + d_incppl_pris_abc + penalpoint + s
 Pairwise interpretation:
 
 | Relationship | Interpretation |   |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | desor_core & inc ppl | strong shared variance, likely suppression |  |
 | desorcore & ideo -0.37 | expected liberal/conservative |  |
 | desorcore & penalpoint: -0.19 | mild relationship |  |
