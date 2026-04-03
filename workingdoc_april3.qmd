@@ -1,0 +1,177 @@
+---
+title: "prospectus_april3_26"
+format: html
+editor: visual
+---
+
+## 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,       # Hide code by default
+  warning = FALSE,
+  message = FALSE
+)
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(tibble)
+library(gt)
+library(marginaleffects)
+library(mediation)
+library(naniar)
+library(rsq)
+library(patchwork)
+
+```
+
+Please help me work through my necessary steps. First question: are those models you showed relevant for goal 1 or goal 2? I have already created a table comparing means. My sense is that I have both of the goals 1 and goal 2. I'd like to show you the code I am using right now for comparing means - it might be different than you last saw (I fixed variables and have been trying to streamline and make sure I understand what is happening in the code). 
+
+Step 1: Run Bivariate Models. I want to know how 
+Dependent Variables:
+-help policy index: prisonhelp
+-punitive policy index: prisonpen
+-help policy items (see below)
+-punitive policy items (see below)
+
+These dependent variables are all defined in this: 
+policy_vars <- c(
+  "prisonhelp", "prisonpen",
+  "q23_2_rev", "q23_7_rev", "q25_2_rev", "q25_3_rev", "q25_4_rev", "q25_6_rev",
+  "prisonpen_1", "prisonpen_5"
+
+and this: 
+
+policy_map <- tibble::tribble(
+  ~var,          ~label,                                              ~section,
+  "prisonhelp",  "Help-oriented policy index",                        "Help",
+  "q23_2_rev",   "Voting rights after serving felony sentences",      "Help",
+  "q23_7_rev",   "Ensuring eligible incarcerated people can vote",    "Help",
+  "q25_2_rev",   "Minimum wage for prison labor",                     "Help",
+  "q25_3_rev",   "Free calls with family members",                    "Help",
+  "q25_4_rev",   "Funding GED and college courses in prisons",        "Help",
+  "q25_6_rev",   "Sentencing alternatives for parents of young children", "Help",
+  "prisonpen",   "Punitive policy index",                             "Punish",
+  "prisonpen_1", "Death penalty for people convicted of murder",      "Punish",
+  "prisonpen_5", "Life without parole sentences",                     "Punish"
+)
+
+Independent Variables
+-impact (0,1)
+-incarc (0,1)
+-knowincarc (0,1)
+-vict (0,1)
+
+comparison_labels <- c(
+  impact = "Impacted",
+  incarc = "Ever incarcerated",
+  knowincarc = "Knows incarcerated",
+  vict = "Victim"
+)
+
+all people who are 1 in incarc, knowincarc, and vict should be 1 in impact; many people who are 1 in 1 of incarc, knowincarc, vict, may also be 1 in the other 2
+
+These independent variables are all defined in this: 
+
+impact_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+The first thing that I do is I run simple dummy regressions for each IV, on each DV.
+
+
+```{r}
+
+#Approach A is doing . . .
+
+# function to add significance star
+star_if_sig <- function(p) {
+  ifelse(!is.na(p) & p < 0.05, "*", "")
+}
+
+# function to build one row of the table
+make_pctdiff_row <- function(df, var) {
+  ni     <- df[[var]][df$impact == 0]
+  direct <- df[[var]][df$incarc == 1]
+  prox   <- df[[var]][df$knowincarc == 1]
+  vict   <- df[[var]][df$vict == 1]
+
+  ni_mean     <- mean(ni, na.rm = TRUE)
+  direct_mean <- mean(direct, na.rm = TRUE)
+  prox_mean   <- mean(prox, na.rm = TRUE)
+  vict_mean   <- mean(vict, na.rm = TRUE)
+
+  direct_pct <- ((direct_mean - ni_mean) / ni_mean) * 100
+  prox_pct   <- ((prox_mean   - ni_mean) / ni_mean) * 100
+  vict_pct   <- ((vict_mean   - ni_mean) / ni_mean) * 100
+
+  direct_p <- tryCatch(t.test(ni, direct)$p.value, error = function(e) NA)
+  prox_p   <- tryCatch(t.test(ni, prox)$p.value,   error = function(e) NA)
+  vict_p   <- tryCatch(t.test(ni, vict)$p.value,   error = function(e) NA)
+
+  tibble(
+    policy = policy_labels[[var]],
+    not_impacted_mean = round(ni_mean, 2),
+    directly_impacted = paste0(round(direct_pct, 1), star_if_sig(direct_p)),
+    proximally_impacted = paste0(round(prox_pct, 1), star_if_sig(prox_p)),
+    victimized = paste0(round(vict_pct, 1), star_if_sig(vict_p))
+  )
+}
+
+# build final table
+means_table <- bind_rows(
+  lapply(policy_items, function(v) make_pctdiff_row(raw_data_cleaned, v))
+)
+
+means_table
+
+#output LaTeX rows
+latex_rows <- means_table |>
+  mutate(
+    row = paste0(
+      policy, " & ",
+      not_impacted_mean, " & ",
+      directly_impacted, " & ",
+      proximally_impacted, " & ",
+      victimized, " \\\\"
+    )
+  ) |>
+  pull(row)
+
+cat(paste(latex_rows, collapse = "\n"))
+
+
+#Later, will do regressions that may look like
+
+m1_help_index <- . . .
+
+lm(prisonhelp ~ impact, data = raw_data_cleaned)
+lm(prisonhelp ~ incarc, data = raw_data_cleaned)
+lm(prisonhelp ~ knowincarc, data = raw_data_cleaned)
+lm(prisonhelp ~ vict, data = raw_data_cleaned)
+
+m1_pen_index <- . . .
+
+lm(prisonhelp ~ impact, data = raw_data_cleaned)
+lm(prisonhelp ~ incarc, data = raw_data_cleaned)
+lm(prisonhelp ~ knowincarc, data = raw_data_cleaned)
+lm(prisonhelp ~ vict, data = raw_data_cleaned)
+
+
+
+m3_help <- lm(prisonhelp ~ incarc + knowincarc + vict +
+                ses + race_black + race_hispanic + race_other +
+                male + rep + dem + ideology +
+                deservingness_core + policy_disposition + racial_resentment,
+              data = raw_data_cleaned)
+
+m3_pen <- lm(prisonpen ~ incarc + knowincarc + vict +
+               ses + race_black + race_hispanic + race_other +
+               male + rep + dem + ideology +
+               deservingness_core + policy_disposition + racial_resentment,
+             data = raw_data_cleaned)
+```

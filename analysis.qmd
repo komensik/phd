@@ -26,6 +26,8 @@ library(mediation)
 library(naniar)
 library(rsq)
 library(patchwork)
+library(modelsummary)
+library(rlang)
 
 ```
 
@@ -37,7 +39,7 @@ raw_data_cleaned
 names(raw_data_cleaned)
 ```
 
-## Preliminary Analyses
+## Descriptive Analyses
 
 | Decision                | Notes                                        |
 |-------------------------|----------------------------------------------|
@@ -444,9 +446,11 @@ view(combo_table)
 
 
 ```{r}
+#| eval: false
+#| include: false
 #impact counts check again shows 1 is impacted 0 is not
 
-table(raw_data_cleaned$impact, useNA = "ifany")
+#table(raw_data_cleaned$impact, useNA = "ifany")
 
 race_counts <- raw_data_cleaned %>%
   summarise(
@@ -456,7 +460,6 @@ race_counts <- raw_data_cleaned %>%
     OtherRace = sum(OtherRace == 1, na.rm = TRUE)
   )
 
-race_counts
 
 raw_data_cleaned %>%
   count(block)
@@ -489,6 +492,8 @@ raw_data_cleaned %>%
 ### 1.02. Diagnostics on Lack on Survey Weights
 
 ```{r}
+#| eval: false
+#| include: false
 
 table(raw_data_cleaned$impact)
 prop.table(table(raw_data_cleaned$impact))
@@ -549,7 +554,9 @@ About
 
 -   variance: 782.03
 
-```{r, prechecks}
+```{r prechecks}
+#| eval: false
+#| include: false
 #check counts: 
 
 #raw_data_cleaned %>% count(d_incppl_pris_abc)
@@ -583,6 +590,8 @@ dv_density_data <- raw_data_cleaned %>%
 ### 1.2. Control: Generalized Deservingness (desor)
 
 ```{r}
+#| eval: false
+#| include: false
 
 # Histogram for generalized deservingness control variable
 desor_core_hist <- hist(raw_data_cleaned$desor_core, breaks = 20,
@@ -598,18 +607,14 @@ sd(raw_data_cleaned$desor_core, na.rm = TRUE)
 ### 1.3. Generalized Deservingness (desor) x
 
 
+
 ## 2. M1: Predicting deservingness
 
-### 2.0 Means
+### 2.0 Means - Deservingness
 
 ```{r}
 #DVs
-
 deserving_vars <- c("d_incppl_pris_abc", "d_crim_abc", "d_incwomen_abc")
-
-library(dplyr)
-library(tidyr)
-library(rlang)
 
 get_diff_table <- function(df, group_var) {
   df %>%
@@ -1264,12 +1269,131 @@ cat(
 
 ```
 
+## 3. Policy BV Dummies
+```{r}
+
+dvs <- c("prisonhelp", "prisonpen", "prisonpen_1", "prisonpen_5",
+         "q23_2_rev", "q23_7_rev", "q25_2_rev",
+         "q25_3_rev", "q25_6_rev", "q25_4_rev")
+
+ivs <- c("impact", "incarc", "knowincarc", "vict")
+
+policy_dummies_models <- list()
+
+for (dv in dvs) {
+  for (iv in ivs) {
+    name <- paste0("m_", dv, "_", iv)
+    policy_dummies_models[[name]] <- lm(as.formula(paste(dv, "~", iv)), data = raw_data_cleaned)
+  }
+}
+
+```
+
+Overleaf Tables - first, clean model list
+```{r}
+
+```
+
+
+## 4. Compare Each Impacted Subgroup to Non-Impacted
+
+```{r}
+## 4. Compare Each Impacted Subgroup to Non-Impacted
+
+make_comparison_model <- function(df, dv, subgroup_var) {
+  df_sub <- df %>%
+    filter(impact == 0 | .data[[subgroup_var]] == 1) %>%
+    mutate(treat = ifelse(.data[[subgroup_var]] == 1, 1, 0))
+
+  lm(as.formula(paste(dv, "~ treat")), data = df_sub)
+}
+
+policy_vs_nonimp_models <- list()
+
+# any impact vs no impact
+for (dv in dvs) {
+  comparison_models[[paste0("comp_", dv, "_impact")]] <-
+    lm(as.formula(paste(dv, "~ impact")), data = raw_data_cleaned)
+}
+
+# each specific subgroup vs non-impacted only
+for (dv in dvs) {
+  for (iv in c("incarc", "knowincarc", "vict")) {
+    name <- paste0("comp_", dv, "_", iv)
+    policy_vs_nonimp_models[[name]] <- make_comparison_model(raw_data_cleaned, dv, iv)
+  }
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#.
+#.
+#.
+#.
+#.
+#.
+#.
+#.
+#.
+
+# "Prelim Paper Only" Analyses Start Here
+
 #### 2.1 Without Controls
 
 ```{r}
 m1 <- lm(d_incppl_pris_abc ~ impact, data = raw_data_cleaned)
 summary(m1)
-
 
 ```
 
