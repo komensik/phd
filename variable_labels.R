@@ -21,7 +21,7 @@ targets <- c(
 
 ##
 
-deserving_vars <- c(
+all_deserving_vars <- c(
   "d_black_afam_abc", "d_native_ind_abc", "d_asianam_abc", "d_latino_his_abc",
   "d_whiteam_abc", "d_mideastam_abc", "d_incwomen_abc", "d_collegewom_abc",
   "d_enviro_abc", "d_feminists_abc", "d_proabort_choice_abc", "d_abortprov_abc",
