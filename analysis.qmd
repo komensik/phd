@@ -49,12 +49,412 @@ names(raw_data_cleaned)
 | plot aesthetics?        | clear x-axis label                           |
 | Output                  |                                              |
 
+#delete this: average time
+```{r}
+summary(raw_data_cleaned$duration_in_seconds)
+
+quantile(raw_data_cleaned$duration_in_seconds,
+         probs = c(.25, .5, .75, .9, .95, .99), na.rm = TRUE)
+hist(raw_data_cleaned$duration_in_seconds, breaks = 100)
+```
+
+
 ### 1.0 Counts
 
+### 1.1 Experience Counts
 ```{r}
+# because analysis has included previously odd combos (ie people who have nas or say not impacted and both), my first step here is trying to diagnose their patterns of missingness and other things so I can explain to my committee/self what it may or may not mean to include them.
 
-#names(raw_data_cleaned)
+table(raw_data_cleaned$impact)
+table(raw_data_cleaned$knowincarc)
+table(raw_data_cleaned$vict)
+
+problematic <- raw_data_cleaned %>%
+  mutate(
+    prob_flag = case_when(
+      contact_pattern %in% c(
+        "001011",
+        "011001",
+        "010011",
+        "001111",
+        "011110",
+        "011010",
+        "110101"
+      ) ~ 1,
+
+      # all NAs
+      contact_pattern == "-99-99-99-99-99-99" ~ 1,
+
+      # partial NA patterns
+      contact_pattern %in% c(
+        "-99-99-99001",   # NA NA NA then 001
+        "-99-99-99100", # NA NA NA then 100
+        "-99-99-99010", 
+        "001-99-99-99",   # incarceration none + NA victim block
+        "100-99-99-99",
+        "111-99-99-99"
+      ) ~ 1,
+
+      TRUE ~ 0
+    )
+  )
+
+table(problematic$prob_flag)
+```
+there are 32 of these problematic responses in total. 
+
+```{r}
+problematic %>%
+  summarise(
+    n_problematic = sum(prob_flag == 1),
+    pct_problematic = mean(prob_flag == 1)
+  )
+```
+comparing missingness
+```{r}
+problematic %>%
+  group_by(prob_flag) %>%
+  summarise(
+    missing_q25 = mean(is.na(q25_1)),
+    missing_desor = mean(is.na(desor)),
+    missing_controls = mean(is.na(Democrat) | is.na(Black))
+  )
+```
+they have higher missingness 
+
+do they behave differently on outcomes
+```{r}
+problematic %>%
+  group_by(prob_flag) %>%
+  summarise(
+    prisonhelp = mean(prisonhelp, na.rm=TRUE),
+    prisonpen = mean(prisonpen, na.rm=TRUE),
+    desor = mean(desor, na.rm=TRUE)
+  )
+```
+
+Demographics? 
+```{r}
+problematic %>%
+  group_by(prob_flag) %>%
+  summarise(
+    pct_black = mean(Black == 1, na.rm=TRUE),
+    pct_white = mean(White == 1, na.rm=TRUE),
+    pct_hisp = mean(Hispanic == 1, na.rm=TRUE),
+    pct_dem = mean(Democrat == 1, na.rm=TRUE),
+    pct_rep = mean(Republican == 1, na.rm=TRUE),
+    pct_female = mean(gender == 1, na.rm=TRUE)
+  )
+```
+within this group, what kind of contact do they report? 
+
+```{r}
+problematic %>%
+  filter(prob_flag == 1) %>%
+  summarise(
+    pct_incarc = mean(incarc == 1, na.rm=TRUE),
+    pct_know = mean(knowincarc == 1, na.rm=TRUE),
+    pct_vict = mean(vict == 1, na.rm=TRUE)
+  )
+```
+
+```{r}
+problematic %>%
+  group_by(prob_flag) %>%
+  summarise(
+    incarc = mean(incarc == 1, na.rm=TRUE),
+    know = mean(knowincarc == 1, na.rm=TRUE),
+    vict = mean(vict == 1, na.rm=TRUE)
+  )
+```
+
+the decision here is that I'm reporting these folks in the appendix. I don't want to exclude them yet. 4-2-26
+
+Now, turning to a table for the appendix
+
+### 1.001 Impact Counts for appendix
+
+```{r}
+pattern_lookup <- tibble(
+  contact_pattern = c(
+    "000000",
+    "001001",
+    "001010",
+    "001011",
+    "001100",
+    "001101",
+    "001110",
+    "001111",
+    
+    "010000",
+    "010001",
+    "010011",
+    "010100",
+    "010101",
+    "010110",
+    "010111",
+    
+    "011000",
+    "011001",
+    "011010",
+    "011100",
+    "011101",
+    "011110",
+    "011111",
+    
+    "100000",
+    "100001",
+    "100010",
+    "100011",
+    "100100",
+    "100101",
+    
+    "101000",
+    "101001",
+    "101010",
+    "101011",
+    "101100",
+    "101101",
+    
+    "110000",
+    "110001",
+    "110100",
+    "110101",
+    "110110",
+    "110111",
+    
+    "111000",
+    "111001",
+    "111101",
+    "111110",
+    "111111",
+    
+    "-99-99-99-99-99-99",
+    "-99-99-99001",
+    "-99-99-99010",
+    "-99-99-99100",
+    "001-99-99-99",
+    "100-99-99-99",
+    "111-99-99-99"
+  ),
+  label = c(
+    "Skipped all Q4 items",
+    "No/unsure incarceration; no/unsure victimization",
+    "No/unsure incarceration; knows victim only",
+    "No/unsure incarceration; knows victim + victimization no/unsure contradiction",
+    "No/unsure incarceration; victim only",
+    "No/unsure incarceration; victim + victimization no/unsure contradiction",
+    "No/unsure incarceration; victim + knows victim",
+    "No/unsure incarceration; victim + knows victim + victimization no/unsure contradiction",
+    
+    "Knows incarcerated only; victimization block blank",
+    "Knows incarcerated only; no/unsure victimization",
+    "Knows incarcerated + knows victim + victimization no/unsure contradiction",
+    "Knows incarcerated + victim only",
+    "Knows incarcerated + victim + victimization no/unsure contradiction",
+    "Knows incarcerated + victim + knows victim",
+    "Knows incarcerated + victim + knows victim + victimization no/unsure contradiction",
+    
+    "Knows incarcerated + incarceration no/unsure contradiction; victimization block blank",
+    "Knows incarcerated + incarceration no/unsure contradiction; no/unsure victimization",
+    "Knows incarcerated + incarceration no/unsure contradiction + knows victim",
+    "Knows incarcerated + incarceration no/unsure contradiction + victim only",
+    "Knows incarcerated + incarceration no/unsure contradiction + victim + victimization no/unsure contradiction",
+    "Knows incarcerated + incarceration no/unsure contradiction + victim + knows victim",
+    "Knows incarcerated + incarceration no/unsure contradiction + victim + knows victim + victimization no/unsure contradiction",
+    
+    "Incarcerated only; victimization block blank",
+    "Incarcerated only; no/unsure victimization",
+    "Incarcerated + knows victim only",
+    "Incarcerated + knows victim + victimization no/unsure contradiction",
+    "Incarcerated + victim only",
+    "Incarcerated + victim + victimization no/unsure contradiction",
+    
+    "Incarcerated + incarceration no/unsure contradiction; victimization block blank",
+    "Incarcerated + incarceration no/unsure contradiction; no/unsure victimization",
+    "Incarcerated + incarceration no/unsure contradiction + knows victim",
+    "Incarcerated + incarceration no/unsure contradiction + knows victim + victimization no/unsure contradiction",
+    "Incarcerated + incarceration no/unsure contradiction + victim only",
+    "Incarcerated + incarceration no/unsure contradiction + victim + victimization no/unsure contradiction",
+    
+    "Incarcerated + knows incarcerated; victimization block blank",
+    "Incarcerated + knows incarcerated; no/unsure victimization",
+    "Incarcerated + knows incarcerated + victim only",
+    "Incarcerated + knows incarcerated + victim + victimization no/unsure contradiction",
+    "Incarcerated + knows incarcerated + victim + knows victim",
+    "Incarcerated + knows incarcerated + victim + knows victim + victimization no/unsure contradiction",
+    
+    "Incarcerated + knows incarcerated + incarceration no/unsure contradiction; victimization block blank",
+    "Incarcerated + knows incarcerated + incarceration no/unsure contradiction; no/unsure victimization",
+    "Incarcerated + knows incarcerated + incarceration no/unsure contradiction + victim + victimization no/unsure contradiction",
+    "Incarcerated + knows incarcerated + incarceration no/unsure contradiction + victim + knows victim",
+    "Incarcerated + knows incarcerated + incarceration no/unsure contradiction + victim + knows victim + victimization no/unsure contradiction",
+    
+    "All six Q4 items missing",
+    "Incarceration block missing; no/unsure victimization",
+    "Incarceration block missing; knows victim only",
+    "Incarceration block missing; victim only",
+    "No/unsure incarceration; victimization block missing",
+    "Incarcerated only; victimization block missing",
+    "Incarcerated + knows incarcerated + incarceration no/unsure contradiction; victimization block missing"
+  )
+)
+
+pattern_lookup <- pattern_lookup %>%
+  mutate(
+    has_missing = str_detect(contact_pattern, "-99"),
+    clean_6digit = str_detect(contact_pattern, "^[01]{6}$"),
+    illogical = case_when(
+      clean_6digit ~ (
+        ((str_sub(contact_pattern, 1, 1) == "1") | (str_sub(contact_pattern, 2, 2) == "1")) &
+          (str_sub(contact_pattern, 3, 3) == "1")
+      ) | (
+        ((str_sub(contact_pattern, 4, 4) == "1") | (str_sub(contact_pattern, 5, 5) == "1")) &
+          (str_sub(contact_pattern, 6, 6) == "1")
+      ),
+      TRUE ~ NA
+    ),
+    has_incarc = case_when(
+      clean_6digit ~ str_sub(contact_pattern, 1, 1) == "1",
+      contact_pattern %in% c("100-99-99-99", "111-99-99-99") ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    has_knowincarc = case_when(
+      clean_6digit ~ str_sub(contact_pattern, 2, 2) == "1",
+      contact_pattern %in% c("111-99-99-99") ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    has_vict = case_when(
+      clean_6digit ~ str_sub(contact_pattern, 4, 4) == "1",
+      contact_pattern %in% c("-99-99-99100") ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    has_knowvict = case_when(
+      clean_6digit ~ str_sub(contact_pattern, 5, 5) == "1",
+      contact_pattern %in% c("-99-99-99010") ~ TRUE,
+      TRUE ~ FALSE
+    )
+  )
+
+pattern_counts <- raw_data_cleaned %>%
+  count(contact_pattern, name = "N") %>%
+  left_join(pattern_lookup, by = "contact_pattern") %>%
+  mutate(
+    label = if_else(is.na(label), "UNMAPPED PATTERN", label)
+  ) %>%
+  arrange(desc(N))
+
+#weird patterns
+View(pattern_counts %>%
+  filter(label == "UNMAPPED PATTERN"))
+
+#incarc patterns
+
+incarc_patterns <- pattern_counts %>%
+  filter(has_incarc) %>%
+  mutate(
+    pct_of_incarc_patterns = 100 * N / sum(N, na.rm = TRUE)
+  ) %>%
+  arrange(desc(N))
+
+View(incarc_patterns)
+#know incarc patterns
+knowincarc_patterns <- pattern_counts %>%
+  filter(has_knowincarc) %>%
+  mutate(
+    pct_of_knowincarc_patterns = 100 * N / sum(N, na.rm = TRUE)
+  ) %>%
+  arrange(desc(N))
+#vict patterns
+vict_patterns <- pattern_counts %>%
+  filter(has_vict) %>%
+  mutate(
+    pct_of_vict_patterns = 100 * N / sum(N, na.rm = TRUE)
+  ) %>%
+  arrange(desc(N))
+
+View(vict_patterns)
+View(pattern_counts)
+
+incarc_patterns %>%
+  summarise(
+    total = sum(N),
+    illogical_n = sum(N[illogical %in% TRUE], na.rm = TRUE),
+    missing_n = sum(N[has_missing %in% TRUE], na.rm = TRUE)
+  )
+
+knowincarc_patterns %>%
+  summarise(
+    total = sum(N),
+    illogical_n = sum(N[illogical %in% TRUE], na.rm = TRUE),
+    missing_n = sum(N[has_missing %in% TRUE], na.rm = TRUE)
+  )
+
+vict_patterns %>%
+  summarise(
+    total = sum(N),
+    illogical_n = sum(N[illogical %in% TRUE], na.rm = TRUE),
+    missing_n = sum(N[has_missing %in% TRUE], na.rm = TRUE)
+  )
+
+
+```
+
+
+```{r}
+#basic version? unsure what to do with this as of 4-2
+contact_crosstab <- raw_data_cleaned %>%
+  summarise(
+    incarc_yes = sum(incarc == 1, na.rm=TRUE),
+    knowincarc_yes = sum(knowincarc == 1, na.rm=TRUE),
+    vict_yes = sum(vict == 1, na.rm=TRUE)
+  )
+
+
+# Optional: define custom labels for key combinations
+pattern_labels <- tibble::tibble(
+  contact_pattern = c(
+    "001001", "000000", "100000", "010000", "100100",
+    "010100", "110110", "110100", "011010", "001100"
+  ),
+  label = c(
+    "No or unsure only",
+    "Skipped all Q4 items",
+    "Been incarcerated only",
+    "Knows someone incarcerated only",
+    "Been incarcerated & victimized",
+    "Knows incarcerated & victimized",
+    "All four: incarcerated, knows, victim, knows victim",
+    "Incarcerated, knows, victim",
+    "Knows incarcerated & knows victim",
+    "Victimized only"
+  )
+)
+
+# Join with summary table
+combo_summary_labeled <- combo_summary %>%
+  left_join(pattern_labels, by = "contact_pattern") %>%
+  mutate(label = ifelse(is.na(label), "Other", label))
+
+combo_summary_labeled
+
+```
+
+```{r}
+#table from unique patterns made in variable prep
+combo_table <- raw_data_cleaned %>%
+  count(contact_pattern, name = "N") %>%
+  mutate(pct = 100 * N / nrow(raw_data_cleaned)) %>%
+  arrange(desc(N))
+
+view(combo_table)
+#add a clear interpretation layer
+```
+
+
+```{r}
 #impact counts check again shows 1 is impacted 0 is not
+
 table(raw_data_cleaned$impact, useNA = "ifany")
 
 race_counts <- raw_data_cleaned %>%
@@ -93,6 +493,7 @@ raw_data_cleaned %>%
   )
 
 ```
+
 
 ### 1.01 Policy Questions Doing Cronback's Alpha Late
 
@@ -274,57 +675,6 @@ sd(raw_data_cleaned$desor_core, na.rm = TRUE)
 
 ### 1.3. Generalized Deservingness (desor) x
 
-### 1.4 Cross-Tabs of Contact Types
-
-```{r}
-library(dplyr)
-library(gt)
-library(stringr)
-
-#basic
-contact_crosstab <- raw_data_cleaned %>%
-  summarise(
-    incarc_yes = sum(incarc == 1, na.rm=TRUE),
-    knowincarc_yes = sum(knowincarc == 1, na.rm=TRUE),
-    vict_yes = sum(vict == 1, na.rm=TRUE)
-  )
-
-
-# Optional: define custom labels for key combinations
-pattern_labels <- tibble::tibble(
-  contact_pattern = c(
-    "001001", "000000", "100000", "010000", "100100",
-    "010100", "110110", "110100", "011010", "001100"
-  ),
-  label = c(
-    "No or unsure only",
-    "Skipped all Q4 items",
-    "Been incarcerated only",
-    "Knows someone incarcerated only",
-    "Been incarcerated & victimized",
-    "Knows incarcerated & victimized",
-    "All four: incarcerated, knows, victim, knows victim",
-    "Incarcerated, knows, victim",
-    "Knows incarcerated & knows victim",
-    "Victimized only"
-  )
-)
-
-# Join with summary table
-combo_summary_labeled <- combo_summary %>%
-  left_join(pattern_labels, by = "contact_pattern") %>%
-  mutate(label = ifelse(is.na(label), "Other", label))
-
-combo_summary_labeled
-```
-
-#### A. All Contact Combos
-
-pull from 2B
-
-```{r}
-
-```
 
 ## 2. M1: Predicting deservingness
 
