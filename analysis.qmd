@@ -34,7 +34,7 @@ library(rlang)
 ```{r}
 here::here()
 raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data_may9.csv")
-
+source("variable_labels.R")
 raw_data_cleaned
 names(raw_data_cleaned)
 ```
@@ -614,7 +614,7 @@ sd(raw_data_cleaned$desor_core, na.rm = TRUE)
 
 ```{r}
 #DVs
-deserving_vars <- c("d_incppl_pris_abc", "d_crim_abc", "d_incwomen_abc")
+source("variable_labels.R")
 
 get_diff_table <- function(df, group_var) {
   df %>%
@@ -629,10 +629,11 @@ get_diff_table <- function(df, group_var) {
     ) %>%
     dplyr::select(target, baseline, pct_diff)
 }
-impact_tab  <- get_diff_table(long_df, "impact")
-incarc_tab  <- get_diff_table(long_df, "incarc")
-know_tab    <- get_diff_table(long_df, "knowincarc")
-vict_tab    <- get_diff_table(long_df, "vict")
+
+impact_tab <- get_diff_table(long_df, "impact")
+incarc_tab <- get_diff_table(long_df, "incarc")
+know_tab   <- get_diff_table(long_df, "knowincarc")
+vict_tab   <- get_diff_table(long_df, "vict")
 
 get_pvals_impact <- function(df) {
   df %>%
@@ -661,49 +662,34 @@ impact_tab <- impact_tab %>%
     pct_diff = paste0(round(pct_diff, 1), add_stars(pval))
   ) %>%
   dplyr::select(-pval)
-#impact
-#incarc
-#knowincarc
-#vict
 
 density_compare <- function(df, subgroup_var, label, xvar) {
 
   plot_df <- df %>%
-    transmute(
+    dplyr::transmute(
       d = .data[[xvar]],
-      group = case_when(
+      group = dplyr::case_when(
         impact == 0 ~ "Not impacted",
         .data[[subgroup_var]] == 1 ~ label,
         TRUE ~ NA_character_
       )
     ) %>%
-    filter(!is.na(group), !is.na(d))
+    dplyr::filter(!is.na(group), !is.na(d))
 
   means_df <- plot_df %>%
-    group_by(group) %>%
-    summarise(mean_val = mean(d, na.rm = TRUE))
+    dplyr::group_by(group) %>%
+    dplyr::summarise(mean_val = mean(d, na.rm = TRUE), .groups = "drop")
 
-  ggplot(plot_df, aes(x = d, color = group)) +
-    geom_density(linewidth = 1.2) +
-    geom_vline(data = means_df,
-               aes(xintercept = mean_val, color = group),
-               linetype = "dashed") +
-    labs(x = "Deservingness", y = "Density", color = NULL) +
-    theme_minimal()
+  ggplot2::ggplot(plot_df, ggplot2::aes(x = d, color = group)) +
+    ggplot2::geom_density(linewidth = 1.2) +
+    ggplot2::geom_vline(
+      data = means_df,
+      ggplot2::aes(xintercept = mean_val, color = group),
+      linetype = "dashed"
+    ) +
+    ggplot2::labs(x = "Deservingness", y = "Density", color = NULL) +
+    ggplot2::theme_minimal()
 }
-#scale across outcomes
-targets <- c(
-  d_incppl_pris_abc = "Incarcerated People",
-  d_crim_abc = "Criminals",
-  d_incwomen_abc = "Incarcerated Women"
-)
-
-groups <- list(
-  impact = "Impacted",
-  incarc = "Ever incarcerated",
-  knowincarc = "Knows incarcerated",
-  vict = "Victim"
-)
 
 ## TABLES
 
@@ -718,7 +704,7 @@ know_tab <- know_tab %>%
 
 vict_tab <- vict_tab %>%
   dplyr::rename(pct_vict = pct_diff)
-# merge
+
 table_out <- impact_tab %>%
   dplyr::select(target, baseline, pct_impact) %>%
   dplyr::left_join(
@@ -734,16 +720,12 @@ table_out <- impact_tab %>%
     by = "target"
   )
 
-#making row labels redable
+# readable row labels from variable_labels.R
 table_out <- table_out %>%
   dplyr::mutate(
-    target = dplyr::recode(
-      target,
-      d_incppl_pris_abc = "Incarcerated people",
-      d_crim_abc = "Criminals",
-      d_incwomen_abc = "Incarcerated women"
-    )
+    target = unname(targets[target])
   )
+
 table_out <- table_out %>%
   dplyr::mutate(
     baseline = round(baseline, 1),
@@ -752,7 +734,6 @@ table_out <- table_out %>%
     pct_vict = round(pct_vict, 1)
   )
 
-#print % in percent columns
 table_out_print <- table_out %>%
   dplyr::mutate(
     pct_impact = paste0(pct_impact, "\\%"),
@@ -760,7 +741,6 @@ table_out_print <- table_out %>%
     pct_knowincarc = paste0(pct_knowincarc, "\\%"),
     pct_vict = paste0(pct_vict, "\\%")
   )
-library(knitr)
 
 latex_tab <- knitr::kable(
   table_out_print,
