@@ -28,6 +28,8 @@ library(rsq)
 library(patchwork)
 library(modelsummary)
 library(rlang)
+library(forcats)
+library(ggplot2)
 
 ```
 
@@ -542,85 +544,383 @@ table(raw_data_cleaned$vict, raw_data_cleaned$Democrat)
 table(raw_data_cleaned$vict, raw_data_cleaned$gender)
 ```
 
-### 1.1. Main DV: Deservingness of Incarcerated People/Prisoners
-
-About
-
--   mean: 46.13
-
--   median: 50
-
--   SD: 27.96
-
--   variance: 782.03
-
-```{r prechecks}
-#| eval: false
-#| include: false
-#check counts: 
-
-#raw_data_cleaned %>% count(d_incppl_pris_abc)
-
-#summary:
-#summary(raw_data_cleaned$d_incppl_pris_abc)
-
-
-
-#histogram
-incarc_ppl_hist <- hist(raw_data_cleaned$d_incppl_pris_abc, breaks = 20,
-     main = "Deservingness of Incarcerated People/Prisoners",
-     xlab = "Deservingness (0–100)", col = "gray80", border = "white")
-
-
-#mean(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
-
-#sd(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
-
-#var(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
-
-boxplot(raw_data_cleaned$d_incppl_pris_abc)
-
-#density plot
-dv_density_data <- raw_data_cleaned %>%
-  dplyr::select(d_incppl_pris_abc) %>%
-  filter(!is.na(d_incppl_pris_abc))
-
-```
-
-### 1.2. Control: Generalized Deservingness (desor)
-
-```{r}
-#| eval: false
-#| include: false
-
-# Histogram for generalized deservingness control variable
-desor_core_hist <- hist(raw_data_cleaned$desor_core, breaks = 20,
-     main = "'Needy' Deservingness Orientation",
-     xlab = "Average Deservingness of Help-Target Groups (0–100)",
-     col = "gray80", border = "white")
-
-summary(raw_data_cleaned$desor_core)
-sd(raw_data_cleaned$desor_core, na.rm = TRUE)
-
-```
 
 ### 1.3. Generalized Deservingness (desor) x
 
+#.
 
 
-## 2. M1: Predicting deservingness
+# 2. Policy
+## 2.1 Policy Means
 
-### 2.0 Means - Deservingness
+"sanity check" for coding -- how these behave
+```{r}
+
+raw_data_cleaned %>%
+  dplyr::select(all_of(policy_vars)) %>%
+  psych::describe()
+
+raw_data_cleaned %>%
+  dplyr::group_by(impact) %>%
+  dplyr::summarise(
+    prisonpen_1 = mean(prisonpen_1, na.rm = TRUE),
+    prisonpen_5 = mean(prisonpen_5, na.rm = TRUE),
+    prisonpen   = mean(prisonpen, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+Means Tables
+```{r}
+
+
+#defining the non impact means and percent differences from impact vars
+pct_diff <- function(x, ref) {
+  ((x - ref) / ref) * 100
+}
+
+policy_summary <- function(df, var) {
+  no_impact_mean <- mean(df[[var]][df$impact == 0], na.rm = TRUE)
+  direct_mean    <- mean(df[[var]][df$incarc == 1], na.rm = TRUE)
+  proximal_mean  <- mean(df[[var]][df$knowincarc == 1], na.rm = TRUE)
+  victim_mean    <- mean(df[[var]][df$vict == 1], na.rm = TRUE)
+
+  tibble::tibble(
+    var = var,
+    no_impact_mean = no_impact_mean,
+    direct_pct = pct_diff(direct_mean, no_impact_mean),
+    proximal_pct = pct_diff(proximal_mean, no_impact_mean),
+    victim_pct = pct_diff(victim_mean, no_impact_mean)
+  )
+}
+
+policy_table <- purrr::map_dfr(policy_map$var, ~ policy_summary(raw_data_cleaned, .x)) %>%
+  dplyr::left_join(policy_map, by = "var") %>%
+  dplyr::select(var, section, label, no_impact_mean, direct_pct, proximal_pct, victim_pct)
+
+pval_ttest <- function(df, var, group_var) {
+  sub <- df %>%
+    dplyr::filter(!is.na(.data[[var]]), !is.na(.data[[group_var]])) %>%
+    dplyr::filter(.data[[group_var]] %in% c(0, 1))
+
+  if (length(unique(sub[[group_var]])) < 2) return(NA_real_)
+
+  stats::t.test(sub[[var]] ~ sub[[group_var]])$p.value
+}
+
+add_star <- function(x, p) {
+  ifelse(!is.na(p) & p < .05, paste0(sprintf("%.1f", x), "*"), sprintf("%.1f", x))
+}
+
+policy_stars <- policy_map %>%
+  dplyr::mutate(
+    p_direct   = purrr::map_dbl(var, ~ pval_ttest(raw_data_cleaned %>% dplyr::filter(impact == 0 | incarc == 1), .x, "incarc")),
+    p_proximal = purrr::map_dbl(var, ~ pval_ttest(raw_data_cleaned %>% dplyr::filter(impact == 0 | knowincarc == 1), .x, "knowincarc")),
+    p_victim   = purrr::map_dbl(var, ~ pval_ttest(raw_data_cleaned %>% dplyr::filter(impact == 0 | vict == 1), .x, "vict"))
+  )
+
+#merging the objects and formatting the display columns
+policy_table_final <- policy_table %>%
+  dplyr::left_join(
+    policy_stars %>% dplyr::select(var, p_direct, p_proximal, p_victim),
+    by = "var"
+  ) %>%
+  dplyr::mutate(
+    no_impact_mean = sprintf("%.2f", no_impact_mean),
+    direct_display   = add_star(direct_pct, p_direct),
+    proximal_display = add_star(proximal_pct, p_proximal),
+    victim_display   = add_star(victim_pct, p_victim)
+  ) %>%
+  dplyr::select(
+    section, label,
+    no_impact_mean,
+    direct_display,
+    proximal_display,
+    victim_display
+  )
+
+# for overleaf
+latex_rows <- policy_table_final %>%
+  dplyr::mutate(
+    latex_row = paste0(
+      label, " & ",
+      no_impact_mean, " & ",
+      direct_display, " & ",
+      proximal_display, " & ",
+      victim_display, " \\\\"
+    )
+  )
+
+help_rows <- latex_rows %>%
+  dplyr::filter(section == "Help") %>%
+  dplyr::pull(latex_row)
+
+punish_rows <- latex_rows %>%
+  dplyr::filter(section == "Punish") %>%
+  dplyr::pull(latex_row)
+
+cat(
+  paste(help_rows, collapse = "\n"),
+  "\n\\addlinespace\n",
+  paste(punish_rows, collapse = "\n"),
+  sep = ""
+)
+
+```
+
+## 2.2 Policy BV Dummies
+```{r}
+
+
+policy_dummies_models <- list()
+
+for (dv in policy_vars) {
+  for (iv in impact_vars) {
+    name <- paste0("m_", dv, "_", iv)
+    policy_dummies_models[[name]] <- lm(as.formula(paste(dv, "~", iv)), data = raw_data_cleaned)
+  }
+}
+
+```
+
+Overleaf Tables - first, clean model list
+```{r}
+
+```
+
+
+## 2.3 Compare Each Impacted Subgroup to Non-Impacted
+
+```{r}
+## 4. Compare Each Impacted Subgroup to Non-Impacted
+
+make_comparison_model <- function(df, dv, subgroup_var) {
+  df_sub <- df %>%
+    filter(impact == 0 | .data[[subgroup_var]] == 1) %>%
+    mutate(treat = ifelse(.data[[subgroup_var]] == 1, 1, 0))
+
+  lm(as.formula(paste(dv, "~ treat")), data = df_sub)
+}
+
+policy_vs_nonimp_models <- list()
+
+# any impact vs no impact
+for (dv in dvs) {
+  comparison_models[[paste0("comp_", dv, "_impact")]] <-
+    lm(as.formula(paste(dv, "~ impact")), data = raw_data_cleaned)
+}
+
+# each specific subgroup vs non-impacted only
+for (dv in dvs) {
+  for (iv in c("incarc", "knowincarc", "vict")) {
+    name <- paste0("comp_", dv, "_", iv)
+    policy_vs_nonimp_models[[name]] <- make_comparison_model(raw_data_cleaned, dv, iv)
+  }
+}
+
+```
+
+
+# 3. DV: Deservingness
+
+### 3.1 All Des Means Loop
+
+```{r}
+source("variable_labels.R")
+
+# Optional: prettier target labels
+pretty_target <- function(x) {
+  x %>%
+    str_remove("^d_") %>%
+    str_remove("_abc$|_a$|_b$|_c$") %>%
+    str_replace_all("_", " ") %>%
+    str_to_title()
+}
+
+# -----------------------------
+# 2. Reshape data long
+# -----------------------------
+
+long_df_heatmap <- raw_data_cleaned %>%
+  dplyr::select(all_of(impact_vars), all_of(all_deserving_vars)) %>%
+  pivot_longer(
+    cols = all_of(all_deserving_vars),
+    names_to = "target",
+    values_to = "deservingness"
+  ) %>%
+  pivot_longer(
+    cols = all_of(impact_vars),
+    names_to = "impact_group",
+    values_to = "in_group"
+  ) %>%
+  mutate(
+    target_label = pretty_target(target),
+    impact_group = recode(impact_group, !!!impact_labels)
+  )
+# -----------------------------
+# 3. Summarize means/sd/n
+#    among subgroup == 1
+# -----------------------------
+
+summary_df <- long_df_heatmap %>%
+  filter(in_group == 1, !is.na(deservingness)) %>%
+  group_by(impact_group, target, target_label) %>%
+  summarise(
+    n = n(),
+    mean_score = mean(deservingness, na.rm = TRUE),
+    sd_score = sd(deservingness, na.rm = TRUE),
+    var_score = var(deservingness, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# View or export
+summary_df
+# write.csv(summary_df, "deservingness_by_impact_summary.csv", row.names = FALSE)
+
+# Visual 1: heatmaps of means
+ggplot(summary_df, aes(
+  x = impact_group,
+  y = fct_reorder(target_label, mean_score, .fun = base::mean),
+  fill = mean_score
+)) +
+  geom_tile(color = "white") +
+  labs(
+    x = NULL,
+    y = NULL,
+    fill = "Mean\nDeservingness",
+    title = "Mean Deservingness by Impact Subgroup Across All Targets"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 7),
+    legend.position = "right"
+  )
+```
+
+Difference from overall heat map
+
+```{r}
+# -----------------------------
+# 4. Overall means for each target
+# -----------------------------
+
+overall_means <- long_df_heatmap %>%
+  filter(!is.na(deservingness)) %>%
+  group_by(target, target_label) %>%
+  summarise(
+    overall_mean_score = mean(deservingness, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# -----------------------------
+# 5. Merge with subgroup summary and calculate differences
+# -----------------------------
+
+diff_df <- summary_df %>%
+  left_join(overall_means, by = c("target", "target_label")) %>%
+  mutate(
+    diff_from_overall = mean_score - overall_mean_score
+  )
+
+# -----------------------------
+# 6. Order targets by average subgroup deviation
+# -----------------------------
+
+diff_df <- diff_df %>%
+  group_by(target_label) %>%
+  mutate(avg_diff = mean(diff_from_overall, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(
+    target_label = forcats::fct_reorder(target_label, avg_diff)
+  )
+
+# -----------------------------
+# 7. Plot difference-from-overall heatmap
+# -----------------------------
+
+ggplot(diff_df, aes(
+  x = impact_group,
+  y = target_label,
+  fill = diff_from_overall
+)) +
+  geom_tile(color = "white") +
+  labs(
+    x = NULL,
+    y = NULL,
+    fill = "Difference\nfrom overall mean",
+    title = "How Each Impact Subgroup Differs from the Full Sample"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 7),
+    legend.position = "right"
+  )
+
+heatmap_plot <- ggplot(diff_df, aes(
+  x = impact_group,
+  y = target_label,
+  fill = diff_from_overall
+)) +
+  geom_tile(color = "white") +
+  labs(
+    x = NULL,
+    y = NULL,
+    fill = "Difference\nfrom overall mean",
+    title = "How Each Impact Subgroup Differs from the Full Sample"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 6),
+    axis.text.x = element_text(size = 10),
+    plot.title = element_text(size = 12, face = "bold"),
+    legend.position = "right",
+    plot.margin = margin(10, 10, 10, 10)
+  )
+
+heatmap_plot
+
+ggsave(
+  filename = "deservingness_heatmap_diff.png",
+  plot = heatmap_plot,
+  width = 8,
+  height = 24,
+  dpi = 300,
+  bg = "white"
+)
+
+ggsave(
+  filename = "deservingness_heatmap_diff.png",
+  plot = heatmap_plot,
+  width = 9,
+  height = 30,
+  dpi = 300,
+  bg = "white"
+)
+```
+
+
+
+## 3.2 Incarc Des Means
 
 ```{r}
 #DVs
 source("variable_labels.R")
 
+#separate object from above for just incarcerated des groups
+
+long_df_table <- raw_data_cleaned %>%
+  dplyr::select(all_of(impact_vars), all_of(deserving_vars)) %>%
+  pivot_longer(
+    cols = all_of(deserving_vars),
+    names_to = "target",
+    values_to = "deservingness"
+  )
+
 get_diff_table <- function(df, group_var) {
   df %>%
-    dplyr::filter(!is.na(deserving)) %>%
+    dplyr::filter(!is.na(deservingness)) %>%
     dplyr::group_by(target, !!rlang::sym(group_var)) %>%
-    dplyr::summarise(mean = mean(deserving, na.rm = TRUE), .groups = "drop") %>%
+    dplyr::summarise(mean = mean(deservingness, na.rm = TRUE), .groups = "drop") %>%
     tidyr::pivot_wider(names_from = !!rlang::sym(group_var), values_from = mean) %>%
     dplyr::mutate(
       baseline = `0`,
@@ -630,17 +930,19 @@ get_diff_table <- function(df, group_var) {
     dplyr::select(target, baseline, pct_diff)
 }
 
-impact_tab <- get_diff_table(long_df, "impact")
-incarc_tab <- get_diff_table(long_df, "incarc")
-know_tab   <- get_diff_table(long_df, "knowincarc")
-vict_tab   <- get_diff_table(long_df, "vict")
+names(long_df)
+
+impact_tab <- get_diff_table(long_df_table, "impact")
+incarc_tab <- get_diff_table(long_df_table, "incarc")
+know_tab   <- get_diff_table(long_df_table, "knowincarc")
+vict_tab   <- get_diff_table(long_df_table, "vict")
 
 get_pvals_impact <- function(df) {
   df %>%
-    dplyr::filter(!is.na(deserving), !is.na(impact)) %>%
+    dplyr::filter(!is.na(deservingness), !is.na(impact)) %>%
     dplyr::group_by(target) %>%
     dplyr::summarise(
-      pval = t.test(deserving ~ impact)$p.value,
+      pval = t.test(deservingness ~ impact)$p.value,
       .groups = "drop"
     )
 }
@@ -654,7 +956,9 @@ add_stars <- function(p) {
   )
 }
 
-impact_pvals <- get_pvals_impact(long_df)
+names(long_df_table)
+
+impact_pvals <- get_pvals_impact(long_df_table)
 
 impact_tab <- impact_tab %>%
   dplyr::left_join(impact_pvals, by = "target") %>%
@@ -763,30 +1067,12 @@ cat(latex_tab)
 #### into plots
 
 ```{r}
-library(dplyr)
-library(tidyr)
-library(ggplot2)
 
-# -----------------------------
-# 1. labels
-# -----------------------------
-target_labels <- c(
-  d_incppl_pris_abc = "Incarcerated people",
-  d_crim_abc = "Criminals",
-  d_incwomen_abc = "Incarcerated women"
-)
-
-comparison_labels <- c(
-  impact = "Impacted",
-  incarc = "Ever incarcerated",
-  knowincarc = "Knows incarcerated",
-  vict = "Victim"
-)
 
 # -----------------------------
 # 2. helper to build one comparison
 # -----------------------------
-make_plot_df <- function(df, xvar, subgroup_var, subgroup_label, target_label) {
+make_plot_df <- function(df, xvar, subgroup_var, subgroup_label, targets) {
   df %>%
     transmute(
       deserving = .data[[xvar]],
@@ -798,7 +1084,7 @@ make_plot_df <- function(df, xvar, subgroup_var, subgroup_label, target_label) {
     ) %>%
     filter(!is.na(deserving), !is.na(group)) %>%
     mutate(
-      target = target_label,
+      target = targets,
       comparison = subgroup_label
     )
 }
@@ -872,9 +1158,8 @@ p <- ggplot(plot_df, aes(x = deserving, color = group)) +
     strip.text = element_text(face = "bold")
   )
 
-p
-```
-```{r}
+
+
 ggsave(
   "deservingness_3x4_density.png",
   plot = p,
@@ -891,425 +1176,6 @@ ggsave(
   height = 9
 )
 ```
-
-
-### 2.001 Attemting a big Deservingness Means Loop
-
-```{r}
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(stringr)
-library(forcats)
-
-# -----------------------------
-# 1. Define variables
-# -----------------------------
-
-deserving_vars <- c(
-  "d_black_afam_abc", "d_native_ind_abc", "d_asianam_abc", "d_latino_his_abc",
-  "d_whiteam_abc", "d_mideastam_abc", "d_incwomen_abc", "d_collegewom_abc",
-  "d_enviro_abc", "d_feminists_abc", "d_proabort_choice_abc", "d_abortprov_abc",
-  "d_welfare_tanf_abc", "d_fstamps_snap_abc", "d_unions_abc", "d_medicaid_abc",
-  "d_medicare_abc", "d_unemployed_abc", "d_police_abc", "d_poorfam_abc",
-  "d_wealthy_abc", "d_teachers_abc", "d_sci_experts_abc", "d_child_abc",
-  "d_crim_abc", "d_incppl_pris_abc", "d_homeless_abc", "d_immigrants_abc",
-  "d_unauth_undoc_abc", "d_gunowners_abc", "d_voters_abc", "d_lgbt_abc",
-  "d_trans_abc", "d_transkids_abc", "d_gunmans_abc", "d_ice_abc",
-  "d_socmed_abc", "d_nra_abc", "d_bigbank_abc", "d_bigcorp_abc",
-  "d_uni_abc", "d_comcoll_abc", "d_noncit_parent_a", "d_incparents_a",
-  "d_hsteen_a", "d_athiest_a", "d_cath_a", "d_evan_a", "d_jews_a", "d_pal_a",
-  "d_muslim_a", "d_blackwom_a", "d_blackmen_a", "d_lds_a", "d_longcov_a",
-  "d_exon_a", "d_weed_a", "d_opioid_a", "d_whitecol_a", "d_tech_a",
-  "d_smokers_a", "d_genx_a", "d_boomer_a", "d_mill_a", "d_genz_a",
-  "d_metoo_b", "d_christnat_b", "d_ruralam_b", "d_urbanam_b", "d_suburbam_b",
-  "d_billion_b", "d_blm_b", "d_maga_b", "d_progs_b", "d_soc_b",
-  "d_proudboys_b", "d_attnys_b", "d_military_b", "d_vets_b", "d_solds_b",
-  "d_essentials_b", "d_nurses_b", "d_drs_b", "d_dems_b", "d_reps_b",
-  "d_media_b", "d_bluecol_c", "d_working_c", "d_midclass_c", "d_migrantwork_c",
-  "d_smallbiz_c", "d_taxpayers_c", "d_elderly_c", "d_moms_c", "d_retires_c",
-  "d_sexoffenders_c", "d_sexhar_vict_c", "d_sexharrasser_c", "d_formerlyinc_c",
-  "d_homeown_c", "d_regufee_c", "d_gunvi_vict_c", "d_polbrut_vict_c",
-  "d_unins_c", "d_mentill_c", "d_aids_c", "d_gay_c", "d_lesbians_c"
-)
-
-
-impact_vars <- c("impact", "incarc", "knowincarc", "vict")
-
-impact_labels <- c(
-  impact = "Any impact",
-  incarc = "Ever incarcerated",
-  knowincarc = "Knows incarcerated person",
-  vict = "Victim"
-)
-
-# Optional: prettier target labels
-pretty_target <- function(x) {
-  x %>%
-    str_remove("^d_") %>%
-    str_remove("_abc$|_a$|_b$|_c$") %>%
-    str_replace_all("_", " ") %>%
-    str_to_title()
-}
-
-# -----------------------------
-# 2. Reshape data long
-# -----------------------------
-
-long_df <- raw_data_cleaned %>%
-  dplyr::select(all_of(impact_vars), all_of(deserving_vars)) %>%
-  pivot_longer(
-    cols = all_of(deserving_vars),
-    names_to = "target",
-    values_to = "deservingness"
-  ) %>%
-  pivot_longer(
-    cols = all_of(impact_vars),
-    names_to = "impact_group",
-    values_to = "in_group"
-  ) %>%
-  mutate(
-    target_label = pretty_target(target),
-    impact_group = recode(impact_group, !!!impact_labels)
-  )
-# -----------------------------
-# 3. Summarize means/sd/n
-#    among subgroup == 1
-# -----------------------------
-
-summary_df <- long_df %>%
-  filter(in_group == 1, !is.na(deservingness)) %>%
-  group_by(impact_group, target, target_label) %>%
-  summarise(
-    n = n(),
-    mean_score = mean(deservingness, na.rm = TRUE),
-    sd_score = sd(deservingness, na.rm = TRUE),
-    var_score = var(deservingness, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-# View or export
-summary_df
-# write.csv(summary_df, "deservingness_by_impact_summary.csv", row.names = FALSE)
-
-# Visual 1: heatmaps of means
-ggplot(summary_df, aes(
-  x = impact_group,
-  y = fct_reorder(target_label, mean_score, .fun = base::mean),
-  fill = mean_score
-)) +
-  geom_tile(color = "white") +
-  labs(
-    x = NULL,
-    y = NULL,
-    fill = "Mean\nDeservingness",
-    title = "Mean Deservingness by Impact Subgroup Across All Targets"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.y = element_text(size = 7),
-    legend.position = "right"
-  )
-```
-
-Difference from overall heat map
-
-```{r}
-# -----------------------------
-# 4. Overall means for each target
-# -----------------------------
-
-overall_means <- long_df %>%
-  filter(!is.na(deservingness)) %>%
-  group_by(target, target_label) %>%
-  summarise(
-    overall_mean_score = mean(deservingness, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-# -----------------------------
-# 5. Merge with subgroup summary and calculate differences
-# -----------------------------
-
-diff_df <- summary_df %>%
-  left_join(overall_means, by = c("target", "target_label")) %>%
-  mutate(
-    diff_from_overall = mean_score - overall_mean_score
-  )
-
-# -----------------------------
-# 6. Order targets by average subgroup deviation
-# -----------------------------
-
-diff_df <- diff_df %>%
-  group_by(target_label) %>%
-  mutate(avg_diff = mean(diff_from_overall, na.rm = TRUE)) %>%
-  ungroup() %>%
-  mutate(
-    target_label = forcats::fct_reorder(target_label, avg_diff)
-  )
-
-# -----------------------------
-# 7. Plot difference-from-overall heatmap
-# -----------------------------
-
-ggplot(diff_df, aes(
-  x = impact_group,
-  y = target_label,
-  fill = diff_from_overall
-)) +
-  geom_tile(color = "white") +
-  labs(
-    x = NULL,
-    y = NULL,
-    fill = "Difference\nfrom overall mean",
-    title = "How Each Impact Subgroup Differs from the Full Sample"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.y = element_text(size = 7),
-    legend.position = "right"
-  )
-
-library(ggplot2)
-
-heatmap_plot <- ggplot(diff_df, aes(
-  x = impact_group,
-  y = target_label,
-  fill = diff_from_overall
-)) +
-  geom_tile(color = "white") +
-  labs(
-    x = NULL,
-    y = NULL,
-    fill = "Difference\nfrom overall mean",
-    title = "How Each Impact Subgroup Differs from the Full Sample"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.y = element_text(size = 6),
-    axis.text.x = element_text(size = 10),
-    plot.title = element_text(size = 12, face = "bold"),
-    legend.position = "right",
-    plot.margin = margin(10, 10, 10, 10)
-  )
-
-heatmap_plot
-
-ggsave(
-  filename = "deservingness_heatmap_diff.png",
-  plot = heatmap_plot,
-  width = 8,
-  height = 24,
-  dpi = 300,
-  bg = "white"
-)
-
-ggsave(
-  filename = "deservingness_heatmap_diff.png",
-  plot = heatmap_plot,
-  width = 9,
-  height = 30,
-  dpi = 300,
-  bg = "white"
-)
-```
-
-### 2.01 Policy Means
-
-"sanity check" for coding -- how these behave
-```{r}
-policy_vars <- c(
-  "prisonhelp", "prisonpen",
-  "q23_2_rev", "q23_7_rev", "q25_2_rev", "q25_3_rev", "q25_4_rev", "q25_6_rev",
-  "prisonpen_1", "prisonpen_5"
-)
-
-raw_data_cleaned %>%
-  dplyr::select(all_of(policy_vars)) %>%
-  psych::describe()
-
-raw_data_cleaned %>%
-  dplyr::group_by(impact) %>%
-  dplyr::summarise(
-    prisonpen_1 = mean(prisonpen_1, na.rm = TRUE),
-    prisonpen_5 = mean(prisonpen_5, na.rm = TRUE),
-    prisonpen   = mean(prisonpen, na.rm = TRUE),
-    .groups = "drop"
-  )
-```
-
-Means Tables
-```{r}
-policy_map <- tibble::tribble(
-  ~var,          ~label,                                              ~section,
-  "prisonhelp",  "Help-oriented policy index",                        "Help",
-  "q23_2_rev",   "Voting rights after serving felony sentences",      "Help",
-  "q23_7_rev",   "Ensuring eligible incarcerated people can vote",    "Help",
-  "q25_2_rev",   "Minimum wage for prison labor",                     "Help",
-  "q25_3_rev",   "Free calls with family members",                    "Help",
-  "q25_4_rev",   "Funding GED and college courses in prisons",        "Help",
-  "q25_6_rev",   "Sentencing alternatives for parents of young children", "Help",
-  "prisonpen",   "Punitive policy index",                             "Punish",
-  "prisonpen_1", "Death penalty for people convicted of murder",      "Punish",
-  "prisonpen_5", "Life without parole sentences",                     "Punish"
-)
-
-#defining the non impact means and percent differences from impact vars
-pct_diff <- function(x, ref) {
-  ((x - ref) / ref) * 100
-}
-
-policy_summary <- function(df, var) {
-  no_impact_mean <- mean(df[[var]][df$impact == 0], na.rm = TRUE)
-  direct_mean    <- mean(df[[var]][df$incarc == 1], na.rm = TRUE)
-  proximal_mean  <- mean(df[[var]][df$knowincarc == 1], na.rm = TRUE)
-  victim_mean    <- mean(df[[var]][df$vict == 1], na.rm = TRUE)
-
-  tibble::tibble(
-    var = var,
-    no_impact_mean = no_impact_mean,
-    direct_pct = pct_diff(direct_mean, no_impact_mean),
-    proximal_pct = pct_diff(proximal_mean, no_impact_mean),
-    victim_pct = pct_diff(victim_mean, no_impact_mean)
-  )
-}
-
-policy_table <- purrr::map_dfr(policy_map$var, ~ policy_summary(raw_data_cleaned, .x)) %>%
-  dplyr::left_join(policy_map, by = "var") %>%
-  dplyr::select(var, section, label, no_impact_mean, direct_pct, proximal_pct, victim_pct)
-
-pval_ttest <- function(df, var, group_var) {
-  sub <- df %>%
-    dplyr::filter(!is.na(.data[[var]]), !is.na(.data[[group_var]])) %>%
-    dplyr::filter(.data[[group_var]] %in% c(0, 1))
-
-  if (length(unique(sub[[group_var]])) < 2) return(NA_real_)
-
-  stats::t.test(sub[[var]] ~ sub[[group_var]])$p.value
-}
-
-add_star <- function(x, p) {
-  ifelse(!is.na(p) & p < .05, paste0(sprintf("%.1f", x), "*"), sprintf("%.1f", x))
-}
-
-policy_stars <- policy_map %>%
-  dplyr::mutate(
-    p_direct   = purrr::map_dbl(var, ~ pval_ttest(raw_data_cleaned %>% dplyr::filter(impact == 0 | incarc == 1), .x, "incarc")),
-    p_proximal = purrr::map_dbl(var, ~ pval_ttest(raw_data_cleaned %>% dplyr::filter(impact == 0 | knowincarc == 1), .x, "knowincarc")),
-    p_victim   = purrr::map_dbl(var, ~ pval_ttest(raw_data_cleaned %>% dplyr::filter(impact == 0 | vict == 1), .x, "vict"))
-  )
-
-#merging the objects and formatting the display columns
-policy_table_final <- policy_table %>%
-  dplyr::left_join(
-    policy_stars %>% dplyr::select(var, p_direct, p_proximal, p_victim),
-    by = "var"
-  ) %>%
-  dplyr::mutate(
-    no_impact_mean = sprintf("%.2f", no_impact_mean),
-    direct_display   = add_star(direct_pct, p_direct),
-    proximal_display = add_star(proximal_pct, p_proximal),
-    victim_display   = add_star(victim_pct, p_victim)
-  ) %>%
-  dplyr::select(
-    section, label,
-    no_impact_mean,
-    direct_display,
-    proximal_display,
-    victim_display
-  )
-
-# for overleaf
-latex_rows <- policy_table_final %>%
-  dplyr::mutate(
-    latex_row = paste0(
-      label, " & ",
-      no_impact_mean, " & ",
-      direct_display, " & ",
-      proximal_display, " & ",
-      victim_display, " \\\\"
-    )
-  )
-
-help_rows <- latex_rows %>%
-  dplyr::filter(section == "Help") %>%
-  dplyr::pull(latex_row)
-
-punish_rows <- latex_rows %>%
-  dplyr::filter(section == "Punish") %>%
-  dplyr::pull(latex_row)
-
-cat(
-  paste(help_rows, collapse = "\n"),
-  "\n\\addlinespace\n",
-  paste(punish_rows, collapse = "\n"),
-  sep = ""
-)
-
-```
-
-## 3. Policy BV Dummies
-```{r}
-
-dvs <- c("prisonhelp", "prisonpen", "prisonpen_1", "prisonpen_5",
-         "q23_2_rev", "q23_7_rev", "q25_2_rev",
-         "q25_3_rev", "q25_6_rev", "q25_4_rev")
-
-ivs <- c("impact", "incarc", "knowincarc", "vict")
-
-policy_dummies_models <- list()
-
-for (dv in dvs) {
-  for (iv in ivs) {
-    name <- paste0("m_", dv, "_", iv)
-    policy_dummies_models[[name]] <- lm(as.formula(paste(dv, "~", iv)), data = raw_data_cleaned)
-  }
-}
-
-```
-
-Overleaf Tables - first, clean model list
-```{r}
-
-```
-
-
-## 4. Compare Each Impacted Subgroup to Non-Impacted
-
-```{r}
-## 4. Compare Each Impacted Subgroup to Non-Impacted
-
-make_comparison_model <- function(df, dv, subgroup_var) {
-  df_sub <- df %>%
-    filter(impact == 0 | .data[[subgroup_var]] == 1) %>%
-    mutate(treat = ifelse(.data[[subgroup_var]] == 1, 1, 0))
-
-  lm(as.formula(paste(dv, "~ treat")), data = df_sub)
-}
-
-policy_vs_nonimp_models <- list()
-
-# any impact vs no impact
-for (dv in dvs) {
-  comparison_models[[paste0("comp_", dv, "_impact")]] <-
-    lm(as.formula(paste(dv, "~ impact")), data = raw_data_cleaned)
-}
-
-# each specific subgroup vs non-impacted only
-for (dv in dvs) {
-  for (iv in c("incarc", "knowincarc", "vict")) {
-    name <- paste0("comp_", dv, "_", iv)
-    policy_vs_nonimp_models[[name]] <- make_comparison_model(raw_data_cleaned, dv, iv)
-  }
-}
-
-```
-
-
-
-
-
 
 
 
@@ -1368,6 +1234,67 @@ for (dv in dvs) {
 #.
 
 # "Prelim Paper Only" Analyses Start Here
+### 1.1. Main DV: Deservingness of Incarcerated People/Prisoners
+
+About
+
+-   mean: 46.13
+
+-   median: 50
+
+-   SD: 27.96
+
+-   variance: 782.03
+
+```{r prechecks}
+#| eval: false
+#| include: false
+#check counts: 
+
+#raw_data_cleaned %>% count(d_incppl_pris_abc)
+
+#summary:
+#summary(raw_data_cleaned$d_incppl_pris_abc)
+
+
+
+#histogram
+incarc_ppl_hist <- hist(raw_data_cleaned$d_incppl_pris_abc, breaks = 20,
+     main = "Deservingness of Incarcerated People/Prisoners",
+     xlab = "Deservingness (0–100)", col = "gray80", border = "white")
+
+
+#mean(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
+
+#sd(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
+
+#var(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
+
+boxplot(raw_data_cleaned$d_incppl_pris_abc)
+
+#density plot
+dv_density_data <- raw_data_cleaned %>%
+  dplyr::select(d_incppl_pris_abc) %>%
+  filter(!is.na(d_incppl_pris_abc))
+
+```
+
+### 1.2. Control: Generalized Deservingness (desor)
+
+```{r}
+#| eval: false
+#| include: false
+
+# Histogram for generalized deservingness control variable
+desor_core_hist <- hist(raw_data_cleaned$desor_core, breaks = 20,
+     main = "'Needy' Deservingness Orientation",
+     xlab = "Average Deservingness of Help-Target Groups (0–100)",
+     col = "gray80", border = "white")
+
+summary(raw_data_cleaned$desor_core)
+sd(raw_data_cleaned$desor_core, na.rm = TRUE)
+
+```
 
 #### 2.1 Without Controls
 
