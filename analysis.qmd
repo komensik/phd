@@ -668,21 +668,91 @@ cat(
 
 ```
 
+## 2.2A: Definining model sequences
+
+```{r}
+# ============================================================
+# 3. Control bundles used for cumulative model waves
+# Assumes these objects already exist in your variable script:
+#   demo_controls
+#   party_ideo_controls
+#   deservingness_controls
+#   fire_controls
+# ============================================================
+
+control_waves <- list(
+  nocontrol = character(0),
+  demo = demo_controls,
+  party_ideo = c(demo_controls, party_ideo_controls),
+  full_attitudes = c(demo_controls, party_ideo_controls,
+                     desor_core, fire_controls)
+)
+```
+
 ## 2.2 Policy BV Dummies
 ```{r}
+# ============================================================
+# Goal 1 helper: full-sample models
+# ============================================================
 
-policy_dummies_models <- list()
+make_fullsample_model <- function(df, dv, iv, controls = character(0)) {
+  rhs <- c(iv, controls)
+  fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
+  lm(fml, data = df)
+}
 
-for (dv in policy_vars) {
-  for (iv in impact_vars) {
-    name <- paste0("m_", dv, "_", iv)
-    policy_dummies_models[[name]] <- lm(
-      as.formula(paste(dv, "~", iv)),
-      data = raw_data_cleaned
-    )
+policy_dummies_waves <- list()
+
+for (wave_name in names(control_waves)) {
+
+  model_list <- list()
+
+  for (dv in policy_vars) {
+    for (iv in impact_vars) {
+
+      model_name <- paste0("m_", dv, "_", iv)
+
+      model_list[[model_name]] <- make_fullsample_model(
+        df = raw_data_cleaned,
+        dv = dv,
+        iv = iv,
+        controls = control_waves[[wave_name]]
+      )
+    }
   }
+
+  policy_dummies_waves[[wave_name]] <- model_list
+}
+
+policy_dummies_models <- policy_dummies_waves[["nocontrol"]]
+policy_dummies_demo_models <- policy_dummies_waves[["demo"]]
+policy_dummies_partyideo_models <- policy_dummies_waves[["party_ideo"]]
+policy_dummies_full_models <- policy_dummies_waves[["full_attitudes"]]
+
+```
+
+4.5 new
+```{r}
+# goal 1 wave loop above
+
+make_restricted_model <- function(df, dv, subgroup_var, controls = character(0)) {
+
+  if (subgroup_var == "impact") {
+    rhs <- c("impact", controls)
+    fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
+    return(lm(fml, data = df))
+  }
+
+  df_sub <- df %>%
+    dplyr::filter(impact == 0 | .data[[subgroup_var]] == 1) %>%
+    dplyr::mutate(treat = ifelse(.data[[subgroup_var]] == 1, 1, 0))
+
+  rhs <- c("treat", controls)
+  fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
+  lm(fml, data = df_sub)
 }
 ```
+
 
 ##2.3 Appendix Tables - Each IV Model Grouped around DV
 ```{r}
@@ -832,8 +902,6 @@ for (dv_name in policy_vars) {
 }
 ```
 
-
-
 ## 2.4 Compare Each Impacted Subgroup to Non-Impacted
 Restricted sample comparison logic (not impacted vs incarcerated)
 ultimate goal: no-controls to controls main results table built from the restricted-sample non-impacted-versus-subgroup models. then extend the restricted-sample models rather than rebuilding everything from scratch when adding controls.
@@ -849,29 +917,33 @@ A single categorical variable like 0 = not impacted, 1 = direct only, 2 = proxim
 # non-impacted group
 # ============================================================
 
-make_comparison_model <- function(df, dv, subgroup_var) {
-  df_sub <- df %>%
-    filter(impact == 0 | .data[[subgroup_var]] == 1) %>%
-    mutate(treat = ifelse(.data[[subgroup_var]] == 1, 1, 0))
+policy_vs_nonimp_waves <- list()
 
-  lm(as.formula(paste(dv, "~ treat")), data = df_sub) #fits DV to treat to compare non-impacted to incarc, knowincarc, vict
-}
+for (wave_name in names(control_waves)) {
 
-policy_vs_nonimp_nocontrol_models <- list()
+  model_list <- list()
 
-# any impact vs no impact
-for (dv in policy_vars) {
-  policy_vs_nonimp_nocontrol_models[[paste0("comp_", dv, "_impact")]] <-
-    lm(as.formula(paste(dv, "~ impact")), data = raw_data_cleaned)
-}
+  for (dv in policy_vars) {
+    for (iv in impact_vars) {
 
-# each specific subgroup vs non-impacted only
-for (dv in policy_vars) {
-  for (iv in c("incarc", "knowincarc", "vict")) {
-    name <- paste0("comp_", dv, "_", iv)
-    policy_vs_nonimp_nocontrol_models[[name]] <- make_comparison_model(raw_data_cleaned, dv, iv)
+      model_name <- paste0("comp_", dv, "_", iv)
+
+      model_list[[model_name]] <- make_restricted_model(
+        df = raw_data_cleaned,
+        dv = dv,
+        subgroup_var = iv,
+        controls = control_waves[[wave_name]]
+      )
+    }
   }
+
+  policy_vs_nonimp_waves[[wave_name]] <- model_list
 }
+
+policy_vs_nonimp_nocontrol_models <- policy_vs_nonimp_waves[["nocontrol"]]
+policy_vs_nonimp_demo_models <- policy_vs_nonimp_waves[["demo"]]
+policy_vs_nonimp_partyideo_models <- policy_vs_nonimp_waves[["party_ideo"]]
+policy_vs_nonimp_full_models <- policy_vs_nonimp_waves[["full_attitudes"]]
 
 ```
 
