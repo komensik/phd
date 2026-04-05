@@ -1270,6 +1270,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ###. LAST OF CLEANING - WRITE CSV
 
 ```{r}
+
+names(raw_data_cleaned)
 write_csv(raw_data_cleaned, "data/cleaned/coded_data_may9.csv")
 
 ```

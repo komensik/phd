@@ -71,3 +71,20 @@ policy_map <- tibble::tribble(
 )
 
 ##
+
+demo_controls <- c(
+  "Black", "Hispanic", "White", "OtherRace", "gender"
+)
+
+polid_controls <- c(
+  "Republican",          
+  "Democrat",           
+  "fiscal_ideology",      
+  "social_ideology"      
+)
+
+#below is missing policy disposition index bc problems so deprioritized
+
+tude_controls <- c(
+  "fire_rare" , "fire_privilege", "fire_angry","fire_fear", "desor_core"
+)
