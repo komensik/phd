@@ -99,10 +99,10 @@ party_ideo_controls_labels <- c(
 
 #below is missing policy disposition index bc problems so deprioritized
 
-deservingness_control <- c("desor_core")
+desor_core <- c("desor_core")
 
-deservingness_controls_labels <- c(
-  desor_core = "Core deservingness orientation"
+desor_core_label <- c(
+  desor_core = "Deservingness orientation"
 )
 
 fire_controls <- c(
@@ -121,6 +121,6 @@ fire_controls_labels <- c(
 
 all_attitudinal_controls <- c(
   party_ideo_controls,
-  deservingness_controls,
+  desor_core,
   fire_controls
 )
