@@ -83,15 +83,44 @@ demo_controls_labels <- c(
   gender = Male
 )
 
-polid_controls <- c(
-  "Republican",          
-  "Democrat",           
-  "fiscal_ideology",      
-  "social_ideology"      
+party_ideo_controls <- c(
+  "Republican",
+  "Democrat",
+  "fiscal_ideology",
+  "social_ideology"
+)
+
+party_ideo_controls_labels <- c(
+  Republican = "Republican",
+  Democrat = "Democrat",
+  fiscal_ideology = "Fiscal ideology",
+  social_ideology = "Social ideology"
 )
 
 #below is missing policy disposition index bc problems so deprioritized
 
-tude_controls <- c(
-  "fire_rare" , "fire_privilege", "fire_angry","fire_fear", "desor_core"
+deservingness_control <- c("desor_core")
+
+deservingness_controls_labels <- c(
+  desor_core = "Core deservingness orientation"
+)
+
+fire_controls <- c(
+  "fire_rare",
+  "fire_privilege",
+  "fire_angry",
+  "fire_fear"
+)
+
+fire_controls_labels <- c(
+  fire_rare = "Racism rare",
+  fire_privilege = "White privilege",
+  fire_angry = "Angry about racism",
+  fire_fear = "Fear other races"
+)
+
+all_attitudinal_controls <- c(
+  party_ideo_controls,
+  deservingness_controls,
+  fire_controls
 )

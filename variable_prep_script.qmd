@@ -1206,10 +1206,17 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #party ID dummies
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    Republican = ifelse(dem101 == 1, 1, 0),
-    Democrat = ifelse(dem101 == 2, 1, 0)
+    Republican = case_when(
+      dem101 == 1 ~ 1,
+      dem101 %in% c(2, 3, 4) ~ 0,
+      TRUE ~ NA_real_
+    ),
+    Democrat = case_when(
+      dem101 == 2 ~ 1,
+      dem101 %in% c(1, 3, 4) ~ 0,
+      TRUE ~ NA_real_
+    )
   )
-(raw_data_cleaned$Republican)
 
 #clean ideology
 raw_data_cleaned <- raw_data_cleaned %>%
