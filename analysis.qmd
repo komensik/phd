@@ -163,6 +163,98 @@ help_alpha$item.stats           # item stats
 help_alpha$alpha.drop           # alpha if item dropped
 ```
 
+### Note to self: use prisonpen and prison help as indices in analysis. You made these in variable pre. Later, you're going to reverse code prisonpen, too – you should do this later in variable prep and then rerun (march 13 2026). The point is that way higher items will mean less supp
+
+```{r}
+
+library(dplyr)
+library(tibble)
+
+# items to include in the table
+# NOTE:
+# - prisonhelp: higher = more support for rehabilitative/help-oriented policies
+# - prisonpen:  higher = less support for punitive policies ONLY AFTER reversal in variable prep
+#   For now, if not yet reversed, higher = less support? No: use your current coding carefully in label.
+policy_items <- c(
+  "prisonhelp",
+  "prisonpen",
+  "q25_2_rev",
+  "q25_3_rev",
+  "q25_4_rev",
+  "q25_6_rev",
+  "q25_1",
+  "q25_5"
+)
+
+# labels for the final table
+policy_labels <- c(
+  prisonhelp = "Help-oriented policy index",
+  prisonpen  = "Punitive policy index",
+  q25_2_rev  = "Voting rights after serving felony sentences",
+  q25_3_rev  = "Ensuring eligible incarcerated people can vote",
+  q25_4_rev  = "Funding GED and college courses in prisons",
+  q25_6_rev  = "Sentencing alternatives for parents of young children",
+  q25_1      = "Death penalty for people convicted of murder",
+  q25_5      = "Life without parole sentences"
+)
+
+# function to add significance star
+star_if_sig <- function(p) {
+  ifelse(!is.na(p) & p < 0.05, "*", "")
+}
+
+# function to build one row of the table
+make_pctdiff_row <- function(df, var) {
+  ni     <- df[[var]][df$impact == 0]
+  direct <- df[[var]][df$incarc == 1]
+  prox   <- df[[var]][df$knowincarc == 1]
+  vict   <- df[[var]][df$vict == 1]
+
+  ni_mean     <- mean(ni, na.rm = TRUE)
+  direct_mean <- mean(direct, na.rm = TRUE)
+  prox_mean   <- mean(prox, na.rm = TRUE)
+  vict_mean   <- mean(vict, na.rm = TRUE)
+
+  direct_pct <- ((direct_mean - ni_mean) / ni_mean) * 100
+  prox_pct   <- ((prox_mean   - ni_mean) / ni_mean) * 100
+  vict_pct   <- ((vict_mean   - ni_mean) / ni_mean) * 100
+
+  direct_p <- tryCatch(t.test(ni, direct)$p.value, error = function(e) NA)
+  prox_p   <- tryCatch(t.test(ni, prox)$p.value,   error = function(e) NA)
+  vict_p   <- tryCatch(t.test(ni, vict)$p.value,   error = function(e) NA)
+
+  tibble(
+    policy = policy_labels[[var]],
+    not_impacted_mean = round(ni_mean, 2),
+    directly_impacted = paste0(round(direct_pct, 1), star_if_sig(direct_p)),
+    proximally_impacted = paste0(round(prox_pct, 1), star_if_sig(prox_p)),
+    victimized = paste0(round(vict_pct, 1), star_if_sig(vict_p))
+  )
+}
+
+# build final table
+means_table <- bind_rows(
+  lapply(policy_items, function(v) make_pctdiff_row(raw_data_cleaned, v))
+)
+
+means_table
+
+latex_rows <- means_table |>
+  mutate(
+    row = paste0(
+      policy, " & ",
+      not_impacted_mean, " & ",
+      directly_impacted, " & ",
+      proximally_impacted, " & ",
+      victimized, " \\\\"
+    )
+  ) |>
+  pull(row)
+
+cat(paste(latex_rows, collapse = "\n"))
+
+```
+
 ### 1.1. Main DV: Deservingness of Incarcerated People/Prisoners
 
 About
@@ -374,6 +466,77 @@ tapply(raw_data_cleaned$d_incwomen_abc,
                      sd   = sd(x, na.rm = TRUE)))
 ```
 
+Overleaf Table Version
+
+```{r}
+library(dplyr)
+library(tibble)
+
+deservingness_items <- c(
+  "d_incppl_pris_abc",
+  "d_crim_abc",
+  "d_incwomen_abc"
+)
+
+deservingness_labels <- c(
+  d_incppl_pris_abc = "Incarcerated People / Prisoners",
+  d_crim_abc        = "Criminals",
+  d_incwomen_abc    = "Incarcerated Women"
+)
+
+star_if_sig <- function(p) {
+  ifelse(!is.na(p) & p < 0.05, "*", "")
+}
+
+make_pctdiff_row <- function(df, var) {
+  ni     <- df[[var]][df$impact == 0]
+  direct <- df[[var]][df$incarc == 1]
+  prox   <- df[[var]][df$knowincarc == 1]
+  vict   <- df[[var]][df$vict == 1]
+
+  ni_mean     <- mean(ni, na.rm = TRUE)
+  direct_mean <- mean(direct, na.rm = TRUE)
+  prox_mean   <- mean(prox, na.rm = TRUE)
+  vict_mean   <- mean(vict, na.rm = TRUE)
+
+  direct_pct <- ((direct_mean - ni_mean) / ni_mean) * 100
+  prox_pct   <- ((prox_mean   - ni_mean) / ni_mean) * 100
+  vict_pct   <- ((vict_mean   - ni_mean) / ni_mean) * 100
+
+  direct_p <- tryCatch(t.test(ni, direct)$p.value, error = function(e) NA)
+  prox_p   <- tryCatch(t.test(ni, prox)$p.value,   error = function(e) NA)
+  vict_p   <- tryCatch(t.test(ni, vict)$p.value,   error = function(e) NA)
+
+  tibble(
+    target_group = deservingness_labels[[var]],
+    not_impacted_mean = round(ni_mean, 2),
+    directly_impacted = paste0(round(direct_pct, 1), star_if_sig(direct_p)),
+    proximally_impacted = paste0(round(prox_pct, 1), star_if_sig(prox_p)),
+    victimized = paste0(round(vict_pct, 1), star_if_sig(vict_p))
+  )
+}
+
+deservingness_table <- bind_rows(
+  lapply(deservingness_items, function(v) make_pctdiff_row(raw_data_cleaned, v))
+)
+
+deservingness_table
+
+latex_rows <- deservingness_table |>
+  mutate(
+    row = paste0(
+      target_group, " & ",
+      not_impacted_mean, " & ",
+      directly_impacted, " & ",
+      proximally_impacted, " & ",
+      victimized, " \\\\"
+    )
+  ) |>
+  pull(row)
+
+cat(paste(latex_rows, collapse = "\n"))
+```
+
 ### 2.01 Policy Means
 
 ```{r}
@@ -435,6 +598,79 @@ for (y in pun_items) {
 }
 ```
 
+Table as percent change for impacted groups
+
+```{r}
+library(dplyr)
+library(tibble)
+library(readr)
+
+
+# policy items (all coded so higher = more help-oriented / less punitive)
+policy_items <- c(
+  "q25_1_rev",
+  "q25_2_rev",
+  "q25_3_rev",
+  "q25_4_rev",
+  "q25_5_rev",
+  "q25_6_rev"
+)
+
+# labels for the final table
+policy_labels <- c(
+  q25_1_rev = "Death penalty for people convicted of murder",
+  q25_2_rev = "Voting rights after serving felony sentences",
+  q25_3_rev = "Ensuring eligible incarcerated people can vote",
+  q25_4_rev = "Funding GED and college courses in prisons",
+  q25_5_rev = "Life without parole sentences",
+  q25_6_rev = "Sentencing alternatives for parents of young children"
+)
+
+# function to add significance star
+star_if_sig <- function(p) {
+  ifelse(!is.na(p) & p < 0.05, "*", "")
+}
+
+# function to compute table row
+make_pctdiff_row <- function(df, var) {
+
+  ni <- df[[var]][df$impact == 0]
+  direct <- df[[var]][df$incarc == 1]
+  prox <- df[[var]][df$knowincarc == 1]
+  vict <- df[[var]][df$vict == 1]
+
+  ni_mean <- mean(ni, na.rm = TRUE)
+  direct_mean <- mean(direct, na.rm = TRUE)
+  prox_mean <- mean(prox, na.rm = TRUE)
+  vict_mean <- mean(vict, na.rm = TRUE)
+
+  direct_pct <- ((direct_mean - ni_mean) / ni_mean) * 100
+  prox_pct <- ((prox_mean - ni_mean) / ni_mean) * 100
+  vict_pct <- ((vict_mean - ni_mean) / ni_mean) * 100
+
+  # two-tailed t tests
+  direct_p <- tryCatch(t.test(ni, direct)$p.value, error = function(e) NA)
+  prox_p <- tryCatch(t.test(ni, prox)$p.value, error = function(e) NA)
+  vict_p <- tryCatch(t.test(ni, vict)$p.value, error = function(e) NA)
+
+  tibble(
+    policy = policy_labels[[var]],
+    not_impacted_mean = round(ni_mean, 2),
+    directly_impacted = paste0(round(direct_pct, 1), star_if_sig(direct_p)),
+    proximally_impacted = paste0(round(prox_pct, 1), star_if_sig(prox_p)),
+    victimized = paste0(round(vict_pct, 1), star_if_sig(vict_p))
+  )
+}
+
+# build final table
+means_table <- bind_rows(
+  lapply(policy_items, function(v) make_pctdiff_row(raw_data_cleaned, v))
+)
+
+means_table
+
+```
+
 #### 2.1 Without Controls
 
 ```{r}
@@ -493,7 +729,7 @@ ggplot(plot_data, aes(x = impact_label, y = mean_deserving)) +
 ```
 
 ```{r}
-
+library(ggplot2)
 
 # Function to create plot comparing no contact vs specific contact type
 create_comparison_plot_data <- function(data, contact_var, 
