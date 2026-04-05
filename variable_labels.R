@@ -80,7 +80,7 @@ demo_controls_labels <- c(
   Black = "Black",
   Hispanic = "Hispanic", 
   OtherRace = "Other Race", 
-  gender = Male
+  gender = "Male"
 )
 
 party_ideo_controls <- c(
