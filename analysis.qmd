@@ -945,6 +945,10 @@ policy_vs_nonimp_demo_models <- policy_vs_nonimp_waves[["demo"]]
 policy_vs_nonimp_partyideo_models <- policy_vs_nonimp_waves[["party_ideo"]]
 policy_vs_nonimp_full_models <- policy_vs_nonimp_waves[["full_attitudes"]]
 
+
+summary(policy_vs_nonimp_nocontrol_models$comp_prisonhelp_impact)
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_impact)
+
 ```
 
 reusable system for:
@@ -1299,6 +1303,21 @@ for (i in seq_along(appendix_punish_chunks)) {
   appendix_tables[[paste0("punish_", i)]] <- tex
   writeLines(tex, paste0("appendix_punish_restricted_table_", i, ".tex"))
 }
+```
+
+Looking just at prison help and prison pun after adding in demographic factors
+
+```{r}
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_impact)
+summary(policy_vs_nonimp_demo_models$comp_prisonpen_impact)
+
+comp_prisonhelp_incarc     
+comp_prisonhelp_knowincarc  
+comp_prisonhelp_vict       
+comp_prisonpen_impact       
+comp_prisonpen_incarc      
+comp_prisonpen_knowincarc  
+comp_prisonpen_vict        
 ```
 
 
