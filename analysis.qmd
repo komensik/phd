@@ -19,7 +19,6 @@ library(janitor)   # for clean_names()
 library(tibble)
 library(stringr)
 library(haven)
-library(tibble)
 library(gt)
 library(marginaleffects)
 library(mediation)
@@ -30,6 +29,9 @@ library(modelsummary)
 library(rlang)
 library(forcats)
 library(ggplot2)
+library(broom)
+library(knitr)
+
 
 ```
 
@@ -572,8 +574,6 @@ raw_data_cleaned %>%
 
 Means Tables
 ```{r}
-
-
 #defining the non impact means and percent differences from impact vars
 pct_diff <- function(x, ref) {
   ((x - ref) / ref) * 100
@@ -671,53 +671,562 @@ cat(
 ## 2.2 Policy BV Dummies
 ```{r}
 
-
 policy_dummies_models <- list()
 
 for (dv in policy_vars) {
   for (iv in impact_vars) {
     name <- paste0("m_", dv, "_", iv)
-    policy_dummies_models[[name]] <- lm(as.formula(paste(dv, "~", iv)), data = raw_data_cleaned)
+    policy_dummies_models[[name]] <- lm(
+      as.formula(paste(dv, "~", iv)),
+      data = raw_data_cleaned
+    )
   }
 }
-
 ```
 
-Overleaf Tables - first, clean model list
+##2.3 Appendix Tables - Each IV Model Grouped around DV
 ```{r}
+# ============================================================
+# Build one LaTeX regression-results table per DV
+# Assumes  variable-label script has already been sourced,
+# so the following objects already exist:
+#   - impact_vars
+#   - impact_labels
+#   - policy_vars
+#   - policy_map
+# Also assumes policy_dummies_models already exists.
+# ============================================================
 
+
+# ------------------------------------------------------------
+# sanity checks: make sure the variables referenced in your
+# helper objects actually exist in the data
+# -----------------------------------------------------------
+
+missing_policy_vars <- setdiff(policy_vars, names(raw_data_cleaned))
+missing_impact_vars <- setdiff(impact_vars, names(raw_data_cleaned))
+
+if (length(missing_policy_vars) > 0) {
+  stop("These policy_vars are missing from raw_data_cleaned: ",
+       paste(missing_policy_vars, collapse = ", "))
+}
+
+if (length(missing_impact_vars) > 0) {
+  stop("These impact_vars are missing from raw_data_cleaned: ",
+       paste(missing_impact_vars, collapse = ", "))
+}
+
+# ------------------------------------------------------------
+# create a named vector of DV labels from policy_map
+# ------------------------------------------------------------
+
+policy_labels <- setNames(policy_map$label, policy_map$var)
+
+# ------------------------------------------------------------
+# helper function: convert p-values to significance stars
+# ------------------------------------------------------------
+
+p_to_stars <- function(p) {
+  dplyr::case_when(
+    is.na(p)  ~ "",
+    p < .001  ~ "***",
+    p < .01   ~ "**",
+    p < .05   ~ "*",
+    TRUE      ~ ""
+  )
+}
+
+# ------------------------------------------------------------
+# function: build a clean one-DV results table
+# ------------------------------------------------------------
+
+make_dv_results_table <- function(dv_name, model_list) {
+
+  rows <- lapply(impact_vars, function(iv_name) {
+
+    model_name <- paste0("m_", dv_name, "_", iv_name)
+
+    if (!model_name %in% names(model_list)) {
+      stop("Model not found in policy_dummies_models: ", model_name)
+    }
+
+    mod <- model_list[[model_name]]
+
+    coef_row <- broom::tidy(mod) %>%
+      dplyr::filter(term != "(Intercept)") %>%
+      dplyr::mutate(
+        iv_name = iv_name,
+        iv_label = impact_labels[[iv_name]],
+        coef = round(estimate, 3),
+        se = round(std.error, 3),
+        p = round(p.value, 3),
+        stars = p_to_stars(p.value),
+        coef_with_stars = paste0(format(coef, nsmall = 3), stars),
+        n = broom::glance(mod)$nobs,
+        r2 = round(broom::glance(mod)$r.squared, 3)
+      ) %>%
+      dplyr::select(iv_label, coef_with_stars, se, p, n, r2)
+
+    coef_row
+  })
+
+  dplyr::bind_rows(rows) %>%
+    dplyr::rename(
+      `Independent Variable` = iv_label,
+      `Coefficient` = coef_with_stars,
+      `SE` = se,
+      `p-value` = p,
+      `N` = n,
+      `R^2` = r2
+    )
+}
+
+# ------------------------------------------------------------
+# function: convert one DV results table into LaTeX code
+# ------------------------------------------------------------
+
+make_dv_latex_table <- function(dv_name, model_list) {
+
+  results_df <- make_dv_results_table(dv_name, model_list)
+
+  caption_text <- paste0("Bivariate Models Predicting ", policy_labels[[dv_name]])
+  label_text <- paste0("tab:", dv_name, "_bivariate")
+
+  knitr::kable(
+    results_df,
+    format = "latex",
+    booktabs = TRUE,
+    caption = caption_text,
+    label = label_text,
+    align = c("l", "c", "c", "c", "c", "c"),
+    escape = TRUE
+  )
+}
+
+# ------------------------------------------------------------
+# create one LaTeX table per DV and store them in a named list
+# ------------------------------------------------------------
+
+dv_latex_tables <- lapply(policy_vars, function(dv_name) {
+  make_dv_latex_table(dv_name, policy_dummies_models)
+})
+
+names(dv_latex_tables) <- policy_vars
+
+# ------------------------------------------------------------
+# example: print one table to the console so you can copy/paste
+# into Overleaf
+# ------------------------------------------------------------
+
+#cat(dv_latex_tables[["prisonhelp"]])
+
+# ------------------------------------------------------------
+# write all tables to separate .tex files
+# ------------------------------------------------------------
+
+for (dv_name in policy_vars) {
+  writeLines(
+    dv_latex_tables[[dv_name]],
+    con = paste0(dv_name, "_bivariate_table.tex")
+  )
+}
 ```
 
 
-## 2.3 Compare Each Impacted Subgroup to Non-Impacted
 
+## 2.4 Compare Each Impacted Subgroup to Non-Impacted
+Restricted sample comparison logic (not impacted vs incarcerated)
+ultimate goal: no-controls to controls main results table built from the restricted-sample non-impacted-versus-subgroup models. then extend the restricted-sample models rather than rebuilding everything from scratch when adding controls.
+
+Why doing this instead of a factor variable for all impact:
+-restricted-sample regressions keep the logic consistent with everything I are already doing and make it much easier to scale to later models with controls. A t-test table and a restricted-sample dummy regression are telling the same story in the no-controls case. But the regression route gives me a single framework you can preserve when you later add demographic controls, then political controls, then attitudinal controls. If I switch to t-tests for model 2 and regressions for later models, I create an unnecessary break in the workflow and probably more formatting work.
+
+A single categorical variable like 0 = not impacted, 1 = direct only, 2 = proximal only, 3 = victim only, 4 = multiple forms would answer a different question. It would force you to partition the sample into mutually exclusive bins, which is useful for some appendix descriptives and maybe later robustness checks, but it would also collapse substantively important overlap into a catch-all “multiple forms” group and make it harder to estimate the specific contrast you currently care about: whether each exposure type, as experienced in the real world, is associated with different outcomes relative to the fully non-impacted. For your main table, the restricted-sample approach is cleaner and more faithful to the theory.
 ```{r}
-## 4. Compare Each Impacted Subgroup to Non-Impacted
+
+# ============================================================
+# Goal #2: compare each impacted subgroup to the fully
+# non-impacted group
+# ============================================================
 
 make_comparison_model <- function(df, dv, subgroup_var) {
   df_sub <- df %>%
     filter(impact == 0 | .data[[subgroup_var]] == 1) %>%
     mutate(treat = ifelse(.data[[subgroup_var]] == 1, 1, 0))
 
-  lm(as.formula(paste(dv, "~ treat")), data = df_sub)
+  lm(as.formula(paste(dv, "~ treat")), data = df_sub) #fits DV to treat to compare non-impacted to incarc, knowincarc, vict
 }
 
-policy_vs_nonimp_models <- list()
+policy_vs_nonimp_nocontrol_models <- list()
 
 # any impact vs no impact
-for (dv in dvs) {
-  comparison_models[[paste0("comp_", dv, "_impact")]] <-
+for (dv in policy_vars) {
+  policy_vs_nonimp_nocontrol_models[[paste0("comp_", dv, "_impact")]] <-
     lm(as.formula(paste(dv, "~ impact")), data = raw_data_cleaned)
 }
 
 # each specific subgroup vs non-impacted only
-for (dv in dvs) {
+for (dv in policy_vars) {
   for (iv in c("incarc", "knowincarc", "vict")) {
     name <- paste0("comp_", dv, "_", iv)
-    policy_vs_nonimp_models[[name]] <- make_comparison_model(raw_data_cleaned, dv, iv)
+    policy_vs_nonimp_nocontrol_models[[name]] <- make_comparison_model(raw_data_cleaned, dv, iv)
   }
 }
 
+```
+
+reusable system for:
+
+a results-section table for prisonhelp and prisonpen,
+
+appendix tables for the remaining DVs in the same architecture,
+
+a blank second model block for later controlled models,
+
+placeholder control rows so the table skeleton already matches where you are headed.
+
+## 2.5 Tables Loop
+```{r}
+# ============================================================
+# Advisor-style restricted-sample tables
+# Goal: compare each impacted subgroup to non-impacted only
+# Model 2 = no-controls restricted-sample models
+# Model 3 = placeholder for later controlled models
+#
+# Packages used:
+# dplyr, stringr, purrr, lmtest, sandwich
+# ============================================================
+
+library(dplyr)
+library(stringr)
+library(purrr)
+library(lmtest)
+library(sandwich)
+
+# ------------------------------------------------------------
+# Labels from your variable script
+# ------------------------------------------------------------
+policy_labels <- setNames(policy_map$label, policy_map$var)
+
+# ------------------------------------------------------------
+# Formatting helpers
+# ------------------------------------------------------------
+p_to_stars <- function(p) {
+  dplyr::case_when(
+    is.na(p) ~ "",
+    p < .001 ~ "***",
+    p < .01  ~ "**",
+    p < .05  ~ "*",
+    TRUE     ~ ""
+  )
+}
+
+fmt_num <- function(x, digits = 3) {
+  ifelse(is.na(x), "", sprintf(paste0("%.", digits, "f"), x))
+}
+
+latex_escape <- function(x) {
+  x %>%
+    str_replace_all("\\\\", "\\\\\\\\") %>%
+    str_replace_all("([#$%&_{}])", "\\\\\\1") %>%
+    str_replace_all("~", "\\\\textasciitilde{}") %>%
+    str_replace_all("\\^", "\\\\textasciicircum{}")
+}
+
+# ------------------------------------------------------------
+# Extract one non-intercept coefficient from a model
+# robust = HC1 by default
+# ------------------------------------------------------------
+get_single_term_stats <- function(mod, robust = TRUE) {
+  if (robust) {
+    ct <- lmtest::coeftest(mod, vcov. = sandwich::vcovHC(mod, type = "HC1"))
+    out <- data.frame(
+      term      = rownames(ct),
+      estimate  = ct[, 1],
+      std.error = ct[, 2],
+      p.value   = ct[, 4],
+      stringsAsFactors = FALSE
+    )
+  } else {
+    sm <- summary(mod)$coefficients
+    out <- data.frame(
+      term      = rownames(sm),
+      estimate  = sm[, 1],
+      std.error = sm[, 2],
+      p.value   = sm[, 4],
+      stringsAsFactors = FALSE
+    )
+  }
+
+  out %>%
+    filter(term != "(Intercept)") %>%
+    slice(1) %>%
+    mutate(
+      n  = stats::nobs(mod),
+      r2 = summary(mod)$r.squared
+    )
+}
+
+# ------------------------------------------------------------
+# Build one cell for one DV x subgroup x model-list
+# Returns something like:
+# \makecell[c]{0.210*** \\ (0.030)}
+#
+# If model_list is NULL, returns blank cell
+# ------------------------------------------------------------
+make_comp_cell <- function(model_list, dv, iv, robust = TRUE) {
+
+  if (is.null(model_list)) return("")
+
+  model_name <- paste0("comp_", dv, "_", iv)
+
+  if (!model_name %in% names(model_list)) return("")
+
+  stats_row <- get_single_term_stats(model_list[[model_name]], robust = robust)
+
+  coef_txt <- paste0(
+    fmt_num(stats_row$estimate, 3),
+    p_to_stars(stats_row$p.value)
+  )
+
+  se_txt <- paste0("(", fmt_num(stats_row$std.error, 3), ")")
+
+  paste0("\\makecell[c]{", coef_txt, " \\\\ ", se_txt, "}")
+}
+
+# ------------------------------------------------------------
+# Split a vector into chunks for appendix tables
+# ------------------------------------------------------------
+chunk_vector <- function(x, chunk_size = 2) {
+  split(x, ceiling(seq_along(x) / chunk_size))
+}
+
+# ------------------------------------------------------------
+# Main table builder
+#
+# dv_vec: which DVs go in the columns for each model block
+# model2_list: required (your no-controls restricted-sample list)
+# model3_list: optional, NULL for now
+# row_vars: rows to display under carceral contact
+# include_placeholder_control_rows: include blank future rows
+# ------------------------------------------------------------
+make_restricted_panel_latex_table <- function(
+    dv_vec,
+    model2_list,
+    model3_list = NULL,
+    caption_text,
+    label_text,
+    model2_title = "Model 2",
+    model3_title = "Model 3",
+    row_vars = c("impact", "incarc", "knowincarc", "vict"),
+    include_placeholder_control_rows = TRUE,
+    robust = TRUE
+) {
+
+  # ----- column setup -----
+  n_dv <- length(dv_vec)
+  n_model_blocks <- 2
+  total_data_cols <- n_dv * n_model_blocks
+  align_string <- paste0("l", paste(rep("c", total_data_cols), collapse = ""))
+
+  # ----- header rows -----
+  header_top <- c(
+    "",
+    paste0("\\multicolumn{", n_dv, "}{c}{", latex_escape(model2_title), "}"),
+    paste0("\\multicolumn{", n_dv, "}{c}{", latex_escape(model3_title), "}")
+  )
+
+  header_second <- c(
+    "",
+    latex_escape(policy_labels[dv_vec]),
+    latex_escape(policy_labels[dv_vec])
+  )
+
+  # cmidrules
+  cmid_model2 <- paste0("\\cmidrule(lr){2-", 1 + n_dv, "}")
+  cmid_model3 <- paste0("\\cmidrule(lr){", 2 + n_dv, "-", 1 + (2 * n_dv), "}")
+  cmid_line <- paste(cmid_model2, cmid_model3, collapse = " ")
+
+  # ----- body rows -----
+  body_lines <- c()
+
+  # Section header: carceral contact
+  body_lines <- c(
+    body_lines,
+    paste(
+      c(
+        "\\textit{Carceral Contact (ref. Not impacted)}",
+        rep("", total_data_cols)
+      ),
+      collapse = " & "
+    ),
+    "\\\\"
+  )
+
+  # Carceral contact rows
+  for (iv in row_vars) {
+    row_label <- impact_labels[[iv]]
+
+    model2_cells <- sapply(dv_vec, function(dv) {
+      make_comp_cell(model2_list, dv, iv, robust = robust)
+    })
+
+    model3_cells <- sapply(dv_vec, function(dv) {
+      make_comp_cell(model3_list, dv, iv, robust = robust)
+    })
+
+    this_line <- paste(
+      c(latex_escape(row_label), model2_cells, model3_cells),
+      collapse = " & "
+    )
+
+    body_lines <- c(body_lines, paste0(this_line, " \\\\"))
+  }
+
+  # Placeholder future control rows
+  if (include_placeholder_control_rows) {
+
+    placeholder_sections <- list(
+      "Demographics" = c("SES", "Black", "Hispanic", "Other race", "Male"),
+      "Political Identity" = c("Republican", "Democrat", "Ideology"),
+      "Attitudinal Factors" = c("Core deservingness orientation",
+                                "Policy disposition index",
+                                "Racial resentment")
+    )
+
+    for (sec_name in names(placeholder_sections)) {
+
+      sec_header <- paste(
+        c(paste0("\\textit{", latex_escape(sec_name), "}"),
+          rep("", total_data_cols)),
+        collapse = " & "
+      )
+
+      body_lines <- c(body_lines, "\\addlinespace")
+      body_lines <- c(body_lines, paste0(sec_header, " \\\\"))
+
+      for (row_name in placeholder_sections[[sec_name]]) {
+        blank_line <- paste(
+          c(latex_escape(row_name), rep("", total_data_cols)),
+          collapse = " & "
+        )
+        body_lines <- c(body_lines, paste0(blank_line, " \\\\"))
+      }
+    }
+  }
+
+  # ----- assemble LaTeX -----
+  out <- c(
+    "\\begin{table}[!htbp]",
+    "\\centering",
+    paste0("\\caption{", latex_escape(caption_text), "}"),
+    paste0("\\label{", latex_escape(label_text), "}"),
+    "\\begin{threeparttable}",
+    paste0("\\begin{tabular}{", align_string, "}"),
+    "\\toprule",
+    paste(header_top, collapse = " & "),
+    " \\\\",
+    cmid_line,
+    paste(header_second, collapse = " & "),
+    " \\\\",
+    "\\midrule",
+    body_lines,
+    "\\bottomrule",
+    "\\end{tabular}",
+    "\\begin{tablenotes}[flushleft]",
+    "\\footnotesize",
+    "\\item Entries are OLS coefficients with HC1 robust standard errors in parentheses.",
+    "\\item Each cell is estimated from a separate restricted-sample regression comparing the named subgroup to the non-impacted group.",
+    "\\item Because rows come from different restricted samples, observation counts and $R^2$ are not shown in this table format.",
+    "\\item * p$<$0.05, ** p$<$0.01, *** p$<$0.001.",
+    "\\end{tablenotes}",
+    "\\end{threeparttable}",
+    "\\end{table}"
+  )
+
+  out
+}
+
+# ------------------------------------------------------------
+# 1. RESULTS-SECTION TABLE
+# ------------------------------------------------------------
+results_dvs <- c("prisonhelp", "prisonpen")
+
+results_table_tex <- make_restricted_panel_latex_table(
+  dv_vec = results_dvs,
+  model2_list = policy_vs_nonimp_nocontrol_models,
+  model3_list = NULL,   # blank for now
+  caption_text = "OLS Models of Carceral Policy Orientations",
+  label_text = "tab:carceral_policy_orientations",
+  model2_title = "Model 2",
+  model3_title = "Model 3",
+  row_vars = c("impact", "incarc", "knowincarc", "vict"),
+  include_placeholder_control_rows = TRUE,
+  robust = TRUE
+)
+
+writeLines(results_table_tex, "results_policy_orientations_table.tex")
+
+# Optional preview in console
+# cat(results_table_tex, sep = "\n")
+
+
+# ------------------------------------------------------------
+# 2. APPENDIX TABLES FOR REMAINING POLICY DVs
+#    Same architecture, chunked two DVs at a time
+# ------------------------------------------------------------
+appendix_dvs <- setdiff(policy_vars, results_dvs)
+
+# You can keep help/punish separated if you want cleaner appendix organization
+appendix_help_dvs <- appendix_dvs[policy_map$section[match(appendix_dvs, policy_map$var)] == "Help"]
+appendix_punish_dvs <- appendix_dvs[policy_map$section[match(appendix_dvs, policy_map$var)] == "Punish"]
+
+appendix_help_chunks <- chunk_vector(appendix_help_dvs, chunk_size = 2)
+appendix_punish_chunks <- chunk_vector(appendix_punish_dvs, chunk_size = 2)
+
+appendix_tables <- list()
+
+# Help tables
+for (i in seq_along(appendix_help_chunks)) {
+  dv_chunk <- appendix_help_chunks[[i]]
+
+  tex <- make_restricted_panel_latex_table(
+    dv_vec = dv_chunk,
+    model2_list = policy_vs_nonimp_nocontrol_models,
+    model3_list = NULL,
+    caption_text = paste0("Restricted-Sample OLS Models of Help-Oriented Policy Outcomes, Appendix Table ", i),
+    label_text = paste0("tab:appendix_help_restricted_", i),
+    model2_title = "Model 2",
+    model3_title = "Model 3",
+    row_vars = c("impact", "incarc", "knowincarc", "vict"),
+    include_placeholder_control_rows = TRUE,
+    robust = TRUE
+  )
+
+  appendix_tables[[paste0("help_", i)]] <- tex
+  writeLines(tex, paste0("appendix_help_restricted_table_", i, ".tex"))
+}
+
+# Punish tables
+for (i in seq_along(appendix_punish_chunks)) {
+  dv_chunk <- appendix_punish_chunks[[i]]
+
+  tex <- make_restricted_panel_latex_table(
+    dv_vec = dv_chunk,
+    model2_list = policy_vs_nonimp_nocontrol_models,
+    model3_list = NULL,
+    caption_text = paste0("Restricted-Sample OLS Models of Punitive Policy Outcomes, Appendix Table ", i),
+    label_text = paste0("tab:appendix_punish_restricted_", i),
+    model2_title = "Model 2",
+    model3_title = "Model 3",
+    row_vars = c("impact", "incarc", "knowincarc", "vict"),
+    include_placeholder_control_rows = TRUE,
+    robust = TRUE
+  )
+
+  appendix_tables[[paste0("punish_", i)]] <- tex
+  writeLines(tex, paste0("appendix_punish_restricted_table_", i, ".tex"))
+}
 ```
 
 
