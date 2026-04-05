@@ -1311,6 +1311,16 @@ Looking just at prison help and prison pun after adding in demographic factors
 summary(policy_vs_nonimp_demo_models$comp_prisonhelp_impact)
 summary(policy_vs_nonimp_demo_models$comp_prisonpen_impact)
 
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_demo_models$comp_prisonpen_incarc)
+
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_knowincarc)
+summary(policy_vs_nonimp_demo_models$comp_prisonpen_knowincarc)
+
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_vict)
+summary(policy_vs_nonimp_demo_models$comp_prisonpen_vict)
+
+
 comp_prisonhelp_incarc     
 comp_prisonhelp_knowincarc  
 comp_prisonhelp_vict       
@@ -1318,6 +1328,24 @@ comp_prisonpen_impact
 comp_prisonpen_incarc      
 comp_prisonpen_knowincarc  
 comp_prisonpen_vict        
+
+
+results_dvs <- c("prisonhelp", "prisonpen")
+
+results_table_tex <- make_restricted_panel_latex_table(
+  dv_vec = results_dvs,
+  model2_list = policy_vs_nonimp_nocontrol_models,
+  model3_list = policy_vs_nonimp_demo_models,
+  caption_text = "OLS Models of Carceral Policy Orientations - No controls to Demographic Controls",
+  label_text = "tab:carceral_policy_orientations_nocontrol_demo",
+  model2_title = "Model 2",
+  model3_title = "Model 3",
+  row_vars = c("impact", "incarc", "knowincarc", "vict"),
+  include_placeholder_control_rows = TRUE,
+  robust = TRUE
+)
+
+writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
 ```
 
 
