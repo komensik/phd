@@ -73,7 +73,14 @@ policy_map <- tibble::tribble(
 ##
 
 demo_controls <- c(
-  "Black", "Hispanic", "White", "OtherRace", "gender"
+  "Black", "Hispanic", "OtherRace", "gender"
+)
+
+demo_controls_labels <- c(
+  Black = "Black",
+  Hispanic = "Hispanic", 
+  OtherRace = "Other Race", 
+  gender = Male
 )
 
 polid_controls <- c(
