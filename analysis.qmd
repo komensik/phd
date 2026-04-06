@@ -1095,7 +1095,13 @@ make_restricted_panel_latex_table <- function(
     model2_title = "Model 2",
     model3_title = "Model 3",
     row_vars = c("impact", "incarc", "knowincarc", "vict"),
-    include_placeholder_control_rows = TRUE,
+    control_vars = c("Black", "Hispanic", "OtherRace", "gender"),
+    control_labels = c(
+      Black = "Black",
+      Hispanic = "Hispanic",
+      OtherRace = "Other race",
+      gender = "Male"
+    ),
     robust = TRUE
 ) {
 
@@ -1118,15 +1124,58 @@ make_restricted_panel_latex_table <- function(
     latex_escape(policy_labels[dv_vec])
   )
 
-  # cmidrules
   cmid_model2 <- paste0("\\cmidrule(lr){2-", 1 + n_dv, "}")
   cmid_model3 <- paste0("\\cmidrule(lr){", 2 + n_dv, "-", 1 + (2 * n_dv), "}")
   cmid_line <- paste(cmid_model2, cmid_model3, collapse = " ")
 
+  # ----- helper: extract a specific term from a model -----
+  get_term_cell <- function(model_list, dv, iv, term_name, robust = TRUE) {
+
+    if (is.null(model_list)) return("")
+
+    model_name <- paste0("comp_", dv, "_", iv)
+    if (!model_name %in% names(model_list)) return("")
+
+    mod <- model_list[[model_name]]
+
+    if (robust) {
+      ct <- lmtest::coeftest(mod, vcov. = sandwich::vcovHC(mod, type = "HC1"))
+      out <- data.frame(
+        term      = rownames(ct),
+        estimate  = ct[, 1],
+        std.error = ct[, 2],
+        p.value   = ct[, 4],
+        stringsAsFactors = FALSE
+      )
+    } else {
+      sm <- summary(mod)$coefficients
+      out <- data.frame(
+        term      = rownames(sm),
+        estimate  = sm[, 1],
+        std.error = sm[, 2],
+        p.value   = sm[, 4],
+        stringsAsFactors = FALSE
+      )
+    }
+
+    if (!term_name %in% out$term) return("")
+
+    row <- out[out$term == term_name, ]
+
+    coef_txt <- paste0(
+      fmt_num(row$estimate, 3),
+      p_to_stars(row$p.value)
+    )
+
+    se_txt <- paste0("(", fmt_num(row$std.error, 3), ")")
+
+    paste0("\\makecell[c]{", coef_txt, " \\\\ ", se_txt, "}")
+  }
+
   # ----- body rows -----
   body_lines <- c()
 
-  # Section header: carceral contact
+  # Section header
   body_lines <- c(
     body_lines,
     paste(
@@ -1139,56 +1188,48 @@ make_restricted_panel_latex_table <- function(
     "\\\\"
   )
 
-  # Carceral contact rows
+  # For each subgroup, print coefficient row + repeated control rows
   for (iv in row_vars) {
-    row_label <- impact_labels[[iv]]
 
+    row_label <- impact_labels[[iv]]
+    main_term <- ifelse(iv == "impact", "impact", "treat")
+
+    # main subgroup row
     model2_cells <- sapply(dv_vec, function(dv) {
-      make_comp_cell(model2_list, dv, iv, robust = robust)
+      get_term_cell(model2_list, dv, iv, main_term, robust = robust)
     })
 
     model3_cells <- sapply(dv_vec, function(dv) {
-      make_comp_cell(model3_list, dv, iv, robust = robust)
+      get_term_cell(model3_list, dv, iv, main_term, robust = robust)
     })
 
-    this_line <- paste(
+    subgroup_line <- paste(
       c(latex_escape(row_label), model2_cells, model3_cells),
       collapse = " & "
     )
 
-    body_lines <- c(body_lines, paste0(this_line, " \\\\"))
-  }
+    body_lines <- c(body_lines, paste0(subgroup_line, " \\\\"))
 
-  # Placeholder future control rows
-  if (include_placeholder_control_rows) {
+    # repeated control rows under this subgroup
+    for (ctrl in control_vars) {
 
-    placeholder_sections <- list(
-      "Demographics" = c("SES", "Black", "Hispanic", "Other race", "Male"),
-      "Political Identity" = c("Republican", "Democrat", "Ideology"),
-      "Attitudinal Factors" = c("Core deservingness orientation",
-                                "Policy disposition index",
-                                "Racial resentment")
-    )
+      model2_ctrl_cells <- sapply(dv_vec, function(dv) {
+        get_term_cell(model2_list, dv, iv, ctrl, robust = robust)
+      })
 
-    for (sec_name in names(placeholder_sections)) {
+      model3_ctrl_cells <- sapply(dv_vec, function(dv) {
+        get_term_cell(model3_list, dv, iv, ctrl, robust = robust)
+      })
 
-      sec_header <- paste(
-        c(paste0("\\textit{", latex_escape(sec_name), "}"),
-          rep("", total_data_cols)),
+      ctrl_line <- paste(
+        c(latex_escape(control_labels[[ctrl]]), model2_ctrl_cells, model3_ctrl_cells),
         collapse = " & "
       )
 
-      body_lines <- c(body_lines, "\\addlinespace")
-      body_lines <- c(body_lines, paste0(sec_header, " \\\\"))
-
-      for (row_name in placeholder_sections[[sec_name]]) {
-        blank_line <- paste(
-          c(latex_escape(row_name), rep("", total_data_cols)),
-          collapse = " & "
-        )
-        body_lines <- c(body_lines, paste0(blank_line, " \\\\"))
-      }
+      body_lines <- c(body_lines, paste0(ctrl_line, " \\\\"))
     }
+
+    body_lines <- c(body_lines, "\\addlinespace")
   }
 
   # ----- assemble LaTeX -----
@@ -1222,7 +1263,37 @@ make_restricted_panel_latex_table <- function(
 
   out
 }
+```
 
+```{r}
+results_dvs <- c("prisonhelp", "prisonpen")
+
+results_table_tex <- make_restricted_panel_latex_table(
+  dv_vec = results_dvs,
+  model2_list = policy_vs_nonimp_nocontrol_models,
+  model3_list = policy_vs_nonimp_demo_models,
+  caption_text = "OLS Models of Carceral Policy Orientations - No controls to Demographic Controls",
+  label_text = "tab:carceral_policy_orientations_nocontrol_demo",
+  model2_title = "Model 2",
+  model3_title = "Model 3",
+  row_vars = c("impact", "incarc", "knowincarc", "vict"),
+  control_vars = c("Black", "Hispanic", "OtherRace", "gender"),
+  control_labels = c(
+    Black = "Black",
+    Hispanic = "Hispanic",
+    OtherRace = "Other race",
+    gender = "Male"
+  ),
+  robust = TRUE
+)
+
+writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
+```
+
+
+
+
+```{r}
 # ------------------------------------------------------------
 # 1. RESULTS-SECTION TABLE
 # ------------------------------------------------------------
@@ -1231,17 +1302,23 @@ results_dvs <- c("prisonhelp", "prisonpen")
 results_table_tex <- make_restricted_panel_latex_table(
   dv_vec = results_dvs,
   model2_list = policy_vs_nonimp_nocontrol_models,
-  model3_list = NULL,   # blank for now
-  caption_text = "OLS Models of Carceral Policy Orientations",
-  label_text = "tab:carceral_policy_orientations",
+  model3_list = policy_vs_nonimp_demo_models,
+  caption_text = "OLS Models of Carceral Policy Orientations - No controls to Demographic Controls",
+  label_text = "tab:carceral_policy_orientations_nocontrol_demo",
   model2_title = "Model 2",
   model3_title = "Model 3",
   row_vars = c("impact", "incarc", "knowincarc", "vict"),
-  include_placeholder_control_rows = TRUE,
+  control_vars = c("Black", "Hispanic", "OtherRace", "gender"),
+  control_labels = c(
+    Black = "Black",
+    Hispanic = "Hispanic",
+    OtherRace = "Other race",
+    gender = "Male"
+  ),
   robust = TRUE
 )
 
-writeLines(results_table_tex, "results_policy_orientations_table.tex")
+writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
 
 # Optional preview in console
 # cat(results_table_tex, sep = "\n")
