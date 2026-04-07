@@ -1288,6 +1288,14 @@ results_table_tex <- make_restricted_panel_latex_table(
 )
 
 writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
+
+
+##model for just desor
+
+dep_variable <-(raw_data_cleaned$knowincarc)
+desor_model <- lm(desor_core ~ dep_variable + Black+Hispanic+OtherRace+fiscal_ideology+social_ideology, data = raw_data_cleaned)
+summary(desor_model)
+
 ```
 
 
@@ -1883,9 +1891,246 @@ ggsave(
 ```
 
 
+4-5 the tables aren't working. I just am pivoting to making sure I can print out all the info I need to fix the writing in my analysis. 
+
+```{r}
+summary(policy_vs_nonimp_nocontrol_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_partyideo_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_full_models$comp_prisonhelp_incarc)
+
+
+summary(policy_vs_nonimp_nocontrol_models$comp_prisonhelp_i)
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_partyideo_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_full_models$comp_prisonhelp_incarc)
+
+```
 
 
 
+
+```{r}
+# ============================================================
+# EXPORT ALL MODEL SUMMARIES AND ROBUST COEFFICIENT TABLES
+# ============================================================
+
+library(lmtest)
+library(sandwich)
+
+# -----------------------------
+# 1. Collect all model lists
+# -----------------------------
+all_model_lists <- list(
+  goal1_nocontrol   = policy_dummies_models,
+  goal1_demo        = policy_dummies_demo_models,
+  goal1_partyideo   = policy_dummies_partyideo_models,
+  goal1_full        = policy_dummies_full_models,
+  goal2_nocontrol   = policy_vs_nonimp_nocontrol_models,
+  goal2_demo        = policy_vs_nonimp_demo_models,
+  goal2_partyideo   = policy_vs_nonimp_partyideo_models,
+  goal2_full        = policy_vs_nonimp_full_models
+)
+
+# -----------------------------
+# 2. Helper: write one model list
+# -----------------------------
+write_model_list_outputs <- function(model_list, list_name, out_dir = "model_outputs") {
+
+  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+
+  summary_file <- file.path(out_dir, paste0(list_name, "_summary_output.txt"))
+  robust_file  <- file.path(out_dir, paste0(list_name, "_robust_output.txt"))
+
+  # -------- summary() output --------
+  con_sum <- file(summary_file, open = "wt")
+  for (model_name in names(model_list)) {
+    mod <- model_list[[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_sum)
+
+    capture.output(summary(mod), file = con_sum, append = TRUE)
+    writeLines("\n\n", con_sum)
+  }
+  close(con_sum)
+
+  # -------- robust coefficient output --------
+  con_rob <- file(robust_file, open = "wt")
+  for (model_name in names(model_list)) {
+    mod <- model_list[[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_rob)
+
+    robust_tab <- lmtest::coeftest(mod, vcov. = sandwich::vcovHC(mod, type = "HC1"))
+    capture.output(print(robust_tab), file = con_rob, append = TRUE)
+
+    writeLines("\n--- Model fit ---\n", con_rob)
+    fit_info <- c(
+      paste("N   =", nobs(mod)),
+      paste("R2  =", round(summary(mod)$r.squared, 4)),
+      paste("Adj =", round(summary(mod)$adj.r.squared, 4))
+    )
+    writeLines(fit_info, con_rob)
+
+    writeLines("\n\n", con_rob)
+  }
+  close(con_rob)
+
+  invisible(list(
+    summary_file = summary_file,
+    robust_file = robust_file
+  ))
+}
+
+# -----------------------------
+# 3. Run for all model lists
+# -----------------------------
+output_files <- lapply(names(all_model_lists), function(list_name) {
+  write_model_list_outputs(
+    model_list = all_model_lists[[list_name]],
+    list_name = list_name,
+    out_dir = "model_outputs"
+  )
+})
+
+names(output_files) <- names(all_model_lists)
+
+# -----------------------------
+# 4. Optional: make one master file
+# -----------------------------
+master_summary_file <- file.path("model_outputs", "ALL_MODEL_SUMMARIES.txt")
+master_robust_file  <- file.path("model_outputs", "ALL_MODEL_ROBUST.txt")
+
+con_master_sum <- file(master_summary_file, open = "wt")
+for (list_name in names(all_model_lists)) {
+  writeLines(paste0(
+    "\n\n",
+    strrep("#", 100), "\n",
+    "MODEL LIST: ", list_name, "\n",
+    strrep("#", 100), "\n"
+  ), con_master_sum)
+
+  for (model_name in names(all_model_lists[[list_name]])) {
+    mod <- all_model_lists[[list_name]][[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_master_sum)
+
+    capture.output(summary(mod), file = con_master_sum, append = TRUE)
+    writeLines("\n\n", con_master_sum)
+  }
+}
+close(con_master_sum)
+
+con_master_rob <- file(master_robust_file, open = "wt")
+for (list_name in names(all_model_lists)) {
+  writeLines(paste0(
+    "\n\n",
+    strrep("#", 100), "\n",
+    "MODEL LIST: ", list_name, "\n",
+    strrep("#", 100), "\n"
+  ), con_master_rob)
+
+  for (model_name in names(all_model_lists[[list_name]])) {
+    mod <- all_model_lists[[list_name]][[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_master_rob)
+
+    robust_tab <- lmtest::coeftest(mod, vcov. = sandwich::vcovHC(mod, type = "HC1"))
+    capture.output(print(robust_tab), file = con_master_rob, append = TRUE)
+
+    writeLines("\n--- Model fit ---\n", con_master_rob)
+    fit_info <- c(
+      paste("N   =", nobs(mod)),
+      paste("R2  =", round(summary(mod)$r.squared, 4)),
+      paste("Adj =", round(summary(mod)$adj.r.squared, 4))
+    )
+    writeLines(fit_info, con_master_rob)
+
+    writeLines("\n\n", con_master_rob)
+  }
+}
+close(con_master_rob)
+
+# -----------------------------
+# 5. Confirm output locations
+# -----------------------------
+print(output_files)
+cat("\nMaster files written to:\n",
+    master_summary_file, "\n",
+    master_robust_file, "\n")
+```
+
+## deservingness with controls
+
+```{r}
+
+m_des_inc_impact <- lm(d_incppl_pris_abc ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_inc_incarc <- lm(d_incppl_pris_abc ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_inc_knowincarc <- lm(d_incppl_pris_abc ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_inc_vict <- lm(d_incppl_pris_abc ~ vict + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+##
+
+m_des_crim_impact <- lm(d_crim_abc ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_crim_incarc <- lm(d_crim_abc ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_crim_knowincarc <- lm(d_crim_abc ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_crim_vict <- lm(d_crim_abc ~ vict + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+##
+
+m_des_incwomen_imp <- lm(d_incwomen_abc ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_incwomen_incarc <- lm(d_incwomen_abc ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_incwomen_knowinc <- lm(d_incwomen_abc ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_incwomen_vict <- lm(d_incwomen_abc ~ vict + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+
+##
+
+
+summary(m_des_inc_impact)
+summary(m_des_inc_incarc)
+summary(m_des_inc_knowincarc)
+summary(m_des_inc_vict)
+
+summary(m_des_crim_impact)
+summary(m_des_crim_incarc)
+summary(m_des_crim_knowincarc)
+summary(m_des_crim_vict)
+
+summary(m_des_incwomen_imp)
+summary(m_des_incwomen_incarc)
+summary(m_des_incwomen_knowinc)
+summary(m_des_incwomen_vict)
+```
 
 
 
