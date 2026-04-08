@@ -545,6 +545,113 @@ table(raw_data_cleaned$vict, raw_data_cleaned$Republican)
 table(raw_data_cleaned$vict, raw_data_cleaned$Democrat)
 table(raw_data_cleaned$vict, raw_data_cleaned$gender)
 ```
+### 1.03 Table of Impact x Race
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(stringr)
+
+#----------------------------
+# 1. OPTIONAL: create White
+#----------------------------
+# This assumes Black, Hispanic, and OtherRace are 0/1 indicators and that
+# "White" means not coded as any of those categories.
+# If you already have a White variable, skip this block.
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    White = case_when(
+      is.na(Black) | is.na(Hispanic) | is.na(OtherRace) ~ NA_real_,
+      Black == 0 & Hispanic == 0 & OtherRace == 0 ~ 1,
+      TRUE ~ 0
+    )
+  )
+
+#----------------------------
+# 2. Define race columns/labels
+#----------------------------
+race_vars <- c("White", "Black", "Hispanic", "OtherRace")
+
+race_labels <- c(
+  White = "White",
+  Black = "Black",
+  Hispanic = "Hispanic",
+  OtherRace = "Other Race"
+)
+
+#----------------------------
+# 3. Define impact rows
+#----------------------------
+impact_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+impact_labels <- c(
+  impact = "Any Impact",
+  incarc = "Direct",
+  knowincarc = "Proximal",
+  vict = "Victim"
+)
+
+#----------------------------
+# 4. Total N for denominator
+#----------------------------
+# This uses all rows in the dataset as the denominator for percentages.
+# If you want only respondents with nonmissing race info included in the denominator,
+# change this to a filtered dataset first.
+
+total_n <- nrow(raw_data_cleaned)
+
+#----------------------------
+# 5. Build impact x race table
+#----------------------------
+impact_race_table <- map_dfr(impact_vars, function(iv) {
+  
+  row_dat <- raw_data_cleaned %>%
+    filter(.data[[iv]] == 1)
+  
+  tibble(
+    Impact = impact_labels[[iv]],
+    Total_n = nrow(row_dat),
+    Total_pct = 100 * nrow(row_dat) / total_n
+  ) %>%
+    bind_cols(
+      map_dfc(race_vars, function(rv) {
+        n_cell <- sum(row_dat[[rv]] == 1, na.rm = TRUE)
+        pct_cell <- 100 * n_cell / total_n
+        
+        tibble(!!race_labels[[rv]] := sprintf("%d (%.1f%%)", n_cell, pct_cell))
+      })
+    ) %>%
+    mutate(
+      Total = sprintf("%d (%.1f%%)", Total_n, Total_pct)
+    ) %>%
+    dplyr::select(Impact, all_of(unname(race_labels)), Total)
+})
+
+#----------------------------
+# 6. Add overall sample row
+#----------------------------
+overall_row <- tibble(
+  Impact = "Overall sample",
+  White = sprintf("%d (%.1f%%)", sum(raw_data_cleaned$White == 1, na.rm = TRUE),
+                  100 * sum(raw_data_cleaned$White == 1, na.rm = TRUE) / total_n),
+  Black = sprintf("%d (%.1f%%)", sum(raw_data_cleaned$Black == 1, na.rm = TRUE),
+                  100 * sum(raw_data_cleaned$Black == 1, na.rm = TRUE) / total_n),
+  Hispanic = sprintf("%d (%.1f%%)", sum(raw_data_cleaned$Hispanic == 1, na.rm = TRUE),
+                     100 * sum(raw_data_cleaned$Hispanic == 1, na.rm = TRUE) / total_n),
+  `Other Race` = sprintf("%d (%.1f%%)", sum(raw_data_cleaned$OtherRace == 1, na.rm = TRUE),
+                         100 * sum(raw_data_cleaned$OtherRace == 1, na.rm = TRUE) / total_n),
+  Total = sprintf("%d (100.0%%)", total_n)
+)
+
+impact_race_table <- bind_rows(impact_race_table, overall_row)
+
+View(impact_race_table)
+
+impact_race_table
+```
+
 
 
 ### 1.3. Generalized Deservingness (desor) x
@@ -570,6 +677,99 @@ raw_data_cleaned %>%
     prisonpen   = mean(prisonpen, na.rm = TRUE),
     .groups = "drop"
   )
+
+help_means_impact <- (raw_data_cleaned %>%
+  dplyr::group_by(impact) %>%
+  dplyr::summarise(
+    q23_2_rev = mean(q23_2_rev, na.rm = TRUE),
+    q23_7_rev = mean(q23_7_rev, na.rm = TRUE),
+    q25_2_rev = mean(q25_2_rev, na.rm=TRUE),
+    q25_3_rev = mean(q25_3_rev, na.rm=TRUE),
+    q25_4_rev = mean(q25_4_rev, na.rm=TRUE),
+    q25_6_rev = mean(q25_6_rev, na.rm=TRUE),
+    prisonhelp   = mean(prisonhelp, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_impact)
+
+help_means_incarc <- (raw_data_cleaned %>%
+  dplyr::group_by(incarc) %>%
+  dplyr::summarise(
+    q23_2_rev = mean(q23_2_rev, na.rm = TRUE),
+    q23_7_rev = mean(q23_7_rev, na.rm = TRUE),
+    q25_2_rev = mean(q25_2_rev, na.rm=TRUE),
+    q25_3_rev = mean(q25_3_rev, na.rm=TRUE),
+    q25_4_rev = mean(q25_4_rev, na.rm=TRUE),
+    q25_6_rev = mean(q25_6_rev, na.rm=TRUE),
+    prisonhelp   = mean(prisonhelp, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_incarc)
+
+help_means_knowincarc <- (raw_data_cleaned %>%
+  dplyr::group_by(knowincarc) %>%
+  dplyr::summarise(
+    q23_2_rev = mean(q23_2_rev, na.rm = TRUE),
+    q23_7_rev = mean(q23_7_rev, na.rm = TRUE),
+    q25_2_rev = mean(q25_2_rev, na.rm=TRUE),
+    q25_3_rev = mean(q25_3_rev, na.rm=TRUE),
+    q25_4_rev = mean(q25_4_rev, na.rm=TRUE),
+    q25_6_rev = mean(q25_6_rev, na.rm=TRUE),
+    prisonhelp   = mean(prisonhelp, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_knowincarc)
+
+help_means_vict <- (raw_data_cleaned %>%
+  dplyr::group_by(vict) %>%
+  dplyr::summarise(
+    q23_2_rev = mean(q23_2_rev, na.rm = TRUE),
+    q23_7_rev = mean(q23_7_rev, na.rm = TRUE),
+    q25_2_rev = mean(q25_2_rev, na.rm=TRUE),
+    q25_3_rev = mean(q25_3_rev, na.rm=TRUE),
+    q25_4_rev = mean(q25_4_rev, na.rm=TRUE),
+    q25_6_rev = mean(q25_6_rev, na.rm=TRUE),
+    prisonhelp   = mean(prisonhelp, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_vict)
+
+# overleaf table of all
+
+impact_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+policy_vars <- c(
+  "q23_2_rev", "q23_7_rev", "q25_2_rev",
+  "q25_3_rev", "q25_4_rev", "q25_6_rev", "prisonhelp"
+)
+
+get_means <- function(var) {
+  raw_data_cleaned %>%
+    dplyr::group_by(.data[[var]]) %>%
+    dplyr::summarise(
+      dplyr::across(all_of(policy_vars), ~ mean(.x, na.rm = TRUE)),
+      .groups = "drop"
+    ) %>%
+    dplyr::mutate(group = var) %>%
+    dplyr::rename(value = all_of(var)) %>%
+    dplyr::mutate(row = paste0(group, " = ", value)) %>%
+    dplyr::select(row, all_of(policy_vars))
+}
+
+pol_means_app_table <- bind_rows(lapply(impact_vars, get_means)) %>%
+  dplyr::mutate(dplyr::across(-row, ~ round(.x, 3))) %>%
+  dplyr::rename_with(
+    ~ policy_map$label[match(.x, policy_map$var)],
+    -row
+  )
+
+(pol_means_app_table)
+
+
 ```
 
 Means Tables
@@ -638,6 +838,8 @@ policy_table_final <- policy_table %>%
     proximal_display,
     victim_display
   )
+
+View(policy_table_final)
 
 # for overleaf
 latex_rows <- policy_table_final %>%
