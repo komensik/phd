@@ -769,7 +769,6 @@ pol_means_app_table <- bind_rows(lapply(impact_vars, get_means)) %>%
 
 (pol_means_app_table)
 
-
 ```
 
 Means Tables
@@ -1634,7 +1633,169 @@ results_table_tex <- make_restricted_panel_latex_table(
 
 writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
 ```
+##.
+##.
+## 4-8 Policy MV Regressions (non-restricted) 
+```{r}
+names(raw_data_cleaned)
+#checkin that reported restricted table matches
+#restricted_incarc <- raw_data_cleaned %>%
+#  filter(impact == 0 | incarc == 1)
 
+#m_check <- lm(prisonhelp ~ incarc + Black + Hispanic + OtherRace + #gender + Republican + Democrat + fiscal_ideology + social_ideology #+desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data #= restricted_incarc)
+
+#summary(m_check)
+
+
+#impact - help 
+test_impact_full <- lm(prisonhelp ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_incarc_full <- lm(prisonhelp ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+#knowincarc 
+test_knowincarc_full <- lm(prisonhelp ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_vict_full <- lm(prisonhelp ~ vict + Black + Hispanic + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_impact_full
+test_knowincarc_full
+test_incarc_full
+test_vict_full
+
+#impact - pun 
+test_impact_full_pen <- lm(prisonpen ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_incarc_full_pen <- lm(prisonpen ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+#knowincarc 
+test_knowincarc_full_pen <- lm(prisonpen ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_vict_full_pen <- lm(prisonpen ~ vict + Black + Hispanic + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_impact_full_pen
+test_knowincarc_full_pen
+test_incarc_full_pen
+test_vict_full_pen
+
+```
+
+Same as above but for policies
+```{r}
+policy_dvs <- policy_map %>%
+  dplyr::filter(!var %in% c("prisonhelp", "prisonpen")) %>%
+  dplyr::pull(var)
+
+impact_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+policy_models <- list()
+
+for (dv in policy_dvs) {
+  for (iv in impact_vars) {
+    
+    model_name <- paste0("m_", dv, "_", iv)
+    
+    formula <- as.formula(paste(dv, "~", iv))
+    
+    policy_models[[model_name]] <- lm(formula, data = raw_data_cleaned)
+  }
+}
+
+policy_models_by_dv <- split(
+  policy_models,
+  gsub("m_(.*)_(impact|incarc|knowincarc|vict)", "\\1", names(policy_models))
+)
+
+length(policy_models_by_dv)        # should be 32
+names(policy_models_by_dv)         # all model names
+
+# print one
+summary(policy_models[["m_q23_2_rev_impact"]])
+
+# or loop through all
+lapply(policy_models, summary)
+
+#table for appendix
+library(dplyr)
+library(purrr)
+library(broom)
+library(stringr)
+library(tidyr)
+
+impact_labels <- c(
+  impact = "Any impact",
+  incarc = "Direct incarceration",
+  knowincarc = "Proximal incarceration contact",
+  vict = "Victimization"
+)
+
+comparison_table <- imap_dfr(policy_models, function(model, model_name) {
+  
+  tidied <- broom::tidy(model)
+  glanced <- broom::glance(model)
+  
+  dv <- str_match(model_name, "^m_(.*)_(impact|incarc|knowincarc|vict)$")[,2]
+  iv <- str_match(model_name, "^m_(.*)_(impact|incarc|knowincarc|vict)$")[,3]
+  
+  coef_row <- tidied %>%
+    filter(term == iv)
+  
+  tibble(
+    model_name = model_name,
+    dv = dv,
+    impact_var = iv,
+    impact_label = impact_labels[iv],
+    estimate = coef_row$estimate,
+    std.error = coef_row$std.error,
+    statistic = coef_row$statistic,
+    p.value = coef_row$p.value,
+    n = glanced$nobs,
+    r.squared = glanced$r.squared,
+    adj.r.squared = glanced$adj.r.squared
+  )
+})
+
+#add readable dv labels and significance stars
+comparison_table <- comparison_table %>%
+  left_join(
+    policy_map %>% dplyr::select(var, label, section),
+    by = c("dv" = "var")
+  ) %>%
+  mutate(
+    stars = case_when(
+      p.value < .001 ~ "***",
+      p.value < .01  ~ "**",
+      p.value < .05  ~ "*",
+      p.value < .1   ~ "†",
+      TRUE ~ ""
+    ),
+    coef_with_stars = paste0(sprintf("%.3f", estimate), stars),
+    se_fmt = paste0("(", sprintf("%.3f", std.error), ")"),
+    p_fmt = sprintf("%.3f", p.value),
+    r2_fmt = sprintf("%.3f", r.squared)
+  ) %>%
+  dplyr::select(
+    section, label, dv, impact_label, impact_var,
+    coef_with_stars, se_fmt, p_fmt, n, r2_fmt,
+    estimate, std.error, p.value, r.squared, adj.r.squared, model_name
+  ) %>%
+  arrange(section, label, factor(impact_var, levels = c("impact", "incarc", "knowincarc", "vict")))
+
+appendix_table_wide <- comparison_table %>%
+  dplyr::select(label, section, impact_var, coef_with_stars, se_fmt, n, r2_fmt) %>%
+  mutate(result = paste0(coef_with_stars, " ", se_fmt)) %>%
+  dplyr::select(label, section, impact_var, result, n, r2_fmt) %>%
+  pivot_wider(
+    names_from = impact_var,
+    values_from = c(result, n, r2_fmt),
+    names_glue = "{impact_var}_{.value}"
+  ) %>%
+  relocate(section, label)
+
+View(appendix_table_wide)
+```
+
+
+#. 
 
 # 3. DV: Deservingness
 
