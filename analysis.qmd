@@ -652,6 +652,77 @@ View(impact_race_table)
 impact_race_table
 ```
 
+Bar plots of impact x race
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
+
+#----------------------------
+# 1. Reshape race indicators long
+#----------------------------
+race_impact_long <- raw_data_cleaned %>%
+  dplyr::select(all_of(race_vars), all_of(impact_vars)) %>%
+  pivot_longer(
+    cols = all_of(race_vars),
+    names_to = "race_var",
+    values_to = "in_race"
+  ) %>%
+  filter(in_race == 1) %>%
+  mutate(
+    race = recode(race_var, !!!race_labels)
+  )
+
+#----------------------------
+# 2. Plot ANY impact by race
+#----------------------------
+impact_by_race <- race_impact_long %>%
+  group_by(race) %>%
+  summarise(
+    pct_impacted = mean(impact, na.rm = TRUE),
+    n_race = n(),
+    .groups = "drop"
+  )
+
+ggplot(impact_by_race, aes(x = fct_reorder(race, pct_impacted), y = pct_impacted)) +
+  geom_col() +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    x = NULL,
+    y = "Share with any impact",
+    title = "Proportion of each racial group with any carceral contact"
+  ) +
+  coord_flip() +
+  theme_minimal()
+```
+```{r}
+impact_by_race_type <- race_impact_long %>%
+  pivot_longer(
+    cols = all_of(impact_vars),
+    names_to = "impact_var",
+    values_to = "has_impact"
+  ) %>%
+  mutate(
+    impact_type = recode(impact_var, !!!impact_labels)
+  ) %>%
+  group_by(race, impact_type) %>%
+  summarise(
+    pct = mean(has_impact, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ggplot(impact_by_race_type, aes(x = race, y = pct, fill = impact_type)) +
+  geom_col(position = position_dodge(width = 0.8)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    x = NULL,
+    y = "Share within racial group",
+    fill = NULL,
+    title = "Sample Carceral Contact by Race"
+  ) +
+  theme_minimal()
+```
 
 
 ### 1.3. Generalized Deservingness (desor) x
@@ -1872,6 +1943,44 @@ ggplot(summary_df, aes(
     legend.position = "right"
   )
 ```
+4-8 looking at means for all by impact
+
+```{r}
+overall_target_means <- raw_data_cleaned %>%
+  dplyr::select(all_of(all_deserving_vars)) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "target",
+    values_to = "deservingness"
+  ) %>%
+  mutate(target_label = pretty_target(target)) %>%
+  group_by(target, target_label) %>%
+  summarise(
+    n = sum(!is.na(deservingness)),
+    mean_score = mean(deservingness, na.rm = TRUE),
+    sd_score = sd(deservingness, na.rm = TRUE),
+    var_score = var(deservingness, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(mean_score))
+
+overall_target_means
+View(overall_target_means)
+
+#lookup table
+target_means_wide <- summary_df %>%
+  dplyr::select(target, target_label, impact_group, mean_score) %>%
+  pivot_wider(
+    names_from = impact_group,
+    values_from = mean_score
+  )
+
+View(target_means_wide)
+write.csv(target_means_wide, "target_means_by_impact_group_wide.csv", row.names = FALSE)
+
+write.csv(overall_target_means, "overall_target_means.csv", row.names = FALSE)
+```
+
 
 Difference from overall heat map
 
@@ -1977,7 +2086,8 @@ ggsave(
 
 
 ## 3.2 Incarc Des Means
-
+-means
+-density plots
 ```{r}
 #DVs
 source("variable_labels.R")
@@ -2143,7 +2253,6 @@ cat(latex_tab)
 #### into plots
 
 ```{r}
-
 
 # -----------------------------
 # 2. helper to build one comparison
@@ -2443,7 +2552,7 @@ cat("\nMaster files written to:\n",
     master_robust_file, "\n")
 ```
 
-## deservingness with controls
+## deservingness straight up models with controls
 
 ```{r}
 
@@ -2494,8 +2603,176 @@ summary(m_des_incwomen_incarc)
 summary(m_des_incwomen_knowinc)
 summary(m_des_incwomen_vict)
 ```
+## Des Restricted Sample
+
+```{r}
+library(sandwich)
+library(lmtest)
+library(broom)
+##
+# model generation code
+##
+# DVs
 
 
+deserving_vars <- c("d_incppl_pris_abc", "d_crim_abc", "d_incwomen_abc")
+impact_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+model_specs <- list(
+  nocontrols = NULL,
+  demo = demo_controls,
+  full = c(demo_controls, all_attitudinal_controls)
+)
+
+get_restricted_data <- function(data, iv) {
+  if (iv == "impact") {
+    data %>% filter(!is.na(impact))
+  } else {
+    data %>% filter((.data[[iv]] == 1) | (impact == 0))
+  }
+}
+
+restricted_model_list <- list()
+results_df_restricted <- list()
+
+for (dv in deserving_vars) {
+  for (spec_name in names(model_specs)) {
+    controls <- model_specs[[spec_name]]
+    
+    for (iv in impact_vars) {
+      dat_iv <- get_restricted_data(raw_data_cleaned, iv)
+      vars_needed <- c(dv, iv, "impact", controls)
+      dat_iv <- dat_iv %>% filter(complete.cases(across(all_of(vars_needed))))
+      
+      form <- if (is.null(controls)) {
+        as.formula(paste(dv, "~", iv))
+      } else {
+        as.formula(paste(dv, "~", iv, "+", paste(controls, collapse = " + ")))
+      }
+      
+      model <- lm(form, data = dat_iv)
+      robust <- coeftest(model, vcov = vcovHC(model, type = "HC1"))
+      
+      model_name <- paste(dv, spec_name, iv, sep = "_")
+      restricted_model_list[[model_name]] <- list(
+        model = model,
+        robust = robust,
+        data = dat_iv
+      )
+      
+      d0 <- dat_iv
+      d1 <- dat_iv
+      d0[[iv]] <- 0
+      d1[[iv]] <- 1
+      
+      baseline <- mean(predict(model, newdata = d0), na.rm = TRUE)
+      predicted <- mean(predict(model, newdata = d1), na.rm = TRUE)
+      coef_iv <- predicted - baseline
+      pct_change <- ((predicted - baseline) / baseline) * 100
+      
+      results_df_restricted[[model_name]] <- data.frame(
+        baseline = baseline,
+        coef = coef_iv,
+        predicted = predicted,
+        pct_change = pct_change,
+        se = robust[iv, "Std. Error"],
+        p = robust[iv, "Pr(>|t|)"],
+        dv = dv,
+        spec = spec_name,
+        iv = iv,
+        n = nrow(dat_iv),
+        r2 = summary(model)$r.squared,
+        adj_r2 = summary(model)$adj.r.squared
+      )
+    }
+  }
+}
+
+
+results_df_restricted <- do.call(rbind, results_df_restricted)
+View(results_df_restricted)
+
+restricted_model_list[["d_incppl_pris_abc_demo_incarc"]]
+coef(restricted_model_list[["d_incppl_pris_abc_demo_incarc"]]$model)
+restricted_model_list[["d_incppl_pris_abc_demo_incarc"]]$robust
+restricted_model_list[["d_incppl_pris_abc_demo_incarc"]]$robust
+
+
+get_model_table <- function(model_entry) {
+  robust_mat <- model_entry$robust
+  
+  data.frame(
+    term = rownames(robust_mat),
+    estimate = robust_mat[, "Estimate"],
+    se = robust_mat[, "Std. Error"],
+    p = robust_mat[, "Pr(>|t|)"],
+    stringsAsFactors = FALSE,
+    row.names = NULL
+  )
+}
+
+
+#incarc, demo controls
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_demo_impact"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_demo_incarc"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_demo_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_demo_vict"]]))
+
+#crim, demo controls
+print(get_model_table(restricted_model_list[["d_crim_abc_demo_impact"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_demo_incarc"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_demo_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_demo_vict"]]))
+
+#inc women, demo controls
+print(get_model_table(restricted_model_list[["d_incwomen_abc_demo_impact"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_demo_incarc"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_demo_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_demo_vict"]]))
+
+
+#incarc, demo controls
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_full_impact"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_full_incarc"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_full_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_full_vict"]]))
+
+#crim, demo controls
+print(get_model_table(restricted_model_list[["d_crim_abc_full_impact"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_full_incarc"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_full_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_full_vict"]]))
+
+#inc women, demo controls
+print(get_model_table(restricted_model_list[["d_incwomen_abc_full_impact"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_full_incarc"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_full_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_full_vict"]]))
+
+
+
+
+summary(d_incppl_pris_abc_demo_impact)
+d_incppl_pris_abc_demo_incarc 
+d_incppl_pris_abc_demo_knowincarc
+d_incppl_pris_abc_demo_vict
+
+```
+
+Interpretation: 
+The baseline is the average predicted deservingness score for the comparison group within each restricted sample when the focal IV is set to 0. The comparison group is people with no experience (impact = 0). So the baseline now means: what is the expected deservingness score among non-impacted respondents (within the relevant sample and model specification). The baseline is NOT the regression intercept. 
+
+-Predicted: the average predicted score if everyone in that same sample had the focal experience (ie incarc = 1). The coef is the difference between those two quantities, and pct_change is the percent increase relative to the non-impacted baseline. Each row then is answering the questionL how much higher or lower is the predicted deservingness score for people with this type of contact compared to people with no contact. 
+
+Substantively, the patterns are quite strong and very consistent across DVs. For incarcerated people, the baseline sits around 43–44 across specifications, and all forms of contact increase deservingness relative to that group. Direct incarceration produces the largest shifts (roughly 22–27% depending on controls), proximal contact is somewhat smaller, and victimization is consistently the smallest and sometimes not statistically significant once you include full controls. That ordering is doing real theoretical work for you: it suggests that experiential proximity to incarceration increases generosity in a graded way, but that victimization is a qualitatively different kind of experience rather than just another form of “contact.”
+
+You see the same structure for “criminals,” but with larger effect sizes. The baseline is lower (around 29–30), and the increases for direct incarceration are much larger (often ~29–33% even with controls). That’s important because “criminals” are the most negatively constructed target in your set, so the fact that contact moves those evaluations substantially is strong evidence that experience is reshaping underlying deservingness judgments, not just marginal preferences. This lines up cleanly with your broader argument about contact altering how people interpret stigmatized groups rather than simply shifting policy opinions at the margin.
+
+For incarcerated women, the baseline is higher (around 50), and the effects are more compressed. You still see positive differences for all forms of contact, but they are smaller and attenuate more with controls. That pattern is also theoretically coherent: respondents already view this group as more deserving, so there is less room for contact to shift evaluations upward. In other words, contact effects are conditional on the prior social construction of the group, which is exactly the kind of mechanism your framework is trying to get at.
+
+The role of controls is also now interpretable in a clean way. Moving from no controls to demo to full controls generally attenuates the percent differences, but does not eliminate them—especially for direct and proximal incarceration. That gives you a defensible claim that these differences are not simply artifacts of race, gender, ideology, or racial attitudes. In your language, it supports the idea that carceral contact is associated with distinct political orientations, rather than just sorting into pre-existing ideological camps. This connects directly to the literature you’re drawing on about how policy experience shapes political views and engagement .
+
+So the bottom line is that this table now does what you need it to do. The baseline is a meaningful “no experience” reference point, the percent changes are interpretable group differences, and the patterns across DVs and specifications are theoretically informative rather than artifacts of model construction.
 
 
 
