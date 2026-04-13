@@ -723,6 +723,78 @@ ggplot(impact_by_race_type, aes(x = race, y = pct, fill = impact_type)) +
   ) +
   theme_minimal()
 ```
+Turning above into 4 tables
+
+```{r}
+library(dplyr)
+library(purrr)
+library(tibble)
+
+# race vars and labels
+race_vars <- c("White", "Black", "Hispanic", "OtherRace")
+
+race_labels <- c(
+  White = "White",
+  Black = "Black",
+  Hispanic = "Hispanic",
+  OtherRace = "Other Race"
+)
+
+impact_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+impact_labels <- c(
+  impact = "Any Impact",
+  incarc = "Direct",
+  knowincarc = "Proximal",
+  vict = "Victim"
+)
+
+# function: one table for one racial group
+make_race_impact_table <- function(race_var) {
+  
+  dat_race <- raw_data_cleaned %>%
+    dplyr::filter(.data[[race_var]] == 1)
+  
+  race_n <- nrow(dat_race)
+  
+  tibble(
+    Impact = unname(impact_labels),
+    n = purrr::map_int(impact_vars, ~ sum(dat_race[[.x]] == 1, na.rm = TRUE))
+  ) %>%
+    dplyr::mutate(
+      pct = round(100 * n / race_n, 1),
+      `n (%)` = sprintf("%d (%.1f\\%%)", n, pct)
+    ) %>%
+    dplyr::select(Impact, `n (%)`)
+}
+
+# create all four tables as a named list
+race_impact_tables <- setNames(
+  lapply(race_vars, make_race_impact_table),
+  unname(race_labels)
+)
+
+# view one example
+race_impact_tables[["White"]]
+race_impact_tables[["Black"]]
+race_impact_tables[["Hispanic"]]
+race_impact_tables[["Other Race"]]
+
+
+
+latex_tables <- imap(race_impact_tables, ~ knitr::kable(
+  .x,
+  format = "latex",
+  booktabs = TRUE,
+  escape = FALSE,
+  caption = paste("Carceral contact among", .y, "respondents")
+))
+
+cat(latex_tables[["White"]])
+cat(latex_tables[["Black"]])
+cat(latex_tables[["Hispanic"]])
+cat(latex_tables[["Other Race"]])
+```
 
 
 ### 1.3. Generalized Deservingness (desor) x
@@ -2551,6 +2623,143 @@ cat("\nMaster files written to:\n",
     master_summary_file, "\n",
     master_robust_file, "\n")
 ```
+
+## deservingness means by target by impact
+```{r}
+library(dplyr)
+library(tidyr)
+
+# -----------------------------
+# 1. Define the three targets
+# -----------------------------
+deserving_vars <- c("d_incppl_pris_abc", "d_crim_abc", "d_incwomen_abc")
+
+targets <- c(
+  d_incppl_pris_abc = "Incarcerated people",
+  d_crim_abc = "Criminals",
+  d_incwomen_abc = "Incarcerated women"
+)
+
+# -----------------------------
+# 2. Create simple group flags
+# -----------------------------
+df <- raw_data_cleaned %>%
+  mutate(
+    not_impacted = if_else(impact == 0, 1, 0, missing = 0),
+    impacted_grp = if_else(impact == 1, 1, 0, missing = 0),
+    incarcerated_grp = if_else(incarc == 1, 1, 0, missing = 0),
+    knowincarc_grp = if_else(knowincarc == 1, 1, 0, missing = 0),
+    victim_grp = if_else(vict == 1, 1, 0, missing = 0)
+  )
+
+# -----------------------------
+# 3. Put the data in long format
+# -----------------------------
+long_df <- df %>%
+  dplyr::select(
+    not_impacted, impacted_grp, incarcerated_grp, knowincarc_grp, victim_grp,
+    all_of(deserving_vars)
+  ) %>%
+  pivot_longer(
+    cols = all_of(deserving_vars),
+    names_to = "target",
+    values_to = "score"
+  ) %>%
+  mutate(
+    target = recode(target, !!!targets)
+  )
+
+# -----------------------------
+# 4. Compute means for each group x target
+# -----------------------------
+group_means <- bind_rows(
+  long_df %>%
+    filter(not_impacted == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Not impacted"),
+
+  long_df %>%
+    filter(impacted_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Impacted"),
+
+  long_df %>%
+    filter(incarcerated_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Incarcerated"),
+
+  long_df %>%
+    filter(knowincarc_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Knows incarcerated"),
+
+  long_df %>%
+    filter(victim_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Victim")
+) %>%
+  dplyr::select(group, target, mean_score)
+
+# View the long table
+group_means
+group_means_wide <- group_means %>%
+  pivot_wider(
+    names_from = target,
+    values_from = mean_score
+  )
+
+group_means_wide
+
+group_differences <- group_means_wide %>%
+  mutate(
+    `Incarcerated people - Criminals` =
+      `Incarcerated people` - `Criminals`,
+
+    `Incarcerated women - Criminals` =
+      `Incarcerated women` - `Criminals`,
+
+    `Incarcerated women - Incarcerated people` =
+      `Incarcerated women` - `Incarcerated people`
+  )
+
+group_differences
+
+final_deservingness_table <- group_differences %>%
+  mutate(across(where(is.numeric), ~ round(.x, 2)))
+
+View(final_deservingness_table)
+```
+to overleaf
+
+```{r}
+
+kable(
+  final_deservingness_table,
+  format = "latex",
+  booktabs = TRUE,
+  digits = 2,
+  align = c("l", rep("r", ncol(final_deservingness_table) - 1)),
+  caption = "Mean deservingness scores and within-group target differences"
+)
+
+library(knitr)
+
+kable(
+  final_deservingness_table,
+  format = "latex",
+  booktabs = TRUE,
+  digits = 2,
+  align = c("l", rep("r", ncol(final_deservingness_table) - 1)),
+  caption = "Mean deservingness scores and within-group target differences"
+) %>%
+  cat()
+```
+
 
 ## deservingness straight up models with controls
 
