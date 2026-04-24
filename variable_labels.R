@@ -72,6 +72,47 @@ policy_map <- tibble::tribble(
 
 ##
 
+police_items_1_to_5 <- c(
+  "q15_1_1_to_5",
+  "q15_2_1_to_5",
+  "q15_3_1_to_5",
+  "q15_4_1_to_5",
+  "q15_5_1_to_5"
+)
+
+police_items_labels <- c(
+  q15_1_1_to_5 = "Local Police",
+  q15_2_1_to_5 = "No Strangle",
+  q15_3_1_to_5 = "Police Tracker",
+  q15_4_1_to_5 = "Police Training",
+  q15_5_1_to_5 = "Charge Police"
+)
+
+police_map <- tibble::tribble(
+  ~var,          ~label,                                              ~section,
+  "q15_1_1_to_5",  "Local Police",                              "Misc. Police",
+  "q15_2_1_to_5",   "No Strangle",                          "Police Violence",
+  "q15_3_1_to_5",   "Police Tracker",                          "Police Police",
+  "q15_4_1_to_5",   "Police Training",                       "Police Violence",
+  "q15_5_1_to_5",   "Charge Police",                           "Police Police",
+)
+
+
+##
+
+##
+
+#Gov pays attention to preferences? 1 not much, 2 some, 3 a lot
+political_behavior_vars <- c("gov_attn", "vote2020", "willvote")
+
+political_behavior_labels <- c(
+  gov_attn = "Government pays attention",
+  vote2020 = "Voted in 2020",
+  willvote = "Plans to vote"
+)
+
+##
+
 demo_controls <- c(
   "Black", "Hispanic", "OtherRace", "gender"
 )

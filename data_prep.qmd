@@ -127,7 +127,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ### d. Clean: attn checks
 
--   first, create flags for passed/not each check and people who failed all
+- first, create flags for passed/not each check and people who failed all
 
 ```{r}
 #| eval: false
