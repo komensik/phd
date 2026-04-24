@@ -55,10 +55,10 @@ names(raw_data_cleaned)
 | plot aesthetics?        | clear x-axis label                           |
 | Output                  |                                              |
 
-
 ### 1.0 Counts
 
 ### 1.1 Experience Counts
+
 ```{r}
 # because analysis has included previously odd combos (ie people who have nas or say not impacted and both), my first step here is trying to diagnose their patterns of missingness and other things so I can explain to my committee/self what it may or may not mean to include them.
 
@@ -98,7 +98,8 @@ problematic <- raw_data_cleaned %>%
 
 table(problematic$prob_flag)
 ```
-there are 32 of these problematic responses in total. 
+
+there are 32 of these problematic responses in total.
 
 ```{r}
 problematic %>%
@@ -107,7 +108,9 @@ problematic %>%
     pct_problematic = mean(prob_flag == 1)
   )
 ```
+
 comparing missingness
+
 ```{r}
 problematic %>%
   group_by(prob_flag) %>%
@@ -117,9 +120,11 @@ problematic %>%
     missing_controls = mean(is.na(Democrat) | is.na(Black))
   )
 ```
-they have higher missingness 
+
+they have higher missingness
 
 do they behave differently on outcomes
+
 ```{r}
 problematic %>%
   group_by(prob_flag) %>%
@@ -130,7 +135,8 @@ problematic %>%
   )
 ```
 
-Demographics? 
+Demographics?
+
 ```{r}
 problematic %>%
   group_by(prob_flag) %>%
@@ -143,7 +149,8 @@ problematic %>%
     pct_female = mean(gender == 1, na.rm=TRUE)
   )
 ```
-within this group, what kind of contact do they report? 
+
+within this group, what kind of contact do they report?
 
 ```{r}
 problematic %>%
@@ -397,7 +404,6 @@ vict_patterns %>%
 
 ```
 
-
 ```{r}
 #basic version? unsure what to do with this as of 4-2
 contact_crosstab <- raw_data_cleaned %>%
@@ -448,7 +454,6 @@ view(combo_table)
 #add a clear interpretation layer
 ```
 
-
 ```{r}
 #| eval: false
 #| include: false
@@ -491,7 +496,6 @@ raw_data_cleaned %>%
   )
 
 ```
-
 
 ### 1.02. Diagnostics on Lack on Survey Weights
 
@@ -545,6 +549,7 @@ table(raw_data_cleaned$vict, raw_data_cleaned$Republican)
 table(raw_data_cleaned$vict, raw_data_cleaned$Democrat)
 table(raw_data_cleaned$vict, raw_data_cleaned$gender)
 ```
+
 ### 1.03 Table of Impact x Race
 
 ```{r}
@@ -653,6 +658,7 @@ impact_race_table
 ```
 
 Bar plots of impact x race
+
 ```{r}
 library(dplyr)
 library(tidyr)
@@ -696,6 +702,7 @@ ggplot(impact_by_race, aes(x = fct_reorder(race, pct_impacted), y = pct_impacted
   coord_flip() +
   theme_minimal()
 ```
+
 ```{r}
 impact_by_race_type <- race_impact_long %>%
   pivot_longer(
@@ -723,6 +730,7 @@ ggplot(impact_by_race_type, aes(x = race, y = pct, fill = impact_type)) +
   ) +
   theme_minimal()
 ```
+
 Turning above into 4 tables
 
 ```{r}
@@ -796,16 +804,16 @@ cat(latex_tables[["Hispanic"]])
 cat(latex_tables[["Other Race"]])
 ```
 
-
 ### 1.3. Generalized Deservingness (desor) x
 
-#.
-
+1.  
 
 # 2. Policy
+
 ## 2.1 Policy Means
 
 "sanity check" for coding -- how these behave
+
 ```{r}
 
 raw_data_cleaned %>%
@@ -915,6 +923,7 @@ pol_means_app_table <- bind_rows(lapply(impact_vars, get_means)) %>%
 ```
 
 Means Tables
+
 ```{r}
 #defining the non impact means and percent differences from impact vars
 pct_diff <- function(x, ref) {
@@ -1034,6 +1043,7 @@ control_waves <- list(
 ```
 
 ## 2.2 Policy BV Dummies
+
 ```{r}
 # ============================================================
 # Goal 1 helper: full-sample models
@@ -1076,6 +1086,7 @@ policy_dummies_full_models <- policy_dummies_waves[["full_attitudes"]]
 ```
 
 4.5 new
+
 ```{r}
 # goal 1 wave loop above
 
@@ -1097,8 +1108,8 @@ make_restricted_model <- function(df, dv, subgroup_var, controls = character(0))
 }
 ```
 
-
 ##2.3 Appendix Tables - Each IV Model Grouped around DV
+
 ```{r}
 # ============================================================
 # Build one LaTeX regression-results table per DV
@@ -1247,13 +1258,13 @@ for (dv_name in policy_vars) {
 ```
 
 ## 2.4 Compare Each Impacted Subgroup to Non-Impacted
-Restricted sample comparison logic (not impacted vs incarcerated)
-ultimate goal: no-controls to controls main results table built from the restricted-sample non-impacted-versus-subgroup models. then extend the restricted-sample models rather than rebuilding everything from scratch when adding controls.
 
-Why doing this instead of a factor variable for all impact:
--restricted-sample regressions keep the logic consistent with everything I are already doing and make it much easier to scale to later models with controls. A t-test table and a restricted-sample dummy regression are telling the same story in the no-controls case. But the regression route gives me a single framework you can preserve when you later add demographic controls, then political controls, then attitudinal controls. If I switch to t-tests for model 2 and regressions for later models, I create an unnecessary break in the workflow and probably more formatting work.
+Restricted sample comparison logic (not impacted vs incarcerated) ultimate goal: no-controls to controls main results table built from the restricted-sample non-impacted-versus-subgroup models. then extend the restricted-sample models rather than rebuilding everything from scratch when adding controls.
+
+Why doing this instead of a factor variable for all impact: -restricted-sample regressions keep the logic consistent with everything I are already doing and make it much easier to scale to later models with controls. A t-test table and a restricted-sample dummy regression are telling the same story in the no-controls case. But the regression route gives me a single framework you can preserve when you later add demographic controls, then political controls, then attitudinal controls. If I switch to t-tests for model 2 and regressions for later models, I create an unnecessary break in the workflow and probably more formatting work.
 
 A single categorical variable like 0 = not impacted, 1 = direct only, 2 = proximal only, 3 = victim only, 4 = multiple forms would answer a different question. It would force you to partition the sample into mutually exclusive bins, which is useful for some appendix descriptives and maybe later robustness checks, but it would also collapse substantively important overlap into a catch-all “multiple forms” group and make it harder to estimate the specific contrast you currently care about: whether each exposure type, as experienced in the real world, is associated with different outcomes relative to the fully non-impacted. For your main table, the restricted-sample approach is cleaner and more faithful to the theory.
+
 ```{r}
 
 # ============================================================
@@ -1306,6 +1317,7 @@ a blank second model block for later controlled models,
 placeholder control rows so the table skeleton already matches where you are headed.
 
 ## 2.5 Tables Loop
+
 ```{r}
 # ============================================================
 # Advisor-style restricted-sample tables
@@ -1642,9 +1654,6 @@ summary(desor_model)
 
 ```
 
-
-
-
 ```{r}
 # ------------------------------------------------------------
 # 1. RESULTS-SECTION TABLE
@@ -1776,9 +1785,9 @@ results_table_tex <- make_restricted_panel_latex_table(
 
 writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
 ```
-##.
-##.
-## 4-8 Policy MV Regressions (non-restricted) 
+
+##. ##. \## 4-8 Policy MV Regressions (non-restricted)
+
 ```{r}
 names(raw_data_cleaned)
 #checkin that reported restricted table matches
@@ -1823,6 +1832,7 @@ test_vict_full_pen
 ```
 
 Same as above but for policies
+
 ```{r}
 policy_dvs <- policy_map %>%
   dplyr::filter(!var %in% c("prisonhelp", "prisonpen")) %>%
@@ -1937,8 +1947,7 @@ appendix_table_wide <- comparison_table %>%
 View(appendix_table_wide)
 ```
 
-
-#. 
+1.  
 
 # 3. DV: Deservingness
 
@@ -2015,6 +2024,7 @@ ggplot(summary_df, aes(
     legend.position = "right"
   )
 ```
+
 4-8 looking at means for all by impact
 
 ```{r}
@@ -2052,7 +2062,6 @@ write.csv(target_means_wide, "target_means_by_impact_group_wide.csv", row.names 
 
 write.csv(overall_target_means, "overall_target_means.csv", row.names = FALSE)
 ```
-
 
 Difference from overall heat map
 
@@ -2155,11 +2164,10 @@ ggsave(
 )
 ```
 
-
-
 ## 3.2 Incarc Des Means
--means
--density plots
+
+-means -density plots
+
 ```{r}
 #DVs
 source("variable_labels.R")
@@ -2322,6 +2330,7 @@ latex_tab <- knitr::kable(
 
 cat(latex_tab)
 ```
+
 #### into plots
 
 ```{r}
@@ -2434,8 +2443,7 @@ ggsave(
 )
 ```
 
-
-4-5 the tables aren't working. I just am pivoting to making sure I can print out all the info I need to fix the writing in my analysis. 
+4-5 the tables aren't working. I just am pivoting to making sure I can print out all the info I need to fix the writing in my analysis.
 
 ```{r}
 summary(policy_vs_nonimp_nocontrol_models$comp_prisonhelp_incarc)
@@ -2450,9 +2458,6 @@ summary(policy_vs_nonimp_partyideo_models$comp_prisonhelp_incarc)
 summary(policy_vs_nonimp_full_models$comp_prisonhelp_incarc)
 
 ```
-
-
-
 
 ```{r}
 # ============================================================
@@ -2625,6 +2630,7 @@ cat("\nMaster files written to:\n",
 ```
 
 ## deservingness means by target by impact
+
 ```{r}
 library(dplyr)
 library(tidyr)
@@ -2734,6 +2740,7 @@ final_deservingness_table <- group_differences %>%
 
 View(final_deservingness_table)
 ```
+
 to overleaf
 
 ```{r}
@@ -2759,7 +2766,6 @@ kable(
 ) %>%
   cat()
 ```
-
 
 ## deservingness straight up models with controls
 
@@ -2812,6 +2818,7 @@ summary(m_des_incwomen_incarc)
 summary(m_des_incwomen_knowinc)
 summary(m_des_incwomen_vict)
 ```
+
 ## Des Restricted Sample
 
 ```{r}
@@ -2968,14 +2975,13 @@ d_incppl_pris_abc_demo_vict
 
 ```
 
-Interpretation: 
-The baseline is the average predicted deservingness score for the comparison group within each restricted sample when the focal IV is set to 0. The comparison group is people with no experience (impact = 0). So the baseline now means: what is the expected deservingness score among non-impacted respondents (within the relevant sample and model specification). The baseline is NOT the regression intercept. 
+Interpretation: The baseline is the average predicted deservingness score for the comparison group within each restricted sample when the focal IV is set to 0. The comparison group is people with no experience (impact = 0). So the baseline now means: what is the expected deservingness score among non-impacted respondents (within the relevant sample and model specification). The baseline is NOT the regression intercept.
 
--Predicted: the average predicted score if everyone in that same sample had the focal experience (ie incarc = 1). The coef is the difference between those two quantities, and pct_change is the percent increase relative to the non-impacted baseline. Each row then is answering the questionL how much higher or lower is the predicted deservingness score for people with this type of contact compared to people with no contact. 
+-Predicted: the average predicted score if everyone in that same sample had the focal experience (ie incarc = 1). The coef is the difference between those two quantities, and pct_change is the percent increase relative to the non-impacted baseline. Each row then is answering the questionL how much higher or lower is the predicted deservingness score for people with this type of contact compared to people with no contact.
 
 Substantively, the patterns are quite strong and very consistent across DVs. For incarcerated people, the baseline sits around 43–44 across specifications, and all forms of contact increase deservingness relative to that group. Direct incarceration produces the largest shifts (roughly 22–27% depending on controls), proximal contact is somewhat smaller, and victimization is consistently the smallest and sometimes not statistically significant once you include full controls. That ordering is doing real theoretical work for you: it suggests that experiential proximity to incarceration increases generosity in a graded way, but that victimization is a qualitatively different kind of experience rather than just another form of “contact.”
 
-You see the same structure for “criminals,” but with larger effect sizes. The baseline is lower (around 29–30), and the increases for direct incarceration are much larger (often ~29–33% even with controls). That’s important because “criminals” are the most negatively constructed target in your set, so the fact that contact moves those evaluations substantially is strong evidence that experience is reshaping underlying deservingness judgments, not just marginal preferences. This lines up cleanly with your broader argument about contact altering how people interpret stigmatized groups rather than simply shifting policy opinions at the margin.
+You see the same structure for “criminals,” but with larger effect sizes. The baseline is lower (around 29–30), and the increases for direct incarceration are much larger (often \~29–33% even with controls). That’s important because “criminals” are the most negatively constructed target in your set, so the fact that contact moves those evaluations substantially is strong evidence that experience is reshaping underlying deservingness judgments, not just marginal preferences. This lines up cleanly with your broader argument about contact altering how people interpret stigmatized groups rather than simply shifting policy opinions at the margin.
 
 For incarcerated women, the baseline is higher (around 50), and the effects are more compressed. You still see positive differences for all forms of contact, but they are smaller and attenuate more with controls. That pattern is also theoretically coherent: respondents already view this group as more deserving, so there is less room for contact to shift evaluations upward. In other words, contact effects are conditional on the prior social construction of the group, which is exactly the kind of mechanism your framework is trying to get at.
 
@@ -2983,56 +2989,26 @@ The role of controls is also now interpretable in a clean way. Moving from no co
 
 So the bottom line is that this table now does what you need it to do. The baseline is a meaningful “no experience” reference point, the percent changes are interpretable group differences, and the patterns across DVs and specifications are theoretically informative rather than artifacts of model construction.
 
+1.  
 
+2.  
 
+3.  
 
+4.  
 
+5.  
 
+6.  
 
+7.  
 
+8.  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#.
-#.
-#.
-#.
-#.
-#.
-#.
-#.
-#.
+9.  
 
 # "Prelim Paper Only" Analyses Start Here
+
 ### 1.1. Main DV: Deservingness of Incarcerated People/Prisoners
 
 About
@@ -3647,7 +3623,6 @@ SUMMARY:
 Individuals with personal or proximate contact with the carceral system perceive incarcerated people as significantly more deserving of help or compassion (β = 4.60, p \< 0.001). This relationship remains robust after adjusting for partisanship, ideology, punitiveness, racial attitudes, and demographics. In contrast, more socially conservative and punitive respondents evaluate incarcerated people as substantially less deserving. General deservingness orientations exert the largest effect, suggesting that judgments about incarcerated people reflect broader moral schemas about who merits social support. Race and gender do not systematically differentiate deservingness perceptions, although Hispanic respondents express somewhat lower ratings than White respondents.
 
 BEFORE MOVING ONTO INTERPRETATION
-
 
 ### 2.8 Variable Check -
 
