@@ -202,7 +202,7 @@ total_knows_victim<- sum(raw_data_cleaned$q4_2_2 == 1, na.rm = TRUE)
 total_no_victim <- sum(raw_data_cleaned$q4_2_3 == 1, na.rm = TRUE)
 ```
 
-#### Impact Variable
+#### Impact Variable (Constructing For-Analysis)
 
 ```{r, impactvar}
 
@@ -217,44 +217,95 @@ raw_data_cleaned <- raw_data_cleaned %>%
     )
   )
 
-#specific binary impact indicators
+
+```
+
+#### Incarc Variable (Constructing For-Analysis)
+
+```{r}
+
+# pre August 2026 version:
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(
+#     incarc = if_else(
+#       q4_1_1 == 1,
+#       1, 
+#       0,
+#       missing = NA_real_
+#     )
+#   )
+
+#for now - aug 24 2026 - I don't need to change noincarc
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(
+#     noincarc = if_else(
+#       q4_1_1 == 0 | q4_1_2 == 0 | q4_1_3 == 1,
+#       1, 0,
+#       missing = NA_real_
+#     )
+#   )
+
+# post Aug 2026 version with casewhen, becuase if_else runs as a true false and I want incarc = 0 to mean impact = 0 (no impact, not just no incarceration):
 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    incarc = if_else(
-      q4_1_1 == 1,
-      1, 
-      0,
-      missing = NA_real_
+    incarc = case_when(
+      q4_1_1 == 1 ~ 1, 
+      impact == 0 ~ 0, 
+      TRUE ~ NA_real_ #"otherwise, assign NA"
     )
   )
 
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(
-    knowincarc = if_else(
-      q4_1_2 == 1,
-      1, 
-      0,
-      missing = NA_real_
-    )
-  )
+```
+
+#### Knowincarc Variable (Constructing For-Analysis)
+
+```{r}
+# pre August 2026 version:
+# raw_data_cleaned <- raw_data_cleaned %>%
+#  mutate(
+#    knowincarc = if_else(
+#      q4_1_2 == 1,
+#      1, 
+#      0,
+#      missing = NA_real_
+#    )
+#  )
+
+# post Aug 2026 version with casewhen
+
 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    noincarc = if_else(
-      q4_1_1 == 0 | q4_1_2 == 0 | q4_1_3 == 1,
-      1, 0,
-      missing = NA_real_
+    knowincarc = case_when(
+      q4_1_2 == 1 ~ 1, 
+      impact == 0 ~ 0, 
+      TRUE ~ NA_real_ #"otherwise, assign NA"
     )
   )
 
+```
+
+#### Vict Variable (Constructing For-Analysis)
+```{r}
+
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(
+#     vict = if_else(
+#       q4_2_1 == 1,
+#       1, 
+#       0,
+#       missing = NA_real_
+#     )
+#   )
+
+
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    vict = if_else(
-      q4_2_1 == 1,
-      1, 
-      0,
-      missing = NA_real_
+    vict = case_when(
+      q4_2_1 == 1 ~ 1, 
+      impact == 0 ~ 0, 
+      TRUE ~ NA_real_ #"otherwise, assign NA"
     )
   )
 
@@ -287,7 +338,7 @@ count(raw_data_cleaned, contact_pattern)
 
 ```
 
-#### Coding Note –
+#### Patterns and Coding Note –
 
 Some respondents selected both a contact experience (e.g., "been incarcerated") and also marked “none/unsure”, which is logically inconsistent. These may reflect confusion, misclicks, or low-quality responses.
 
@@ -1367,7 +1418,8 @@ Approximately 561 respondents did not provide responses to the political behavio
 ```{r}
 
 names(raw_data_cleaned)
-write_csv(raw_data_cleaned, "data/cleaned/coded_data_may9.csv")
+write_csv(raw_data_cleaned, "data/cleaned/coded_data__08_2026.csv")
+#write_csv(raw_data_cleaned, "data/cleaned/coded_data_may9.csv")
 
 ```
 

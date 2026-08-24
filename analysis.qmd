@@ -701,7 +701,7 @@ ggplot(impact_by_race, aes(x = fct_reorder(race, pct_impacted), y = pct_impacted
     y = "Share with any impact",
     title = "Proportion of each racial group with any carceral contact"
   ) +
-  coord_flip() +
+  coord_flip() +e4
   theme_minimal()
 ```
 
@@ -731,6 +731,7 @@ ggplot(impact_by_race_type, aes(x = race, y = pct, fill = impact_type)) +
     title = "Sample Carceral Contact by Race"
   ) +
   theme_minimal()
+
 ```
 
 Turning above into 4 tables
@@ -918,13 +919,18 @@ pol_means_app_table <- bind_rows(lapply(impact_vars, get_means)) %>%
     -row
   )
 
-(pol_means_app_table)
+View(pol_means_app_table)
+
+
 
 ```
 
 Means Tables
 
 ```{r}
+
+summary()
+
 #defining the non impact means and percent differences from impact vars
 pct_diff <- function(x, ref) {
   ((x - ref) / ref) * 100
@@ -1018,6 +1024,151 @@ cat(
   paste(punish_rows, collapse = "\n"),
   sep = ""
 )
+
+# Mean differences relative to respondents reporting
+# none of the three focal experiences
+mean_diff <- function(x, ref) {
+  x - ref
+}
+
+policy_summary <- function(df, var) {
+  no_impact_mean <- mean(df[[var]][df$impact == 0], na.rm = TRUE)
+  direct_mean    <- mean(df[[var]][df$incarc == 1], na.rm = TRUE)
+  proximal_mean  <- mean(df[[var]][df$knowincarc == 1], na.rm = TRUE)
+  victim_mean    <- mean(df[[var]][df$vict == 1], na.rm = TRUE)
+  
+  tibble::tibble(
+    var = var,
+    no_impact_mean = no_impact_mean,
+    direct_diff   = mean_diff(direct_mean, no_impact_mean),
+    proximal_diff = mean_diff(proximal_mean, no_impact_mean),
+    victim_diff   = mean_diff(victim_mean, no_impact_mean)
+  )
+}
+
+policy_table <- purrr::map_dfr(
+  policy_map$var,
+  ~ policy_summary(raw_data_cleaned, .x)
+) %>%
+  dplyr::left_join(policy_map, by = "var") %>%
+  dplyr::select(
+    var, section, label,
+    no_impact_mean,
+    direct_diff,
+    proximal_diff,
+    victim_diff
+  )
+
+pval_ttest <- function(df, var, group_var) {
+  sub <- df %>%
+    dplyr::filter(
+      !is.na(.data[[var]]),
+      !is.na(.data[[group_var]])
+    ) %>%
+    dplyr::filter(.data[[group_var]] %in% c(0, 1))
+  
+  if (length(unique(sub[[group_var]])) < 2) {
+    return(NA_real_)
+  }
+  
+  stats::t.test(
+    sub[[var]] ~ sub[[group_var]]
+  )$p.value
+}
+
+add_star <- function(x, p) {
+  formatted <- sprintf("%+.2f", x)
+  
+  ifelse(
+    !is.na(p) & p < .05,
+    paste0(formatted, "*"),
+    formatted
+  )
+}
+
+policy_stars <- policy_map %>%
+  dplyr::mutate(
+    p_direct = purrr::map_dbl(
+      var,
+      ~ pval_ttest(
+        raw_data_cleaned %>%
+          dplyr::filter(impact == 0 | incarc == 1),
+        .x,
+        "incarc"
+      )
+    ),
+    
+    p_proximal = purrr::map_dbl(
+      var,
+      ~ pval_ttest(
+        raw_data_cleaned %>%
+          dplyr::filter(impact == 0 | knowincarc == 1),
+        .x,
+        "knowincarc"
+      )
+    ),
+    
+    p_victim = purrr::map_dbl(
+      var,
+      ~ pval_ttest(
+        raw_data_cleaned %>%
+          dplyr::filter(impact == 0 | vict == 1),
+        .x,
+        "vict"
+      )
+    )
+  )
+
+policy_table_final <- policy_table %>%
+  dplyr::left_join(
+    policy_stars %>%
+      dplyr::select(var, p_direct, p_proximal, p_victim),
+    by = "var"
+  ) %>%
+  dplyr::mutate(
+    no_impact_mean   = sprintf("%.2f", no_impact_mean),
+    direct_display   = add_star(direct_diff, p_direct),
+    proximal_display = add_star(proximal_diff, p_proximal),
+    victim_display   = add_star(victim_diff, p_victim)
+  ) %>%
+  dplyr::select(
+    section,
+    label,
+    no_impact_mean,
+    direct_display,
+    proximal_display,
+    victim_display
+  )
+
+View(policy_table_final)
+
+# Generate rows for Overleaf
+latex_rows <- policy_table_final %>%
+  dplyr::mutate(
+    latex_row = paste0(
+      label, " & ",
+      no_impact_mean, " & ",
+      direct_display, " & ",
+      proximal_display, " & ",
+      victim_display, " \\\\"
+    )
+  )
+
+help_rows <- latex_rows %>%
+  dplyr::filter(section == "Help") %>%
+  dplyr::pull(latex_row)
+
+punish_rows <- latex_rows %>%
+  dplyr::filter(section == "Punish") %>%
+  dplyr::pull(latex_row)
+
+cat(
+  paste(help_rows, collapse = "\n"),
+  "\n\\addlinespace\n",
+  paste(punish_rows, collapse = "\n"),
+  sep = ""
+)
+
 
 ```
 
