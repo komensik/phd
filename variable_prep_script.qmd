@@ -908,69 +908,57 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ```{r, prisonpen}
 #ORIGINALLY Q25_1 and Q25_5, death penalty and LWOP (1 = strongly favor 4 = strongly oppose, 5 = don't know)
 
-#recode Q25_1 and Q25_5:  -99 (na_if converts to numeric)
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(q25_1 = na_if(as.numeric(q25_1), -99),
-         q25_5 = na_if(as.numeric(q25_5), -99)
-                )
          
-# Code prisonpen subitems (dpen, lwop),  "Don't know" becomes midpoint
-# Create cleaned subcomponents
-raw_data_cleaned <- raw_data_cleaned %>%
+#rename, -99, ensure numeric
+raw_data_cleaned <- raw_data_cleaned %>% 
   mutate(
-    prisonpen_1 = case_when(
-      q25_1 %in% 1:4 ~ q25_1,
-      q25_1 == 5 ~ 2.5,
-      TRUE ~ NA_real_
-    ),
-    prisonpen_5 = case_when(
-      q25_5 %in% 1:4 ~ q25_5,
-      q25_5 == 5 ~ 2.5,
-      TRUE ~ NA_real_
-    )
+    dpen         = na_if(as.numeric(q25_1), -99),
+    lwop = na_if(as.numeric(q25_5), -99)
   )
 
+pen_vars <- c("dpen", "lwop") #character vector 
+
+# Reverse code (higher num should mean more support, lower less support, and  "Don't know" becomes midpoint)
+
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(
-    prisonpen_1 = case_when(
-      prisonpen_1 == 1 ~ 4,
-      prisonpen_1 == 2 ~ 3,
-      prisonpen_1 == 3 ~ 2,
-      prisonpen_1 == 4 ~ 1,
-      prisonpen_1 == 2.5 ~ 2.5,
-      TRUE ~ NA_real_
-    ),
-    prisonpen_5 = case_when(
-      prisonpen_5 == 1 ~ 4,
-      prisonpen_5 == 2 ~ 3,
-      prisonpen_5 == 3 ~ 2,
-      prisonpen_5 == 4 ~ 1,
-      prisonpen_5 == 2.5 ~ 2.5,
-      TRUE ~ NA_real_
-    )
-  )
+  mutate(across(
+    all_of(pen_vars),
+    ~ case_when(
+    . == 1 ~ 4,           # strongly favor → strongly support help
+    . == 2 ~ 3,
+    . == 3 ~ 2,
+    . == 4 ~ 1,
+    . == 5 ~ 2.5,         # DK = neutral midpoint
+    TRUE ~ NA_real_
+  ),  # note: we skip 5 = DK
+    .names = "{.col}_rev"
+  ))
+
+
+# step 3: save just the means of pen questions as prisonpen
 
 raw_data_cleaned <- raw_data_cleaned %>%
   rowwise() %>%
-  mutate(prisonpen = mean(c_across(c(prisonpen_1, prisonpen_5)), na.rm = TRUE)) %>%
+  mutate(prisonpen = mean(c_across(c(dpen_rev, lwop_rev)), na.rm = TRUE)) %>%
   ungroup()
 
-summary(raw_data_cleaned$prisonpen)
+summary(raw_data_cleaned$dpen_rev)
+summary(raw_data_cleaned$lwop_rev)
 ```
 
-Takeaway: prison pen, prison pen 1 = dpen, prison pen 5 = lwop now -confirmed that prisonpen works -- constructed with average of death penalty and lwop
+Takeaway: prison pen, prison pen 1 = dpen, prison pen 5 = lwop now -confirmed that prisonpen works -- constructed with average of death penalty and lwop. USE dpen_rev and lwop_rev ! and prisonpen
 
 OPTIONAL/potentially helpful for tables: factor version
 
 ```{r, q25_1_ord}
-#OPTIONAL/potentially helpful for tables: factor version
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(q25_1_ord = factor(
-    q25_1,
-    levels = 1:5,
-    labels = c("Strongly favor", "Favor", "Oppose", "Strongly oppose", "Don't know"),
-    ordered = TRUE
-  ))
+# #OPTIONAL/potentially helpful for tables: factor version
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(q25_1_ord = factor(
+#     q25_1,
+#     levels = 1:5,
+#     labels = c("Strongly favor", "Favor", "Oppose", "Strongly oppose", "Don't know"),
+#     ordered = TRUE
+#   ))
 ```
 
 #### D.3 Punitive Items: Doing Cronback's Alpha
@@ -979,16 +967,27 @@ raw_data_cleaned <- raw_data_cleaned %>%
 library(psych)
 library(dplyr)
 
-#prisonpen, prisonpen_1, prisonpen_2
+#prisonpen, prisonpen_1, prisonpen_5
+pen_vars <- c("dpen_rev", "lwop_rev")
+
+pen_data <- raw_data_cleaned %>%
+  select(all_of(pen_vars))
+
+cor(pen_data,
+    use = "pairwise.complete.obs")
+
+print(psych::corr.test(pen_data))
+
+print(psych::alpha(pen_data))
 
 # Quick look
-psych::describe(raw_data_clean$prisonpen)
+psych::describe(pen_data)
 
 # Correlation (more interpretable than alpha for 2 items)
-cor(prisonpen, use = "pairwise.complete.obs")
+cor(raw_data_cleaned[pen_vars], use = "pairwise.complete.obs")
 
 # Cronbach's alpha (fine to report, but remember it's 2 items)
-psych::alpha(prisonpen, check.keys = FALSE)
+psych::alpha(pen_data, check.keys = FALSE)
 
 ```
 
@@ -998,11 +997,17 @@ results - The **correlation** between the two items is **r = 0.238**.
 
 Interpretation
 
-- **These two punitive items are positively related, but only weak-to-moderately so.** People who favor the death penalty are *somewhat* more likely to favor LWOP, but plenty of respondents don’t treat them as interchangeable.
+- **These two punitive items are positively related, but  weakly so.** People who favor the death penalty are *somewhat* more likely to favor LWOP, but plenty of respondents don’t treat them as interchangeable.
 
 - That’s not necessarily a “problem.” Death penalty and LWOP are conceptually related (punitive severity), but they can tap **different moral/legal intuitions** (irreversibility, innocence risk, retribution vs incapacitation), so moderate association is plausible.
 
 - The response distribution shows a **nontrivial chunk of “Don’t know”** recoded to 2.5 (15–17%) and about **8% missing** for each item. The DK-to-midpoint choice can slightly inflate apparent consistency by shrinking variance, so reliability is a conservative-ish check but not definitive.
+
+Visual
+
+
+
+
 
 #### D.4_A Q25 'Help-Oriented' Prison Policy.
 
@@ -1042,6 +1047,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
   ungroup()
 
 names(raw_data_cleaned)
+
 ```
 
 ##### D.4_A Descriptive
@@ -1109,11 +1115,121 @@ barplot(table(raw_data_cleaned$q25_6_rev),
 
 par(mfrow = c(1, 1))
 
+
+#bar plot for overleaf
+
+# Create plotting data
+q25_plot_data <- raw_data_cleaned %>%
+  select(
+    q25_2_rev,
+    q25_3_rev,
+    q25_4_rev,
+    q25_6_rev
+  ) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "item",
+    values_to = "position"
+  ) %>%
+  filter(!is.na(position)) %>%
+  mutate(
+    item = factor(
+      item,
+      levels = c(
+        "q25_2_rev",
+        "q25_3_rev",
+        "q25_4_rev",
+        "q25_6_rev"
+      ),
+      labels = c(
+        "Minimum Wage",
+        "No Cost Calls",
+        "Fund Education",
+        "Parental Alts"
+      )
+    ),
+    
+    # Treat the response categories as discrete/ordinal categories
+    position = factor(
+      position,
+      levels = c(1, 2, 2.5, 3, 4)
+    )
+  ) %>%
+  count(item, position, .drop = FALSE)
+
+
+# Make figure
+q25_barplot <- ggplot(
+  q25_plot_data,
+  aes(x = position, y = n)
+) +
+  geom_col(
+    width = 0.70,
+    fill = "grey35"
+  ) +
+  facet_wrap(
+    ~ item,
+    ncol = 2
+  ) +
+  scale_x_discrete(drop = FALSE) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+  labs(
+    x = "Position",
+    y = "Number of Respondents",
+    caption = paste0(
+      "Position: 1 = Strongly Oppose; 2 = Somewhat Oppose; ",
+      "2.5 = Unsure; 3 = Somewhat Support; 4 = Strongly Support."
+    )
+  ) +
+  theme_classic(base_size = 11) +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(
+      face = "bold",
+      size = 11
+    ),
+    axis.title = element_text(size = 11),
+    axis.text = element_text(size = 9.5),
+    panel.spacing = grid::unit(1, "lines"),
+    plot.caption = element_text(
+      size = 9,
+      hjust = 0,
+      margin = margin(t = 8)
+    )
+  )
+
+ggsave(
+  filename = "figures/q25_help_items_barplot.pdf",
+  plot = q25_barplot,
+  width = 6.5,
+  height = 5,
+  units = "in",
+  device = cairo_pdf
+)
+q25_barplot
+# box plot 
 boxplot(
   raw_data_cleaned[q25_help_vars],
   main = "Q25 Help Items",
   ylab = "Response"
-)
+
+
+```
+Correlations, Crohnbach's alpha
+
+```{r}
+
+q25_help_data <- raw_data_cleaned %>%
+  select(all_of(q25_help_vars))
+
+cor(q25_help_data,
+    use = "pairwise.complete.obs")
+
+print(psych::corr.test(q25_help_data))
+
+print(psych::alpha(q25_help_data))
 
 # Correlation (more interpretable than alpha for 2 items)
 cor(prisonpen, use = "pairwise.complete.obs")
@@ -1121,6 +1237,11 @@ cor(prisonpen, use = "pairwise.complete.obs")
 # Cronbach's alpha (fine to report, but remember it's 2 items)
 psych::alpha(prisonpen, check.keys = FALSE)
 
+q25_help_data <- raw_data_cleaned %>%
+  select(all_of(q25_help_vars))
+
+cor(q25_help_data,
+    use = "pairwise.complete.obs")
 ```
 
 
@@ -1148,31 +1269,26 @@ names(raw_data_cleaned) %>% stringr::str_subset("q25|q23")
 
 # Define Q23 help-oriented items (election - q23_2 is elects_reenfranchise and q23_7 is voting in jail (Requiring that jail and election officers ensure that people who are eligible to vote while incarcerated are able to exercise that right.) OG 1 = favor, 2 = oppose, 3 = DK
 
-
+#rename, -99, ensure numeric
 raw_data_cleaned <- raw_data_cleaned %>% 
   mutate(
-    auto_reg = q23_1,
-     post_felony_vote = q23_2,
-    early_vote = q23_3,
-    election_holiday = q23_4,
-    voter_id = q23_5,
-    noncit_local = q23_6,
-    jail_access = q23_7
+    auto_reg         = na_if(as.numeric(q23_1), -99),
+    post_felony_vote = na_if(as.numeric(q23_2), -99),
+    early_vote       = na_if(as.numeric(q23_3), -99),
+    election_holiday = na_if(as.numeric(q23_4), -99),
+    voter_id         = na_if(as.numeric(q23_5), -99),
+    noncit_local     = na_if(as.numeric(q23_6), -99),
+    jail_access      = na_if(as.numeric(q23_7), -99)
   )
 
-all_election_items <- c("auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access")
-
-#recode -99 and ensure numeric
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(all_of(all_election_items), ~ na_if(as.numeric(.), -99)))
-
+all_electoral_vars <- c("auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access") #character vector 
 
 #recode 1-3 scale to match direction of prison help items (also intuition that higher number means more support)
 # here, 1 = favor, 2 = oppose, 3 = DK
 # we want higher = more support for help-oriented policy so 1-> 3, 2-> 1, 3 -> 2
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
-    all_of(all_election_items),
+    all_of(all_electoral_vars),
     ~ case_when(
       . == 1 ~ 3,
       . == 2 ~ 1,
@@ -1182,40 +1298,38 @@ raw_data_cleaned <- raw_data_cleaned %>%
     .names = "{.col}_rev"
   ))
 
-#the variables TO USE are now auto_reg_rev, xyz_rev
+# respondent level means: all electoral vars
+# 
+# raw_data_cleaned <- raw_data_cleaned %>% 
+#   rowwise() %>% #dplyr should treat each row as own group so c_across() can return row level vector of cols for that row
+#   mutate(all_electoral_means = mean(c_across(c(auto_reg_rev, post_felony_vote_rev, early_vote_rev, election_holiday_rev, voter_id_rev, noncit_local_rev, jail_access_rev)), na.rm = TRUE)) %>%
+#   ungroup()
 
-# save just the means of all election items as all_election_items
+summary(raw_data_cleaned$all_electoral_means)#all_election_items now exists as mean across all 7 Q23 questions, reverse coded, for each observation. 
 
-raw_data_cleaned <- raw_data_cleaned %>% 
-  rowwise() %>% #dplyr should treat each row as own group so c_across() can return row level vector of cols for that row
-  mutate(all_election_items = mean(c_across(c(auto_reg_rev, post_felony_vote_rev, early_vote_rev, election_holiday_rev, voter_id_rev, noncit_local_rev, jail_access_rev)), na.rm = TRUE)) %>%
-  ungroup()
+## Jail voting and rights restoration
 
-summary(raw_data_cleaned$all_election_items)
+incarc_electoral_vars <- c("post_felony_vote_rev", "jail_access_rev")
 
-#all_election_items now exists as mean across all 7 Q23 questions, reverse coded, for each observation. 
+# respondent level means: just the two (incarc_electoral_means)
 
-#however, the thing that you've been reporting (as of 08-26) are just two of the questions -- post_felony_vote_rev and jail_access_rev.
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    incarc_electoral_means = if_else(
+      !is.na(post_felony_vote_rev) & !is.na(jail_access_rev),
+      (post_felony_vote_rev + jail_access_rev) / 2,
+      NA_real_
+    )
+  )
 
 # old: q23_help_items <- c("q23_2", "q23_7")
-# new: incarc_voting_items
+# new: incarc_electoral_means, post_felony_vote_rev, jail_access_rev
 
-raw_data_cleaned <- raw_data_cleaned %>% 
-  rowwise() %>% #dplyr should treat each row as own group so c_across() can return row level vector of cols for that row
-  mutate(incarc_voting_items = mean(c_across(c(post_felony_vote_rev, jail_access_rev)), na.rm = TRUE)) %>%
-  ungroup()
+# to compare to other prison policy questions on same scale, rescale these two  the 1–3 items to 1–4 range
 
-summary(raw_data_cleaned$incarc_voting_items)
-# new saved: incarc_voting_items as the means per observation of just the two election incarceration ones, kept to oppose/IDK/support 1-2-3 scale. 
-
-# next, to use prisonhelp, still SCHMEAR these join to prisonhelp:
-
-incarc_voting_items <- c("post_felony_vote_rev", "jail_access_rev")
-
-# # Rescale the 1–3 items to 1–4 range
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
-    all_of(incarc_voting_items),
+    all_of(incarc_electoral_vars),
     ~ case_when(
       . == 3 ~ 4,
       . == 1 ~ 1,
@@ -1225,34 +1339,177 @@ raw_data_cleaned <- raw_data_cleaned %>%
     .names = "{.col}_1_to_4"
   ))
 
+# produces: post_felony_vote_rev_1_to_4, jail_access_rev_1_to_4
+
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(c(post_felony_vote_rev_1_to_4, jail_access_rev_1_to_4),
-                ~ scales::rescale(., to = c(1, 4))))
+  mutate(
+    incarc_electoral_mean_1_to_4 = if_else(
+      !is.na(post_felony_vote_rev_1_to_4) &
+        !is.na(jail_access_rev_1_to_4),
+      (post_felony_vote_rev_1_to_4 +
+         jail_access_rev_1_to_4) / 2,
+      NA_real_
+    )
+  )
+hist(raw_data_cleaned$post_felony_vote_rev)
+hist(raw_data_cleaned$jail_access_rev)
 
+print(summary(raw_data_cleaned$post_felony_vote_rev))
+print(summary(raw_data_cleaned$jail_access_rev))
 ``` 
+Come out of above block with: 
+post_felony_vote_rev          individual item, 1–3
+jail_access_rev               individual item, 1–3
+incarc_electoral_mean         combined measure, 1–3
 
-Now this is ready for prisonhelp
+post_felony_vote_rev_1_to_4   comparable item, 1–4
+jail_access_rev_1_to_4        comparable item, 1–4
+incarc_electoral_mean_1_to_4  comparable combined measure, 1–4
+
+#### D.4_C Prison/Election Items Descriptive look 
+What's up
+```{r}
+
+#bar plot for overleaf
+
+# Create plotting data
+incarc_electoral_data <- raw_data_cleaned %>%
+  select(
+    post_felony_vote_rev,
+    jail_access_rev
+  ) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "item",
+    values_to = "position"
+  ) %>%
+  filter(!is.na(position)) %>%
+  mutate(
+    item = factor(
+      item,
+      levels = c(
+        "post_felony_vote_rev",
+        "jail_access_rev"
+      ),
+      labels = c(
+        "Rights Restoration",
+        "Jail Vote Access"
+      )
+    ),
+    
+    # Treat the response categories as discrete/ordinal categories
+    position = factor(
+      position,
+      levels = c(1, 2, 3)
+    )
+  ) %>%
+  count(item, position, .drop = FALSE)
+
+
+# Make figure
+incarc_electoral_barplot <- ggplot(
+  incarc_electoral_data ,
+  aes(x = position, y = n)
+) +
+  geom_col(
+    width = 0.70,
+    fill = "grey35"
+  ) +
+  facet_wrap(
+    ~ item,
+    ncol = 2
+  ) +
+  scale_x_discrete(drop = FALSE) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+  labs(
+    x = "Position",
+    y = "Number of Respondents",
+    caption = paste0(
+      "Position: 1 = Oppose; 2 = Unsure; ",
+      "3 = Somewhat Support."
+    )
+  ) +
+  theme_classic(base_size = 11) +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(
+      face = "bold",
+      size = 11
+    ),
+    axis.title = element_text(size = 11),
+    axis.text = element_text(size = 9.5),
+    panel.spacing = grid::unit(1, "lines"),
+    plot.caption = element_text(
+      size = 9,
+      hjust = 0,
+      margin = margin(t = 8)
+    )
+  )
+
+
+ggsave(
+  filename = "figures/incarc_electoral_barplot.pdf",
+  plot = q25_barplot,
+  width = 6.5,
+  height = 5,
+  units = "in",
+  device = cairo_pdf
+)
+incarc_electoral_barplot
+
+```
+
+
+Correlation between jail voting and rights restoration 
+```{r}
+
+incarc_electoral_data <- raw_data_cleaned %>%
+  select(all_of(incarc_electoral_vars))
+
+cor(incarc_electoral_data,
+    use = "pairwise.complete.obs")
+
+print(psych::corr.test(incarc_electoral_data))
+
+print(psych::alpha(incarc_electoral_data))
+```
+
+
+What about relationship between all the help variables (2 election, 4 others?)
+
+Need
+
+post_felony_vote_rev
+jail_access_rev_1_to_4
+q25_help_data or q25_2_rev,
+    q25_3_rev,
+    q25_4_rev,
+    q25_6_rev
+
 
 ```{r, electionhelpqs}
-# # now -- prisonhelp composite index (average of 6 items)
-# 
-# # rev gives reverse version of the arguments
-raw_data_cleaned <- raw_data_cleaned %>%
-  rowwise() %>%  # tells dplyr to treat eaach row as own group so c_across() can return row level vector of cols for that row
-  mutate(prisonhelp = mean(c_across(c(q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev, post_felony_vote_rev_1_to_4, jail_access_rev_1_to_4)), na.rm = TRUE)) %>%
-  ungroup()
 
+# ALL HELP ITEMS
 
-#checking that above (construction of prisonhelp) worked even though codechunk won't re-run. 
-#CONFIRMED
-#raw_data_cleaned <- raw_data_cleaned %>%
-#  mutate(prisonhelp_redo = rowMeans(across(c(q25_2_rev, q25_3_rev, #q25_4_rev, q25_6_rev, q23_2_rev, q23_7_rev)), na.rm = TRUE))
+all_help_items <- c(
+  "q25_2_rev",
+  "q25_3_rev",
+  "q25_4_rev",
+  "q25_6_rev",
+  "post_felony_vote_rev_1_to_4",
+  "jail_access_rev_1_to_4"
+)
 
+#df for the six total vars
+all_help_data <- raw_data_cleaned %>%
+  select(all_of(all_help_items))
 
-#checking variance + SD here (Oct 28)
-summary(raw_data_cleaned$prisonhelp)
-#summary(raw_data_cleaned$prisonhelp_redo)
-# c_across: works with rowwise for performing row-wise aggregations. Different from c() in that it uses tidy select semantics to make it easier to select multiple variances
+# now, pairwise corrs
+view(cor(all_help_data,
+    use = "pairwise.complete.obs"))
+
 ```
 
 #### D5. Variance and Stand Dev

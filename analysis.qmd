@@ -784,7 +784,6 @@ cat(latex_tables[["Other Race"]])
 ```
 # 2. Policy
 
-
 ## 2.1 Policy Means
 
 ```{r}
