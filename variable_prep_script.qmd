@@ -33,7 +33,7 @@ File created in data_prep.qmd
 ```{r}
 #view(raw_data_cleaned)
 
-#raw_data_cleaned <- readr::read_csv("data/cleaned/cleaned_light.csv") 
+raw_data_cleaned <- readr::read_csv("data/cleaned/cleaned_light.csv") 
 #CONTINGENT note that alhough this is called raw_data_cleaned, it is the equivalent of "cleaned_data_light" from data_prep.qmd. See that file to pull the version with old var names for D and P. Note: no power here.
 
 #names(raw_data_cleaned)
@@ -483,7 +483,6 @@ table_a %>%
   tab_header(title = "Appendix Table A. Basic Contact Types") %>%
   tab_options(table.font.size = "small")
 
-write
 ```
 
 ```{r}
@@ -1005,7 +1004,7 @@ Interpretation
 
 - The response distribution shows a **nontrivial chunk of “Don’t know”** recoded to 2.5 (15–17%) and about **8% missing** for each item. The DK-to-midpoint choice can slightly inflate apparent consistency by shrinking variance, so reliability is a conservative-ish check but not definitive.
 
-#### D.4_A 'Help-Oriented' Prison Policy.
+#### D.4_A Q25 'Help-Oriented' Prison Policy.
 
 These will include prison and election policies. Here, I first set up the prison policy Q's, then prison/voting Q's.
 
@@ -1033,66 +1032,214 @@ raw_data_cleaned <- raw_data_cleaned %>%
     .names = "{.col}_rev"
   ))
 
-summary(raw_data_cleaned$q25_2_rev)
+# now, raw dta cleaned has q25_n_rev (each reverse coded so that higher number means more support)
+
+# step 3: save just the means of q25 help questions as q25_help_items
+
+raw_data_cleaned <- raw_data_cleaned %>% 
+  rowwise() %>% #dplyr should treat each row as own group so c_across() can return row level vector of cols for that row
+  mutate(q25_help_items = mean(c_across(c(q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev)), na.rm = TRUE)) %>%
+  ungroup()
+
+names(raw_data_cleaned)
 ```
 
-OPTIONAL: Create ordered factor versions- could be useful for plotting/tables/labeling)
+##### D.4_A Descriptive
+q25_help_items is the average of means of the help items (just prison policy "help" excluding the prison and voting ones); q25_help_items is to look at them separately
+```{r}
+
+#checking variance + SD here 08-2026)
+summary(raw_data_cleaned$q25_help_items)
+
+summary(raw_data_cleaned$q25_6_rev)
+
+
+q25_help_vars <- c("q25_2_rev", "q25_3_rev", "q25_4_rev", "q25_6_rev")
+
+psych::describe(raw_data_cleaned[q25_help_vars])
+
+
+#I get min 1 1st qu 2.5 median 2.875 mean 2.88 3q 3.250 max 4 nas = 186
+
+#histograms
+print(hist(raw_data_cleaned$q25_2_rev))
+print(hist(raw_data_cleaned$q25_3_rev))
+print(hist(raw_data_cleaned$q25_4_rev))
+print(hist(raw_data_cleaned$q25_6_rev))
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+q25_long <- raw_data_cleaned %>%
+  select(all_of(q25_help_vars)) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "item",
+    values_to = "response"
+  )
+
+ggplot(q25_long, aes(x = response)) +
+  geom_bar() +
+  facet_wrap(~ item) +
+  labs(
+    x = "Response",
+    y = "Count"
+  )
+
+#barplots
+
+par(mfrow = c(2, 2))
+
+barplot(table(raw_data_cleaned$q25_2_rev),
+        main = "q25_2_rev",
+        xlab = "Response")
+
+barplot(table(raw_data_cleaned$q25_3_rev),
+        main = "q25_3_rev",
+        xlab = "Response")
+
+barplot(table(raw_data_cleaned$q25_4_rev),
+        main = "q25_4_rev",
+        xlab = "Response")
+
+barplot(table(raw_data_cleaned$q25_6_rev),
+        main = "q25_6_rev",
+        xlab = "Response")
+
+par(mfrow = c(1, 1))
+
+boxplot(
+  raw_data_cleaned[q25_help_vars],
+  main = "Q25 Help Items",
+  ylab = "Response"
+)
+
+# Correlation (more interpretable than alpha for 2 items)
+cor(prisonpen, use = "pairwise.complete.obs")
+
+# Cronbach's alpha (fine to report, but remember it's 2 items)
+psych::alpha(prisonpen, check.keys = FALSE)
+
+```
+
+
+
+
+Ordered factor versions- could be useful for plotting/tables/labeling) but as of 08-2026 don't use
 
 ```{r, prisonhelp_factor}
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(
-    all_of(q25_help_items),
-    ~ factor(.,
-             levels = 1:5,
-             labels = c("Strongly favor", "Favor", "Oppose", "Strongly oppose", "Don't know"),
-             ordered = TRUE),
-    .names = "{.col}_ord"
-  ))
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(across(
+#     all_of(q25_help_items),
+#     ~ factor(.,
+#              levels = 1:5,
+#              labels = c("Strongly favor", "Favor", "Oppose", "Strongly oppose", "Don't know"),
+#              ordered = TRUE),
+#     .names = "{.col}_ord"
+#   ))
 
 ```
 
-Delivers: q25_help_items
-
-#### D.4_B 'Help-Oriented' Prison/Election Items (Adding to Above)
+#### D.4_B Q35 'Help-Oriented' Prison/Election Items (Adding to Above)
 
 ```{r, electionhelpqs}
-
 names(raw_data_cleaned) %>% stringr::str_subset("q25|q23")
 
 # Define Q23 help-oriented items (election - q23_2 is elects_reenfranchise and q23_7 is voting in jail (Requiring that jail and election officers ensure that people who are eligible to vote while incarcerated are able to exercise that right.) OG 1 = favor, 2 = oppose, 3 = DK
 
-q23_help_items <- c("q23_2", "q23_7")
+
+raw_data_cleaned <- raw_data_cleaned %>% 
+  mutate(
+    auto_reg = q23_1,
+     post_felony_vote = q23_2,
+    early_vote = q23_3,
+    election_holiday = q23_4,
+    voter_id = q23_5,
+    noncit_local = q23_6,
+    jail_access = q23_7
+  )
+
+all_election_items <- c("auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access")
 
 #recode -99 and ensure numeric
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(all_of(q23_help_items), ~ na_if(as.numeric(.), -99)))
+  mutate(across(all_of(all_election_items), ~ na_if(as.numeric(.), -99)))
 
-#recode 1-3 scale to match direction of prison help items 
+
+#recode 1-3 scale to match direction of prison help items (also intuition that higher number means more support)
 # here, 1 = favor, 2 = oppose, 3 = DK
-# we want higher = more support for help-oriented policy so 1-> 3, 2-> 1, 3 -> NA
+# we want higher = more support for help-oriented policy so 1-> 3, 2-> 1, 3 -> 2
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
-    all_of(q23_help_items),
+    all_of(all_election_items),
     ~ case_when(
-      . == 1 ~ 4,
+      . == 1 ~ 3,
       . == 2 ~ 1,
-      . == 3 ~ 2.5,
+      . == 3 ~ 2,
       TRUE ~ NA_real_
     ),
     .names = "{.col}_rev"
   ))
 
-# Rescale the 1–3 items (after reversing) to 1–4 range
+#the variables TO USE are now auto_reg_rev, xyz_rev
+
+# save just the means of all election items as all_election_items
+
+raw_data_cleaned <- raw_data_cleaned %>% 
+  rowwise() %>% #dplyr should treat each row as own group so c_across() can return row level vector of cols for that row
+  mutate(all_election_items = mean(c_across(c(auto_reg_rev, post_felony_vote_rev, early_vote_rev, election_holiday_rev, voter_id_rev, noncit_local_rev, jail_access_rev)), na.rm = TRUE)) %>%
+  ungroup()
+
+summary(raw_data_cleaned$all_election_items)
+
+#all_election_items now exists as mean across all 7 Q23 questions, reverse coded, for each observation. 
+
+#however, the thing that you've been reporting (as of 08-26) are just two of the questions -- post_felony_vote_rev and jail_access_rev.
+
+# old: q23_help_items <- c("q23_2", "q23_7")
+# new: incarc_voting_items
+
+raw_data_cleaned <- raw_data_cleaned %>% 
+  rowwise() %>% #dplyr should treat each row as own group so c_across() can return row level vector of cols for that row
+  mutate(incarc_voting_items = mean(c_across(c(post_felony_vote_rev, jail_access_rev)), na.rm = TRUE)) %>%
+  ungroup()
+
+summary(raw_data_cleaned$incarc_voting_items)
+# new saved: incarc_voting_items as the means per observation of just the two election incarceration ones, kept to oppose/IDK/support 1-2-3 scale. 
+
+# next, to use prisonhelp, still SCHMEAR these join to prisonhelp:
+
+incarc_voting_items <- c("post_felony_vote_rev", "jail_access_rev")
+
+# # Rescale the 1–3 items to 1–4 range
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(c(q23_2_rev, q23_7_rev),
+  mutate(across(
+    all_of(incarc_voting_items),
+    ~ case_when(
+      . == 3 ~ 4,
+      . == 1 ~ 1,
+      . == 2 ~ 2.5,
+      TRUE ~ NA_real_
+    ),
+    .names = "{.col}_1_to_4"
+  ))
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(c(post_felony_vote_rev_1_to_4, jail_access_rev_1_to_4),
                 ~ scales::rescale(., to = c(1, 4))))
 
-# now -- prisonhelp composite index (average of 6 items)
+``` 
 
-# rev gives reverse version of the arguments
+Now this is ready for prisonhelp
+
+```{r, electionhelpqs}
+# # now -- prisonhelp composite index (average of 6 items)
+# 
+# # rev gives reverse version of the arguments
 raw_data_cleaned <- raw_data_cleaned %>%
   rowwise() %>%  # tells dplyr to treat eaach row as own group so c_across() can return row level vector of cols for that row
-  mutate(prisonhelp = mean(c_across(c(q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev, q23_2_rev, q23_7_rev)), na.rm = TRUE)) %>%
+  mutate(prisonhelp = mean(c_across(c(q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev, post_felony_vote_rev_1_to_4, jail_access_rev_1_to_4)), na.rm = TRUE)) %>%
   ungroup()
 
 
@@ -1103,7 +1250,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 
 #checking variance + SD here (Oct 28)
-#summary(raw_data_cleaned$prisonhelp)
+summary(raw_data_cleaned$prisonhelp)
 #summary(raw_data_cleaned$prisonhelp_redo)
 # c_across: works with rowwise for performing row-wise aggregations. Different from c() in that it uses tidy select semantics to make it easier to select multiple variances
 ```

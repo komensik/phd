@@ -39,13 +39,13 @@ library(knitr)
 ```{r}
 
 here::here()
-raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data_may9.csv")
+raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__08_2026.csv")
 source("variable_labels.R")
 raw_data_cleaned
 names(raw_data_cleaned)
 ```
 
-## Descriptive Analyses
+# Descriptive Analyses
 
 | Decision                | Notes                                        |
 |-------------------------|----------------------------------------------|
@@ -57,14 +57,15 @@ names(raw_data_cleaned)
 | plot aesthetics?        | clear x-axis label                           |
 | Output                  |                                              |
 
-### 1.0 Counts
+## 1.0 Counts
 
-### 1.1 Experience Counts
+### (a) Experience Counts
 
 ```{r}
 # because analysis has included previously odd combos (ie people who have nas or say not impacted and both), my first step here is trying to diagnose their patterns of missingness and other things so I can explain to my committee/self what it may or may not mean to include them.
 
 table(raw_data_cleaned$impact)
+table(raw_data_cleaned$incarc)
 table(raw_data_cleaned$knowincarc)
 table(raw_data_cleaned$vict)
 
@@ -98,9 +99,10 @@ problematic <- raw_data_cleaned %>%
     )
   )
 
-table(problematic$prob_flag)
+
 ```
 
+### (b) counts of problems
 there are 32 of these problematic responses in total.
 
 ```{r}
@@ -123,9 +125,9 @@ problematic %>%
   )
 ```
 
-#they have higher missingness
+they have higher missingness
 
-#do they behave differently on outcomes
+do they behave differently on outcomes?
 
 ```{r}
 problematic %>%
@@ -176,9 +178,24 @@ problematic %>%
 
 the decision here is that I'm reporting these folks in the appendix. I don't want to exclude them yet. 4-2-26
 
+08-26 just looking agian at the samples
+
+```{r}
+
+#View(raw_data_cleaned %>% filter(incarc ==1))
+
+#View(raw_data_cleaned %>% filter(response_id == "R_1Y6isBePWi3TZi9"))
+#this guy is my problematic incarcerated respondent
+
+```
+
+```{r}
+#View(raw_data_cleaned %>% filter(knowincarc ==1))
+```
+
 Now, turning to a table for the appendix
 
-### 1.001 Impact Counts for appendix
+### (c) Impact Counts for appendix
 
 ```{r}
 pattern_lookup <- tibble(
@@ -499,7 +516,7 @@ raw_data_cleaned %>%
 
 ```
 
-### 1.02. Diagnostics on Lack on Survey Weights
+### (d) Diagnostics on Lack on Survey Weights
 
 ```{r}
 #| eval: false
@@ -552,7 +569,7 @@ table(raw_data_cleaned$vict, raw_data_cleaned$Democrat)
 table(raw_data_cleaned$vict, raw_data_cleaned$gender)
 ```
 
-### 1.03 Table of Impact x Race
+### (e) Table of Impact x Race
 
 ```{r}
 library(dplyr)
@@ -560,57 +577,15 @@ library(tidyr)
 library(purrr)
 library(stringr)
 
-#----------------------------
-# 1. OPTIONAL: create White
-#----------------------------
-# This assumes Black, Hispanic, and OtherRace are 0/1 indicators and that
-# "White" means not coded as any of those categories.
-# If you already have a White variable, skip this block.
 
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(
-    White = case_when(
-      is.na(Black) | is.na(Hispanic) | is.na(OtherRace) ~ NA_real_,
-      Black == 0 & Hispanic == 0 & OtherRace == 0 ~ 1,
-      TRUE ~ 0
-    )
-  )
-
-#----------------------------
-# 2. Define race columns/labels
-#----------------------------
-race_vars <- c("White", "Black", "Hispanic", "OtherRace")
-
-race_labels <- c(
-  White = "White",
-  Black = "Black",
-  Hispanic = "Hispanic",
-  OtherRace = "Other Race"
-)
-
-#----------------------------
-# 3. Define impact rows
-#----------------------------
-impact_vars <- c("impact", "incarc", "knowincarc", "vict")
-
-impact_labels <- c(
-  impact = "Any Impact",
-  incarc = "Direct",
-  knowincarc = "Proximal",
-  vict = "Victim"
-)
-
-#----------------------------
 # 4. Total N for denominator
 #----------------------------
-# This uses all rows in the dataset as the denominator for percentages.
-# If you want only respondents with nonmissing race info included in the denominator,
-# change this to a filtered dataset first.
+# uses all rows in the dataset as the denominator for percentages.
 
 total_n <- nrow(raw_data_cleaned)
 
 #----------------------------
-# 5. Build impact x race table
+# impact x race table
 #----------------------------
 impact_race_table <- map_dfr(impact_vars, function(iv) {
   
@@ -637,8 +612,9 @@ impact_race_table <- map_dfr(impact_vars, function(iv) {
 })
 
 #----------------------------
-# 6. Add overall sample row
+# Adding overall sample row
 #----------------------------
+
 overall_row <- tibble(
   Impact = "Overall sample",
   White = sprintf("%d (%.1f%%)", sum(raw_data_cleaned$White == 1, na.rm = TRUE),
@@ -806,14 +782,10 @@ cat(latex_tables[["Black"]])
 cat(latex_tables[["Hispanic"]])
 cat(latex_tables[["Other Race"]])
 ```
-
-### 1.3. Generalized Deservingness (desor) x
-
 # 2. Policy
 
-## 2.1 Policy Means
 
-"sanity check" for coding -- how these behave
+## 2.1 Policy Means
 
 ```{r}
 
@@ -1428,15 +1400,53 @@ Police Means Tables
 
 ```
 
-## 2.2A: Defining model sequences
+# 3. Policy Regressions
+This section continues to use variable_labels.R. The goal of this section was to avoid
+and clean up extensive seperated regressions, and instead incorporate use loop that iteratively work through outcome variables and incorporate controls.
+
+PRE 08-26, it had two sets of regression models. 
+
+Set 1 are asks "across the full sample, how is each form of impact associated with each policy outcome before adding controls (ie, prisonhelp ~ incarc) and then after/as we add controls (ie, prisonhelp ~incarc + Black + Hispanic + OtherRace + gender). (policy_dummies_waves)
+
+Set 2 asks instead how each impacted subgroup compares specifically compares with respondents who are fully not-impacted. ie, I throw out respondents who are impacted in some other way, but not directly incarcerated; I compare impact == 0 to incarc == 1). 
+
+As of now, it (policy_vs_nonimp_waves) compares those groups (ie incarc == 1 and impact == 0) and then does so with controls.
+
+Then this chunk builds tables.
+
+***08-26 I HAVE NOW RECODED incarc, knowincarc, and vict so that 1 = impacted in that particular way and 0 = NOT IMPACTED at all (ie, impact == 0). 
+
+This means that I don't need the same 2 goal situation. I am now cleaning this up so that the main models will say: 
+
+For every policy DV:
+
+1. Any impact vs no impact
+2. Direct impact vs no impact
+3. Proximal impact vs no impact
+4. Victim impact vs no impact
+
+Run each through:
+    Model 1: no controls
+    Model 2: demographics
+    Model 3: demographics + party/ideology
+    Model 4: full attitudes
+
+### 3.1A: Framework for model sequence
+
+control_waves
+   |
+   |-- nocontrol
+   |-- demo
+   |-- party_ideo
+   |-- full_attitudes
 
 ```{r}
 # ============================================================
-# 3. Control bundles used for cumulative model waves
-# Assumes these objects already exist in your variable script:
+# 3. TO START - big picture here is defining the model "waves." The first is bivariate o no controls ("nocontrol"), then demo is models with just demographic controls (8-26 this is just race I think, then demographic controls and part ID and fiscal ideology and social ideology (party_ideo) then with all controls, so aforementioned plus FIRE and *eventually, need to fix* deservingness orientation. 
+# The following controls are grouped in vriable_labels, but prepped in variable_prep_script:
 #   demo_controls
 #   party_ideo_controls
-#   deservingness_controls
+#   desor_core***
 #   fire_controls
 # ============================================================
 
@@ -1445,40 +1455,58 @@ control_waves <- list(
   demo = demo_controls,
   party_ideo = c(demo_controls, party_ideo_controls),
   full_attitudes = c(demo_controls, party_ideo_controls,
-                     desor_core, fire_controls)
+                     fire_controls) # 8-26 once desorcore fixed, add #desor_core to this list in full_attitudes
 )
 ```
 
-```{r}
-```
-
-## 2.2 Policy BV Dummies
+### 3.2 Define lm function that will waves will operate thru
 
 ```{r}
 # ============================================================
-# Goal 1 helper: full-sample models
+# This starts by defining my reusable function. That function says:
+
+#"whenever (later) I give this function a dataset (df), a dependent variable (dv), an independent variable (iv), and some controls (controls), R should:
+
+##(a) start with a default of assuming there are no controls, if no controls are given (character (0)); 
+## (b) in the right-hand side (rhs) or the equation, use the supplied iv and supplied controls to make a vector with all vraibles that should appear to the right of ~
+## (c) (fml) construct an ordinary regression syntax with the supplied dv on the left of ~, then supplied rhs info and turn it into a signle string (collapse = "+"), and 
+## (d) treat this as a statistical formula rather than a string (as.formula())
+## (e) run the regression
 # ============================================================
 
-make_fullsample_model <- function(df, dv, iv, controls = character(0)) {
+make_policy_model <- function(df, dv, iv, controls = character(0)) {#character(0) just means empty character vector so this function works for uncontrolled model then for controlled model
   rhs <- c(iv, controls)
   fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
   lm(fml, data = df)
 }
 
+# ============================================================
+# MAIN MODEL GENERATING LOOOP Now, I need to line up buckets to put the models 
+## that place is "policy_dummies_waves"
+#
+# Then, I need to say how I will fill it. I will fill it with waves of models that loop through dvs and iteratively add controls 
+#for each dv, generates 4 substantive comparisons:
+### impact versus non impact
+### incarc versus non impact
+### knowincarc versus non impact
+### victimized vs non impact
+# ============================================================
+
 policy_dummies_waves <- list()
 
-for (wave_name in names(control_waves)) {
+for (wave_name in names(control_waves)) {#calls list of waves in control waves
 
-  model_list <- list()
+  model_list <- list() #fresh model list within each wave
 
   for (dv in policy_vars) {
-    for (iv in impact_vars) {
+    for (iv in impact_vars) { #loop thru dvs, ivs, labels file gives the 4 ivs; fits 4 models for each outcome
 
-      model_name <- paste0("m_", dv, "_", iv)
+      model_name <- paste0("m_", dv, "_", iv) #ie model using prisonhelp and incarc will be named m_prisonhelp_incarc
 
-      model_list[[model_name]] <- make_fullsample_model(
+      # NOW, actually telling it to run and store the regressions
+      model_list[[model_name]] <- make_policy_model(
         df = raw_data_cleaned,
-        dv = dv,
+        dv = dv, 
         iv = iv,
         controls = control_waves[[wave_name]]
       )
@@ -1487,6 +1515,34 @@ for (wave_name in names(control_waves)) {
 
   policy_dummies_waves[[wave_name]] <- model_list
 }
+##after the two inner loops finish organization for storing them. 
+## object is roughly: policy_dummies_waves : A no control -> A1 no control m_prisonhelp_impact, A2 no control m_prisonhelp_incarc. . ..etc; B1 demographic controls m_prisonhelp_impact....(see below)
+#policy_dummies_waves
+# |
+# |-- nocontrol
+# |     |-- m_prisonhelp_impact
+# |     |-- m_prisonhelp_incarc
+# |     |-- m_prisonhelp_knowincarc
+# |     |-- m_prisonhelp_vict
+# |     |-- ...
+# |
+# |-- demo
+# |     |-- m_prisonhelp_impact
+# |     |-- m_prisonhelp_incarc
+# |     |-- ...
+# |
+# |-- party_ideo
+# |
+# |-- full_attitudes
+ 
+# ============================================================
+# NEXT -- making hopefully more convenient references so that  instead of typing out the full "policy_dummies_waves[["nocontrol"]][["m_prisonhelp_incarc"]] I can type "policy_dummies_models[{"m_prisonhelp_incarc"}] (really tho, the table making code came first and this lets me adopt above outputs to )
+## 
+#
+# T 
+# ============================================================
+
+
 
 policy_dummies_models <- policy_dummies_waves[["nocontrol"]]
 policy_dummies_demo_models <- policy_dummies_waves[["demo"]]
@@ -1495,7 +1551,8 @@ policy_dummies_full_models <- policy_dummies_waves[["full_attitudes"]]
 
 ```
 
-4.5 new
+
+## 3.3 -- PRE 08-26 RECODING "restricted" model for when incarc, knowincarc, vict were coded such that 0 meant not incarc, not vict, etc.. (08-2026 no longer necessary for main reported relationships having recoded incarc, knowincarc, and vict)
 
 ```{r}
 # goal 1 wave loop above
@@ -1518,7 +1575,7 @@ make_restricted_model <- function(df, dv, subgroup_var, controls = character(0))
 }
 ```
 
-##2.3 Appendix Tables - Each IV Model Grouped around DV
+### 3.3 Appendix Tables - Each IV Model Grouped around DV
 
 ```{r}
 # ============================================================
@@ -1534,7 +1591,7 @@ make_restricted_model <- function(df, dv, subgroup_var, controls = character(0))
 
 
 # ------------------------------------------------------------
-# sanity checks: make sure the variables referenced in your
+# sanity checks: make sure the variables referenced in 
 # helper objects actually exist in the data
 # -----------------------------------------------------------
 
@@ -1667,7 +1724,7 @@ for (dv_name in policy_vars) {
 }
 ```
 
-## 2.4 Compare Each Impacted Subgroup to Non-Impacted
+### 3.4 Compare Each Impacted Subgroup to Non-Impacted
 
 Restricted sample comparison logic (not impacted vs incarcerated) ultimate goal: no-controls to controls main results table built from the restricted-sample non-impacted-versus-subgroup models. then extend the restricted-sample models rather than rebuilding everything from scratch when adding controls.
 
@@ -1726,7 +1783,7 @@ a blank second model block for later controlled models,
 
 placeholder control rows so the table skeleton already matches where you are headed.
 
-## 2.5 Tables Loop
+### 3.5 Tables Loop
 
 ```{r}
 # ============================================================
@@ -2359,9 +2416,9 @@ View(appendix_table_wide)
 
 1.  
 
-# 3. DV: Deservingness
+# 4. DV: Deservingness
 
-### 3.1 All Des Means Loop
+### 4.1 All Des Means Loop
 
 ```{r}
 source("variable_labels.R")
@@ -2574,7 +2631,7 @@ ggsave(
 )
 ```
 
-## 3.2 Incarc Des Means
+### 4.2 Incarc Des Means
 
 -means -density plots
 

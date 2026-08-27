@@ -1,3 +1,10 @@
+##
+# Objective of this script is to store conceptual groups and names so that analysis.qmd
+# can consult to know which variables belong in which groups, and use groups to generate a bunch of regressions
+# in an iterative, systematic way (lots of loops) rather than running a million regressions seperately
+##
+
+## Independent Variables: Impact, Incarc, Knowincarc, Vict
 
 impact_vars<- c("impact", "incarc", "knowincarc", "vict")
 
@@ -9,7 +16,65 @@ impact_labels <- c(
   vict = "Victim"
 )
 
+
+## Outcome A: Policy Questions
+
+q25_help_vars <- c("25_2_rev", "q25_3_rev","q25_4_rev","q25_6_rev")
+
+policy_vars <- c("prisonhelp", "prisonpen", "incarc_voting_items",
+  "post_felony_vote_rev_1_to_4", "jail_access_rev_1_to_4", "q25_2_rev", "q25_3_rev", "q25_4_rev", "q25_6_rev",
+  "prisonpen_1", "prisonpen_5" 
+)
+
+policy_map <- tibble::tribble(
+  ~var,          ~label,                                              ~section,
+  "prisonhelp",  "Help-oriented policy index",                        "Help",
+  "post_felony_vote_rev_1_to_4",   "Voting rights after serving felony sentences",      "Help",
+  "jail_access_rev_1_to_4",   "Ensuring eligible incarcerated people can vote",    "Help",
+  "q25_2_rev",   "Minimum wage for prison labor",                     "Help",
+  "q25_3_rev",   "Free calls with family members",                    "Help",
+  "q25_4_rev",   "Funding GED and college courses in prisons",        "Help",
+  "q25_6_rev",   "Sentencing alternatives for parents of young children", "Help",
+  "prisonpen",   "Punitive policy index",                             "Punish",
+  "prisonpen_1", "Death penalty for people convicted of murder",      "Punish",
+  "prisonpen_5", "Life without parole sentences",                     "Punish"
+)
+
+
+# check where policy_map is used, remember go back to making sure variable prep correctly sets 
+# up so that I can group all the prison help items and then separately the two election 
+
+
 ##
+
+police_items_1_to_5 <- c(
+  "q15_1_1_to_5",
+  "q15_2_1_to_5",
+  "q15_3_1_to_5",
+  "q15_4_1_to_5",
+  "q15_5_1_to_5"
+)
+
+police_items_labels <- c(
+  q15_1_1_to_5 = "Local Police",
+  q15_2_1_to_5 = "No Strangle",
+  q15_3_1_to_5 = "Police Tracker",
+  q15_4_1_to_5 = "Police Training",
+  q15_5_1_to_5 = "Charge Police"
+)
+
+police_map <- tibble::tribble(
+  ~var,          ~label,                                              ~section,
+  "q15_1_1_to_5",  "Local Police",                              "Misc. Police",
+  "q15_2_1_to_5",   "No Strangle",                          "Police Violence",
+  "q15_3_1_to_5",   "Police Tracker",                          "Police Police",
+  "q15_4_1_to_5",   "Police Training",                       "Police Violence",
+  "q15_5_1_to_5",   "Charge Police",                           "Police Police",
+)
+
+
+##
+## Outcome B: Deservingness
 
 deserving_vars <- c("d_incppl_pris_abc", "d_crim_abc", "d_incwomen_abc")
 
@@ -47,59 +112,6 @@ all_deserving_vars <- c(
   "d_homeown_c", "d_regufee_c", "d_gunvi_vict_c", "d_polbrut_vict_c",
   "d_unins_c", "d_mentill_c", "d_aids_c", "d_gay_c", "d_lesbians_c"
 )
-
-##
-
-policy_vars <- c(
-  "prisonhelp", "prisonpen",
-  "q23_2_rev", "q23_7_rev", "q25_2_rev", "q25_3_rev", "q25_4_rev", "q25_6_rev",
-  "prisonpen_1", "prisonpen_5"
-)
-
-policy_map <- tibble::tribble(
-  ~var,          ~label,                                              ~section,
-  "prisonhelp",  "Help-oriented policy index",                        "Help",
-  "q23_2_rev",   "Voting rights after serving felony sentences",      "Help",
-  "q23_7_rev",   "Ensuring eligible incarcerated people can vote",    "Help",
-  "q25_2_rev",   "Minimum wage for prison labor",                     "Help",
-  "q25_3_rev",   "Free calls with family members",                    "Help",
-  "q25_4_rev",   "Funding GED and college courses in prisons",        "Help",
-  "q25_6_rev",   "Sentencing alternatives for parents of young children", "Help",
-  "prisonpen",   "Punitive policy index",                             "Punish",
-  "prisonpen_1", "Death penalty for people convicted of murder",      "Punish",
-  "prisonpen_5", "Life without parole sentences",                     "Punish"
-)
-
-##
-
-police_items_1_to_5 <- c(
-  "q15_1_1_to_5",
-  "q15_2_1_to_5",
-  "q15_3_1_to_5",
-  "q15_4_1_to_5",
-  "q15_5_1_to_5"
-)
-
-police_items_labels <- c(
-  q15_1_1_to_5 = "Local Police",
-  q15_2_1_to_5 = "No Strangle",
-  q15_3_1_to_5 = "Police Tracker",
-  q15_4_1_to_5 = "Police Training",
-  q15_5_1_to_5 = "Charge Police"
-)
-
-police_map <- tibble::tribble(
-  ~var,          ~label,                                              ~section,
-  "q15_1_1_to_5",  "Local Police",                              "Misc. Police",
-  "q15_2_1_to_5",   "No Strangle",                          "Police Violence",
-  "q15_3_1_to_5",   "Police Tracker",                          "Police Police",
-  "q15_4_1_to_5",   "Police Training",                       "Police Violence",
-  "q15_5_1_to_5",   "Charge Police",                           "Police Police",
-)
-
-
-##
-
 ##
 
 #Gov pays attention to preferences? 1 not much, 2 some, 3 a lot
@@ -109,6 +121,19 @@ political_behavior_labels <- c(
   gov_attn = "Government pays attention",
   vote2020 = "Voted in 2020",
   willvote = "Plans to vote"
+)
+
+## CONTROLS
+
+# race vars used in basic impact table
+
+race_vars <- c("White", "Black", "Hispanic", "OtherRace")
+
+race_labels <- c(
+  White = "White",
+  Black = "Black",
+  Hispanic = "Hispanic",
+  OtherRace = "Other Race"
 )
 
 ##
@@ -146,6 +171,7 @@ desor_core_label <- c(
   desor_core = "Deservingness orientation"
 )
 
+#FIRE controls 
 fire_controls <- c(
   "fire_rare",
   "fire_privilege",
