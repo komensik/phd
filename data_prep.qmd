@@ -11,6 +11,7 @@ knitr::opts_chunk$set(
   message = FALSE
 )
 
+
 # Load packages
 library(dplyr)
 library(tidyr)
@@ -483,6 +484,12 @@ raw_data_cleaned <- raw_data_cleaned %>%
   }))
 
 sapply(raw_data_cleaned[vars_to_clean], class)
+
+```
+
+```{r}
+
+
 
 ```
 
