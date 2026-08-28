@@ -28,7 +28,7 @@ policy_vars <- c("q25_help_items", "prisonpen",
 
 policy_map <- tibble::tribble(
   ~var,          ~label,                                              ~section,
-  "q25_help_items", "Help-oriented CJ policy index",                  "Help"
+  "q25_help_items", "Help-oriented CJ policy index",                  "Help",
   "post_felony_vote_rev_1_to_4",   "Post-sentence voting rights restoration", "Help",
   "jail_access_rev_1_to_4", "Requiring eligible incarcerated people ability to vote",  "Help",
   "q25_2_rev",   "Minimum wage for prison labor",                     "Help",
