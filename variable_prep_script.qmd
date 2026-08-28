@@ -22,6 +22,7 @@ library(haven)
 library(tibble)
 library(gt)
 library(psych)
+library(ggplot2)
 
 ```
 
@@ -933,8 +934,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
   mutate(prisonpen = mean(c_across(c(dpen_rev, lwop_rev)), na.rm = TRUE)) %>%
   ungroup()
 
-summary(raw_data_cleaned$dpen_rev)
-summary(raw_data_cleaned$lwop_rev)
+
+
 ```
 
 Takeaway: prison pen, prison pen 1 = dpen, prison pen 5 = lwop now -confirmed that prisonpen works -- constructed with average of death penalty and lwop. USE dpen_rev and lwop_rev ! and prisonpen
@@ -952,12 +953,107 @@ OPTIONAL/potentially helpful for tables: factor version
 #   ))
 ```
 
+Visualizing the data
+```{r}
+hist(raw_data_cleaned$dpen_rev)
+print(hist(raw_data_cleaned$lwop_rev))
+print(hist(raw_data_cleaned$q25_5))
+
+# ------------------------------------------------------------
+# bar plot for overleaf
+# ------------------------------------------------------------
+
+pen_data <- raw_data_cleaned %>%
+  select(all_of(pen_vars)) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "item",
+    values_to = "position"
+  ) %>%
+  filter(!is.na(position)) %>%
+  mutate(
+    item = factor(
+      item,
+      levels = c(
+        "dpen_rev",
+        "lwop_rev"
+      ),
+      labels = c(
+        "Death Penalty",
+        "Life Without Parole"
+      )
+    ),
+    
+    # Treat the response categories as discrete/ordinal categories
+    position = factor(
+      position,
+      levels = c(1, 2, 2.5, 3, 4)
+    )
+  ) %>%
+  count(item, position, .drop = FALSE)
+# ------------------------------------------------------------
+# make figure
+# ------------------------------------------------------------
+pen_barplot <- ggplot(
+  pen_data,
+  aes(x = position, y = n)
+) +
+  geom_col(
+    width = 0.70,
+    fill = "grey35"
+  ) +
+  facet_wrap(
+    ~ item,
+    ncol = 2
+  ) +
+  scale_x_discrete(drop = FALSE) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+  labs(
+    x = "Position",
+    y = "Number of Respondents",
+    caption = paste0(
+      "Position: 1 = Strongly Oppose; 2 = Somewhat Oppose; ",
+      "2.5 = Unsure; 3 = Somewhat Support; 4 = Strongly Support."
+    )
+  ) +
+  theme_classic(base_size = 11) +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(
+      face = "bold",
+      size = 11
+    ),
+    axis.title = element_text(size = 11),
+    axis.text = element_text(size = 9.5),
+    panel.spacing = grid::unit(1, "lines"),
+    plot.caption = element_text(
+      size = 9,
+      hjust = 0,
+      margin = margin(t = 8)
+    )
+  )
+
+# ------------------------------------------------------------
+# save/print
+# ------------------------------------------------------------
+
+ggsave(
+  filename = "figures/pen_barplot.pdf",
+  plot = q25_barplot,
+  width = 6.5,
+  height = 5,
+  units = "in",
+)
+
+
+```
+
+
 #### D.3 Punitive Items: Doing Cronback's Alpha
 
 ```{r}
-library(psych)
-library(dplyr)
-
 #prisonpen, prisonpen_1, prisonpen_5
 pen_vars <- c("dpen_rev", "lwop_rev")
 
@@ -1036,8 +1132,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
   rowwise() %>% #dplyr should treat each row as own group so c_across() can return row level vector of cols for that row
   mutate(q25_help_items = mean(c_across(c(q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev)), na.rm = TRUE)) %>%
   ungroup()
-
-names(raw_data_cleaned)
 
 ```
 
@@ -1197,14 +1291,8 @@ ggsave(
   width = 6.5,
   height = 5,
   units = "in",
-  device = cairo_pdf
 )
 q25_barplot
-# box plot 
-boxplot(
-  raw_data_cleaned[q25_help_vars],
-  main = "Q25 Help Items",
-  ylab = "Response"
 
 
 ```
@@ -1446,7 +1534,6 @@ ggsave(
   width = 6.5,
   height = 5,
   units = "in",
-  device = cairo_pdf
 )
 incarc_electoral_barplot
 
@@ -1528,17 +1615,17 @@ Decided to skip because of how questions are worded/coded. Will need to return t
 10-27 Diagnostics
 
 ```{r}
-names(raw_data_cleaned) %>% stringr::str_subset("q25|q23|q62|prison|help|punish|rehab")
-
-glimpse(raw_data_cleaned %>% select(starts_with("q25"), starts_with("q23"), starts_with("q62"), starts_with("prison"), starts_with("penal")))
-
-
-glimpse(dplyr::select(raw_data_cleaned,
-                      starts_with("q25_"),
-                      starts_with("q23_"),
-                      starts_with("q62"),
-                      starts_with("prison"),
-                      starts_with("penal")))
+# names(raw_data_cleaned) %>% stringr::str_subset("q25|q23|q62|prison|help|punish|rehab")
+# 
+# glimpse(raw_data_cleaned %>% select(starts_with("q25"), starts_with("q23"), starts_with("q62"), starts_with("prison"), starts_with("penal")))
+# 
+# 
+# glimpse(dplyr::select(raw_data_cleaned,
+#                       starts_with("q25_"),
+#                       starts_with("q23_"),
+#                       starts_with("q62"),
+#                       starts_with("prison"),
+#                       starts_with("penal")))
 
 ```
 
@@ -1555,7 +1642,7 @@ glimpse(dplyr::select(raw_data_cleaned,
 #raw_data_cleaned %>% count(Q111)
 
 fire_vars <- c("q32", "q33", "q34", "q111")
-
+names(raw_data_cleaned)
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
     all_of(fire_vars),
