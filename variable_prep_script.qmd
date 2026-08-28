@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, echo=FALSE}
 knitr::opts_chunk$set(
   echo = FALSE,       # Hide code by default
   warning = FALSE,
@@ -38,7 +38,7 @@ File created in data_prep.qmd
 raw_data_cleaned <- readr::read_csv("data/cleaned/cleaned_light.csv") 
 #CONTINGENT note that alhough this is called raw_data_cleaned, it is the equivalent of "cleaned_data_light" from data_prep.qmd. See that file to pull the version with old var names for D and P. Note: no power here.
 
-#names(raw_data_cleaned)
+names(raw_data_cleaned)
 
 ```
 
