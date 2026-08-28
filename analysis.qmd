@@ -93,6 +93,7 @@ problematic <- raw_data_cleaned %>%
 ```
 
 ### (b) counts of problems
+
 there are 32 of these problematic responses in total.
 
 ```{r}
@@ -772,6 +773,7 @@ cat(latex_tables[["Black"]])
 cat(latex_tables[["Hispanic"]])
 cat(latex_tables[["Other Race"]])
 ```
+
 # 2. Policy
 
 ## 2.1 Policy Means
@@ -1387,44 +1389,35 @@ Police Means Tables
 ```
 
 # 3. Policy Regressions
-This section continues to use variable_labels.R. The goal of this section was to avoid
-and clean up extensive seperated regressions, and instead incorporate use loop that iteratively work through outcome variables and incorporate controls.
 
-PRE 08-26, it had two sets of regression models. 
+This section continues to use variable_labels.R. The goal of this section was to avoid and clean up extensive seperated regressions, and instead incorporate use loop that iteratively work through outcome variables and incorporate controls.
 
-Set 1 are asks "across the full sample, how is each form of impact associated with each policy outcome before adding controls (ie, prisonhelp ~ incarc) and then after/as we add controls (ie, prisonhelp ~incarc + Black + Hispanic + OtherRace + gender). (policy_dummies_waves)
+PRE 08-26, it had two sets of regression models.
 
-Set 2 asks instead how each impacted subgroup compares specifically compares with respondents who are fully not-impacted. ie, I throw out respondents who are impacted in some other way, but not directly incarcerated; I compare impact == 0 to incarc == 1). 
+Set 1 are asks "across the full sample, how is each form of impact associated with each policy outcome before adding controls (ie, prisonhelp \~ incarc) and then after/as we add controls (ie, prisonhelp \~incarc + Black + Hispanic + OtherRace + gender). (policy_dummies_waves)
+
+Set 2 asks instead how each impacted subgroup compares specifically compares with respondents who are fully not-impacted. ie, I throw out respondents who are impacted in some other way, but not directly incarcerated; I compare impact == 0 to incarc == 1).
 
 As of now, it (policy_vs_nonimp_waves) compares those groups (ie incarc == 1 and impact == 0) and then does so with controls.
 
 Then this chunk builds tables.
 
-***08-26 I HAVE NOW RECODED incarc, knowincarc, and vict so that 1 = impacted in that particular way and 0 = NOT IMPACTED at all (ie, impact == 0). 
+\*\*\*08-26 I HAVE NOW RECODED incarc, knowincarc, and vict so that 1 = impacted in that particular way and 0 = NOT IMPACTED at all (ie, impact == 0).
 
-This means that I don't need the same 2 goal situation. I am now cleaning this up so that the main models will say: 
+This means that I don't need the same 2 goal situation. I am now cleaning this up so that the main models will say:
 
 For every policy DV:
 
-1. Any impact vs no impact
-2. Direct impact vs no impact
-3. Proximal impact vs no impact
-4. Victim impact vs no impact
+1.  Any impact vs no impact
+2.  Direct impact vs no impact
+3.  Proximal impact vs no impact
+4.  Victim impact vs no impact
 
-Run each through:
-    Model 1: no controls
-    Model 2: demographics
-    Model 3: demographics + party/ideology
-    Model 4: full attitudes
+Run each through: Model 1: no controls Model 2: demographics Model 3: demographics + party/ideology Model 4: full attitudes
 
 ### 3.1A: Framework for model sequence
 
-control_waves
-   |
-   |-- nocontrol
-   |-- demo
-   |-- party_ideo
-   |-- full_attitudes
+control_waves \| \|-- nocontrol \|-- demo \|-- party_ideo \|-- full_attitudes
 
 ```{r}
 # ============================================================
@@ -1536,7 +1529,6 @@ policy_dummies_partyideo_models <- policy_dummies_waves[["party_ideo"]]
 policy_dummies_full_models <- policy_dummies_waves[["full_attitudes"]]
 
 ```
-
 
 ## 3.3 -- PRE 08-26 RECODING "restricted" model for when incarc, knowincarc, vict were coded such that 0 meant not incarc, not vict, etc.. (08-2026 no longer necessary for main reported relationships having recoded incarc, knowincarc, and vict)
 

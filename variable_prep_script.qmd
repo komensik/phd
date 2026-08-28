@@ -280,6 +280,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ```
 
 #### Vict Variable (Constructing For-Analysis)
+
 ```{r}
 
 # raw_data_cleaned <- raw_data_cleaned %>%
@@ -989,13 +990,14 @@ results - The **correlation** between the two items is **r = 0.238**.
 
 Interpretation
 
-- **These two punitive items are positively related, but  weakly so.** People who favor the death penalty are *somewhat* more likely to favor LWOP, but plenty of respondents don’t treat them as interchangeable.
+- **These two punitive items are positively related, but weakly so.** People who favor the death penalty are *somewhat* more likely to favor LWOP, but plenty of respondents don’t treat them as interchangeable.
 
 - That’s not necessarily a “problem.” Death penalty and LWOP are conceptually related (punitive severity), but they can tap **different moral/legal intuitions** (irreversibility, innocence risk, retribution vs incapacitation), so moderate association is plausible.
 
 - The response distribution shows a **nontrivial chunk of “Don’t know”** recoded to 2.5 (15–17%) and about **8% missing** for each item. The DK-to-midpoint choice can slightly inflate apparent consistency by shrinking variance, so reliability is a conservative-ish check but not definitive.
 
 Visualizing the data
+
 ```{r}
 # hist(raw_data_cleaned$dpen_rev)
 # print(hist(raw_data_cleaned$lwop_rev))
@@ -1133,7 +1135,9 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ```
 
 ##### D.4_A Descriptive
+
 prisonhelp is the average of means of the help items (just prison policy "help" excluding the prison and voting ones); q25_help_items is to look at them separately
+
 ```{r}
 
 #checking variance + SD here 08-2026)
@@ -1299,6 +1303,7 @@ q25_barplot
 
 
 ```
+
 Correlations, Crohnbach's alpha
 
 ```{r}
@@ -1325,9 +1330,6 @@ q25_help_data <- raw_data_cleaned %>%
 cor(q25_help_data,
     use = "pairwise.complete.obs")
 ```
-
-
-
 
 Ordered factor versions- could be useful for plotting/tables/labeling) but as of 08-2026 don't use
 
@@ -1438,18 +1440,16 @@ hist(raw_data_cleaned$jail_access_rev)
 
 print(summary(raw_data_cleaned$post_felony_vote_rev))
 print(summary(raw_data_cleaned$jail_access_rev))
-``` 
-Come out of above block with: 
-post_felony_vote_rev          individual item, 1–3
-jail_access_rev               individual item, 1–3
-incarc_electoral_mean         combined measure, 1–3
+```
 
-post_felony_vote_rev_1_to_4   comparable item, 1–4
-jail_access_rev_1_to_4        comparable item, 1–4
-incarc_electoral_mean_1_to_4  comparable combined measure, 1–4
+Come out of above block with: post_felony_vote_rev individual item, 1–3 jail_access_rev individual item, 1–3 incarc_electoral_mean combined measure, 1–3
 
-#### D.4_C Prison/Election Items Descriptive look 
+post_felony_vote_rev_1_to_4 comparable item, 1–4 jail_access_rev_1_to_4 comparable item, 1–4 incarc_electoral_mean_1_to_4 comparable combined measure, 1–4
+
+#### D.4_C Prison/Election Items Descriptive look
+
 What's up
+
 ```{r}
 
 #bar plot for overleaf
@@ -1542,8 +1542,8 @@ incarc_electoral_barplot
 
 ```
 
+Correlation between jail voting and rights restoration
 
-Correlation between jail voting and rights restoration 
 ```{r}
 
 incarc_electoral_data <- raw_data_cleaned %>%
@@ -1557,18 +1557,11 @@ print(psych::corr.test(incarc_electoral_data))
 print(psych::alpha(incarc_electoral_data))
 ```
 
-
 What about relationship between all the help variables (2 election, 4 others?)
 
 Need
 
-post_felony_vote_rev
-jail_access_rev_1_to_4
-q25_help_data or q25_2_rev,
-    q25_3_rev,
-    q25_4_rev,
-    q25_6_rev
-
+post_felony_vote_rev jail_access_rev_1_to_4 q25_help_data or q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev
 
 ```{r, electionhelpqs}
 
@@ -1650,7 +1643,6 @@ combined_alpha <- psych::alpha(
 
 print(combined_alpha)
 ```
-
 
 #### D5. Variance and Stand Dev
 

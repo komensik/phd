@@ -1,0 +1,27 @@
+---
+title: "experiences.qmd"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(tibble)
+library(gt)
+library(psych)
+library(ggplot2)
+
+raw_data <- read_csv("./data/cleaned/coded_data__08_2026_3.csv")
+```
+
+```{r}
+
+
+
+```
