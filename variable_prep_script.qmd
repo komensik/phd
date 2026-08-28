@@ -21,6 +21,7 @@ library(stringr)
 library(haven)
 library(tibble)
 library(gt)
+library(psych)
 
 ```
 
@@ -60,111 +61,101 @@ Creating a core composite score for groups evaluated by all 3 ABC first. Flaggin
 
 ```{r desor}
 
-#names(raw_data_cleaned)
-
-#summary(raw_data_cleaned$d_mentill_c)
-
-#NEW (OCT 27) DESOR
+# ------------------------------------------------------------
+# Deservingness / "sympathy" orientation: CORE items
+# ------------------------------------------------------------
 
 desor_core_vars <- c(
   "d_welfare_tanf_abc","d_fstamps_snap_abc","d_medicaid_abc","d_medicare_abc",
   "d_unemployed_abc","d_poorfam_abc","d_homeless_abc","d_immigrants_abc","d_unauth_undoc_abc"
 )
 
-# below, try to keep only things in current dataset / prevent old code constructs I don't want to include
-core_vars <- intersect(desor_core_vars, names(raw_data_cleaned))
-# Takes the vector  defined earlier (desor_core_vars) and keeps only those names that actually exist in the current data. Prevents errors if a column is missing or was renamed
+#no -99s, are all numeric
 
-core_mat  <- dplyr::select(raw_data_cleaned, dplyr::all_of(core_vars))
-#Builds a mini data frame (matrix) containing only the core variables (columns) from dataset.
+# ------------------------------------------------------------
+# 1. Item-only data and missingness
+# ------------------------------------------------------------
 
-core_n    <- rowSums(!is.na(core_mat))
-#For each respondent (row), counts how many core items are non-missing. Will be used to enforce minimum answered-items rule
+# Item-only data
+core_mat <- raw_data_cleaned %>%
+  select(all_of(desor_core_vars))
 
-raw_data_cleaned$desor_core   <- ifelse(core_n >= 5, rowMeans(core_mat, na.rm = TRUE), NA_real_)
-# Creates the core composite. With 9 core items, “≥5” ≈ a 50% completeness rule—balances coverage and reliability.
+# Number of observed items per respondent
+core_n <- rowSums(!is.na(core_mat))
 
-raw_data_cleaned$desor_core_z <- as.numeric(scale(raw_data_cleaned$desor_core))
-# Makes a standardized version (z-score) of the core composite (mean 0, sd 1).
-# Convenient for regression comparability and coefficient interpretation.
+print(table(core_n, useNA = "ifany"))
 
+# ------------------------------------------------------------
+# 2. Should they be index? Correlations among component items
+# ------------------------------------------------------------
 
-# EXTENDED VERSION -- groups only evaluated by 1 of ABC. For robustness. 
-desor_ext_vars <- c(desor_core_vars, "d_unins_c", "d_mentill_c", "d_noncit_parent_a")
-ext_vars <- intersect(desor_ext_vars, names(raw_data_cleaned))
-ext_mat  <- dplyr::select(raw_data_cleaned, dplyr::all_of(ext_vars))
-ext_n    <- rowSums(!is.na(ext_mat))
-raw_data_cleaned$desor_ext    <- ifelse(ext_n >= 6, rowMeans(ext_mat, na.rm = TRUE), NA_real_)
-raw_data_cleaned$desor_ext_z  <- as.numeric(scale(raw_data_cleaned$desor_ext))
+desor_corr <- psych::corr.test(
+  core_mat,
+  use = "pairwise",
+  method = "pearson",
+  adjust = "none"
+)
 
-# Check
-summary(raw_data_cleaned$desor_core); table(core_n)
-summary(raw_data_cleaned$desor_ext);  table(ext_n)
+# Pairwise correlations
+view(round(desor_corr$r, 2))
 
-summary(raw_data_cleaned$desor_core); table(core_n, useNA="ifany")
-summary(raw_data_cleaned$desor_ext);  table(ext_n,  useNA="ifany")
+# N used for each pairwise correlation
+print(desor_corr$n)
 
+# ------------------------------------------------------------
+# 3. Reliability / internal consistency
+# ------------------------------------------------------------
 
-```
+# Eligibility rule for composite
+# at least 5 of 9 items observed
+core_keep <- core_n >= 5
 
-Section Conclusion: - creates composite desor Main specs: use desor_core_z.
-
-Robustness: re-estimate with desor_ext_z and add + factor(block) (or + block) to your regressions.
-
-Keep justice-adjacent targets out of both composites.
-
-#### Deservingness Orientation Control -- Checks
-
-```{r}
-library(psych)
+print(table(core_keep, useNA = "ifany"))
 
 
-# keep only vars that exist
-core_vars <- intersect(desor_core_vars, names(raw_data_cleaned))
+core_alpha <- psych::alpha(
+  core_mat[core_keep, ],
+  check.keys = TRUE
+)
 
-# build item matrix/dataframe
-core_mat <- dplyr::select(raw_data_cleaned, dplyr::all_of(core_vars))
-
-# apply your completeness rule (>= 5 answered out of 9)
-core_keep <- rowSums(!is.na(core_mat)) >= 5
-
-# Cronbach's alpha on respondents who meet the rule
-core_alpha <- psych::alpha(core_mat[core_keep, ], check.keys = TRUE)
-
-# key outputs
+# Key reliability outputs
 print(core_alpha$total$raw_alpha)
 print(core_alpha$total$std.alpha)
 print(core_alpha$total$average_r)
 print(core_alpha$n.obs)
+
+# Item diagnostics
 print(core_alpha$alpha.drop)
 print(core_alpha$item.stats)
 
+# Check whether psych automatically reversed any items
+print(core_alpha$keys)
+
+# ------------------------------------------------------------
+# 4. Construct respondent-level composite
+# ------------------------------------------------------------
+
+raw_data_cleaned$desor_core <- ifelse(
+  core_keep,
+  rowMeans(core_mat, na.rm = TRUE),
+  NA_real_
+)
+
+print(summary(raw_data_cleaned$desor_core))
+
+
+# ------------------------------------------------------------
+# 5. Standardized version for models
+# ------------------------------------------------------------
+
+raw_data_cleaned$desor_core_z <-
+  as.numeric(scale(raw_data_cleaned$desor_core))
+
+print(summary(raw_data_cleaned$desor_core_z))
 
 ```
 
-Interpretation: raw_alpha: 0.9078 and 0.9142 internal consistency -- suggests items hang together well. average_r = 0.5422 -- high inter-item correlation. cor: fairly strong correlation to the DV (0.547) R\^2 = 0.30 bivariately. Soaks up general generosity toward assistance-framed groups. Should justify use of control for testing whether contact predicts deservingness of incarcerated people, above and beyond that general orientation.
-
-```{r}
-# reliability -- EXT
-
-ext_mat  <- dplyr::select(raw_data_cleaned, dplyr::all_of(ext_vars))
-ext_keep <- rowSums(!is.na(ext_mat)) >= 6
-# alpha on complete cases after the ≥6 rule
-psych::alpha(na.omit(ext_mat[ext_keep, ]), check.keys = TRUE)
-
-#  per-block alphas
-psych::alpha(na.omit(ext_mat[ext_keep & raw_data_cleaned$block=="A", ]), check.keys = TRUE)
-psych::alpha(na.omit(ext_mat[ext_keep & raw_data_cleaned$block=="B", ]), check.keys = TRUE)
-psych::alpha(na.omit(ext_mat[ext_keep & raw_data_cleaned$block=="C", ]), check.keys = TRUE)
-
-```
-
-```{r}
-#standardize
-raw_data_cleaned$desor_core_z <- as.numeric(scale(raw_data_cleaned$desor_core))
-raw_data_cleaned$desor_ext_z  <- as.numeric(scale(raw_data_cleaned$desor_ext))
-
-```
+oooold Interpretation: raw_alpha: 0.9078 and 0.9142 internal consistency -- suggests items hang together well. average_r = 0.5422 -- high inter-item correlation. cor: fairly strong correlation to the DV (0.547) R\^2 = 0.30 bivariately. Soaks up general generosity toward assistance-framed groups. Should justify use of control for testing whether contact predicts deservingness of incarcerated people, above and beyond that general orientation.
 
 #### A1. Deserving Validation
 
