@@ -18,17 +18,17 @@ impact_labels <- c(
 
 
 ## Outcome A: Policy Questions
-
+**prisonhelp back in? 
 q25_help_vars <- c("25_2_rev", "q25_3_rev","q25_4_rev","q25_6_rev")
 
-policy_vars <- c("q25_help_items", "prisonpen",
+policy_vars <- c("prisonhelp", "prisonpen",
   "post_felony_vote_rev", "jail_access_rev", "q25_2_rev", "q25_3_rev", "q25_4_rev", "q25_6_rev",
   "dpen_rev", "lwop_rev" 
 )
 
 policy_map <- tibble::tribble(
   ~var,          ~label,                                              ~section,
-  "q25_help_items", "Help-oriented CJ policy index",                  "Help",
+  "prisonhelp", "Help-oriented CJ policy index",                  "Help",
   "post_felony_vote_rev",   "Post-sentence voting rights restoration", "Help",
   "jail_access_rev", "Requiring eligible incarcerated people ability to vote",  "Help",
   "q25_2_rev",   "Minimum wage for prison labor",                     "Help",

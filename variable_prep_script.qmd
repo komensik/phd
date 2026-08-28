@@ -1083,7 +1083,7 @@ pen_barplot <- ggplot(
 
 ggsave(
   filename = "figures/pen_barplot.pdf",
-  plot = q25_barplot,
+  plot = pen_barplot,
   width = 6.5,
   height = 5,
   units = "in",
@@ -1091,13 +1091,6 @@ ggsave(
 
 
 ```
-
-
-Visual
-
-
-
-
 
 #### D.4_A Q25 'Help-Oriented' Prison Policy.
 
