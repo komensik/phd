@@ -953,6 +953,48 @@ OPTIONAL/potentially helpful for tables: factor version
 #   ))
 ```
 
+#### D.3 Punitive Items: Doing Cronback's Alpha
+
+```{r}
+#prisonpen, prisonpen_1, prisonpen_5
+pen_vars <- c("dpen_rev", "lwop_rev")
+
+pen_data <- raw_data_cleaned %>%
+  select(all_of(pen_vars))
+
+cor(pen_data,
+    use = "pairwise.complete.obs")
+
+print(psych::corr.test(pen_data))
+
+print(psych::alpha(pen_data))
+
+# Quick look
+psych::describe(pen_data)
+
+# Correlation (more interpretable than alpha for 2 items)
+cor(raw_data_cleaned[pen_vars], use = "pairwise.complete.obs")
+
+# Cronbach's alpha (fine to report, but remember it's 2 items)
+psych::alpha(pen_data, check.keys = FALSE)
+
+summary(raw_data_cleaned$dpen_rev)
+
+summary(raw_data_cleaned$lwop_rev)
+```
+
+results - The **correlation** between the two items is **r = 0.238**.
+
+- With only two items, Cronbach’s alpha is essentially a rescaled version of that correlation. (So don’t oversell alpha here; the correlation is the clean summary.)
+
+Interpretation
+
+- **These two punitive items are positively related, but  weakly so.** People who favor the death penalty are *somewhat* more likely to favor LWOP, but plenty of respondents don’t treat them as interchangeable.
+
+- That’s not necessarily a “problem.” Death penalty and LWOP are conceptually related (punitive severity), but they can tap **different moral/legal intuitions** (irreversibility, innocence risk, retribution vs incapacitation), so moderate association is plausible.
+
+- The response distribution shows a **nontrivial chunk of “Don’t know”** recoded to 2.5 (15–17%) and about **8% missing** for each item. The DK-to-midpoint choice can slightly inflate apparent consistency by shrinking variance, so reliability is a conservative-ish check but not definitive.
+
 Visualizing the data
 ```{r}
 # hist(raw_data_cleaned$dpen_rev)
@@ -1050,46 +1092,6 @@ ggsave(
 
 ```
 
-
-#### D.3 Punitive Items: Doing Cronback's Alpha
-
-```{r}
-#prisonpen, prisonpen_1, prisonpen_5
-pen_vars <- c("dpen_rev", "lwop_rev")
-
-pen_data <- raw_data_cleaned %>%
-  select(all_of(pen_vars))
-
-cor(pen_data,
-    use = "pairwise.complete.obs")
-
-print(psych::corr.test(pen_data))
-
-print(psych::alpha(pen_data))
-
-# Quick look
-psych::describe(pen_data)
-
-# Correlation (more interpretable than alpha for 2 items)
-cor(raw_data_cleaned[pen_vars], use = "pairwise.complete.obs")
-
-# Cronbach's alpha (fine to report, but remember it's 2 items)
-psych::alpha(pen_data, check.keys = FALSE)
-
-
-```
-
-results - The **correlation** between the two items is **r = 0.238**.
-
-- With only two items, Cronbach’s alpha is essentially a rescaled version of that correlation. (So don’t oversell alpha here; the correlation is the clean summary.)
-
-Interpretation
-
-- **These two punitive items are positively related, but  weakly so.** People who favor the death penalty are *somewhat* more likely to favor LWOP, but plenty of respondents don’t treat them as interchangeable.
-
-- That’s not necessarily a “problem.” Death penalty and LWOP are conceptually related (punitive severity), but they can tap **different moral/legal intuitions** (irreversibility, innocence risk, retribution vs incapacitation), so moderate association is plausible.
-
-- The response distribution shows a **nontrivial chunk of “Don’t know”** recoded to 2.5 (15–17%) and about **8% missing** for each item. The DK-to-midpoint choice can slightly inflate apparent consistency by shrinking variance, so reliability is a conservative-ish check but not definitive.
 
 Visual
 
