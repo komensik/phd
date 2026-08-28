@@ -1441,7 +1441,7 @@ control_waves <- list(
   demo = demo_controls,
   party_ideo = c(demo_controls, party_ideo_controls),
   full_attitudes = c(demo_controls, party_ideo_controls,
-                     fire_controls) # 8-26 once desorcore fixed, add #desor_core to this list in full_attitudes
+                     fire_controls, desor_core) # 8-26 once desorcore fixed, add #desor_core to this list in full_attitudes
 )
 ```
 
