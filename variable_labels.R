@@ -18,7 +18,7 @@ impact_labels <- c(
 
 
 ## Outcome A: Policy Questions
-**prisonhelp back in? 
+
 q25_help_vars <- c("25_2_rev", "q25_3_rev","q25_4_rev","q25_6_rev")
 
 policy_vars <- c("prisonhelp", "prisonpen",
