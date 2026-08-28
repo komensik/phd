@@ -1120,6 +1120,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
     .names = "{.col}_rev"
   ))
 
+
 # now, raw dta cleaned has q25_n_rev (each reverse coded so that higher number means more support)
 
 # step 3: save just the means of q25 help questions as prisonhelp

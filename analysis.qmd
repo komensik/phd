@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, echo=FALSE}
 knitr::opts_chunk$set(
   echo = FALSE,       # Hide code by default
   warning = FALSE,
@@ -39,7 +39,7 @@ library(knitr)
 ```{r}
 
 here::here()
-raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__08_2026_2.csv")
+raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__08_2026_3.csv")
 source("variable_labels.R")
 raw_data_cleaned
 names(raw_data_cleaned)
@@ -47,19 +47,9 @@ names(raw_data_cleaned)
 
 # Descriptive Analyses
 
-| Decision                | Notes                                        |
-|-------------------------|----------------------------------------------|
-| which version of table? | prisonerdeserves (block aware and cleaned)   |
-| NAs?                    | drop silently for plot but log               |
-| scale?                  | raw 0-100 for now                            |
-| compare subgroups?      | for now, overall distribution of just incppl |
-| summary overlays?       | mean line, kernal density, histogram bars    |
-| plot aesthetics?        | clear x-axis label                           |
-| Output                  |                                              |
-
 ## 1.0 Counts
 
-### (a) Experience Counts
+### (a) Mapping Experience Counts
 
 ```{r}
 # because analysis has included previously odd combos (ie people who have nas or say not impacted and both), my first step here is trying to diagnose their patterns of missingness and other things so I can explain to my committee/self what it may or may not mean to include them.
