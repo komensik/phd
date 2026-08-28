@@ -30,7 +30,7 @@ policy_map <- tibble::tribble(
   ~var,          ~label,                                              ~section,
   "q25_help_items", "Help-oriented CJ policy index",                  "Help",
   "post_felony_vote_rev",   "Post-sentence voting rights restoration", "Help",
-  "jail_access_rev_1", "Requiring eligible incarcerated people ability to vote",  "Help",
+  "jail_access_rev", "Requiring eligible incarcerated people ability to vote",  "Help",
   "q25_2_rev",   "Minimum wage for prison labor",                     "Help",
   "q25_3_rev",   "Free calls with family members",                    "Help",
   "q25_4_rev",   "Funding GED and college courses in prisons",        "Help",

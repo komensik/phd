@@ -804,13 +804,13 @@ raw_data_cleaned %>%
 help_means_impact <- (raw_data_cleaned %>%
   dplyr::group_by(impact) %>%
   dplyr::summarise(
-    q23_2_rev = mean(q23_2_rev, na.rm = TRUE),
-    q23_7_rev = mean(q23_7_rev, na.rm = TRUE),
+    post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
     q25_2_rev = mean(q25_2_rev, na.rm=TRUE),
     q25_3_rev = mean(q25_3_rev, na.rm=TRUE),
     q25_4_rev = mean(q25_4_rev, na.rm=TRUE),
     q25_6_rev = mean(q25_6_rev, na.rm=TRUE),
-    prisonhelp   = mean(prisonhelp, na.rm = TRUE),
+    q25_help_items   = mean(q25_help_items, na.rm = TRUE),
     .groups = "drop"
   )
 )
@@ -825,7 +825,7 @@ help_means_incarc <- (raw_data_cleaned %>%
     q25_3_rev = mean(q25_3_rev, na.rm=TRUE),
     q25_4_rev = mean(q25_4_rev, na.rm=TRUE),
     q25_6_rev = mean(q25_6_rev, na.rm=TRUE),
-    prisonhelp   = mean(prisonhelp, na.rm = TRUE),
+    q25_help_items   = mean(q25_help_items, na.rm = TRUE),
     .groups = "drop"
   )
 )
