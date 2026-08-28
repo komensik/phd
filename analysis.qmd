@@ -819,8 +819,8 @@ View(help_means_impact)
 help_means_incarc <- (raw_data_cleaned %>%
   dplyr::group_by(incarc) %>%
   dplyr::summarise(
-    q23_2_rev = mean(q23_2_rev, na.rm = TRUE),
-    q23_7_rev = mean(q23_7_rev, na.rm = TRUE),
+     post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
     q25_2_rev = mean(q25_2_rev, na.rm=TRUE),
     q25_3_rev = mean(q25_3_rev, na.rm=TRUE),
     q25_4_rev = mean(q25_4_rev, na.rm=TRUE),
@@ -834,13 +834,13 @@ View(help_means_incarc)
 help_means_knowincarc <- (raw_data_cleaned %>%
   dplyr::group_by(knowincarc) %>%
   dplyr::summarise(
-    q23_2_rev = mean(q23_2_rev, na.rm = TRUE),
-    q23_7_rev = mean(q23_7_rev, na.rm = TRUE),
+     post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
     q25_2_rev = mean(q25_2_rev, na.rm=TRUE),
     q25_3_rev = mean(q25_3_rev, na.rm=TRUE),
     q25_4_rev = mean(q25_4_rev, na.rm=TRUE),
     q25_6_rev = mean(q25_6_rev, na.rm=TRUE),
-    prisonhelp   = mean(prisonhelp, na.rm = TRUE),
+    q25_help_items   = mean(q25_help_items, na.rm = TRUE),
     .groups = "drop"
   )
 )
@@ -849,26 +849,19 @@ View(help_means_knowincarc)
 help_means_vict <- (raw_data_cleaned %>%
   dplyr::group_by(vict) %>%
   dplyr::summarise(
-    q23_2_rev = mean(q23_2_rev, na.rm = TRUE),
-    q23_7_rev = mean(q23_7_rev, na.rm = TRUE),
+     post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
     q25_2_rev = mean(q25_2_rev, na.rm=TRUE),
     q25_3_rev = mean(q25_3_rev, na.rm=TRUE),
     q25_4_rev = mean(q25_4_rev, na.rm=TRUE),
     q25_6_rev = mean(q25_6_rev, na.rm=TRUE),
-    prisonhelp   = mean(prisonhelp, na.rm = TRUE),
+    q25_help_items   = mean(q25_help_items, na.rm = TRUE),
     .groups = "drop"
   )
 )
 View(help_means_vict)
 
 # overleaf table of all
-
-impact_vars <- c("impact", "incarc", "knowincarc", "vict")
-
-policy_vars <- c(
-  "q23_2_rev", "q23_7_rev", "q25_2_rev",
-  "q25_3_rev", "q25_4_rev", "q25_6_rev", "prisonhelp"
-)
 
 get_means <- function(var) {
   raw_data_cleaned %>%
@@ -900,7 +893,6 @@ Means Tables
 
 ```{r}
 
-summary()
 
 #defining the non impact means and percent differences from impact vars
 pct_diff <- function(x, ref) {
@@ -909,6 +901,7 @@ pct_diff <- function(x, ref) {
 
 policy_summary <- function(df, var) {
   no_impact_mean <- mean(df[[var]][df$impact == 0], na.rm = TRUE)
+  impact_mean <- mean(df[[var]][df$impact == 1], na.rm = TRUE)
   direct_mean    <- mean(df[[var]][df$incarc == 1], na.rm = TRUE)
   proximal_mean  <- mean(df[[var]][df$knowincarc == 1], na.rm = TRUE)
   victim_mean    <- mean(df[[var]][df$vict == 1], na.rm = TRUE)
@@ -916,6 +909,7 @@ policy_summary <- function(df, var) {
   tibble::tibble(
     var = var,
     no_impact_mean = no_impact_mean,
+    impact_mean = pct_diff(impact_mean, no_impact_mean),
     direct_pct = pct_diff(direct_mean, no_impact_mean),
     proximal_pct = pct_diff(proximal_mean, no_impact_mean),
     victim_pct = pct_diff(victim_mean, no_impact_mean)
@@ -1004,6 +998,7 @@ mean_diff <- function(x, ref) {
 
 policy_summary <- function(df, var) {
   no_impact_mean <- mean(df[[var]][df$impact == 0], na.rm = TRUE)
+  impact_mean <- mean(df[[var]][df$impact == 1], na.rm = TRUE)
   direct_mean    <- mean(df[[var]][df$incarc == 1], na.rm = TRUE)
   proximal_mean  <- mean(df[[var]][df$knowincarc == 1], na.rm = TRUE)
   victim_mean    <- mean(df[[var]][df$vict == 1], na.rm = TRUE)
@@ -1011,9 +1006,10 @@ policy_summary <- function(df, var) {
   tibble::tibble(
     var = var,
     no_impact_mean = no_impact_mean,
-    direct_diff   = mean_diff(direct_mean, no_impact_mean),
-    proximal_diff = mean_diff(proximal_mean, no_impact_mean),
-    victim_diff   = mean_diff(victim_mean, no_impact_mean)
+    impact_mean = pct_diff(impact_mean, no_impact_mean),
+    direct_pct = pct_diff(direct_mean, no_impact_mean),
+    proximal_pct = pct_diff(proximal_mean, no_impact_mean),
+    victim_pct = pct_diff(victim_mean, no_impact_mean)
   )
 }
 
@@ -1025,6 +1021,7 @@ policy_table <- purrr::map_dfr(
   dplyr::select(
     var, section, label,
     no_impact_mean,
+    impact_mean,
     direct_diff,
     proximal_diff,
     victim_diff

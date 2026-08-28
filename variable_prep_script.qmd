@@ -1076,6 +1076,7 @@ cor(raw_data_cleaned[pen_vars], use = "pairwise.complete.obs")
 # Cronbach's alpha (fine to report, but remember it's 2 items)
 psych::alpha(pen_data, check.keys = FALSE)
 
+
 ```
 
 results - The **correlation** between the two items is **r = 0.238**.
@@ -1109,7 +1110,7 @@ q25_help_items <- c("q25_2", "q25_3", "q25_4", "q25_6")
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(all_of(q25_help_items), ~ na_if(as.numeric(.), -99)))
 
-# Step 2: Create reverse-coded versions (1 = strong favor → 4 = strong oppose becomes 4 → 1 so higher means more support for help oriented policyaQ                                                 )
+# Step 2: Create reverse-coded versions (1 = strong favor → 4 = strong oppose becomes 4 → 1 so higher means more support for help oriented policyaQ                                                 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
     all_of(q25_help_items),
@@ -1126,26 +1127,31 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 # now, raw dta cleaned has q25_n_rev (each reverse coded so that higher number means more support)
 
-# step 3: save just the means of q25 help questions as q25_help_items
+# step 3: save just the means of q25 help questions as prisonhelp
 
 raw_data_cleaned <- raw_data_cleaned %>% 
   rowwise() %>% #dplyr should treat each row as own group so c_across() can return row level vector of cols for that row
-  mutate(q25_help_items = mean(c_across(c(q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev)), na.rm = TRUE)) %>%
+  mutate(prisonhelp = mean(c_across(c(q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev)), na.rm = TRUE)) %>%
   ungroup()
 
 ```
 
 ##### D.4_A Descriptive
-q25_help_items is the average of means of the help items (just prison policy "help" excluding the prison and voting ones); q25_help_items is to look at them separately
+prisonhelp is the average of means of the help items (just prison policy "help" excluding the prison and voting ones); q25_help_items is to look at them separately
 ```{r}
 
 #checking variance + SD here 08-2026)
-summary(raw_data_cleaned$q25_help_items)
+summary(raw_data_cleaned$prisonhelp)
 
 summary(raw_data_cleaned$q25_6_rev)
 
 
 q25_help_vars <- c("q25_2_rev", "q25_3_rev", "q25_4_rev", "q25_6_rev")
+
+# 
+# prisonhelp_data <- raw_data_cleaned %>%
+#   select(all_of(q25_help_vars))
+
 
 psych::describe(raw_data_cleaned[q25_help_vars])
 
@@ -1161,6 +1167,7 @@ print(hist(raw_data_cleaned$q25_6_rev))
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+
 
 q25_long <- raw_data_cleaned %>%
   select(all_of(q25_help_vars)) %>%
@@ -1180,25 +1187,25 @@ ggplot(q25_long, aes(x = response)) +
 
 #barplots
 
-par(mfrow = c(2, 2))
-
-barplot(table(raw_data_cleaned$q25_2_rev),
-        main = "q25_2_rev",
-        xlab = "Response")
-
-barplot(table(raw_data_cleaned$q25_3_rev),
-        main = "q25_3_rev",
-        xlab = "Response")
-
-barplot(table(raw_data_cleaned$q25_4_rev),
-        main = "q25_4_rev",
-        xlab = "Response")
-
-barplot(table(raw_data_cleaned$q25_6_rev),
-        main = "q25_6_rev",
-        xlab = "Response")
-
-par(mfrow = c(1, 1))
+# par(mfrow = c(2, 2))
+# 
+# barplot(table(raw_data_cleaned$q25_2_rev),
+#         main = "q25_2_rev",
+#         xlab = "Response")
+# 
+# barplot(table(raw_data_cleaned$q25_3_rev),
+#         main = "q25_3_rev",
+#         xlab = "Response")
+# 
+# barplot(table(raw_data_cleaned$q25_4_rev),
+#         main = "q25_4_rev",
+#         xlab = "Response")
+# 
+# barplot(table(raw_data_cleaned$q25_6_rev),
+#         main = "q25_6_rev",
+#         xlab = "Response")
+# 
+# par(mfrow = c(1, 1))
 
 
 #bar plot for overleaf
@@ -1230,7 +1237,7 @@ q25_plot_data <- raw_data_cleaned %>%
         "Minimum Wage",
         "No Cost Calls",
         "Fund Education",
-        "Parental Alts"
+        "Parent Alts"
       )
     ),
     
