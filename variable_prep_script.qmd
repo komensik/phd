@@ -65,6 +65,7 @@ Creating a core composite score for groups evaluated by all 3 ABC first. Flaggin
 # ------------------------------------------------------------
 # Deservingness / "sympathy" orientation: CORE items
 # ------------------------------------------------------------
+names(raw_data_cleaned)
 
 desor_core_vars <- c(
   "d_welfare_tanf_abc","d_fstamps_snap_abc","d_medicaid_abc","d_medicare_abc",
@@ -84,7 +85,7 @@ core_mat <- raw_data_cleaned %>%
 # Number of observed items per respondent
 core_n <- rowSums(!is.na(core_mat))
 
-print(table(core_n, useNA = "ifany"))
+capture.output(table(core_n, useNA = "ifany"))
 
 # ------------------------------------------------------------
 # 2. Should they be index? Correlations among component items
@@ -908,13 +909,13 @@ raw_data_cleaned <- raw_data_cleaned %>%
     lwop = na_if(as.numeric(q25_5), -99)
   )
 
-pen_vars <- c("dpen", "lwop") #character vector 
+pen_raw_vars <- c("dpen", "lwop") #character vector 
 
 # Reverse code (higher num should mean more support, lower less support, and  "Don't know" becomes midpoint)
 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
-    all_of(pen_vars),
+    all_of(pen_raw_vars),
     ~ case_when(
     . == 1 ~ 4,           # strongly favor → strongly support help
     . == 2 ~ 3,
@@ -926,6 +927,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
     .names = "{.col}_rev"
   ))
 
+pen_vars <-c("dpen_rev", "lwop_rev")
 
 # step 3: save just the means of pen questions as prisonpen
 
@@ -933,8 +935,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
   rowwise() %>%
   mutate(prisonpen = mean(c_across(c(dpen_rev, lwop_rev)), na.rm = TRUE)) %>%
   ungroup()
-
-
 
 ```
 
@@ -955,9 +955,9 @@ OPTIONAL/potentially helpful for tables: factor version
 
 Visualizing the data
 ```{r}
-hist(raw_data_cleaned$dpen_rev)
-print(hist(raw_data_cleaned$lwop_rev))
-print(hist(raw_data_cleaned$q25_5))
+# hist(raw_data_cleaned$dpen_rev)
+# print(hist(raw_data_cleaned$lwop_rev))
+
 
 # ------------------------------------------------------------
 # bar plot for overleaf
@@ -1311,10 +1311,10 @@ print(psych::corr.test(q25_help_data))
 print(psych::alpha(q25_help_data))
 
 # Correlation (more interpretable than alpha for 2 items)
-cor(prisonpen, use = "pairwise.complete.obs")
+cor(q25_help_data, use = "pairwise.complete.obs")
 
 # Cronbach's alpha (fine to report, but remember it's 2 items)
-psych::alpha(prisonpen, check.keys = FALSE)
+psych::alpha(q25_help_data, check.keys = FALSE)
 
 q25_help_data <- raw_data_cleaned %>%
   select(all_of(q25_help_vars))
@@ -1384,7 +1384,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #   mutate(all_electoral_means = mean(c_across(c(auto_reg_rev, post_felony_vote_rev, early_vote_rev, election_holiday_rev, voter_id_rev, noncit_local_rev, jail_access_rev)), na.rm = TRUE)) %>%
 #   ungroup()
 
-summary(raw_data_cleaned$all_electoral_means)#all_election_items now exists as mean across all 7 Q23 questions, reverse coded, for each observation. 
+#summary(raw_data_cleaned$all_electoral_means)#all_election_items now exists as #mean across all 7 Q23 questions, reverse coded, for each observation. 
 
 ## Jail voting and rights restoration
 
@@ -1585,10 +1585,69 @@ all_help_data <- raw_data_cleaned %>%
   select(all_of(all_help_items))
 
 # now, pairwise corrs
-view(cor(all_help_data,
-    use = "pairwise.complete.obs"))
+View(round(
+  cor(all_help_data, use = "pairwise.complete.obs"),
+  2
+))
+
+# Correlations + N + significance information
+all_help_corr <- psych::corr.test(
+  all_help_data,
+  use = "pairwise",
+  method = "pearson",
+  adjust = "none"
+)
+
+print(all_help_corr)
+
+# Internal consistency of the six items
+all_help_alpha <- psych::alpha(
+  all_help_data,
+  check.keys = FALSE
+)
+
+print(all_help_alpha)
 
 ```
+
+```{r}
+# ALL ITEMS except help as index
+
+combined_items <- c(
+  "post_felony_vote_rev_1_to_4",
+  "jail_access_rev_1_to_4",
+  "q25_help_items",
+  "dpen_rev",
+  "lwop_rev"
+)
+
+
+combined_data <- raw_data_cleaned %>%
+  select(all_of(combined_items))
+
+# Pairwise correlations
+View(round(
+  cor(combined_data, use = "pairwise.complete.obs"),
+  2
+))
+
+combined_corr <- psych::corr.test(
+  combined_data,
+  use = "pairwise",
+  method = "pearson",
+  adjust = "none"
+)
+
+print(combined_corr)
+
+combined_alpha <- psych::alpha(
+  combined_data,
+  check.keys = FALSE
+)
+
+print(combined_alpha)
+```
+
 
 #### D5. Variance and Stand Dev
 

@@ -39,7 +39,7 @@ library(knitr)
 ```{r}
 
 here::here()
-raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__08_2026.csv")
+raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__08_2026_2.csv")
 source("variable_labels.R")
 raw_data_cleaned
 names(raw_data_cleaned)
@@ -677,7 +677,7 @@ ggplot(impact_by_race, aes(x = fct_reorder(race, pct_impacted), y = pct_impacted
     y = "Share with any impact",
     title = "Proportion of each racial group with any carceral contact"
   ) +
-  coord_flip() +e4
+  coord_flip() +
   theme_minimal()
 ```
 
@@ -795,8 +795,8 @@ raw_data_cleaned %>%
 raw_data_cleaned %>%
   dplyr::group_by(impact) %>%
   dplyr::summarise(
-    prisonpen_1 = mean(prisonpen_1, na.rm = TRUE),
-    prisonpen_5 = mean(prisonpen_5, na.rm = TRUE),
+    dpen_rev = mean(dpen_rev, na.rm = TRUE),
+    lwop_rev = mean(lwop_rev, na.rm = TRUE),
     prisonpen   = mean(prisonpen, na.rm = TRUE),
     .groups = "drop"
   )
