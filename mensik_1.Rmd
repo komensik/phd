@@ -1,0 +1,10 @@
+---
+title: "mensik_1"
+output: pdf_document
+date: "2026-08-31"
+---
+
+1. An experiment is when all matters under study are under control of the researcher. 
+There's randomization, which means. 
+
+2. 
