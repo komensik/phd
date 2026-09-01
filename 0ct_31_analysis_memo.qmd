@@ -18,10 +18,10 @@ Models include party ID, ideology, punitiveness, FIRE items, demographics, and a
 
 ## Data Snapshot
 
--   N (rows used across sections): \~2,222; all variables numeric.\
--   DV distribution: mean ≈ **46**, SD ≈ **28**, modest right skew (0–100).\
--   Contact prevalence: **8%** `incarc`, **31%** `knowincarc`, **12%** `vict` (expected imbalance).\
--   Missingness: ideology has more missing than other covariates; models use listwise deletion.
+- N (rows used across sections): \~2,222; all variables numeric.\
+- DV distribution: mean ≈ **46**, SD ≈ **28**, modest right skew (0–100).\
+- Contact prevalence: **8%** `incarc`, **31%** `knowincarc`, **12%** `vict` (expected imbalance).\
+- Missingness: ideology has more missing than other covariates; models use listwise deletion.
 
 ------------------------------------------------------------------------
 
@@ -166,23 +166,23 @@ Text
 
 ## Modeling Decisions
 
--   
+- 
 
--   Retain `desor_core` as a control in all subsequent models (major confounder).
+- Retain `desor_core` as a control in all subsequent models (major confounder).
 
--   
+- 
 
--   Continue to policy outcomes (`prisonhelp`, `prisonpen`) using the same control set.
+- Continue to policy outcomes (`prisonhelp`, `prisonpen`) using the same control set.
 
--   
+- 
 
--   Test **mediation:** `contact → desor_core → policy attitude`.
+- Test **mediation:** `contact → desor_core → policy attitude`.
 
--   
+- 
 
--   Add robustness: weights, block-restricted, and alternative racial-attitudes batteries.
+- Add robustness: weights, block-restricted, and alternative racial-attitudes batteries.
 
--   
+- 
 
 ------------------------------------------------------------------------
 
@@ -253,19 +253,19 @@ Next analyses will shift to **policy outcomes** (`prisonhelp`, `prisonpen`) to e
 
 6.  **Robustness checks:**
 
-    -   
+    - 
 
-    -   Weighted models
+    - Weighted models
 
-    -   
+    - 
 
-    -   Block-restricted subsets
+    - Block-restricted subsets
 
-    -   
+    - 
 
-    -   Alternative racial-attitudes controls
+    - Alternative racial-attitudes controls
 
-    -   
+    - 
 
 7.  
 

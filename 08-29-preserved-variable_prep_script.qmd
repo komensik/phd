@@ -1,0 +1,2054 @@
+---
+title: "variable_prep_script"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,       # Hide code by default
+  warning = FALSE,
+  message = FALSE
+)
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(tibble)
+library(gt)
+library(psych)
+library(ggplot2)
+
+```
+
+## 1. Directory of Most Recent Data
+
+Load cleaned survey data
+
+File created in data_prep.qmd
+
+```{r}
+#view(raw_data_cleaned)
+
+raw_data_cleaned <- readr::read_csv("data/cleaned/cleaned_light.csv") 
+#CONTINGENT note that alhough this is called raw_data_cleaned, it is the equivalent of "cleaned_data_light" from data_prep.qmd. See that file to pull the version with old var names for D and P. Note: no power here.
+
+names(raw_data_cleaned)
+
+```
+
+## 2. Variables
+
+### A. Deservingness and Power consolidation
+
+```{r, prisonerdeserves}
+
+# pretty much done, maybe standardize later?
+
+```
+
+Standardize? No -- in my prelim, I write: To ensure that I do not control for a variable that is conceptually or empirically too close to the deservingness of incarcerated people when it is the dependent variable, I exclude any deservingness ratings for groups that are substantively overlapping or highly correlated. Including those could absorb variance in the outcome or introduce post-treatment bias by controlling for a related evaluative construct. I also avoid using global composite or average deservingness scores across all groups – for example, a respondent's mean deservingnesss rating across all 65 groups they evaluated – because that composite would include the rating of incarcerated people itself, introducing potential collinearity and making it difficult to isolate the unique effect of contact. This modeling strategy attempts to preserve interpretability and ensuring that the effect of policy contact is estimated with respect to unstandardized, target-specific deservingness scores. 12
+
+12 While constructing composite or control variables involving other deservingness targets, I assess whether their inclusion introduces collinearity or conceptual overlap with the dependent variable. In particular, I examine correlations between group-level deservingness ratings to ensure that any included groups are not too closely tied to perceptions of incarcerated people. If preliminary checks reveal that including a particular group (e.g., “criminals” or “formerly incarcerated individuals”) would obscure key variance or conflate target constructs, I exclude it from the model and treat it as conceptually non-distinct for the purposes of this analysis.
+
+#### Deservingness Orientation Control
+
+Creating a core composite score for groups evaluated by all 3 ABC first. Flagging will want to use extended version with targets evaluated by just one of the 3 ABC: "d_unins_c", "d_noncit_parent_a", "d_mentill_c"
+
+```{r desor}
+
+# ------------------------------------------------------------
+# Deservingness / "sympathy" orientation: CORE items
+# ------------------------------------------------------------
+names(raw_data_cleaned)
+
+desor_core_vars <- c(
+  "d_welfare_tanf_abc","d_fstamps_snap_abc","d_medicaid_abc","d_medicare_abc",
+  "d_unemployed_abc","d_poorfam_abc","d_homeless_abc","d_immigrants_abc","d_unauth_undoc_abc"
+)
+
+#no -99s, are all numeric
+
+# ------------------------------------------------------------
+# 1. Item-only data and missingness
+# ------------------------------------------------------------
+
+# Item-only data
+core_mat <- raw_data_cleaned %>%
+  select(all_of(desor_core_vars))
+
+# Number of observed items per respondent
+core_n <- rowSums(!is.na(core_mat))
+
+capture.output(table(core_n, useNA = "ifany"))
+
+# ------------------------------------------------------------
+# 2. Should they be index? Correlations among component items
+# ------------------------------------------------------------
+
+desor_corr <- psych::corr.test(
+  core_mat,
+  use = "pairwise",
+  method = "pearson",
+  adjust = "none"
+)
+
+# Pairwise correlations
+view(round(desor_corr$r, 2))
+
+# N used for each pairwise correlation
+print(desor_corr$n)
+
+# ------------------------------------------------------------
+# 3. Reliability / internal consistency
+# ------------------------------------------------------------
+
+# Eligibility rule for composite
+# at least 5 of 9 items observed
+core_keep <- core_n >= 5
+
+print(table(core_keep, useNA = "ifany"))
+
+
+core_alpha <- psych::alpha(
+  core_mat[core_keep, ],
+  check.keys = TRUE
+)
+
+# Key reliability outputs
+print(core_alpha$total$raw_alpha)
+print(core_alpha$total$std.alpha)
+print(core_alpha$total$average_r)
+print(core_alpha$n.obs)
+
+# Item diagnostics
+print(core_alpha$alpha.drop)
+print(core_alpha$item.stats)
+
+# Check whether psych automatically reversed any items
+print(core_alpha$keys)
+
+# ------------------------------------------------------------
+# 4. Construct respondent-level composite
+# ------------------------------------------------------------
+
+raw_data_cleaned$desor_core <- ifelse(
+  core_keep,
+  rowMeans(core_mat, na.rm = TRUE),
+  NA_real_
+)
+
+print(summary(raw_data_cleaned$desor_core))
+
+
+# ------------------------------------------------------------
+# 5. Standardized version for models
+# ------------------------------------------------------------
+
+raw_data_cleaned$desor_core_z <-
+  as.numeric(scale(raw_data_cleaned$desor_core))
+
+print(summary(raw_data_cleaned$desor_core_z))
+
+```
+
+oooold Interpretation: raw_alpha: 0.9078 and 0.9142 internal consistency -- suggests items hang together well. average_r = 0.5422 -- high inter-item correlation. cor: fairly strong correlation to the DV (0.547) R\^2 = 0.30 bivariately. Soaks up general generosity toward assistance-framed groups. Should justify use of control for testing whether contact predicts deservingness of incarcerated people, above and beyond that general orientation.
+
+#### A1. Deserving Validation
+
+```{r}
+#CHECK INDIVIDUALS
+#raw_data_cleaned %>%
+#  filter(ResponseId == "R_5DugmlzJSCFvja1") %>%
+ # select(block, `Deserving Group A_1`, d_black_afam_abc)
+
+```
+
+### B. Q4 - Experiences Block -- ie Incarcerated Combos
+
+```{r, cleaningexperiences1}
+
+#view(raw_data_cleaned$Q4_1_1)
+
+# Basic Totals
+#I’m counting how many people said they themselves have been incarcerated by checking where Q4_1_1 equals 1. I’m ignoring missing values
+total_incarcerated <- sum(raw_data_cleaned$q4_1_1 == 1, na.rm = TRUE)
+
+#"I’m counting how many people said they know someone who’s been incarcerated (Q4_1_2 == 1). Again, I’m skipping over any missing answers."
+total_knows_incarcerated <- sum(raw_data_cleaned$q4_1_2 == 1, na.rm = TRUE)
+
+#I’m counting how many people selected ‘no / unsure’ when asked about incarceration experience (Q4_1_3 == 1)
+total_no_incarcerated <- sum(raw_data_cleaned$q4_1_3 == 1, na.rm = TRUE)
+
+#I’m counting how many respondents said they themselves were a victim of violent crime.
+total_victim <- sum(raw_data_cleaned$q4_2_1 == 1, na.rm = TRUE)
+
+#I’m counting how many said they know someone who was a victim of violent crime
+total_knows_victim<- sum(raw_data_cleaned$q4_2_2 == 1, na.rm = TRUE)
+
+#I’m counting those who selected ‘no / unsure’ for victimization experience
+total_no_victim <- sum(raw_data_cleaned$q4_2_3 == 1, na.rm = TRUE)
+```
+
+#### Impact Variable (Constructing For-Analysis)
+
+```{r, impactvar}
+
+#counting the *total* of those who said they were incarcerated, know incarcerated, or victims)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    impact = if_else(
+      q4_1_1 == 1 | q4_1_2 == 1 | q4_2_1 == 1,
+      1, 0,
+      missing = NA_real_
+    )
+  )
+
+
+```
+
+#### Incarc Variable (Constructing For-Analysis)
+
+```{r}
+
+# pre August 2026 version:
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(
+#     incarc = if_else(
+#       q4_1_1 == 1,
+#       1, 
+#       0,
+#       missing = NA_real_
+#     )
+#   )
+
+#for now - aug 24 2026 - I don't need to change noincarc
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(
+#     noincarc = if_else(
+#       q4_1_1 == 0 | q4_1_2 == 0 | q4_1_3 == 1,
+#       1, 0,
+#       missing = NA_real_
+#     )
+#   )
+
+# post Aug 2026 version with casewhen, becuase if_else runs as a true false and I want incarc = 0 to mean impact = 0 (no impact, not just no incarceration):
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    incarc = case_when(
+      q4_1_1 == 1 ~ 1, 
+      impact == 0 ~ 0, 
+      TRUE ~ NA_real_ #"otherwise, assign NA"
+    )
+  )
+
+```
+
+#### Knowincarc Variable (Constructing For-Analysis)
+
+```{r}
+# pre August 2026 version:
+# raw_data_cleaned <- raw_data_cleaned %>%
+#  mutate(
+#    knowincarc = if_else(
+#      q4_1_2 == 1,
+#      1, 
+#      0,
+#      missing = NA_real_
+#    )
+#  )
+
+# post Aug 2026 version with casewhen
+
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    knowincarc = case_when(
+      q4_1_2 == 1 ~ 1, 
+      impact == 0 ~ 0, 
+      TRUE ~ NA_real_ #"otherwise, assign NA"
+    )
+  )
+
+```
+
+#### Vict Variable (Constructing For-Analysis)
+
+```{r}
+
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(
+#     vict = if_else(
+#       q4_2_1 == 1,
+#       1, 
+#       0,
+#       missing = NA_real_
+#     )
+#   )
+
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    vict = case_when(
+      q4_2_1 == 1 ~ 1, 
+      impact == 0 ~ 0, 
+      TRUE ~ NA_real_ #"otherwise, assign NA"
+    )
+  )
+
+```
+
+Create fingerprint
+
+- create a new variable named contact_pattern
+
+- for each respondent, create a 6 digit code that summarizes how they answered each Q4_1 and Q4_2 question
+
+  - if the person said yes (1), use that 1. If they didn't answer, treat it as 0
+
+- combine all 6 digits starting with incarceration responses then victimization to create pattern to put in var
+
+```{r, experiencesfingerprints1}
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    contact_pattern = paste0(
+      coalesce(q4_1_1, 0),
+      coalesce(q4_1_2, 0),
+      coalesce(q4_1_3, 0),
+      coalesce(q4_2_1, 0),
+      coalesce(q4_2_2, 0),
+      coalesce(q4_2_3, 0)
+    )
+  )
+
+count(raw_data_cleaned, contact_pattern)
+
+```
+
+#### Patterns and Coding Note –
+
+Some respondents selected both a contact experience (e.g., "been incarcerated") and also marked “none/unsure”, which is logically inconsistent. These may reflect confusion, misclicks, or low-quality responses.
+
+Conflict Type Count Q4_1_1 (Been incarcerated) & Q4_1_3 (None/Unsure) 1 Q4_1_2 (Knows incarcerated) & Q4_1_3 (None/Unsure) 1 Q4_2_1 (Been victimized) & Q4_2_3 (None/Unsure) 10 Q4_2_2 (Knows victim) & Q4_2_3 (None/Unsure) 10
+
+```{r, experiencesfingerprints}
+#table(raw_data_cleaned$Q4_1_3, useNA = "always")
+#table(raw_data_cleaned$Q4_2_3, useNA = "always")
+
+
+strange1 <- raw_data_cleaned %>%
+  filter(q4_1_1 == 1 & q4_1_3 == 1)  
+
+strange2 <- raw_data_cleaned %>%
+  filter(q4_1_2 == 1 & q4_1_3 == 1) 
+
+strange3 <- raw_data_cleaned %>%
+  filter(q4_2_1 == 1 & q4_1_3 == 1) 
+
+strange4 <- raw_data_cleaned %>%
+  filter(q4_2_2 == 1 & q4_1_3 == 1) 
+
+print(strange1)
+print(strange2)
+print(strange3)
+print(strange4)
+
+
+#
+count(raw_data_cleaned, contact_pattern)
+
+
+```
+
+Tabulate unique patterns
+
+```{r, allexperienceuniquecombos}
+
+combo_summary <- raw_data_cleaned %>%
+  group_by(contact_pattern) %>%
+  summarise(
+    N = n(),
+    pct_total = 100 * n() / nrow(raw_data_cleaned),
+    pct_of_been_incarcerated = 100 * sum(q4_1_1 == 1, na.rm = TRUE) / total_incarcerated,
+    pct_of_knows_incarcerated = 100 * sum(q4_1_2 == 1, na.rm = TRUE) / total_knows_incarcerated,
+    pct_of_been_victim = 100 * sum(q4_2_1 == 1, na.rm = TRUE) / total_victim
+  ) %>%
+  arrange(desc(N))
+```
+
+```{r}
+
+gracious_recode <- tibble::tibble(
+ contact_pattern = c(
+  "100000", "100001", "101001", "101000", #Incarcerated Only
+  "010000", "010001", "011001", "011000",  # Knows Inc Only
+  "001100", "001101", "000100", "000101",  # Victim Only
+  "110000", "110001", "111001", "111000", # Inc, Knows Inc
+  "010100", "010101", "011101", "011100",  
+  "110100", "110101", "111101", # Inc, Knows Inc, Vict
+  "010110", "011111", "011110", "010111",  # Knows Inc, Vict, Knows Vict
+  "110110",  "111110", "110111", "111111,"  # All
+ ),
+  label = c(
+    "Incarcerated Only",
+    "Knows Inc Only",
+    "Victim Only",
+    "Inc, Knows Inc",
+    "Knows Inc, Vict",
+    "Inc, Knows Inc, Vict",
+    "Knows Inc, Vict, Knows Vict",
+    "Also Vict",
+    "Also and only Vict",
+    "Victim Only",
+    "Also and only KI"
+  )
+)
+
+
+```
+
+```{r, exploratoryimpactdataframe}
+
+# Step 1: Create the pattern-to-label lookup
+pattern_lookup <- tibble::tibble(
+  contact_pattern = c(
+    "100000", "100001", "101001", "101000",
+    "010000", "010001", "011001", "011000",
+    "001100", "001101", "000100", "000101",
+    "110000", "110001", "111001", "111000",
+    "100100", "100101", "101100", "101101",
+    "100010", "101011", "100011", "101010",
+    "010100", "010101", "011101", "011100",
+    "110100", "110101", "111101",
+    "010110", "011111", "011110", "010111",
+    "110110", "111110", "110111", "111111"
+  ),
+  label = c(
+    rep("Incarcerated Only", 4),
+    rep("Knows Incarcerated Only", 4),
+    rep("Victim Only", 4),
+    rep("Inc & Knows Inc", 4),
+    rep("Inc & Vict", 4),
+    rep("Inc & Knows Vict", 4),
+    rep("Knows Inc & Vict", 4),
+    rep("Inc, Knows Inc, Vict", 3),
+    rep("Knows Inc, Vict, Knows Vict", 4),
+    rep("All", 4)
+  )
+)
+
+# Step 2: Join this to dataset and count
+pattern_counts <- raw_data_cleaned %>%
+  inner_join(pattern_lookup, by = "contact_pattern") %>%
+  count(label, contact_pattern, name = "count") %>%
+  arrange(label, desc(count))
+
+# View the result
+print(pattern_counts)
+
+
+```
+
+### charts
+
+```{r}
+
+# Calculate basic totals
+table_a <- tibble::tibble(
+  Type = c("Been Incarcerated", "Knows Incarcerated", "Been Victimized"),
+  Count = c(total_incarcerated, total_knows_incarcerated, total_victim),
+  Percent_of_Sample = round(100 * Count / nrow(raw_data_cleaned), 1)
+)
+
+table_a %>%
+  gt() %>%
+  cols_label(
+    Type = "Type",
+    Count = "Total Count",
+    Percent_of_Sample = "Percent of Sample"
+  ) %>%
+  tab_header(title = "Appendix Table A. Basic Contact Types") %>%
+  tab_options(table.font.size = "small")
+
+```
+
+```{r}
+
+combo_appendix_data %>%
+  filter(label %in% c(
+    "Incarcerated Only",
+    "Also KI",
+    "Also and only KI",
+    "Also Vict",
+    "Also and only Vict",
+    "Also KI and Vict",
+    "Also and only KI and Vict"
+  )) %>%
+  select(label, N, pct_total, pct_of_incarcerated) %>%
+  arrange(desc(N)) %>%
+  gt() %>%
+  cols_label(
+    label = "Contact Combo",
+    N = "Count",
+    pct_total = "Percent of Sample",
+    pct_of_incarcerated = "Percent of Total Incarcerated Count"
+  ) %>%
+  fmt_number(columns = where(is.numeric), decimals = 1) %>%
+  tab_header(title = "Appendix Table B. Incarcerated (Inc) Combos") %>%
+  tab_options(table.font.size = "small")
+
+```
+
+```{r}
+
+combo_appendix_data %>%
+  filter(label %in% c(
+    "KI Only",
+    "Also Vict",
+    "Also and only Vict"
+  )) %>%
+  select(label, N, pct_total, pct_of_ki) %>%
+  arrange(desc(N)) %>%
+  gt() %>%
+  cols_label(
+    label = "Contact Combo",
+    N = "Count",
+    pct_total = "Percent of Sample",
+    pct_of_ki = "Percent of Total KI Count"
+  ) %>%
+  fmt_number(columns = where(is.numeric), decimals = 1) %>%
+  tab_header(title = "Appendix Table C. Knows Incarcerated (KI) Combos") %>%
+  tab_options(table.font.size = "small")
+```
+
+```{r}
+
+combo_appendix_data %>%
+  filter(label %in% c(
+    "Victim Only",
+    "Also KI",
+    "Also and only KI"
+  )) %>%
+  select(label, N, pct_total, pct_of_victim) %>%
+  arrange(desc(N)) %>%
+  gt() %>%
+  cols_label(
+    label = "Contact Combo",
+    N = "Count",
+    pct_total = "Percent of Sample",
+    pct_of_victim = "Percent of Total Victim Count"
+  ) %>%
+  fmt_number(columns = where(is.numeric), decimals = 1) %>%
+  tab_header(title = "Appendix Table D. Victim (VI) Combos") %>%
+  tab_options(table.font.size = "small")
+
+```
+
+```{r Incarcerated Combos}
+#| eval: false
+#| include: false
+
+incarcerated_only <- sum(
+  raw_data_cleaned$Q4_1_1 == 1 &
+  raw_data_cleaned$Q4_1_2 == 0 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 0 &
+  raw_data_cleaned$Q4_2_2 == 0 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+incarcerated_knowsinc <- sum(
+  raw_data_cleaned$Q4_1_1 == 1 &
+  raw_data_cleaned$Q4_1_2 == 1 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 0 &
+  raw_data_cleaned$Q4_2_2 == 0 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+inc_knowsinc_victim <- sum(
+  raw_data_cleaned$Q4_1_1 == 1 &
+  raw_data_cleaned$Q4_1_2 == 1 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 1 &
+  raw_data_cleaned$Q4_2_2 == 0 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+inc_knowsinc_knowsvict <- sum(
+  raw_data_cleaned$Q4_1_1 == 1 &
+  raw_data_cleaned$Q4_1_2 == 1 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 0 &
+  raw_data_cleaned$Q4_2_2 == 1 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+
+inc_knowsinc_victim_knowsvict <- sum(
+  raw_data_cleaned$Q4_1_1 == 1 &
+  raw_data_cleaned$Q4_1_2 == 1 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 1 &
+  raw_data_cleaned$Q4_2_2 == 1 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+incarcerated_victim <- sum(
+  raw_data_cleaned$Q4_1_1 == 1 &
+  raw_data_cleaned$Q4_1_2 == 0 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 1 &
+  raw_data_cleaned$Q4_2_2 == 0 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+inc_victim_knowsvict <- sum(
+  raw_data_cleaned$Q4_1_1 == 1 &
+  raw_data_cleaned$Q4_1_2 == 0 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 1 &
+  raw_data_cleaned$Q4_2_2 == 1 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+incarcerated_knowsvict <- sum(
+  raw_data_cleaned$Q4_1_1 == 1 &
+  raw_data_cleaned$Q4_1_2 == 0 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 0 &
+  raw_data_cleaned$Q4_2_2 == 1 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+
+knowsinc_only <- sum(
+  raw_data_cleaned$Q4_1_1 == 0 &
+  raw_data_cleaned$Q4_1_2 == 1 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 0 &
+  raw_data_cleaned$Q4_2_2 == 0 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+knowsinc_victim <- sum(
+  raw_data_cleaned$Q4_1_1 == 0 &
+  raw_data_cleaned$Q4_1_2 == 1 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 1 &
+  raw_data_cleaned$Q4_2_2 == 0 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+knowsinc_knowsvict <- sum(
+  raw_data_cleaned$Q4_1_1 == 0 &
+  raw_data_cleaned$Q4_1_2 == 1 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 0 &
+  raw_data_cleaned$Q4_2_2 == 1 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+knowsinc_victim_knowsvict <- sum(
+  raw_data_cleaned$Q4_1_1 == 0 &
+  raw_data_cleaned$Q4_1_2 == 1 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 1 &
+  raw_data_cleaned$Q4_2_2 == 1 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+vict_only <- sum(
+  raw_data_cleaned$Q4_1_1 == 0 &
+  raw_data_cleaned$Q4_1_2 == 0 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 1 &
+  raw_data_cleaned$Q4_2_2 == 0 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+victim_knowsvict <- sum(
+  raw_data_cleaned$Q4_1_1 == 0 &
+  raw_data_cleaned$Q4_1_2 == 0 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 1 &
+  raw_data_cleaned$Q4_2_2 == 1 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+knowsvict_only <- sum(
+  raw_data_cleaned$Q4_1_1 == 0 &
+  raw_data_cleaned$Q4_1_2 == 0 &
+  raw_data_cleaned$Q4_1_3 == 0 &
+  raw_data_cleaned$Q4_2_1 == 1 &
+  raw_data_cleaned$Q4_2_2 == 0 &
+  raw_data_cleaned$Q4_2_3 == 0 &
+  !is.na(raw_data_cleaned$Q4_1_1) &
+  !is.na(raw_data_cleaned$Q4_1_2) &
+  !is.na(raw_data_cleaned$Q4_1_3) &
+  !is.na(raw_data_cleaned$Q4_2_1) &
+  !is.na(raw_data_cleaned$Q4_2_2) &
+  !is.na(raw_data_cleaned$Q4_2_3)
+)
+
+#data frame
+contact_counts <- tibble::tibble(
+  total_incarcerated = total_incarcerated,
+  total_knows_incarcerated = total_knows_incarcerated,
+  total_no_incarcerated = total_no_incarcerated,
+  total_victim = total_victim,
+  total_knows_victim = total_knows_victim,
+  total_no_victim = total_no_victim,
+  incarcerated_only = incarcerated_only,
+  incarcerated_knowsinc = incarcerated_knowsinc,
+  inc_knowsinc_victim = inc_knowsinc_victim,
+  inc_knowsinc_knowsvict = inc_knowsinc_knowsvict,
+  inc_knowsinc_victim_knowsvict = inc_knowsinc_victim_knowsvict,
+  incarcerated_victim = incarcerated_victim,
+  inc_victim_knowsvict = inc_victim_knowsvict,
+  incarcerated_knowsvict = incarcerated_knowsvict,
+  knowsinc_only = knowsinc_only,
+  knowsinc_victim = knowsinc_victim,
+  knowsinc_knowsvict = knowsinc_knowsvict,
+  knowsinc_victim_knowsvict = knowsinc_victim_knowsvict,
+  vict_only = vict_only,
+  victim_knowsvict = victim_knowsvict,
+  knowsvict_only = knowsvict_only
+)
+
+write_csv(contact_counts, "filled_contact_combo_counts.csv")
+
+
+#view(contact_counts)
+
+```
+
+#### Tables
+
+```{r}
+combo_summary_labeled %>%
+  select(label, contact_pattern, N, pct_total) %>%
+  arrange(desc(N)) %>%
+  gt() %>%
+  cols_label(
+    contact_pattern = "Q4 Pattern",
+    label = "Description",
+    N = "N",
+    pct_total = "% of Sample"
+  ) %>%
+  fmt_number(columns = where(is.numeric), decimals = 1) %>%
+  tab_header(title = "Appendix Table A. Full Distribution of Q4 Contact Combinations") %>%
+  tab_options(table.font.size = "small")
+
+
+print(combo_summary_labeled)
+```
+
+### C. Q6, 7, 8 - Ration Block
+
+```{r}
+
+#inspect
+
+#raw_data %>% select(q6, q7, q8) %>% summarise_all(~ list(unique(.)))
+
+# clean and transform
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    c(q6, q7, q8), 
+    ~ na_if(as.numeric(.x), -99)
+    )) %>% mutate(across(
+    c(q6, q7, q8),
+    ~ factor(.x, levels = 1:4,
+             labels = c("Frequently", "Sometimes", "Rarely", "Never"),
+             ordered = TRUE)
+  ))
+
+ raw_data_cleaned %>% count(q8)
+
+```
+
+### D. Prison & Election Policy Questions
+
+#### D.1 "Purpose of Incarceration" - punishment or rehab?
+
+```{r, punishorrehab}
+#Originally 62_1 with 1  punish and 7  rehabilitate people
+
+names(raw_data_cleaned)
+# Renamed raw column to a more intuitive name
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(q62_1 = na_if(as.numeric(q62_1), -99))
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(penalpoint = 8 - q62_1) #reverse coded so 7 = most punitive
+
+# Create ordered factor version of the reverse-coded scale (7 = most punitive)
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(penalpoint_ord = factor(
+    penalpoint,
+    levels = 1:7,
+    labels = c(
+      "Rehab (1)", "Rehab (2)", "Rehab (3)", "Neutral (4)",
+      "Punish (5)", "Punish (6)", "Punish (7)"
+    ),
+    ordered = TRUE
+  ))
+
+# NOTE: Factor version of PenalPunitiveness (reverse-coded already: 1 = least punitive, 7 = most punitive)
+
+# Tabulate raw values in Q62_1
+
+# Count how many times -99 appears in the whole dataset
+#sum(raw_data_cleaned == -99, na.rm = TRUE)
+
+
+
+```
+
+#### D.2 Punitive Items: (death penalty and LWOP) - prisonpen
+
+```{r, prisonpen}
+#ORIGINALLY Q25_1 and Q25_5, death penalty and LWOP (1 = strongly favor 4 = strongly oppose, 5 = don't know)
+
+         
+#rename, -99, ensure numeric
+raw_data_cleaned <- raw_data_cleaned %>% 
+  mutate(
+    dpen         = na_if(as.numeric(q25_1), -99),
+    lwop = na_if(as.numeric(q25_5), -99)
+  )
+
+pen_raw_vars <- c("dpen", "lwop") #character vector 
+
+# Reverse code (higher num should mean more support, lower less support, and  "Don't know" becomes midpoint)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    all_of(pen_raw_vars),
+    ~ case_when(
+    . == 1 ~ 4,           # strongly favor → strongly support help
+    . == 2 ~ 3,
+    . == 3 ~ 2,
+    . == 4 ~ 1,
+    . == 5 ~ 2.5,         # DK = neutral midpoint
+    TRUE ~ NA_real_
+  ),  # note: we skip 5 = DK
+    .names = "{.col}_rev"
+  ))
+
+pen_vars <-c("dpen_rev", "lwop_rev")
+
+# step 3: save just the means of pen questions as prisonpen
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  rowwise() %>%
+  mutate(prisonpen = mean(c_across(c(dpen_rev, lwop_rev)), na.rm = TRUE)) %>%
+  ungroup()
+
+```
+
+Takeaway: prison pen, prison pen 1 = dpen, prison pen 5 = lwop now -confirmed that prisonpen works -- constructed with average of death penalty and lwop. USE dpen_rev and lwop_rev ! and prisonpen
+
+OPTIONAL/potentially helpful for tables: factor version
+
+```{r, q25_1_ord}
+# #OPTIONAL/potentially helpful for tables: factor version
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(q25_1_ord = factor(
+#     q25_1,
+#     levels = 1:5,
+#     labels = c("Strongly favor", "Favor", "Oppose", "Strongly oppose", "Don't know"),
+#     ordered = TRUE
+#   ))
+```
+
+#### D.3 Punitive Items: Doing Cronback's Alpha
+
+```{r}
+#prisonpen, prisonpen_1, prisonpen_5
+pen_vars <- c("dpen_rev", "lwop_rev")
+
+pen_data <- raw_data_cleaned %>%
+  select(all_of(pen_vars))
+
+cor(pen_data,
+    use = "pairwise.complete.obs")
+
+print(psych::corr.test(pen_data))
+
+print(psych::alpha(pen_data))
+
+# Quick look
+psych::describe(pen_data)
+
+# Correlation (more interpretable than alpha for 2 items)
+cor(raw_data_cleaned[pen_vars], use = "pairwise.complete.obs")
+
+# Cronbach's alpha (fine to report, but remember it's 2 items)
+psych::alpha(pen_data, check.keys = FALSE)
+
+summary(raw_data_cleaned$dpen_rev)
+
+summary(raw_data_cleaned$lwop_rev)
+```
+
+results - The **correlation** between the two items is **r = 0.238**.
+
+- With only two items, Cronbach’s alpha is essentially a rescaled version of that correlation. (So don’t oversell alpha here; the correlation is the clean summary.)
+
+Interpretation
+
+- **These two punitive items are positively related, but weakly so.** People who favor the death penalty are *somewhat* more likely to favor LWOP, but plenty of respondents don’t treat them as interchangeable.
+
+- That’s not necessarily a “problem.” Death penalty and LWOP are conceptually related (punitive severity), but they can tap **different moral/legal intuitions** (irreversibility, innocence risk, retribution vs incapacitation), so moderate association is plausible.
+
+- The response distribution shows a **nontrivial chunk of “Don’t know”** recoded to 2.5 (15–17%) and about **8% missing** for each item. The DK-to-midpoint choice can slightly inflate apparent consistency by shrinking variance, so reliability is a conservative-ish check but not definitive.
+
+Visualizing the data
+
+```{r}
+# hist(raw_data_cleaned$dpen_rev)
+# print(hist(raw_data_cleaned$lwop_rev))
+
+
+# ------------------------------------------------------------
+# bar plot for overleaf
+# ------------------------------------------------------------
+
+pen_data <- raw_data_cleaned %>%
+  select(all_of(pen_vars)) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "item",
+    values_to = "position"
+  ) %>%
+  filter(!is.na(position)) %>%
+  mutate(
+    item = factor(
+      item,
+      levels = c(
+        "dpen_rev",
+        "lwop_rev"
+      ),
+      labels = c(
+        "Death Penalty",
+        "Life Without Parole"
+      )
+    ),
+    
+    # Treat the response categories as discrete/ordinal categories
+    position = factor(
+      position,
+      levels = c(1, 2, 2.5, 3, 4)
+    )
+  ) %>%
+  count(item, position, .drop = FALSE)
+# ------------------------------------------------------------
+# make figure
+# ------------------------------------------------------------
+pen_barplot <- ggplot(
+  pen_data,
+  aes(x = position, y = n)
+) +
+  geom_col(
+    width = 0.70,
+    fill = "grey35"
+  ) +
+  facet_wrap(
+    ~ item,
+    ncol = 2
+  ) +
+  scale_x_discrete(drop = FALSE) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+  labs(
+    x = "Position",
+    y = "Number of Respondents",
+    caption = paste0(
+      "Position: 1 = Strongly Oppose; 2 = Somewhat Oppose; ",
+      "2.5 = Unsure; 3 = Somewhat Support; 4 = Strongly Support."
+    )
+  ) +
+  theme_classic(base_size = 11) +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(
+      face = "bold",
+      size = 11
+    ),
+    axis.title = element_text(size = 11),
+    axis.text = element_text(size = 9.5),
+    panel.spacing = grid::unit(1, "lines"),
+    plot.caption = element_text(
+      size = 9,
+      hjust = 0,
+      margin = margin(t = 8)
+    )
+  )
+
+# ------------------------------------------------------------
+# save/print
+# ------------------------------------------------------------
+
+ggsave(
+  filename = "figures/pen_barplot.pdf",
+  plot = pen_barplot,
+  width = 6.5,
+  height = 5,
+  units = "in",
+)
+
+
+```
+
+#### D.4_A Q25 'Help-Oriented' Prison Policy.
+
+These will include prison and election policies. Here, I first set up the prison policy Q's, then prison/voting Q's.
+
+```{r, prisonhelp}
+# Originally 1 = strong favor, 4 = strong oppose, 5 = don't know
+# Define Q25 help-oriented items
+q25_help_items <- c("q25_2", "q25_3", "q25_4", "q25_6")
+
+# Step 1: Recode -99 to NA and ensure numeric
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(all_of(q25_help_items), ~ na_if(as.numeric(.), -99)))
+
+# Step 2: Create reverse-coded versions (1 = strong favor → 4 = strong oppose becomes 4 → 1 so higher means more support for help oriented policyaQ                                                 
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    all_of(q25_help_items),
+    ~ case_when(
+    . == 1 ~ 4,           # strongly favor → strongly support help
+    . == 2 ~ 3,
+    . == 3 ~ 2,
+    . == 4 ~ 1,
+    . == 5 ~ 2.5,         # DK = neutral midpoint
+    TRUE ~ NA_real_
+  ),  # note: we skip 5 = DK
+    .names = "{.col}_rev"
+  ))
+
+
+# now, raw dta cleaned has q25_n_rev (each reverse coded so that higher number means more support)
+
+# step 3: save just the means of q25 help questions as prisonhelp
+
+raw_data_cleaned <- raw_data_cleaned %>% 
+  rowwise() %>% #dplyr should treat each row as own group so c_across() can return row level vector of cols for that row
+  mutate(prisonhelp = mean(c_across(c(q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev)), na.rm = TRUE)) %>%
+  ungroup()
+
+```
+
+##### D.4_A Descriptive
+
+prisonhelp is the average of means of the help items (just prison policy "help" excluding the prison and voting ones); q25_help_items is to look at them separately
+
+```{r}
+
+#checking variance + SD here 08-2026)
+summary(raw_data_cleaned$prisonhelp)
+
+summary(raw_data_cleaned$q25_6_rev)
+
+
+q25_help_vars <- c("q25_2_rev", "q25_3_rev", "q25_4_rev", "q25_6_rev")
+
+# 
+# prisonhelp_data <- raw_data_cleaned %>%
+#   select(all_of(q25_help_vars))
+
+
+psych::describe(raw_data_cleaned[q25_help_vars])
+
+
+#I get min 1 1st qu 2.5 median 2.875 mean 2.88 3q 3.250 max 4 nas = 186
+
+#histograms
+print(hist(raw_data_cleaned$q25_2_rev))
+print(hist(raw_data_cleaned$q25_3_rev))
+print(hist(raw_data_cleaned$q25_4_rev))
+print(hist(raw_data_cleaned$q25_6_rev))
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+
+q25_long <- raw_data_cleaned %>%
+  select(all_of(q25_help_vars)) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "item",
+    values_to = "response"
+  )
+
+ggplot(q25_long, aes(x = response)) +
+  geom_bar() +
+  facet_wrap(~ item) +
+  labs(
+    x = "Response",
+    y = "Count"
+  )
+
+#barplots
+
+# par(mfrow = c(2, 2))
+# 
+# barplot(table(raw_data_cleaned$q25_2_rev),
+#         main = "q25_2_rev",
+#         xlab = "Response")
+# 
+# barplot(table(raw_data_cleaned$q25_3_rev),
+#         main = "q25_3_rev",
+#         xlab = "Response")
+# 
+# barplot(table(raw_data_cleaned$q25_4_rev),
+#         main = "q25_4_rev",
+#         xlab = "Response")
+# 
+# barplot(table(raw_data_cleaned$q25_6_rev),
+#         main = "q25_6_rev",
+#         xlab = "Response")
+# 
+# par(mfrow = c(1, 1))
+
+
+#bar plot for overleaf
+
+# Create plotting data
+q25_plot_data <- raw_data_cleaned %>%
+  select(
+    q25_2_rev,
+    q25_3_rev,
+    q25_4_rev,
+    q25_6_rev
+  ) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "item",
+    values_to = "position"
+  ) %>%
+  filter(!is.na(position)) %>%
+  mutate(
+    item = factor(
+      item,
+      levels = c(
+        "q25_2_rev",
+        "q25_3_rev",
+        "q25_4_rev",
+        "q25_6_rev"
+      ),
+      labels = c(
+        "Minimum Wage",
+        "No Cost Calls",
+        "Fund Education",
+        "Parent Alts"
+      )
+    ),
+    
+    # Treat the response categories as discrete/ordinal categories
+    position = factor(
+      position,
+      levels = c(1, 2, 2.5, 3, 4)
+    )
+  ) %>%
+  count(item, position, .drop = FALSE)
+
+
+# Make figure
+q25_barplot <- ggplot(
+  q25_plot_data,
+  aes(x = position, y = n)
+) +
+  geom_col(
+    width = 0.70,
+    fill = "grey35"
+  ) +
+  facet_wrap(
+    ~ item,
+    ncol = 2
+  ) +
+  scale_x_discrete(drop = FALSE) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+  labs(
+    x = "Position",
+    y = "Number of Respondents",
+    caption = paste0(
+      "Position: 1 = Strongly Oppose; 2 = Somewhat Oppose; ",
+      "2.5 = Unsure; 3 = Somewhat Support; 4 = Strongly Support."
+    )
+  ) +
+  theme_classic(base_size = 11) +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(
+      face = "bold",
+      size = 11
+    ),
+    axis.title = element_text(size = 11),
+    axis.text = element_text(size = 9.5),
+    panel.spacing = grid::unit(1, "lines"),
+    plot.caption = element_text(
+      size = 9,
+      hjust = 0,
+      margin = margin(t = 8)
+    )
+  )
+
+ggsave(
+  filename = "figures/q25_help_items_barplot.pdf",
+  plot = q25_barplot,
+  width = 6.5,
+  height = 5,
+  units = "in",
+)
+q25_barplot
+
+
+```
+
+Correlations, Crohnbach's alpha
+
+```{r}
+
+q25_help_data <- raw_data_cleaned %>%
+  select(all_of(q25_help_vars))
+
+cor(q25_help_data,
+    use = "pairwise.complete.obs")
+
+print(psych::corr.test(q25_help_data))
+
+print(psych::alpha(q25_help_data))
+
+# Correlation (more interpretable than alpha for 2 items)
+cor(q25_help_data, use = "pairwise.complete.obs")
+
+# Cronbach's alpha (fine to report, but remember it's 2 items)
+psych::alpha(q25_help_data, check.keys = FALSE)
+
+q25_help_data <- raw_data_cleaned %>%
+  select(all_of(q25_help_vars))
+
+cor(q25_help_data,
+    use = "pairwise.complete.obs")
+```
+
+Ordered factor versions- could be useful for plotting/tables/labeling) but as of 08-2026 don't use
+
+```{r, prisonhelp_factor}
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(across(
+#     all_of(q25_help_items),
+#     ~ factor(.,
+#              levels = 1:5,
+#              labels = c("Strongly favor", "Favor", "Oppose", "Strongly oppose", "Don't know"),
+#              ordered = TRUE),
+#     .names = "{.col}_ord"
+#   ))
+
+```
+
+#### D.4_B Q35 'Help-Oriented' Prison/Election Items
+
+```{r, electionhelpqs}
+names(raw_data_cleaned) %>% stringr::str_subset("q25|q23")
+
+# Define Q23 help-oriented items (election - q23_2 is elects_reenfranchise and q23_7 is voting in jail (Requiring that jail and election officers ensure that people who are eligible to vote while incarcerated are able to exercise that right.) OG 1 = favor, 2 = oppose, 3 = DK
+
+#rename, -99, ensure numeric
+raw_data_cleaned <- raw_data_cleaned %>% 
+  mutate(
+    auto_reg         = na_if(as.numeric(q23_1), -99),
+    post_felony_vote = na_if(as.numeric(q23_2), -99),
+    early_vote       = na_if(as.numeric(q23_3), -99),
+    election_holiday = na_if(as.numeric(q23_4), -99),
+    voter_id         = na_if(as.numeric(q23_5), -99),
+    noncit_local     = na_if(as.numeric(q23_6), -99),
+    jail_access      = na_if(as.numeric(q23_7), -99)
+  )
+
+all_electoral_vars <- c("auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access") #character vector 
+
+#recode 1-3 scale to match direction of prison help items (also intuition that higher number means more support)
+# here, 1 = favor, 2 = oppose, 3 = DK
+# we want higher = more support for help-oriented policy so 1-> 3, 2-> 1, 3 -> 2
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    all_of(all_electoral_vars),
+    ~ case_when(
+      . == 1 ~ 3,
+      . == 2 ~ 1,
+      . == 3 ~ 2,
+      TRUE ~ NA_real_
+    ),
+    .names = "{.col}_rev"
+  ))
+
+# respondent level means: all electoral vars
+# 
+# raw_data_cleaned <- raw_data_cleaned %>% 
+#   rowwise() %>% #dplyr should treat each row as own group so c_across() can return row level vector of cols for that row
+#   mutate(all_electoral_means = mean(c_across(c(auto_reg_rev, post_felony_vote_rev, early_vote_rev, election_holiday_rev, voter_id_rev, noncit_local_rev, jail_access_rev)), na.rm = TRUE)) %>%
+#   ungroup()
+
+#summary(raw_data_cleaned$all_electoral_means)#all_election_items now exists as #mean across all 7 Q23 questions, reverse coded, for each observation. 
+
+## Jail voting and rights restoration
+
+incarc_electoral_vars <- c("post_felony_vote_rev", "jail_access_rev")
+
+# respondent level means: just the two (incarc_electoral_means)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    incarc_electoral_means = if_else(
+      !is.na(post_felony_vote_rev) & !is.na(jail_access_rev),
+      (post_felony_vote_rev + jail_access_rev) / 2,
+      NA_real_
+    )
+  )
+
+# old: q23_help_items <- c("q23_2", "q23_7")
+# new: incarc_electoral_means, post_felony_vote_rev, jail_access_rev
+
+# to compare to other prison policy questions on same scale, rescale these two  the 1–3 items to 1–4 range
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    all_of(incarc_electoral_vars),
+    ~ case_when(
+      . == 3 ~ 4,
+      . == 1 ~ 1,
+      . == 2 ~ 2.5,
+      TRUE ~ NA_real_
+    ),
+    .names = "{.col}_1_to_4"
+  ))
+
+# produces: post_felony_vote_rev_1_to_4, jail_access_rev_1_to_4
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    incarc_electoral_mean_1_to_4 = if_else(
+      !is.na(post_felony_vote_rev_1_to_4) &
+        !is.na(jail_access_rev_1_to_4),
+      (post_felony_vote_rev_1_to_4 +
+         jail_access_rev_1_to_4) / 2,
+      NA_real_
+    )
+  )
+hist(raw_data_cleaned$post_felony_vote_rev)
+hist(raw_data_cleaned$jail_access_rev)
+
+print(summary(raw_data_cleaned$post_felony_vote_rev))
+print(summary(raw_data_cleaned$jail_access_rev))
+```
+
+Come out of above block with: post_felony_vote_rev individual item, 1–3 jail_access_rev individual item, 1–3 incarc_electoral_mean combined measure, 1–3
+
+post_felony_vote_rev_1_to_4 comparable item, 1–4 jail_access_rev_1_to_4 comparable item, 1–4 incarc_electoral_mean_1_to_4 comparable combined measure, 1–4
+
+#### D.4_C Prison/Election Items Descriptive look
+
+What's up
+
+```{r}
+
+#bar plot for overleaf
+
+# Create plotting data
+incarc_electoral_data <- raw_data_cleaned %>%
+  select(
+    post_felony_vote_rev,
+    jail_access_rev
+  ) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "item",
+    values_to = "position"
+  ) %>%
+  filter(!is.na(position)) %>%
+  mutate(
+    item = factor(
+      item,
+      levels = c(
+        "post_felony_vote_rev",
+        "jail_access_rev"
+      ),
+      labels = c(
+        "Rights Restoration",
+        "Jail Vote Access"
+      )
+    ),
+    
+    # Treat the response categories as discrete/ordinal categories
+    position = factor(
+      position,
+      levels = c(1, 2, 3)
+    )
+  ) %>%
+  count(item, position, .drop = FALSE)
+
+
+# Make figure
+incarc_electoral_barplot <- ggplot(
+  incarc_electoral_data ,
+  aes(x = position, y = n)
+) +
+  geom_col(
+    width = 0.70,
+    fill = "grey35"
+  ) +
+  facet_wrap(
+    ~ item,
+    ncol = 2
+  ) +
+  scale_x_discrete(drop = FALSE) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+  labs(
+    x = "Position",
+    y = "Number of Respondents",
+    caption = paste0(
+      "Position: 1 = Oppose; 2 = Unsure; ",
+      "3 = Somewhat Support."
+    )
+  ) +
+  theme_classic(base_size = 11) +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(
+      face = "bold",
+      size = 11
+    ),
+    axis.title = element_text(size = 11),
+    axis.text = element_text(size = 9.5),
+    panel.spacing = grid::unit(1, "lines"),
+    plot.caption = element_text(
+      size = 9,
+      hjust = 0,
+      margin = margin(t = 8)
+    )
+  )
+
+
+ggsave(
+  filename = "figures/incarc_electoral_barplot.pdf",
+  plot = q25_barplot,
+  width = 6.5,
+  height = 5,
+  units = "in",
+)
+incarc_electoral_barplot
+
+```
+
+Correlation between jail voting and rights restoration
+
+```{r}
+
+incarc_electoral_data <- raw_data_cleaned %>%
+  select(all_of(incarc_electoral_vars))
+
+cor(incarc_electoral_data,
+    use = "pairwise.complete.obs")
+
+print(psych::corr.test(incarc_electoral_data))
+
+print(psych::alpha(incarc_electoral_data))
+```
+
+What about relationship between all the help variables (2 election, 4 others?)
+
+Need
+
+post_felony_vote_rev jail_access_rev_1_to_4 q25_help_data or q25_2_rev, q25_3_rev, q25_4_rev, q25_6_rev
+
+```{r, electionhelpqs}
+
+# ALL HELP ITEMS
+
+all_help_items <- c(
+  "q25_2_rev",
+  "q25_3_rev",
+  "q25_4_rev",
+  "q25_6_rev",
+  "post_felony_vote_rev_1_to_4",
+  "jail_access_rev_1_to_4"
+)
+
+#df for the six total vars
+all_help_data <- raw_data_cleaned %>%
+  select(all_of(all_help_items))
+
+# now, pairwise corrs
+View(round(
+  cor(all_help_data, use = "pairwise.complete.obs"),
+  2
+))
+
+# Correlations + N + significance information
+all_help_corr <- psych::corr.test(
+  all_help_data,
+  use = "pairwise",
+  method = "pearson",
+  adjust = "none"
+)
+
+print(all_help_corr)
+
+# Internal consistency of the six items
+all_help_alpha <- psych::alpha(
+  all_help_data,
+  check.keys = FALSE
+)
+
+print(all_help_alpha)
+
+```
+
+```{r}
+# ALL ITEMS except help as index
+
+combined_items <- c(
+  "post_felony_vote_rev_1_to_4",
+  "jail_access_rev_1_to_4",
+  "q25_help_items",
+  "dpen_rev",
+  "lwop_rev"
+)
+
+
+combined_data <- raw_data_cleaned %>%
+  select(all_of(combined_items))
+
+# Pairwise correlations
+View(round(
+  cor(combined_data, use = "pairwise.complete.obs"),
+  2
+))
+
+combined_corr <- psych::corr.test(
+  combined_data,
+  use = "pairwise",
+  method = "pearson",
+  adjust = "none"
+)
+
+print(combined_corr)
+
+combined_alpha <- psych::alpha(
+  combined_data,
+  check.keys = FALSE
+)
+
+print(combined_alpha)
+```
+
+#### D5. Variance and Stand Dev
+
+```{r}
+#don't need to redo this
+#help_policy_items <- c("q25_2", "q25_3", "q25_4", "q25_6", "q23_2", "q23_7")
+
+# Variance and SD across help policy items
+raw_data_cleaned <- raw_data_cleaned %>%
+  rowwise() %>%
+  mutate(
+    variancehelp = var(c_across(all_of(help_policy_items)), na.rm = TRUE),
+    sdhelp = sd(c_across(all_of(help_policy_items)), na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+
+```
+
+### E.Policy Orientation (polor) control
+
+Decided to skip because of how questions are worded/coded. Will need to return to this later
+
+10-27 Diagnostics
+
+```{r}
+# names(raw_data_cleaned) %>% stringr::str_subset("q25|q23|q62|prison|help|punish|rehab")
+# 
+# glimpse(raw_data_cleaned %>% select(starts_with("q25"), starts_with("q23"), starts_with("q62"), starts_with("prison"), starts_with("penal")))
+# 
+# 
+# glimpse(dplyr::select(raw_data_cleaned,
+#                       starts_with("q25_"),
+#                       starts_with("q23_"),
+#                       starts_with("q62"),
+#                       starts_with("prison"),
+#                       starts_with("penal")))
+
+```
+
+### F. FIRE controls
+
+```{r}
+
+#raw_data_cleaned %>% count(q32)
+
+#raw_data_cleaned %>% count(Q33)
+
+#raw_data_cleaned %>% count(Q34)
+
+#raw_data_cleaned %>% count(Q111)
+
+fire_vars <- c("q32", "q33", "q34", "q111")
+names(raw_data_cleaned)
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    all_of(fire_vars),
+    ~ as.numeric(na_if(as.character(.x), "-99"))
+  ))
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  rename(
+    fire_rare = q32,
+    fire_privilege = q33,
+    fire_angry = q34,
+    fire_fear = q111
+  )
+
+summary(raw_data_cleaned$fire_angry)
+summary(raw_data_cleaned$fire_privilege)
+summary(raw_data_cleaned$fire_fear)
+summary(raw_data_cleaned$fire_rare)
+
+
+```
+
+### G. Race
+
+```{r}
+
+#convert + clean
+race_vars <- paste0("q51_", 1:8)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(all_of(race_vars), ~ na_if(as.numeric(.x), -99)))
+
+# REPLACE your current race dummies with this block
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    # Ethnicity first: Hispanic gets priority
+    Hispanic = ifelse(q51_7 == 1, 1, 0),
+
+    # Among non-Hispanics, assign Black and White
+    Black    = ifelse(q51_2 == 1 & q51_7 != 1, 1, 0),
+    White    = ifelse(q51_1 == 1 & q51_7 != 1, 1, 0)
+  ) %>%
+  mutate(
+    # Everyone else with any race selection becomes OtherRace (mutually exclusive)
+    OtherRace = ifelse(
+      (Black + Hispanic + White) == 0 &
+        rowSums(dplyr::select(., dplyr::all_of(race_vars)), na.rm = TRUE) > 0,
+      1, 0
+    )
+  )
+
+```
+
+DOUBLE CHECK
+
+```{r}
+
+# no overlaps among the 4 dummies
+sum((raw_data_cleaned$Black + raw_data_cleaned$White +
+     raw_data_cleaned$Hispanic + raw_data_cleaned$OtherRace) > 1, na.rm = TRUE)
+
+# counts by category (mutually exclusive)
+table(
+  with(raw_data_cleaned,
+       dplyr::case_when(
+         Hispanic == 1 ~ "Hispanic",
+         Black    == 1 ~ "Black",
+         White    == 1 ~ "White",
+         OtherRace== 1 ~ "OtherRace",
+         TRUE          ~ NA_character_
+       )),
+  useNA = "ifany"
+)
+
+
+```
+
+Diagnosed problem in model where Black + Other dropped - Oct 27 Suggests all Black respondents had missing data so were dropped
+
+### H. Party + Ideology controls
+
+```{r}
+
+#raw_data_cleaned %>% count(q47)
+
+#clean dem 101
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(dem101 = na_if(as.numeric(dem101), -99))
+
+#party ID dummies
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    Republican = case_when(
+      dem101 == 1 ~ 1,
+      dem101 %in% c(2, 3, 4) ~ 0,
+      TRUE ~ NA_real_
+    ),
+    Democrat = case_when(
+      dem101 == 2 ~ 1,
+      dem101 %in% c(1, 3, 4) ~ 0,
+      TRUE ~ NA_real_
+    )
+  )
+
+#clean ideology
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    q46 = na_if(as.numeric(q46), -99),
+    q47 = na_if(as.numeric(q47), -99)
+  )
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    fiscal_ideology = ifelse(!is.na(q46), 6 - q46, NA),
+    social_ideology = ifelse(!is.na(q47), 6 - q47, NA)
+  )
+
+
+```
+
+### I. Gender
+
+```{r, gender}
+#raw_data_cleaned %>% count(q55)
+
+#trans clean
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(q55 = na_if(as.numeric(q55), -99))
+
+#trans indicator
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(trans_id = case_when(
+    q55 == 1 ~ 1,
+    q55 %in% c(2, 3) ~ 0,  # Conservative approach: counts only self-identified trans as 1
+    TRUE ~ NA_real_
+  ))
+
+
+#gender clean
+gender_vars <- paste0("q56_", 1:4)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(all_of(gender_vars), ~ na_if(as.numeric(.x), -99)))
+
+
+#constructing the gender binary
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(gender = case_when(
+    q56_2 == 1 ~ 1,  # Selected man
+    q56_1 == 1 & (q56_2 != 1 | is.na(q56_2)) ~ 0,  # Woman only or with genderqueer/other
+    q56_3 == 1 | q56_4 == 1 ~ 0,  # Genderqueer or other, no man selected
+    TRUE ~ NA_real_
+  ))
+
+
+```
+
+### J. Victim Analysis Vars
+
+```{r}
+
+# police policies
+
+# Originally 6 = strong oppose, 7= somewhat oppose, 8 = neutral, 9 = somewhat support, 10 = strong support
+
+# Define Q25 police items
+police_items <- c("q15_1", "q15_2", "q15_3", "q15_4", "q15_5")
+
+# Step 1: Recode -99 to NA and ensure numeric
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(all_of(police_items), ~ na_if(as.numeric(.), -99)))
+
+# Step 2: Recode so 1-5 (6 = strong oppose → 1 = strong oppose, 
+# 7 = somewhat oppose → 2 = somewhat oppose, 
+# 8 = neutral → 3 = neutral, 
+# 9 = somewhat support → 4 = somewhat support,
+#10 = strong support → 5 = strong support)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    all_of(police_items),
+    ~ case_when(
+    . == 6 ~ 1,          
+    . == 7 ~ 2,
+    . == 8 ~ 3,
+    . == 9 ~ 4,
+    . == 10 ~ 5,        
+    TRUE ~ NA_real_
+  ),  
+    .names = "{.col}_1_to_5"
+  ))
+
+police_items_1_to_5 <- c(
+  "q15_1_1_to_5",
+  "q15_2_1_to_5",
+  "q15_3_1_to_5",
+  "q15_4_1_to_5",
+  "q15_5_1_to_5"
+)
+
+```
+
+```{r}
+
+## trust in government 
+
+summary(raw_data_cleaned$q30)
+unique(raw_data_cleaned$gov_attn)
+
+# Originally 1 = a lot, 2 = some, 3 = not muc
+
+# rename
+## trust in government attention
+# q30 originally: 1 = a lot, 2 = some, 3 = not much
+# recode so higher = more government attention/trust
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    gov_attn = case_when(
+      as.numeric(q30) == -99 ~ NA_real_,
+      as.numeric(q30) == 1 ~ 3,
+      as.numeric(q30) == 2 ~ 2,
+      as.numeric(q30) == 3 ~ 1,
+      TRUE ~ NA_real_
+    )
+  )
+
+hist(raw_data_cleaned$gov_attn)
+
+## did vote in 2020
+# q31: 1 = no, not eligible; 2 = no, eligible; 3 = yes
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    vote2020 = na_if(as.numeric(q31), -99)
+  )
+
+
+## plans to vote
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    willvote = na_if(as.numeric(q110), -99)
+  )
+
+
+```
+
+Note:
+
+Approximately 561 respondents did not provide responses to the political behavior items (government attention, past vote, intended vote). Missingness is perfectly overlapping across these items, indicating that these questions were likely administered to a subset of respondents rather than reflecting item-level nonresponse.
+
+### K. LAST OF CLEANING - WRITE CSV
+
+```{r}
+
+names(raw_data_cleaned)
+write_csv(raw_data_cleaned, "data/cleaned/coded_data__08_2026_3.csv")
+#write_csv(raw_data_cleaned, "data/cleaned/coded_data_may9.csv")
+
+```
+
+# ARCHIVED
+
+```{r}
+#| eval: false
+#| include: false
+
+getwd()
+impacted <- read.csv("/Users/kristinamensik/Library/Mobile Documents/com~apple~CloudDocs/Documents/Duke/2024-2025/902 Legislators Pre-Ananlysis Plan/Prelim Folder/Prelim 3-23/data/impacted.csv")
+
+view(impacted)
+
+# Count unique combinations
+impacted_summary <- impacted %>%
+  select(been_inc, know_inc, none_inc, been_vict, know_vict, no_vict) %>%
+  group_by(across(everything())) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  arrange(desc(count))
+
+# View the result
+view(impacted_summary)
+
+#only incarcerated
+sum(
+  impacted$been_inc == 1 &
+  impacted$no_vict == 1 &
+  impacted$know_inc == 0 &
+  impacted$none_inc == 0 &
+  impacted$been_vict == 0 &
+  impacted$know_vict == 0
+)
+
+#incarcerated & Victimized
+sum(
+  impacted$been_inc == 1 &
+  impacted$no_vict == 0 &
+  impacted$know_inc == 0 &
+  impacted$none_inc == 0 &
+  impacted$been_vict == 1 &
+  impacted$know_vict == 0
+)
+
+#incarcerated & Victimized & Know Inc
+sum(
+  impacted$been_inc == 1 &
+  impacted$no_vict == 0 &
+  impacted$know_inc == 1 &
+  impacted$none_inc == 0 &
+  impacted$been_vict == 1 &
+  impacted$know_vict == 0
+)
+
+#only know incarcerated
+sum(
+  impacted$been_inc == 0 &
+  impacted$no_vict == 1 &
+  impacted$know_inc == 1 &
+  impacted$none_inc == 0 &
+  impacted$been_vict == 0 &
+  impacted$know_vict == 0
+)
+
+#only vict
+sum(
+  impacted$been_inc == 0 &
+  impacted$no_vict == 0 &
+  impacted$know_inc == 0 &
+  impacted$none_inc == 1 &
+  impacted$been_vict == 1 &
+  impacted$know_vict == 0
+)
+
+#only know vict
+sum(
+  impacted$been_inc == 0 &
+  impacted$no_vict == 0 &
+  impacted$know_inc == 0 &
+  impacted$none_inc == 1 &
+  impacted$been_vict == 0 &
+  impacted$know_vict == 1
+)
+
+#know vict, know incarc, been vict
+sum(
+  impacted$been_inc == 0 &
+  impacted$no_vict == 0 &
+  impacted$know_inc == 1 &
+  impacted$none_inc == 0 &
+  impacted$been_vict == 1 &
+  impacted$know_vict == 1
+)
+
+
+```

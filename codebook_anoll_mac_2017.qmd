@@ -1,0 +1,19 @@
+---
+title: "codebook_anoll_mac_2017"
+format: html
+editor: visual
+---
+
+## Setup
+
+maybe as four pieces
+
+| component           | what 1 row reps | important fields |
+|---------------------|-----------------|------------------|
+| variable_dictionary |                 |                  |
+| value_dictionary    |                 |                  |
+| survey_design       |                 |                  |
+| transformation_log  |                 |                  |
+|                     |                 |                  |
+
+## 

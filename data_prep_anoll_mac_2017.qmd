@@ -1,0 +1,90 @@
+---
+title: "data_prep_am_data.qmd"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,       # Hide code by default
+  warning = FALSE,
+  message = FALSE
+)
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+
+```
+
+## 1. Pull raw code and variable clean names
+
+```{r}
+
+# Unzip and load data
+
+raw_data <- read_csv("./data/raw/anoll_mac_data_raw.csv")
+
+
+
+#standardizes and cleans column names by (1) converting to lowerase, (2) replaces spaces with characters, removes accents, ensures uniqueness by adding numbers to duplicates, removing leading/trailing whitespace, creates syntatically valid names
+
+#names(raw_data)
+
+#raw_data <- clean_names(raw_data)
+
+#checked for changes:
+
+#original_data <-read_csv("./data/raw/anoll_mac_data_raw.csv")
+#original_names <-names(original_data)
+
+#data.frame(
+#  original = original_names,
+#  cleaned = names(raw_data)
+#)
+
+# note--main change is made lowercase
+```
+
+## 2. Inventory & create diagnostic output
+
+Aim is to establish what each variable is and classify its role before changing any values.
+
+Likely groups:
+
+- qualtrics/administrative fields (start_date, progress, duration_in_seconds, finished)
+
+- respondent democraphics (race, hispanic, edu, etc)
+
+- substantive questions (a001, a001_2, p001, etc)
+
+- experimental assignment/design fields (e0004_treat or deserve_r)
+
+- derived survey fields (region, educat, agecat)
+
+- completion indicators
+
+- weights
+
+Then, aim to understand cleaning: dimensions, duplicate IDs, data classes, observed values, frequency distributions, missingness, impossible values, completion patterns, and whether the observed categories correspond to the instrument; compare overlapping/similar fields.
+
+## 3. Cleaning and validation
+
+Standardize things that are unambiguously about data integrity: parse dates, establish explicit missing-value conventions, apply value labels, reconstruct literal birth year if necessary, verify derived region/age/education classifications, identify duplicate records if any, and make variable types appropriate. Critically, skip-pattern missingness should not automatically be treated as ordinary NA. For example, `D002` is only shown following nonzero police stops, and `D08` only after a court appearance. A structurally skipped response is substantively different from someone being shown a question and declining to answer. I would want the cleaning architecture to preserve that distinction where feasible.
+
+## 4. Experimental design checks
+
+Dataset has a lot of randomization. We should document each experiment, identify its assignment variable(s), treatment text/condition, expected proportions, and dependent variables; then check whether assignments look approximately balanced and whether randomization fields correspond correctly to the version of the question respondents received. This gives you a clean design map before you decide which experiment belongs in which paper.
+
+## 5. Measurement construction
+
+recoded outcomes, batteries, scales, indices, carceral-contact measures, victimization measures, etc. belong. These should be **new variables**, with the original item variables retained. This is also where reliability, scale direction, constituent items, missing-data rules, and validation tests get documented. I would not call any of that merely “cleaning,” because these are theoretical/measurement decisions.
+
+## 6. Analysis samples and exclusions
+
+Complete cases, attention/completion requirements, contradictory-response rules, experimental subsets, race-specific analyses, weight choice, and so forth should be constructed explicitly here. That means you can always report something like “N fell from X to Y because of these specified analytic restrictions,” rather than discovering later that respondents disappeared during cleaning.
