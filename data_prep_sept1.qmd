@@ -19,6 +19,7 @@ library(janitor)   # for clean_names()
 library(tibble)
 library(stringr)
 library(haven)
+library(ggplot2)
 
 ```
 
@@ -31,9 +32,11 @@ library(haven)
 
 raw_data <- read_csv("./data/raw/scotg_results.csv")
 
+raw_data <- clean_names(raw_data)
+ 
 names(raw_data)
 
-raw_data <- clean_names(raw_data)
+
 
 #standardizes and cleans column names by (1) converting to lowerase, (2) replaces spaces with characters, removes accents, ensures uniqueness by adding numbers to duplicates, removing leading/trailing whitespace, creates syntatically valid names
 #checked for changes:
@@ -51,14 +54,24 @@ raw_data <- clean_names(raw_data)
 
 ## 1. Cleaning
 
-#### a. Label Deserving & Power Blocks – redefine block using column names. Used the below to create block assignments for participants in A, B, and C (to ultimately consolidate)
+#### a. D&P Labels
+
+Assign Deserving & Power Blocks – redefine block using column names. Used the below to create block assignments for participants in A, B, and C (to ultimately consolidate).
+
+Explanation: Participants were sorted into 3 sections (ABC). For the deservingness and power questions, all 3 participant sections evaluated many of the same groups, but two of the three evaluated extra groups that participants in the other sections did not.
+
+This shows up in the raw data:
+
+-   there are 3 versions of the same variables – one corresponding to participants in section a, another in section b, another in section c.
+
+Here, I am creating a block variable to keep track of what block each participant was sorted into, so that when I merge the disparate variables, it is still easy to know which group each participant was assigned to (thus, what groups they would have been prompted to evaluated and also important because it appears that the deserving questions for participants in block A were forced choice and snapped to increments of 10: not the case for B and C).
 
 ```{r}
 #| include: false
-#view(raw_data)
 # DeservingPower Blocks
 
 #FL_8_DO_Deserving&PowerBlockA %in% names(raw_data)
+#View(raw_data)
 
 # Add participant block variable (group a, b, c)
 raw_data <- raw_data %>%
@@ -87,7 +100,7 @@ columns_to_drop <- c(
   "location_longitude", "distribution_channel", "user_language"
 )
 
-names(raw_data)
+#names(raw_data)
 
 # Drop all columns containing "_DO" (Display Order)
 
@@ -127,7 +140,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ### d. Clean: attn checks
 
-- first, create flags for passed/not each check and people who failed all
+-   first, create flags for passed/not each check and people who failed all
 
 ```{r}
 #| eval: false
@@ -164,7 +177,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
   ) %>%
   filter(attn_pass_count > 0)  # Remove only people who failed all
 
-
+#View(raw_data_cleaned)
 
 ```
 
@@ -177,9 +190,71 @@ raw_data_cleaned <- raw_data_cleaned %>%
 raw_data_cleaned <- raw_data_cleaned %>%
  mutate(duration_in_seconds = as.numeric(duration_in_seconds))
 
-str(raw_data_cleaned$duration_in_seconds)
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(duration_minutes = duration_in_seconds / 60)
 
-raw_data_cleaned$duration_sec <- as.numeric(raw_data_cleaned$duration_in_seconds)
+#get pre-cleaned survey duration info: will want this to justify cleaning cutoffs
+
+summary(raw_data_cleaned$duration_minutes)
+
+
+summary(raw_data_cleaned$duration_minutes)
+
+quantile(
+  raw_data_cleaned$duration_minutes,
+  probs = c(.01, .05, .25, .5, .75, .95, .99),
+  na.rm = TRUE
+)
+
+quantile(
+  raw_data_cleaned$duration_minutes,
+  probs = c(.50, .60, .70, .75, .80, .85, .90, .95, .97, .99),
+  na.rm = TRUE
+)
+
+library(ggbeeswarm)
+uncleaned_response_times <-
+ggplot(raw_data_cleaned,
+       aes(x = duration_minutes, y = 0)) +
+  geom_quasirandom(
+    groupOnX = FALSE,
+    width = .35,
+    alpha = .35,
+    size = 1.2
+  ) +
+  coord_cartesian(xlim = c(0, 120)) +
+  labs(
+    x = "Survey duration (minutes)",
+    y = NULL,
+    title = "Survey Duration"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+# save uncleaned_response_times as image
+
+
+ggsave(
+  "uncleaned_response_times.png",
+  plot = uncleaned_response_times,
+  width = 14,
+  height = 9,
+  dpi = 300,
+  bg = "white"
+)
+
+```
+
+```{r}
+names(raw_data)
+summary(raw_data$duration_in_seconds)
+
+plot(raw_data_cleaned$duration_in_seconds)
+
+
 
 raw_data_cleaned <- raw_data_cleaned %>%
   filter(duration_in_seconds >= 480)
@@ -532,11 +607,11 @@ count(finishers_df, block)
 
 what block are they in?
 
-- 18 in A
+-   18 in A
 
-- 28 in B
+-   28 in B
 
-- 20 in C
+-   20 in C
 
 | Block   | nonfinishers | finishers |
 |---------|--------------|-----------|
@@ -555,11 +630,11 @@ count(nonfinishers_df, block)
 | Victims           | 60           | 267       |
 |                   |              |           |
 
-- 8 incarcerated
+-   8 incarcerated
 
-- 21 know incarcerated
+-   21 know incarcerated
 
-- 60 victims
+-   60 victims
 
 ```{r}
 
@@ -598,27 +673,7 @@ count(finishers_df, q15_1)
 
 completion times:
 
-d_crim_abc
-d_incppl_pris_abc
-d_incwomen_abc
-q15_1
-q15_2
-q15_3
-q15_4
-q15_5
-q15
-q25_1
-q25_2
-q25_3
-q25_4
-q25_1
-q4_1_1
-q4_1_2
-q4_1_3
-q4_2_1
-q4_2_2
-q4_2_3
-
+d_crim_abc d_incppl_pris_abc d_incwomen_abc q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3
 
 # LAST: Save to file.
 
