@@ -31,7 +31,7 @@ library(haven)
 
 raw_data <- read_csv("./data/raw/scotg_results.csv")
 
-#names(raw_data)
+names(raw_data)
 
 raw_data <- clean_names(raw_data)
 
@@ -511,9 +511,32 @@ view(cleaned_data_light)
 
 ```
 
-### LAST: Save to file.
+## Retained Respondents who did not finish
 
 ```{r}
+
+table(raw_data_cleaned$finished, useNA = "ifany")
+
+nonfinishers_df <- raw_data_cleaned %>% filter(finished == 0)
+
+hist(nonfinishers_df$block)
+
+
+
+```
+
+what block are they in?
+
+66 non-finishers
+
+completion times:
+
+min
+
+# LAST: Save to file.
+
+```{r}
+
 
 write_csv(raw_data_cleaned, "data/cleaned/cleaned_data_consent.csv")
 
