@@ -31,8 +31,8 @@ library(ggplot2)
 
 ```{r}
 
-raw_data_cleaned <- readr::read_csv("data/cleaned/cleaned_light.csv") 
-
+raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__08_2026_3.csv") 
+# note: check q 6 q 7 q 8 q 112-- why would they be logical 
 ```
 
 # Deservingness Scores
@@ -75,10 +75,10 @@ desor_corr <- psych::corr.test(
 )
 
 # Pairwise correlations
-view(round(desor_corr$r, 2))
+#view(round(desor_corr$r, 2))
 
 # N used for each pairwise correlation
-print(desor_corr$n)
+desor_corr$n
 
 ```
 
@@ -91,7 +91,7 @@ print(desor_corr$n)
 # at least 5 of 9 items observed
 core_keep <- core_n >= 5
 
-print(table(core_keep, useNA = "ifany"))
+table(core_keep, useNA = "ifany")
 
 
 core_alpha <- psych::alpha(
@@ -100,17 +100,17 @@ core_alpha <- psych::alpha(
 )
 
 # Key reliability outputs
-print(core_alpha$total$raw_alpha)
-print(core_alpha$total$std.alpha)
-print(core_alpha$total$average_r)
-print(core_alpha$n.obs)
+core_alpha$total$raw_alpha
+core_alpha$total$std.alpha
+core_alpha$total$average_r
+core_alpha$n.obs
 
 # Item diagnostics
-print(core_alpha$alpha.drop)
-print(core_alpha$item.stats)
+core_alpha$alpha.drop
+core_alpha$item.stats
 
 # Check whether psych automatically reversed any items
-print(core_alpha$keys)
+core_alpha$keys
 ```
 
 ```{r, desor3}
@@ -124,7 +124,7 @@ raw_data_cleaned$desor_core <- ifelse(
   NA_real_
 )
 
-print(summary(raw_data_cleaned$desor_core))
+summary(raw_data_cleaned$desor_core)
 
 
 # ------------------------------------------------------------
@@ -134,7 +134,7 @@ print(summary(raw_data_cleaned$desor_core))
 raw_data_cleaned$desor_core_z <-
   as.numeric(scale(raw_data_cleaned$desor_core))
 
-print(summary(raw_data_cleaned$desor_core_z))
+summary(raw_data_cleaned$desor_core_z)
 
 ```
 
@@ -906,13 +906,13 @@ print(combined_alpha)
 #help_policy_items <- c("q25_2", "q25_3", "q25_4", "q25_6", "q23_2", "q23_7")
 
 # Variance and SD across help policy items
-raw_data_cleaned <- raw_data_cleaned %>%
-  rowwise() %>%
-  mutate(
-    variancehelp = var(c_across(all_of(help_policy_items)), na.rm = TRUE),
-    sdhelp = sd(c_across(all_of(help_policy_items)), na.rm = TRUE)
-  ) %>%
-  ungroup()
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   rowwise() %>%
+#   mutate(
+#     variancehelp = var(c_across(all_of(help_policy_items)), na.rm = TRUE),
+#     sdhelp = sd(c_across(all_of(help_policy_items)), na.rm = TRUE)
+#   ) %>%
+#   ungroup()
 
 
 ```
@@ -921,5 +921,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 # Write and Save Data
 ```{r}
 
+** as...
 ```
 

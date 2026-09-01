@@ -19,10 +19,10 @@ impact_labels <- c(
 
 ## Outcome A: Policy Questions
 
-q25_help_vars <- c("25_2_rev", "q25_3_rev","q25_4_rev","q25_6_rev")
+q25_help_vars <- c("min_wage", "free_calls","ed_funds","q25_6_rev")
 
 policy_vars <- c("prisonhelp", "prisonpen",
-  "post_felony_vote_rev", "jail_access_rev", "q25_2_rev", "q25_3_rev", "q25_4_rev", "q25_6_rev",
+  "post_felony_vote_rev", "jail_access_rev", "min_wage", "free_calls", "ed_funds", "alt_sentencing",
   "dpen_rev", "lwop_rev" 
 )
 
@@ -31,10 +31,10 @@ policy_map <- tibble::tribble(
   "prisonhelp", "Help-oriented CJ policy index",                  "Help",
   "post_felony_vote_rev",   "Post-sentence voting rights restoration", "Help",
   "jail_access_rev", "Requiring eligible incarcerated people ability to vote",  "Help",
-  "q25_2_rev",   "Minimum wage for prison labor",                     "Help",
-  "q25_3_rev",   "Free calls with family members",                    "Help",
-  "q25_4_rev",   "Funding GED and college courses in prisons",        "Help",
-  "q25_6_rev",   "Sentencing alternatives for parents of young children", "Help",
+  "min_wage",   "Minimum wage for prison labor",                     "Help",
+  "free_calls",   "Free calls with family members",                    "Help",
+  "ed_funds",   "Funding GED and college courses in prisons",        "Help",
+  "alt_sentencing",   "Sentencing alternatives for parents of young children", "Help",
   "prisonpen",   "Punitive policy index",                             "Punish",
   "dpen_rev", "Death penalty for people convicted of murder",      "Punish",
   "lwop_rev", "Life without parole sentences",                     "Punish"

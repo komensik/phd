@@ -188,7 +188,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ### e. TBD Clean: ppl who do not answer my IV ??
 
-## 2. Variables - Organize + Clean
+## 2. Deservingness
 
 ### A. Deservingness and Power consolidation
 
@@ -520,7 +520,11 @@ write_csv(raw_data_cleaned, "data/cleaned/cleaned_data_consent.csv")
 #light csv
 write_csv(cleaned_data_light, "data/cleaned/cleaned_light.csv") # main file to use going forward
 
+testing <- readr::read_csv("data/cleaned/cleaned_light.csv")
 
+sum(is.na(raw_data_cleaned$q51_1))
+
+table(raw_data_cleaned$q51_1, useNA = "ifany")
 ```
 
 # ARCHIVED CODE

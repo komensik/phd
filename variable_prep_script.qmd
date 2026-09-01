@@ -176,26 +176,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-### E.Policy Orientation (polor) control
-
-Decided to skip because of how questions are worded/coded. Will need to return to this later
-
-10-27 Diagnostics
-
-```{r}
-# names(raw_data_cleaned) %>% stringr::str_subset("q25|q23|q62|prison|help|punish|rehab")
-# 
-# glimpse(raw_data_cleaned %>% select(starts_with("q25"), starts_with("q23"), starts_with("q62"), starts_with("prison"), starts_with("penal")))
-# 
-# 
-# glimpse(dplyr::select(raw_data_cleaned,
-#                       starts_with("q25_"),
-#                       starts_with("q23_"),
-#                       starts_with("q62"),
-#                       starts_with("prison"),
-#                       starts_with("penal")))
-
-```
 
 ### F. FIRE controls
 
@@ -208,42 +188,141 @@ Decided to skip because of how questions are worded/coded. Will need to return t
 #raw_data_cleaned %>% count(Q34)
 
 #raw_data_cleaned %>% count(Q111)
+# 
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   rename(
+#     fire_rare = q32,
+#     fire_privilege = q33,
+#     fire_angry = q34,
+#     fire_fear = q111
+#   )
 
-fire_vars <- c("q32", "q33", "q34", "q111")
-names(raw_data_cleaned)
+fire_vars <- c("fire_rare", "fire_privilege", "fire_angry", "fire_fear")
+
+
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
     all_of(fire_vars),
     ~ as.numeric(na_if(as.character(.x), "-99"))
   ))
 
-raw_data_cleaned <- raw_data_cleaned %>%
-  rename(
-    fire_rare = q32,
-    fire_privilege = q33,
-    fire_angry = q34,
-    fire_fear = q111
-  )
 
-summary(raw_data_cleaned$fire_angry)
-summary(raw_data_cleaned$fire_privilege)
-summary(raw_data_cleaned$fire_fear)
-summary(raw_data_cleaned$fire_rare)
+# summary(raw_data_cleaned$fire_angry)
+# summary(raw_data_cleaned$fire_privilege)
+# summary(raw_data_cleaned$fire_fear)
+# summary(raw_data_cleaned$fire_rare)
 
 
 ```
 
 ### G. Race
 
-```{r}
+q51_
+▢	White  (1) 
+▢	Black or African American  (2) 
+▢	Native American / Alaska Native  (3) 
+▢	Asian / Asian American  (4) 
+▢	Native Hawaiian / Other Pacific Islander  (5) 
+▢	Middle Eastern/ North African  (6) 
+▢	Hispanic/Latino/a/e  (7) 
+▢	My preferred response not listed  (8) 
 
+-measured as set of binary indicator variables in the survey, rather than as one categorical race variable. 
+- 1 = selected that category
+- 0 = ? did not select?
+- NA =  c
+
+
+```{r}
 #convert + clean
 race_vars <- paste0("q51_", 1:8)
 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(all_of(race_vars), ~ na_if(as.numeric(.x), -99)))
+```
 
-# REPLACE your current race dummies with this block
+```{r}
+
+sum(is.na(raw_data_cleaned$q51_1))
+
+table(raw_data_cleaned$q51_1, useNA = "ifany")
+
+```
+
+White: 
+ 0    1 <NA> 
+ 422 1181  619 
+
+```{r}
+table(raw_data_cleaned$q51_2, useNA = "ifany")
+```
+
+Black or African American  (2) 
+ 0    1 <NA> 
+1336  267  619 
+
+```{r}
+table(raw_data_cleaned$q51_3, useNA = "ifany")
+```
+
+▢	Native American / Alaska Native  (3) 
+
+ 0    1 <NA> 
+1545   58  619 
+
+```{r}
+table(raw_data_cleaned$q51_4, useNA = "ifany")
+```
+▢	Asian / Asian American  (4) 
+ 0    1 <NA> 
+1525   78  619 
+
+```{r}
+table(raw_data_cleaned$q51_5, useNA = "ifany")
+```
+▢	Native Hawaiian / Other Pacific Islander  (5) 
+ 0    1 <NA> 
+1598    5  619 
+
+```{r}
+table(raw_data_cleaned$q51_6, useNA = "ifany")
+```
+▢	Middle Eastern/ North African  (6) 
+ 0    1 <NA> 
+1597    6  619 
+
+```{r}
+table(raw_data_cleaned$q51_7, useNA = "ifany")
+```
+▢	Hispanic/Latino/a/e  (7) 
+  0    1 <NA> 
+1366  237  619 
+```{r}
+table(raw_data_cleaned$q51_8, useNA = "ifany")
+```
+▢	My preferred response not listed  (8) 
+ 0    1 <NA> 
+1583   20  619 
+
+```{r}
+unique(raw_data_cleaned$q51_8)
+
+class(raw_data_cleaned$q51_8)
+
+frame %>% count(q51_1)
+
+frame %>% count(raw_data_cleaned$q51_1, sort = TRUE)
+```
+
+
+
+
+
+```{r}
+
+
+
+# REPLACE current race dummies w
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     # Ethnicity first: Hispanic gets priority
@@ -458,7 +537,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 
 ```
-
 Note:
 
 Approximately 561 respondents did not provide responses to the political behavior items (government attention, past vote, intended vote). Missingness is perfectly overlapping across these items, indicating that these questions were likely administered to a subset of respondents rather than reflecting item-level nonresponse.
