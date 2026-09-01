@@ -517,21 +517,108 @@ view(cleaned_data_light)
 
 table(raw_data_cleaned$finished, useNA = "ifany")
 
+finishers_df <- raw_data_cleaned %>% filter(finished==1)
+write_csv(finishers_df, "data/cleaned/finishers.csv")
+
 nonfinishers_df <- raw_data_cleaned %>% filter(finished == 0)
-
-hist(nonfinishers_df$block)
-
-
+write_csv(nonfinishers_df, "data/cleaned/nonfinishers.csv")
 
 ```
 
+```{r}
+count(nonfinishers_df, block)
+count(finishers_df, block)
+```
+
 what block are they in?
+
+- 18 in A
+
+- 28 in B
+
+- 20 in C
+
+| Block   | nonfinishers | finishers |
+|---------|--------------|-----------|
+| Block A | 18           | 743       |
+| Block B | 28           | 722       |
+| Block C | 20           | 691       |
+
+```{r}
+count(nonfinishers_df, block)
+```
+
+| Experiences       | nonfinishers | finishers |
+|-------------------|--------------|-----------|
+| Incarcerated      | 8            | 162       |
+| Know incarcerated | 21           | 668       |
+| Victims           | 60           | 267       |
+|                   |              |           |
+
+- 8 incarcerated
+
+- 21 know incarcerated
+
+- 60 victims
+
+```{r}
+
+count(nonfinishers_df, q23_1)
+
+count(finishers_df, q15_1)
+```
+
+| NAs in                   | nonfinishers | finishers                |
+|--------------------------|--------------|--------------------------|
+| d_crim_abc               |              |                          |
+| d_incppl_pris_abc        |              |                          |
+| d_incwomen_abc           |              |                          |
+| all Police Questions (5) | 16           |                          |
+| all prison questions     | all 16 NAs   | 170 (171 for 25_4 and 6) |
+| q25_1                    | 16           |                          |
+| q25_2                    | ...          |                          |
+| re enfranchisement       | 35           | 497                      |
+| jail voting              | 35           | 497                      |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
+|                          |              |                          |
 
 66 non-finishers
 
 completion times:
 
-min
+d_crim_abc
+d_incppl_pris_abc
+d_incwomen_abc
+q15_1
+q15_2
+q15_3
+q15_4
+q15_5
+q15
+q25_1
+q25_2
+q25_3
+q25_4
+q25_1
+q4_1_1
+q4_1_2
+q4_1_3
+q4_2_1
+q4_2_2
+q4_2_3
+
 
 # LAST: Save to file.
 

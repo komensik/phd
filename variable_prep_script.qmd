@@ -157,8 +157,12 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ```{r}
 
 #inspect
-
-#raw_data %>% select(q6, q7, q8) %>% summarise_all(~ list(unique(.)))
+# 
+# raw_data %>% select(q6, q7, q8) %>% summarise_all(~ list(unique(.)))
+# 
+# table(raw_data$q6, useNA = "ifany")
+# 
+# table(raw_data_cleaned$q6, useNA = "ifany")
 
 # clean and transform
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -234,6 +238,7 @@ q51_
 
 
 ```{r}
+
 #convert + clean
 race_vars <- paste0("q51_", 1:8)
 
@@ -246,6 +251,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
 sum(is.na(raw_data_cleaned$q51_1))
 
 table(raw_data_cleaned$q51_1, useNA = "ifany")
+
+442+1181+619
 
 ```
 
