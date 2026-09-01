@@ -1,0 +1,653 @@
+---
+title: "variable_prep_script"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,       # Hide code by default
+  warning = FALSE,
+  message = FALSE
+)
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(tibble)
+library(gt)
+library(psych)
+library(ggplot2)
+
+```
+
+## 1. Directory of Most Recent Data
+
+Load cleaned survey data
+
+File created in data_prep.qmd
+
+```{r}
+#view(raw_data_cleaned)
+
+raw_data_cleaned <- readr::read_csv("data/cleaned/cleaned_light.csv") 
+#CONTINGENT note that alhough this is called raw_data_cleaned, it is the equivalent of "cleaned_data_light" from data_prep.qmd. See that file to pull the version with old var names for D and P. Note: no power here.
+
+names(raw_data_cleaned)
+
+```
+
+## 2. Variables
+
+### A. Deservingness and Power consolidation
+
+```{r, prisonerdeserves}
+
+# pretty much done, maybe standardize later?
+
+```
+
+Standardize? No -- in my prelim, I write: To ensure that I do not control for a variable that is conceptually or empirically too close to the deservingness of incarcerated people when it is the dependent variable, I exclude any deservingness ratings for groups that are substantively overlapping or highly correlated. Including those could absorb variance in the outcome or introduce post-treatment bias by controlling for a related evaluative construct. I also avoid using global composite or average deservingness scores across all groups – for example, a respondent's mean deservingnesss rating across all 65 groups they evaluated – because that composite would include the rating of incarcerated people itself, introducing potential collinearity and making it difficult to isolate the unique effect of contact. This modeling strategy attempts to preserve interpretability and ensuring that the effect of policy contact is estimated with respect to unstandardized, target-specific deservingness scores. 12
+
+12 While constructing composite or control variables involving other deservingness targets, I assess whether their inclusion introduces collinearity or conceptual overlap with the dependent variable. In particular, I examine correlations between group-level deservingness ratings to ensure that any included groups are not too closely tied to perceptions of incarcerated people. If preliminary checks reveal that including a particular group (e.g., “criminals” or “formerly incarcerated individuals”) would obscure key variance or conflate target constructs, I exclude it from the model and treat it as conceptually non-distinct for the purposes of this analysis.
+
+
+### B. Experiences - Basic Coding
+
+#### Impact Plus (Constructing For-Analysis)
+
+```{r, impactvar}
+
+#counting the *total* of those who said they were incarcerated, know incarcerated, or victims)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    impact = if_else(
+      q4_1_1 == 1 | q4_1_2 == 1 | q4_2_1 == 1,
+      1, 0,
+      missing = NA_real_
+    )
+  )
+
+# post Aug 2026 version with casewhen,where  incarc = 0 to mean impact = 0 (no impact, not just no incarceration):
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    incarc = case_when(
+      q4_1_1 == 1 ~ 1, 
+      impact == 0 ~ 0, 
+      TRUE ~ NA_real_ #"otherwise, assign NA"
+    )
+  )
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    knowincarc = case_when(
+      q4_1_2 == 1 ~ 1, 
+      impact == 0 ~ 0, 
+      TRUE ~ NA_real_ #"otherwise, assign NA"
+    )
+  )
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    vict = case_when(
+      q4_2_1 == 1 ~ 1, 
+      impact == 0 ~ 0, 
+      TRUE ~ NA_real_ #"otherwise, assign NA"
+    )
+  )
+
+```
+
+#### Extra binaries (incarc, KI, vict)
+
+```{r}
+
+ raw_data_cleaned <- raw_data_cleaned %>%
+   mutate(
+     incarc_bin = if_else(
+       q4_1_1 == 1,
+       1,
+       0,
+       missing = NA_real_
+     )
+   )
+
+ raw_data_cleaned <- raw_data_cleaned %>%
+   mutate(
+     noincarc_bin = if_else(
+       q4_1_1 == 0 | q4_1_2 == 0 | q4_1_3 == 1,
+       1, 0,
+       missing = NA_real_
+     )
+   )
+
+
+ raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    knowincarc_bin = if_else(
+      q4_1_2 == 1,
+      1,
+      0,
+      missing = NA_real_
+    )
+  )
+
+ raw_data_cleaned <- raw_data_cleaned %>%
+   mutate(
+     vict_bin = if_else(
+       q4_2_1 == 1,
+       1,
+       0,
+       missing = NA_real_
+     )
+   )
+
+
+```
+
+### C. Q6, 7, 8 - Ration Block
+
+```{r}
+
+#inspect
+# 
+# raw_data %>% select(q6, q7, q8) %>% summarise_all(~ list(unique(.)))
+# 
+# table(raw_data$q6, useNA = "ifany")
+# 
+# table(raw_data_cleaned$q6, useNA = "ifany")
+
+# clean and transform
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    c(q6, q7, q8), 
+    ~ na_if(as.numeric(.x), -99)
+    )) %>% mutate(across(
+    c(q6, q7, q8),
+    ~ factor(.x, levels = 1:4,
+             labels = c("Frequently", "Sometimes", "Rarely", "Never"),
+             ordered = TRUE)
+  ))
+
+ raw_data_cleaned %>% count(q8)
+
+```
+
+
+### F. FIRE controls
+
+```{r}
+
+#raw_data_cleaned %>% count(q32)
+
+#raw_data_cleaned %>% count(Q33)
+
+#raw_data_cleaned %>% count(Q34)
+
+#raw_data_cleaned %>% count(Q111)
+# 
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   rename(
+#     fire_rare = q32,
+#     fire_privilege = q33,
+#     fire_angry = q34,
+#     fire_fear = q111
+#   )
+
+fire_vars <- c("fire_rare", "fire_privilege", "fire_angry", "fire_fear")
+
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    all_of(fire_vars),
+    ~ as.numeric(na_if(as.character(.x), "-99"))
+  ))
+
+
+# summary(raw_data_cleaned$fire_angry)
+# summary(raw_data_cleaned$fire_privilege)
+# summary(raw_data_cleaned$fire_fear)
+# summary(raw_data_cleaned$fire_rare)
+
+
+```
+
+### G. Race
+
+q51_
+▢	White  (1) 
+▢	Black or African American  (2) 
+▢	Native American / Alaska Native  (3) 
+▢	Asian / Asian American  (4) 
+▢	Native Hawaiian / Other Pacific Islander  (5) 
+▢	Middle Eastern/ North African  (6) 
+▢	Hispanic/Latino/a/e  (7) 
+▢	My preferred response not listed  (8) 
+
+-measured as set of binary indicator variables in the survey, rather than as one categorical race variable. 
+- 1 = selected that category
+- 0 = ? did not select?
+- NA =  c
+
+
+```{r}
+
+#convert + clean
+race_vars <- paste0("q51_", 1:8)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(all_of(race_vars), ~ na_if(as.numeric(.x), -99)))
+```
+
+```{r}
+
+sum(is.na(raw_data_cleaned$q51_1))
+
+table(raw_data_cleaned$q51_1, useNA = "ifany")
+
+442+1181+619
+
+```
+
+White: 
+ 0    1 <NA> 
+ 422 1181  619 
+
+```{r}
+table(raw_data_cleaned$q51_2, useNA = "ifany")
+```
+
+Black or African American  (2) 
+ 0    1 <NA> 
+1336  267  619 
+
+```{r}
+table(raw_data_cleaned$q51_3, useNA = "ifany")
+```
+
+▢	Native American / Alaska Native  (3) 
+
+ 0    1 <NA> 
+1545   58  619 
+
+```{r}
+table(raw_data_cleaned$q51_4, useNA = "ifany")
+```
+▢	Asian / Asian American  (4) 
+ 0    1 <NA> 
+1525   78  619 
+
+```{r}
+table(raw_data_cleaned$q51_5, useNA = "ifany")
+```
+▢	Native Hawaiian / Other Pacific Islander  (5) 
+ 0    1 <NA> 
+1598    5  619 
+
+```{r}
+table(raw_data_cleaned$q51_6, useNA = "ifany")
+```
+▢	Middle Eastern/ North African  (6) 
+ 0    1 <NA> 
+1597    6  619 
+
+```{r}
+table(raw_data_cleaned$q51_7, useNA = "ifany")
+```
+▢	Hispanic/Latino/a/e  (7) 
+  0    1 <NA> 
+1366  237  619 
+```{r}
+table(raw_data_cleaned$q51_8, useNA = "ifany")
+```
+▢	My preferred response not listed  (8) 
+ 0    1 <NA> 
+1583   20  619 
+
+```{r}
+unique(raw_data_cleaned$q51_8)
+
+class(raw_data_cleaned$q51_8)
+
+frame %>% count(q51_1)
+
+frame %>% count(raw_data_cleaned$q51_1, sort = TRUE)
+```
+
+
+
+
+
+```{r}
+
+
+
+# REPLACE current race dummies w
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    # Ethnicity first: Hispanic gets priority
+    Hispanic = ifelse(q51_7 == 1, 1, 0),
+
+    # Among non-Hispanics, assign Black and White
+    Black    = ifelse(q51_2 == 1 & q51_7 != 1, 1, 0),
+    White    = ifelse(q51_1 == 1 & q51_7 != 1, 1, 0)
+  ) %>%
+  mutate(
+    # Everyone else with any race selection becomes OtherRace (mutually exclusive)
+    OtherRace = ifelse(
+      (Black + Hispanic + White) == 0 &
+        rowSums(dplyr::select(., dplyr::all_of(race_vars)), na.rm = TRUE) > 0,
+      1, 0
+    )
+  )
+
+```
+
+DOUBLE CHECK
+
+```{r}
+
+# no overlaps among the 4 dummies
+sum((raw_data_cleaned$Black + raw_data_cleaned$White +
+     raw_data_cleaned$Hispanic + raw_data_cleaned$OtherRace) > 1, na.rm = TRUE)
+
+# counts by category (mutually exclusive)
+table(
+  with(raw_data_cleaned,
+       dplyr::case_when(
+         Hispanic == 1 ~ "Hispanic",
+         Black    == 1 ~ "Black",
+         White    == 1 ~ "White",
+         OtherRace== 1 ~ "OtherRace",
+         TRUE          ~ NA_character_
+       )),
+  useNA = "ifany"
+)
+
+
+```
+
+Diagnosed problem in model where Black + Other dropped - Oct 27 Suggests all Black respondents had missing data so were dropped
+
+### H. Party + Ideology controls
+
+```{r}
+
+#raw_data_cleaned %>% count(q47)
+
+#clean dem 101
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(dem101 = na_if(as.numeric(dem101), -99))
+
+#party ID dummies
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    Republican = case_when(
+      dem101 == 1 ~ 1,
+      dem101 %in% c(2, 3, 4) ~ 0,
+      TRUE ~ NA_real_
+    ),
+    Democrat = case_when(
+      dem101 == 2 ~ 1,
+      dem101 %in% c(1, 3, 4) ~ 0,
+      TRUE ~ NA_real_
+    )
+  )
+
+#clean ideology
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    q46 = na_if(as.numeric(q46), -99),
+    q47 = na_if(as.numeric(q47), -99)
+  )
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    fiscal_ideology = ifelse(!is.na(q46), 6 - q46, NA),
+    social_ideology = ifelse(!is.na(q47), 6 - q47, NA)
+  )
+
+
+```
+
+### I. Gender
+
+```{r, gender}
+#raw_data_cleaned %>% count(q55)
+
+#trans clean
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(q55 = na_if(as.numeric(q55), -99))
+
+#trans indicator
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(trans_id = case_when(
+    q55 == 1 ~ 1,
+    q55 %in% c(2, 3) ~ 0,  # Conservative approach: counts only self-identified trans as 1
+    TRUE ~ NA_real_
+  ))
+
+
+#gender clean
+gender_vars <- paste0("q56_", 1:4)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(all_of(gender_vars), ~ na_if(as.numeric(.x), -99)))
+
+
+#constructing the gender binary
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(gender = case_when(
+    q56_2 == 1 ~ 1,  # Selected man
+    q56_1 == 1 & (q56_2 != 1 | is.na(q56_2)) ~ 0,  # Woman only or with genderqueer/other
+    q56_3 == 1 | q56_4 == 1 ~ 0,  # Genderqueer or other, no man selected
+    TRUE ~ NA_real_
+  ))
+
+
+```
+
+### J. Victim Analysis Vars
+
+```{r}
+
+# police policies
+
+# Originally 6 = strong oppose, 7= somewhat oppose, 8 = neutral, 9 = somewhat support, 10 = strong support
+
+# Define Q25 police items
+police_items <- c("q15_1", "q15_2", "q15_3", "q15_4", "q15_5")
+
+# Step 1: Recode -99 to NA and ensure numeric
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(all_of(police_items), ~ na_if(as.numeric(.), -99)))
+
+# Step 2: Recode so 1-5 (6 = strong oppose → 1 = strong oppose, 
+# 7 = somewhat oppose → 2 = somewhat oppose, 
+# 8 = neutral → 3 = neutral, 
+# 9 = somewhat support → 4 = somewhat support,
+#10 = strong support → 5 = strong support)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    all_of(police_items),
+    ~ case_when(
+    . == 6 ~ 1,          
+    . == 7 ~ 2,
+    . == 8 ~ 3,
+    . == 9 ~ 4,
+    . == 10 ~ 5,        
+    TRUE ~ NA_real_
+  ),  
+    .names = "{.col}_1_to_5"
+  ))
+
+police_items_1_to_5 <- c(
+  "q15_1_1_to_5",
+  "q15_2_1_to_5",
+  "q15_3_1_to_5",
+  "q15_4_1_to_5",
+  "q15_5_1_to_5"
+)
+
+```
+
+```{r}
+
+## trust in government 
+
+summary(raw_data_cleaned$q30)
+unique(raw_data_cleaned$gov_attn)
+
+# Originally 1 = a lot, 2 = some, 3 = not muc
+
+# rename
+## trust in government attention
+# q30 originally: 1 = a lot, 2 = some, 3 = not much
+# recode so higher = more government attention/trust
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    gov_attn = case_when(
+      as.numeric(q30) == -99 ~ NA_real_,
+      as.numeric(q30) == 1 ~ 3,
+      as.numeric(q30) == 2 ~ 2,
+      as.numeric(q30) == 3 ~ 1,
+      TRUE ~ NA_real_
+    )
+  )
+
+hist(raw_data_cleaned$gov_attn)
+
+## did vote in 2020
+# q31: 1 = no, not eligible; 2 = no, eligible; 3 = yes
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    vote2020 = na_if(as.numeric(q31), -99)
+  )
+
+
+## plans to vote
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    willvote = na_if(as.numeric(q110), -99)
+  )
+
+
+```
+Note:
+
+Approximately 561 respondents did not provide responses to the political behavior items (government attention, past vote, intended vote). Missingness is perfectly overlapping across these items, indicating that these questions were likely administered to a subset of respondents rather than reflecting item-level nonresponse.
+
+### K. LAST OF CLEANING - WRITE CSV
+
+```{r}
+
+names(raw_data_cleaned)
+write_csv(raw_data_cleaned, "data/cleaned/coded_data__08_2026_3.csv")
+#write_csv(raw_data_cleaned, "data/cleaned/coded_data_may9.csv")
+
+```
+
+# ARCHIVED
+
+```{r}
+#| eval: false
+#| include: false
+
+getwd()
+impacted <- read.csv("/Users/kristinamensik/Library/Mobile Documents/com~apple~CloudDocs/Documents/Duke/2024-2025/902 Legislators Pre-Ananlysis Plan/Prelim Folder/Prelim 3-23/data/impacted.csv")
+
+view(impacted)
+
+# Count unique combinations
+impacted_summary <- impacted %>%
+  select(been_inc, know_inc, none_inc, been_vict, know_vict, no_vict) %>%
+  group_by(across(everything())) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  arrange(desc(count))
+
+# View the result
+view(impacted_summary)
+
+#only incarcerated
+sum(
+  impacted$been_inc == 1 &
+  impacted$no_vict == 1 &
+  impacted$know_inc == 0 &
+  impacted$none_inc == 0 &
+  impacted$been_vict == 0 &
+  impacted$know_vict == 0
+)
+
+#incarcerated & Victimized
+sum(
+  impacted$been_inc == 1 &
+  impacted$no_vict == 0 &
+  impacted$know_inc == 0 &
+  impacted$none_inc == 0 &
+  impacted$been_vict == 1 &
+  impacted$know_vict == 0
+)
+
+#incarcerated & Victimized & Know Inc
+sum(
+  impacted$been_inc == 1 &
+  impacted$no_vict == 0 &
+  impacted$know_inc == 1 &
+  impacted$none_inc == 0 &
+  impacted$been_vict == 1 &
+  impacted$know_vict == 0
+)
+
+#only know incarcerated
+sum(
+  impacted$been_inc == 0 &
+  impacted$no_vict == 1 &
+  impacted$know_inc == 1 &
+  impacted$none_inc == 0 &
+  impacted$been_vict == 0 &
+  impacted$know_vict == 0
+)
+
+#only vict
+sum(
+  impacted$been_inc == 0 &
+  impacted$no_vict == 0 &
+  impacted$know_inc == 0 &
+  impacted$none_inc == 1 &
+  impacted$been_vict == 1 &
+  impacted$know_vict == 0
+)
+
+#only know vict
+sum(
+  impacted$been_inc == 0 &
+  impacted$no_vict == 0 &
+  impacted$know_inc == 0 &
+  impacted$none_inc == 1 &
+  impacted$been_vict == 0 &
+  impacted$know_vict == 1
+)
+
+#know vict, know incarc, been vict
+sum(
+  impacted$been_inc == 0 &
+  impacted$no_vict == 0 &
+  impacted$know_inc == 1 &
+  impacted$none_inc == 0 &
+  impacted$been_vict == 1 &
+  impacted$know_vict == 1
+)
+
+
+```
