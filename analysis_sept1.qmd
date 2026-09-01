@@ -1,0 +1,5135 @@
+---
+title: "analysis"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,       # Hide code by default
+  warning = FALSE,
+  message = FALSE
+)
+install.packages("rlang")
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(gt)
+library(marginaleffects)
+library(mediation)
+library(naniar)
+library(rsq)
+library(patchwork)
+library(modelsummary)
+library(rlang)
+library(forcats)
+library(ggplot2)
+library(broom)
+library(knitr)
+
+
+```
+
+```{r}
+
+here::here()
+raw_data_cleaned <- readr::read_csv("data/cleaned/...")
+source("variable_labels.R")
+raw_data_cleaned
+names(raw_data_cleaned)
+```
+
+# Descriptive Analyses
+
+# 1. Policy
+
+## 2.1 Policy Means x Impact
+
+```{r}
+
+raw_data_cleaned %>%
+  dplyr::select(all_of(policy_vars)) %>%
+  psych::describe()
+
+raw_data_cleaned %>%
+  dplyr::group_by(impact) %>%
+  dplyr::summarise(
+    dpen_rev = mean(dpen_rev, na.rm = TRUE),
+    lwop_rev = mean(lwop_rev, na.rm = TRUE),
+    prisonpen   = mean(prisonpen, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+help_means_impact <- (raw_data_cleaned %>%
+  dplyr::group_by(impact) %>%
+  dplyr::summarise(
+    post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
+    min_wage = mean(min_wage, na.rm=TRUE),
+    free_calls = mean(free_calls, na.rm=TRUE),
+    ed_funds = mean(ed_funds, na.rm=TRUE),
+    alt_sentencing = mean(alt_sentencing, na.rm=TRUE),
+    q25_help_vars   = mean(q25_help_vars, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_impact)
+
+help_means_incarc <- (raw_data_cleaned %>%
+  dplyr::group_by(incarc) %>%
+  dplyr::summarise(
+     post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
+    min_wage = mean(min_wage, na.rm=TRUE),
+    free_calls = mean(free_calls, na.rm=TRUE),
+    ed_funds = mean(ed_funds, na.rm=TRUE),
+    alt_sentencing = mean(alt_sentencing, na.rm=TRUE),
+    q25_help_vars   = mean(q25_help_vars, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_incarc)
+
+help_means_knowincarc <- (raw_data_cleaned %>%
+  dplyr::group_by(knowincarc) %>%
+  dplyr::summarise(
+     post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
+    min_wage = mean(min_wage, na.rm=TRUE),
+    free_calls = mean(free_calls, na.rm=TRUE),
+    ed_funds = mean(ed_funds, na.rm=TRUE),
+    alt_sentencing = mean(alt_sentencing, na.rm=TRUE),
+    q25_help_vars   = mean(q25_help_vars, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_knowincarc)
+
+help_means_vict <- (raw_data_cleaned %>%
+  dplyr::group_by(vict) %>%
+  dplyr::summarise(
+     post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
+    min_wage = mean(min_wage, na.rm=TRUE),
+    free_calls = mean(free_calls, na.rm=TRUE),
+    ed_funds = mean(ed_funds, na.rm=TRUE),
+    alt_sentencing = mean(alt_sentencing, na.rm=TRUE),
+    q25_help_vars   = mean(q25_help_vars, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_vict)
+
+# overleaf table of all
+
+get_means <- function(var) {
+  raw_data_cleaned %>%
+    dplyr::group_by(.data[[var]]) %>%
+    dplyr::summarise(
+      dplyr::across(all_of(policy_vars), ~ mean(.x, na.rm = TRUE)),
+      .groups = "drop"
+    ) %>%
+    dplyr::mutate(group = var) %>%
+    dplyr::rename(value = all_of(var)) %>%
+    dplyr::mutate(row = paste0(group, " = ", value)) %>%
+    dplyr::select(row, all_of(policy_vars))
+}
+
+pol_means_app_table <- bind_rows(lapply(impact_vars, get_means)) %>%
+  dplyr::mutate(dplyr::across(-row, ~ round(.x, 3))) %>%
+  dplyr::rename_with(
+    ~ policy_map$label[match(.x, policy_map$var)],
+    -row
+  )
+
+View(pol_means_app_table)
+
+
+
+```
+
+Means Tables
+
+```{r}
+
+
+#defining the non impact means and percent differences from impact vars
+pct_diff <- function(x, ref) {
+  ((x - ref) / ref) * 100
+}
+
+policy_summary <- function(df, var) {
+  no_impact_mean <- mean(df[[var]][df$impact == 0], na.rm = TRUE)
+  impact_mean <- mean(df[[var]][df$impact == 1], na.rm = TRUE)
+  direct_mean    <- mean(df[[var]][df$incarc == 1], na.rm = TRUE)
+  proximal_mean  <- mean(df[[var]][df$knowincarc == 1], na.rm = TRUE)
+  victim_mean    <- mean(df[[var]][df$vict == 1], na.rm = TRUE)
+
+  tibble::tibble(
+    var = var,
+    no_impact_mean = no_impact_mean,
+    impact_mean = pct_diff(impact_mean, no_impact_mean),
+    direct_pct = pct_diff(direct_mean, no_impact_mean),
+    proximal_pct = pct_diff(proximal_mean, no_impact_mean),
+    victim_pct = pct_diff(victim_mean, no_impact_mean)
+  )
+}
+
+policy_table <- purrr::map_dfr(policy_map$var, ~ policy_summary(raw_data_cleaned, .x)) %>%
+  dplyr::left_join(policy_map, by = "var") %>%
+  dplyr::select(var, section, label, no_impact_mean, direct_pct, proximal_pct, victim_pct)
+
+pval_ttest <- function(df, var, group_var) {
+  sub <- df %>%
+    dplyr::filter(!is.na(.data[[var]]), !is.na(.data[[group_var]])) %>%
+    dplyr::filter(.data[[group_var]] %in% c(0, 1))
+
+  if (length(unique(sub[[group_var]])) < 2) return(NA_real_)
+
+  stats::t.test(sub[[var]] ~ sub[[group_var]])$p.value
+}
+
+add_star <- function(x, p) {
+  ifelse(!is.na(p) & p < .05, paste0(sprintf("%.1f", x), "*"), sprintf("%.1f", x))
+}
+
+policy_stars <- policy_map %>%
+  dplyr::mutate(
+    p_direct   = purrr::map_dbl(var, ~ pval_ttest(raw_data_cleaned %>% dplyr::filter(impact == 0 | incarc == 1), .x, "incarc")),
+    p_proximal = purrr::map_dbl(var, ~ pval_ttest(raw_data_cleaned %>% dplyr::filter(impact == 0 | knowincarc == 1), .x, "knowincarc")),
+    p_victim   = purrr::map_dbl(var, ~ pval_ttest(raw_data_cleaned %>% dplyr::filter(impact == 0 | vict == 1), .x, "vict"))
+  )
+
+#merging the objects and formatting the display columns
+policy_table_final <- policy_table %>%
+  dplyr::left_join(
+    policy_stars %>% dplyr::select(var, p_direct, p_proximal, p_victim),
+    by = "var"
+  ) %>%
+  dplyr::mutate(
+    no_impact_mean = sprintf("%.2f", no_impact_mean),
+    direct_display   = add_star(direct_pct, p_direct),
+    proximal_display = add_star(proximal_pct, p_proximal),
+    victim_display   = add_star(victim_pct, p_victim)
+  ) %>%
+  dplyr::select(
+    section, label,
+    no_impact_mean,
+    direct_display,
+    proximal_display,
+    victim_display
+  )
+
+View(policy_table_final)
+
+# for overleaf
+latex_rows <- policy_table_final %>%
+  dplyr::mutate(
+    latex_row = paste0(
+      label, " & ",
+      no_impact_mean, " & ",
+      direct_display, " & ",
+      proximal_display, " & ",
+      victim_display, " \\\\"
+    )
+  )
+
+help_rows <- latex_rows %>%
+  dplyr::filter(section == "Help") %>%
+  dplyr::pull(latex_row)
+
+punish_rows <- latex_rows %>%
+  dplyr::filter(section == "Punish") %>%
+  dplyr::pull(latex_row)
+
+cat(
+  paste(help_rows, collapse = "\n"),
+  "\n\\addlinespace\n",
+  paste(punish_rows, collapse = "\n"),
+  sep = ""
+)
+
+# Mean differences relative to respondents reporting
+# none of the three focal experiences
+mean_diff <- function(x, ref) {
+  x - ref
+}
+
+policy_summary <- function(df, var) {
+  no_impact_mean <- mean(df[[var]][df$impact == 0], na.rm = TRUE)
+  impact_mean <- mean(df[[var]][df$impact == 1], na.rm = TRUE)
+  direct_mean    <- mean(df[[var]][df$incarc == 1], na.rm = TRUE)
+  proximal_mean  <- mean(df[[var]][df$knowincarc == 1], na.rm = TRUE)
+  victim_mean    <- mean(df[[var]][df$vict == 1], na.rm = TRUE)
+  
+  tibble::tibble(
+    var = var,
+    no_impact_mean = no_impact_mean,
+    impact_mean = pct_diff(impact_mean, no_impact_mean),
+    direct_pct = pct_diff(direct_mean, no_impact_mean),
+    proximal_pct = pct_diff(proximal_mean, no_impact_mean),
+    victim_pct = pct_diff(victim_mean, no_impact_mean)
+  )
+}
+
+policy_table <- purrr::map_dfr(
+  policy_map$var,
+  ~ policy_summary(raw_data_cleaned, .x)
+) %>%
+  dplyr::left_join(policy_map, by = "var") %>%
+  dplyr::select(
+    var, section, label,
+    no_impact_mean,
+    impact_mean,
+    direct_diff,
+    proximal_diff,
+    victim_diff
+  )
+
+pval_ttest <- function(df, var, group_var) {
+  sub <- df %>%
+    dplyr::filter(
+      !is.na(.data[[var]]),
+      !is.na(.data[[group_var]])
+    ) %>%
+    dplyr::filter(.data[[group_var]] %in% c(0, 1))
+  
+  if (length(unique(sub[[group_var]])) < 2) {
+    return(NA_real_)
+  }
+  
+  stats::t.test(
+    sub[[var]] ~ sub[[group_var]]
+  )$p.value
+}
+
+add_star <- function(x, p) {
+  formatted <- sprintf("%+.2f", x)
+  
+  ifelse(
+    !is.na(p) & p < .05,
+    paste0(formatted, "*"),
+    formatted
+  )
+}
+
+policy_stars <- policy_map %>%
+  dplyr::mutate(
+    p_direct = purrr::map_dbl(
+      var,
+      ~ pval_ttest(
+        raw_data_cleaned %>%
+          dplyr::filter(impact == 0 | incarc == 1),
+        .x,
+        "incarc"
+      )
+    ),
+    
+    p_proximal = purrr::map_dbl(
+      var,
+      ~ pval_ttest(
+        raw_data_cleaned %>%
+          dplyr::filter(impact == 0 | knowincarc == 1),
+        .x,
+        "knowincarc"
+      )
+    ),
+    
+    p_victim = purrr::map_dbl(
+      var,
+      ~ pval_ttest(
+        raw_data_cleaned %>%
+          dplyr::filter(impact == 0 | vict == 1),
+        .x,
+        "vict"
+      )
+    )
+  )
+
+policy_table_final <- policy_table %>%
+  dplyr::left_join(
+    policy_stars %>%
+      dplyr::select(var, p_direct, p_proximal, p_victim),
+    by = "var"
+  ) %>%
+  dplyr::mutate(
+    no_impact_mean   = sprintf("%.2f", no_impact_mean),
+    direct_display   = add_star(direct_diff, p_direct),
+    proximal_display = add_star(proximal_diff, p_proximal),
+    victim_display   = add_star(victim_diff, p_victim)
+  ) %>%
+  dplyr::select(
+    section,
+    label,
+    no_impact_mean,
+    direct_display,
+    proximal_display,
+    victim_display
+  )
+
+View(policy_table_final)
+
+# Generate rows for Overleaf
+latex_rows <- policy_table_final %>%
+  dplyr::mutate(
+    latex_row = paste0(
+      label, " & ",
+      no_impact_mean, " & ",
+      direct_display, " & ",
+      proximal_display, " & ",
+      victim_display, " \\\\"
+    )
+  )
+
+help_rows <- latex_rows %>%
+  dplyr::filter(section == "Help") %>%
+  dplyr::pull(latex_row)
+
+punish_rows <- latex_rows %>%
+  dplyr::filter(section == "Punish") %>%
+  dplyr::pull(latex_row)
+
+cat(
+  paste(help_rows, collapse = "\n"),
+  "\n\\addlinespace\n",
+  paste(punish_rows, collapse = "\n"),
+  sep = ""
+)
+
+
+```
+
+### 2.1A Police Policy
+
+```{r}
+#summary(raw_data_cleaned$q15_1_1_to_5)
+#summary(raw_data_cleaned[police_items_1_to_5])
+#sapply(raw_data_cleaned[police_items_1_to_5], function(x) table(x, useNA = "ifany"))
+
+cor_matrix <- cor(
+  raw_data_cleaned[police_items_1_to_5],
+  use = "pairwise.complete.obs"
+)
+
+round(cor_matrix, 2)
+
+library(psych)
+
+
+alpha_result <- psych::alpha(raw_data_cleaned[police_items_1_to_5])
+
+print(alpha_result)
+
+names(alpha_result)
+
+alpha_result$alpha.drop
+
+alpha_result
+
+as.data.frame(alpha_result$alpha.drop)
+
+View(alpha_result$alpha.drop)
+
+print(raw_data_cleaned %>%
+  pivot_longer(cols = all_of(police_items_1_to_5)) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~ name))
+
+#avg check
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(police_index = rowMeans(across(all_of(police_items_1_to_5)), na.rm = TRUE))
+
+summary(raw_data_cleaned$police_index)
+
+# police index 1: index of all the police items
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    police_reform_index = rowMeans(across(all_of(police_items_1_to_5)), na.rm = TRUE)
+  )
+
+# police index 2: index of the items that hang together best
+
+police_reform_core <- c(
+  "q15_2_1_to_5",
+  "q15_3_1_to_5",
+  "q15_4_1_to_5",
+  "q15_5_1_to_5"
+)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    police_reform_core_index = rowMeans(across(all_of(police_reform_core)), na.rm = TRUE)
+  )
+
+# last - 3 groups 
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    police_violence_prevention = rowMeans(across(c("q15_2_1_to_5", "q15_4_1_to_5")), na.rm = TRUE),
+    police_accountability = rowMeans(across(c("q15_3_1_to_5", "q15_5_1_to_5")), na.rm = TRUE),
+    police_local_residency = q15_1_1_to_5
+  )
+
+## POLICE MEANS ANALYSIS 
+
+# index 1: police_reform_index
+
+## baseline: no impact
+all_baseline_mean <- mean(
+  raw_data_cleaned$police_reform_index[raw_data_cleaned$impact == 0],
+  na.rm = TRUE
+)
+
+## compute means for each impact group
+all_police_means <- tibble(
+  var = impact_vars
+) %>%
+  mutate(
+    label = impact_labels[var],
+    mean = sapply(var, function(v) {
+      mean(
+        raw_data_cleaned$police_reform_index[
+          raw_data_cleaned[[v]] == 1
+        ],
+        na.rm = TRUE
+      )
+    })
+  ) %>%
+  bind_rows(
+    tibble(
+      var = "no_impact",
+      label = "No impact",
+      mean = all_baseline_mean
+    ),
+    .
+  ) %>%
+  mutate(
+    diff_from_no_impact = mean - all_baseline_mean
+  )
+
+all_police_means
+
+##
+# index 2: 
+##
+
+# baseline: no impact
+baseline_mean <- mean(
+  raw_data_cleaned$police_reform_core_index[raw_data_cleaned$impact == 0],
+  na.rm = TRUE
+)
+
+# compute means for each impact group
+police_means <- tibble(
+  var = impact_vars
+) %>%
+  mutate(
+    label = impact_labels[var],
+    mean = sapply(var, function(v) {
+      mean(
+        raw_data_cleaned$police_reform_core_index[
+          raw_data_cleaned[[v]] == 1
+        ],
+        na.rm = TRUE
+      )
+    })
+  ) %>%
+  bind_rows(
+    tibble(
+      var = "no_impact",
+      label = "No impact",
+      mean = baseline_mean
+    ),
+    .
+  ) %>%
+  mutate(
+    diff_from_no_impact = mean - baseline_mean
+  )
+
+print(police_means) # index 2
+print(all_police_means)
+## index 3?
+##
+
+```
+
+**Write up on coding police variables decision**
+
+all - participants' opposition/ support (coded 1-5, unsure = 3)
+
+\(1\) Require that police officers live in the cities or towns they police
+
+\(2\) Make it a crime for police to use chokeholds or strangleholds
+
+\(3\) Create a federal government database to track police officers who have been accused of misconduct
+
+\(4\) Require police to be trained in nonviolent alternatives to deadly force
+
+\(5\) Allow civilians to file lawsuits against police officers that use excessive force or misconduct
+
+My loose overall theory is that experiences with crime victimization may influence trust in government and policy learning. Ie, people who have been victimized may view the CJ system as differently legitimate and trustworthy, potentially extend that to the state; they will also learn things about policy. That's the context in which I'm thinking about how to use these survey items.
+
+My initial view is – theoretically – these mostly might fall into two categories. The first category is policing police, or police oversight – questions 3 and 5. The second is about police violence, or police violence prevention - so questions 2 and 4. My initial view is that question 1 is different, or might not as clearly fit into the buckets. but it could also fit into some idea of constraining police?
+
+I want to make this decision in an appropriate way from the research design perspective – not select on my (xyz - forgot what this is called).
+
+I'm not entirely clear if grouping these variables in a single index improves analyses – more power, especially given that my victimized sample is only 277? One option is use as a whole index, but then also break out separate analyses. Another is to do 3 (keep local as a standalone – this might look like:
+
+police_map \<- tibble::tribble( \~var, \~label, \~section, "q15_1_1_to_5", "Local Police", "Misc. Police", "q15_2_1_to_5", "No Strangle", "Police Violence", "q15_3_1_to_5", "Police Tracker", "Police Police", "q15_4_1_to_5", "Police Training", "Police Violence", "q15_5_1_to_5", "Charge Police", "Police Police", )
+
+) – odds are I would still want to run analyses with them as distinct variables. Last option is all 3?
+
+Relationships between police variables
+
+- Police should be local
+
+  - & no strangle = 0.41
+
+  - & track misconduct = 0.45
+
+  - & require alternatives training = 0.39
+
+  - & allow civilian lawsuits against = 0.39
+
+- Strangleholds & chokeholds illegal
+
+  - & police local = 0.41
+
+  - & track misconduct = 0.58
+
+  - & require alternatives training = 0.55
+
+  - & allow civilian lawsuits against = 0.58
+
+- Federal misconduct database
+
+  - & police local = 0.45
+
+  - & no strangle = 0.48
+
+  - & track misconduct = 0.67
+
+  - & require alternatives training = 0.70
+
+- Require police to be trained in nonviolent alternatives to deadly force
+
+  - & police local = 0.39
+
+  - & no strangle = 0.55
+
+  - & track misconduct = 0.67
+
+  - & allow civilian lawsuits against = 0.65
+
+- Allow civilians to file lawsuits against police officers that use excessive force or misconduct
+
+  - & police local = 0.39
+
+  - & no strangle = 0.58
+
+  - & track misconduct = 0.70
+
+  - & require alternatives training = 0.65
+
+Alpha for all = 0.85 – reason to use as one.
+
+ADD DECISION WRITE UP
+
+Decision: two layers. First (index), second (ones that hang together best), then last (3) created above.
+
+**Basic Means Write-Up: Index 1**
+
+```{r}
+
+
+```
+
+```{r}
+
+```
+
+Police Means Tables
+
+```{r}
+
+
+```
+
+# 3. Policy Regressions
+
+This section continues to use variable_labels.R. The goal of this section was to avoid and clean up extensive seperated regressions, and instead incorporate use loop that iteratively work through outcome variables and incorporate controls.
+
+PRE 08-26, it had two sets of regression models.
+
+Set 1 are asks "across the full sample, how is each form of impact associated with each policy outcome before adding controls (ie, prisonhelp \~ incarc) and then after/as we add controls (ie, prisonhelp \~incarc + Black + Hispanic + OtherRace + gender). (policy_dummies_waves)
+
+Set 2 asks instead how each impacted subgroup compares specifically compares with respondents who are fully not-impacted. ie, I throw out respondents who are impacted in some other way, but not directly incarcerated; I compare impact == 0 to incarc == 1).
+
+As of now, it (policy_vs_nonimp_waves) compares those groups (ie incarc == 1 and impact == 0) and then does so with controls.
+
+Then this chunk builds tables.
+
+\*\*\*08-26 I HAVE NOW RECODED incarc, knowincarc, and vict so that 1 = impacted in that particular way and 0 = NOT IMPACTED at all (ie, impact == 0).
+
+This means that I don't need the same 2 goal situation. I am now cleaning this up so that the main models will say:
+
+For every policy DV:
+
+1.  Any impact vs no impact
+2.  Direct impact vs no impact
+3.  Proximal impact vs no impact
+4.  Victim impact vs no impact
+
+Run each through: Model 1: no controls Model 2: demographics Model 3: demographics + party/ideology Model 4: full attitudes
+
+### 3.1A: Framework for model sequence
+
+control_waves \| \|-- nocontrol \|-- demo \|-- party_ideo \|-- full_attitudes
+
+```{r}
+# ============================================================
+# 3. TO START - big picture here is defining the model "waves." The first is bivariate o no controls ("nocontrol"), then demo is models with just demographic controls (8-26 this is just race I think, then demographic controls and part ID and fiscal ideology and social ideology (party_ideo) then with all controls, so aforementioned plus FIRE and *eventually, need to fix* deservingness orientation. 
+# The following controls are grouped in vriable_labels, but prepped in variable_prep_script:
+#   demo_controls
+#   party_ideo_controls
+#   desor_core***
+#   fire_controls
+# ============================================================
+
+control_waves <- list(
+  nocontrol = character(0),
+  demo = demo_controls,
+  party_ideo = c(demo_controls, party_ideo_controls),
+  full_attitudes = c(demo_controls, party_ideo_controls,
+                     fire_controls, desor_core) # 8-26 once desorcore fixed, add #desor_core to this list in full_attitudes
+)
+```
+
+### 3.2 Define lm function that will waves will operate thru
+
+```{r}
+# ============================================================
+# This starts by defining my reusable function. That function says:
+
+#"whenever (later) I give this function a dataset (df), a dependent variable (dv), an independent variable (iv), and some controls (controls), R should:
+
+##(a) start with a default of assuming there are no controls, if no controls are given (character (0)); 
+## (b) in the right-hand side (rhs) or the equation, use the supplied iv and supplied controls to make a vector with all vraibles that should appear to the right of ~
+## (c) (fml) construct an ordinary regression syntax with the supplied dv on the left of ~, then supplied rhs info and turn it into a signle string (collapse = "+"), and 
+## (d) treat this as a statistical formula rather than a string (as.formula())
+## (e) run the regression
+# ============================================================
+
+make_policy_model <- function(df, dv, iv, controls = character(0)) {#character(0) just means empty character vector so this function works for uncontrolled model then for controlled model
+  rhs <- c(iv, controls)
+  fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
+  lm(fml, data = df)
+}
+
+# ============================================================
+# MAIN MODEL GENERATING LOOOP Now, I need to line up buckets to put the models 
+## that place is "policy_dummies_waves"
+#
+# Then, I need to say how I will fill it. I will fill it with waves of models that loop through dvs and iteratively add controls 
+#for each dv, generates 4 substantive comparisons:
+### impact versus non impact
+### incarc versus non impact
+### knowincarc versus non impact
+### victimized vs non impact
+# ============================================================
+
+policy_dummies_waves <- list()
+
+for (wave_name in names(control_waves)) {#calls list of waves in control waves
+
+  model_list <- list() #fresh model list within each wave
+
+  for (dv in policy_vars) {
+    for (iv in impact_vars) { #loop thru dvs, ivs, labels file gives the 4 ivs; fits 4 models for each outcome
+
+      model_name <- paste0("m_", dv, "_", iv) #ie model using prisonhelp and incarc will be named m_prisonhelp_incarc
+
+      # NOW, actually telling it to run and store the regressions
+      model_list[[model_name]] <- make_policy_model(
+        df = raw_data_cleaned,
+        dv = dv, 
+        iv = iv,
+        controls = control_waves[[wave_name]]
+      )
+    }
+  }
+
+  policy_dummies_waves[[wave_name]] <- model_list
+}
+##after the two inner loops finish organization for storing them. 
+## object is roughly: policy_dummies_waves : A no control -> A1 no control m_prisonhelp_impact, A2 no control m_prisonhelp_incarc. . ..etc; B1 demographic controls m_prisonhelp_impact....(see below)
+#policy_dummies_waves
+# |
+# |-- nocontrol
+# |     |-- m_prisonhelp_impact
+# |     |-- m_prisonhelp_incarc
+# |     |-- m_prisonhelp_knowincarc
+# |     |-- m_prisonhelp_vict
+# |     |-- ...
+# |
+# |-- demo
+# |     |-- m_prisonhelp_impact
+# |     |-- m_prisonhelp_incarc
+# |     |-- ...
+# |
+# |-- party_ideo
+# |
+# |-- full_attitudes
+ 
+# ============================================================
+# NEXT -- making hopefully more convenient references so that  instead of typing out the full "policy_dummies_waves[["nocontrol"]][["m_prisonhelp_incarc"]] I can type "policy_dummies_models[{"m_prisonhelp_incarc"}] (really tho, the table making code came first and this lets me adopt above outputs to )
+## 
+#
+# T 
+# ============================================================
+
+
+
+policy_dummies_models <- policy_dummies_waves[["nocontrol"]]
+policy_dummies_demo_models <- policy_dummies_waves[["demo"]]
+policy_dummies_partyideo_models <- policy_dummies_waves[["party_ideo"]]
+policy_dummies_full_models <- policy_dummies_waves[["full_attitudes"]]
+
+```
+
+## 3.3 -- PRE 08-26 RECODING "restricted" model for when incarc, knowincarc, vict were coded such that 0 meant not incarc, not vict, etc.. (08-2026 no longer necessary for main reported relationships having recoded incarc, knowincarc, and vict)
+
+```{r}
+# goal 1 wave loop above
+
+make_restricted_model <- function(df, dv, subgroup_var, controls = character(0)) {
+
+  if (subgroup_var == "impact") {
+    rhs <- c("impact", controls)
+    fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
+    return(lm(fml, data = df))
+  }
+
+  df_sub <- df %>%
+    dplyr::filter(impact == 0 | .data[[subgroup_var]] == 1) %>%
+    dplyr::mutate(treat = ifelse(.data[[subgroup_var]] == 1, 1, 0))
+
+  rhs <- c("treat", controls)
+  fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
+  lm(fml, data = df_sub)
+}
+```
+
+### 3.3 Appendix Tables - Each IV Model Grouped around DV
+
+```{r}
+# ============================================================
+# Build one LaTeX regression-results table per DV
+# Assumes  variable-label script has already been sourced,
+# so the following objects already exist:
+#   - impact_vars
+#   - impact_labels
+#   - policy_vars
+#   - policy_map
+# Also assumes policy_dummies_models already exists.
+# ============================================================
+
+
+# ------------------------------------------------------------
+# sanity checks: make sure the variables referenced in 
+# helper objects actually exist in the data
+# -----------------------------------------------------------
+
+missing_policy_vars <- setdiff(policy_vars, names(raw_data_cleaned))
+missing_impact_vars <- setdiff(impact_vars, names(raw_data_cleaned))
+
+if (length(missing_policy_vars) > 0) {
+  stop("These policy_vars are missing from raw_data_cleaned: ",
+       paste(missing_policy_vars, collapse = ", "))
+}
+
+if (length(missing_impact_vars) > 0) {
+  stop("These impact_vars are missing from raw_data_cleaned: ",
+       paste(missing_impact_vars, collapse = ", "))
+}
+
+# ------------------------------------------------------------
+# create a named vector of DV labels from policy_map
+# ------------------------------------------------------------
+
+policy_labels <- setNames(policy_map$label, policy_map$var)
+
+# ------------------------------------------------------------
+# helper function: convert p-values to significance stars
+# ------------------------------------------------------------
+
+p_to_stars <- function(p) {
+  dplyr::case_when(
+    is.na(p)  ~ "",
+    p < .001  ~ "***",
+    p < .01   ~ "**",
+    p < .05   ~ "*",
+    TRUE      ~ ""
+  )
+}
+
+# ------------------------------------------------------------
+# function: build a clean one-DV results table
+# ------------------------------------------------------------
+
+make_dv_results_table <- function(dv_name, model_list) {
+
+  rows <- lapply(impact_vars, function(iv_name) {
+
+    model_name <- paste0("m_", dv_name, "_", iv_name)
+
+    if (!model_name %in% names(model_list)) {
+      stop("Model not found in policy_dummies_models: ", model_name)
+    }
+
+    mod <- model_list[[model_name]]
+
+    coef_row <- broom::tidy(mod) %>%
+      dplyr::filter(term != "(Intercept)") %>%
+      dplyr::mutate(
+        iv_name = iv_name,
+        iv_label = impact_labels[[iv_name]],
+        coef = round(estimate, 3),
+        se = round(std.error, 3),
+        p = round(p.value, 3),
+        stars = p_to_stars(p.value),
+        coef_with_stars = paste0(format(coef, nsmall = 3), stars),
+        n = broom::glance(mod)$nobs,
+        r2 = round(broom::glance(mod)$r.squared, 3)
+      ) %>%
+      dplyr::select(iv_label, coef_with_stars, se, p, n, r2)
+
+    coef_row
+  })
+
+  dplyr::bind_rows(rows) %>%
+    dplyr::rename(
+      `Independent Variable` = iv_label,
+      `Coefficient` = coef_with_stars,
+      `SE` = se,
+      `p-value` = p,
+      `N` = n,
+      `R^2` = r2
+    )
+}
+
+# ------------------------------------------------------------
+# function: convert one DV results table into LaTeX code
+# ------------------------------------------------------------
+
+make_dv_latex_table <- function(dv_name, model_list) {
+
+  results_df <- make_dv_results_table(dv_name, model_list)
+
+  caption_text <- paste0("Bivariate Models Predicting ", policy_labels[[dv_name]])
+  label_text <- paste0("tab:", dv_name, "_bivariate")
+
+  knitr::kable(
+    results_df,
+    format = "latex",
+    booktabs = TRUE,
+    caption = caption_text,
+    label = label_text,
+    align = c("l", "c", "c", "c", "c", "c"),
+    escape = TRUE
+  )
+}
+
+# ------------------------------------------------------------
+# create one LaTeX table per DV and store them in a named list
+# ------------------------------------------------------------
+
+dv_latex_tables <- lapply(policy_vars, function(dv_name) {
+  make_dv_latex_table(dv_name, policy_dummies_models)
+})
+
+names(dv_latex_tables) <- policy_vars
+
+# ------------------------------------------------------------
+# example: print one table to the console so you can copy/paste
+# into Overleaf
+# ------------------------------------------------------------
+
+#cat(dv_latex_tables[["prisonhelp"]])
+
+# ------------------------------------------------------------
+# write all tables to separate .tex files
+# ------------------------------------------------------------
+
+for (dv_name in policy_vars) {
+  writeLines(
+    dv_latex_tables[[dv_name]],
+    con = paste0(dv_name, "_bivariate_table.tex")
+  )
+}
+```
+
+### 3.4 Compare Each Impacted Subgroup to Non-Impacted
+
+Restricted sample comparison logic (not impacted vs incarcerated) ultimate goal: no-controls to controls main results table built from the restricted-sample non-impacted-versus-subgroup models. then extend the restricted-sample models rather than rebuilding everything from scratch when adding controls.
+
+Why doing this instead of a factor variable for all impact: -restricted-sample regressions keep the logic consistent with everything I are already doing and make it much easier to scale to later models with controls. A t-test table and a restricted-sample dummy regression are telling the same story in the no-controls case. But the regression route gives me a single framework you can preserve when you later add demographic controls, then political controls, then attitudinal controls. If I switch to t-tests for model 2 and regressions for later models, I create an unnecessary break in the workflow and probably more formatting work.
+
+A single categorical variable like 0 = not impacted, 1 = direct only, 2 = proximal only, 3 = victim only, 4 = multiple forms would answer a different question. It would force you to partition the sample into mutually exclusive bins, which is useful for some appendix descriptives and maybe later robustness checks, but it would also collapse substantively important overlap into a catch-all “multiple forms” group and make it harder to estimate the specific contrast you currently care about: whether each exposure type, as experienced in the real world, is associated with different outcomes relative to the fully non-impacted. For your main table, the restricted-sample approach is cleaner and more faithful to the theory.
+
+```{r}
+
+# ============================================================
+# Goal #2: compare each impacted subgroup to the fully
+# non-impacted group
+# ============================================================
+
+policy_vs_nonimp_waves <- list()
+
+for (wave_name in names(control_waves)) {
+
+  model_list <- list()
+
+  for (dv in policy_vars) {
+    for (iv in impact_vars) {
+
+      model_name <- paste0("comp_", dv, "_", iv)
+
+      model_list[[model_name]] <- make_restricted_model(
+        df = raw_data_cleaned,
+        dv = dv,
+        subgroup_var = iv,
+        controls = control_waves[[wave_name]]
+      )
+    }
+  }
+
+  policy_vs_nonimp_waves[[wave_name]] <- model_list
+}
+
+policy_vs_nonimp_nocontrol_models <- policy_vs_nonimp_waves[["nocontrol"]]
+policy_vs_nonimp_demo_models <- policy_vs_nonimp_waves[["demo"]]
+policy_vs_nonimp_partyideo_models <- policy_vs_nonimp_waves[["party_ideo"]]
+policy_vs_nonimp_full_models <- policy_vs_nonimp_waves[["full_attitudes"]]
+
+
+summary(policy_vs_nonimp_nocontrol_models$comp_prisonhelp_impact)
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_impact)
+
+```
+
+reusable system for:
+
+a results-section table for prisonhelp and prisonpen,
+
+appendix tables for the remaining DVs in the same architecture,
+
+a blank second model block for later controlled models,
+
+placeholder control rows so the table skeleton already matches where you are headed.
+
+### 3.5 Tables Loop
+
+```{r}
+# ============================================================
+# Advisor-style restricted-sample tables
+# Goal: compare each impacted subgroup to non-impacted only
+# Model 2 = no-controls restricted-sample models
+# Model 3 = placeholder for later controlled models
+#
+# Packages used:
+# dplyr, stringr, purrr, lmtest, sandwich
+# ============================================================
+
+library(dplyr)
+library(stringr)
+library(purrr)
+library(lmtest)
+library(sandwich)
+
+# ------------------------------------------------------------
+# Labels from your variable script
+# ------------------------------------------------------------
+policy_labels <- setNames(policy_map$label, policy_map$var)
+
+# ------------------------------------------------------------
+# Formatting helpers
+# ------------------------------------------------------------
+p_to_stars <- function(p) {
+  dplyr::case_when(
+    is.na(p) ~ "",
+    p < .001 ~ "***",
+    p < .01  ~ "**",
+    p < .05  ~ "*",
+    TRUE     ~ ""
+  )
+}
+
+fmt_num <- function(x, digits = 3) {
+  ifelse(is.na(x), "", sprintf(paste0("%.", digits, "f"), x))
+}
+
+latex_escape <- function(x) {
+  x %>%
+    str_replace_all("\\\\", "\\\\\\\\") %>%
+    str_replace_all("([#$%&_{}])", "\\\\\\1") %>%
+    str_replace_all("~", "\\\\textasciitilde{}") %>%
+    str_replace_all("\\^", "\\\\textasciicircum{}")
+}
+
+# ------------------------------------------------------------
+# Extract one non-intercept coefficient from a model
+# robust = HC1 by default
+# ------------------------------------------------------------
+get_single_term_stats <- function(mod, robust = TRUE) {
+  if (robust) {
+    ct <- lmtest::coeftest(mod, vcov. = sandwich::vcovHC(mod, type = "HC1"))
+    out <- data.frame(
+      term      = rownames(ct),
+      estimate  = ct[, 1],
+      std.error = ct[, 2],
+      p.value   = ct[, 4],
+      stringsAsFactors = FALSE
+    )
+  } else {
+    sm <- summary(mod)$coefficients
+    out <- data.frame(
+      term      = rownames(sm),
+      estimate  = sm[, 1],
+      std.error = sm[, 2],
+      p.value   = sm[, 4],
+      stringsAsFactors = FALSE
+    )
+  }
+
+  out %>%
+    filter(term != "(Intercept)") %>%
+    slice(1) %>%
+    mutate(
+      n  = stats::nobs(mod),
+      r2 = summary(mod)$r.squared
+    )
+}
+
+# ------------------------------------------------------------
+# Build one cell for one DV x subgroup x model-list
+# Returns something like:
+# \makecell[c]{0.210*** \\ (0.030)}
+#
+# If model_list is NULL, returns blank cell
+# ------------------------------------------------------------
+make_comp_cell <- function(model_list, dv, iv, robust = TRUE) {
+
+  if (is.null(model_list)) return("")
+
+  model_name <- paste0("comp_", dv, "_", iv)
+
+  if (!model_name %in% names(model_list)) return("")
+
+  stats_row <- get_single_term_stats(model_list[[model_name]], robust = robust)
+
+  coef_txt <- paste0(
+    fmt_num(stats_row$estimate, 3),
+    p_to_stars(stats_row$p.value)
+  )
+
+  se_txt <- paste0("(", fmt_num(stats_row$std.error, 3), ")")
+
+  paste0("\\makecell[c]{", coef_txt, " \\\\ ", se_txt, "}")
+}
+
+# ------------------------------------------------------------
+# Split a vector into chunks for appendix tables
+# ------------------------------------------------------------
+chunk_vector <- function(x, chunk_size = 2) {
+  split(x, ceiling(seq_along(x) / chunk_size))
+}
+
+# ------------------------------------------------------------
+# Main table builder
+#
+# dv_vec: which DVs go in the columns for each model block
+# model2_list: required (your no-controls restricted-sample list)
+# model3_list: optional, NULL for now
+# row_vars: rows to display under carceral contact
+# include_placeholder_control_rows: include blank future rows
+# ------------------------------------------------------------
+make_restricted_panel_latex_table <- function(
+    dv_vec,
+    model2_list,
+    model3_list = NULL,
+    caption_text,
+    label_text,
+    model2_title = "Model 2",
+    model3_title = "Model 3",
+    row_vars = c("impact", "incarc", "knowincarc", "vict"),
+    control_vars = c("Black", "Hispanic", "OtherRace", "gender"),
+    control_labels = c(
+      Black = "Black",
+      Hispanic = "Hispanic",
+      OtherRace = "Other race",
+      gender = "Male"
+    ),
+    robust = TRUE
+) {
+
+  # ----- column setup -----
+  n_dv <- length(dv_vec)
+  n_model_blocks <- 2
+  total_data_cols <- n_dv * n_model_blocks
+  align_string <- paste0("l", paste(rep("c", total_data_cols), collapse = ""))
+
+  # ----- header rows -----
+  header_top <- c(
+    "",
+    paste0("\\multicolumn{", n_dv, "}{c}{", latex_escape(model2_title), "}"),
+    paste0("\\multicolumn{", n_dv, "}{c}{", latex_escape(model3_title), "}")
+  )
+
+  header_second <- c(
+    "",
+    latex_escape(policy_labels[dv_vec]),
+    latex_escape(policy_labels[dv_vec])
+  )
+
+  cmid_model2 <- paste0("\\cmidrule(lr){2-", 1 + n_dv, "}")
+  cmid_model3 <- paste0("\\cmidrule(lr){", 2 + n_dv, "-", 1 + (2 * n_dv), "}")
+  cmid_line <- paste(cmid_model2, cmid_model3, collapse = " ")
+
+  # ----- helper: extract a specific term from a model -----
+  get_term_cell <- function(model_list, dv, iv, term_name, robust = TRUE) {
+
+    if (is.null(model_list)) return("")
+
+    model_name <- paste0("comp_", dv, "_", iv)
+    if (!model_name %in% names(model_list)) return("")
+
+    mod <- model_list[[model_name]]
+
+    if (robust) {
+      ct <- lmtest::coeftest(mod, vcov. = sandwich::vcovHC(mod, type = "HC1"))
+      out <- data.frame(
+        term      = rownames(ct),
+        estimate  = ct[, 1],
+        std.error = ct[, 2],
+        p.value   = ct[, 4],
+        stringsAsFactors = FALSE
+      )
+    } else {
+      sm <- summary(mod)$coefficients
+      out <- data.frame(
+        term      = rownames(sm),
+        estimate  = sm[, 1],
+        std.error = sm[, 2],
+        p.value   = sm[, 4],
+        stringsAsFactors = FALSE
+      )
+    }
+
+    if (!term_name %in% out$term) return("")
+
+    row <- out[out$term == term_name, ]
+
+    coef_txt <- paste0(
+      fmt_num(row$estimate, 3),
+      p_to_stars(row$p.value)
+    )
+
+    se_txt <- paste0("(", fmt_num(row$std.error, 3), ")")
+
+    paste0("\\makecell[c]{", coef_txt, " \\\\ ", se_txt, "}")
+  }
+
+  # ----- body rows -----
+  body_lines <- c()
+
+  # Section header
+  body_lines <- c(
+    body_lines,
+    paste(
+      c(
+        "\\textit{Carceral Contact (ref. Not impacted)}",
+        rep("", total_data_cols)
+      ),
+      collapse = " & "
+    ),
+    "\\\\"
+  )
+
+  # For each subgroup, print coefficient row + repeated control rows
+  for (iv in row_vars) {
+
+    row_label <- impact_labels[[iv]]
+    main_term <- ifelse(iv == "impact", "impact", "treat")
+
+    # main subgroup row
+    model2_cells <- sapply(dv_vec, function(dv) {
+      get_term_cell(model2_list, dv, iv, main_term, robust = robust)
+    })
+
+    model3_cells <- sapply(dv_vec, function(dv) {
+      get_term_cell(model3_list, dv, iv, main_term, robust = robust)
+    })
+
+    subgroup_line <- paste(
+      c(latex_escape(row_label), model2_cells, model3_cells),
+      collapse = " & "
+    )
+
+    body_lines <- c(body_lines, paste0(subgroup_line, " \\\\"))
+
+    # repeated control rows under this subgroup
+    for (ctrl in control_vars) {
+
+      model2_ctrl_cells <- sapply(dv_vec, function(dv) {
+        get_term_cell(model2_list, dv, iv, ctrl, robust = robust)
+      })
+
+      model3_ctrl_cells <- sapply(dv_vec, function(dv) {
+        get_term_cell(model3_list, dv, iv, ctrl, robust = robust)
+      })
+
+      ctrl_line <- paste(
+        c(latex_escape(control_labels[[ctrl]]), model2_ctrl_cells, model3_ctrl_cells),
+        collapse = " & "
+      )
+
+      body_lines <- c(body_lines, paste0(ctrl_line, " \\\\"))
+    }
+
+    body_lines <- c(body_lines, "\\addlinespace")
+  }
+
+  # ----- assemble LaTeX -----
+  out <- c(
+    "\\begin{table}[!htbp]",
+    "\\centering",
+    paste0("\\caption{", latex_escape(caption_text), "}"),
+    paste0("\\label{", latex_escape(label_text), "}"),
+    "\\begin{threeparttable}",
+    paste0("\\begin{tabular}{", align_string, "}"),
+    "\\toprule",
+    paste(header_top, collapse = " & "),
+    " \\\\",
+    cmid_line,
+    paste(header_second, collapse = " & "),
+    " \\\\",
+    "\\midrule",
+    body_lines,
+    "\\bottomrule",
+    "\\end{tabular}",
+    "\\begin{tablenotes}[flushleft]",
+    "\\footnotesize",
+    "\\item Entries are OLS coefficients with HC1 robust standard errors in parentheses.",
+    "\\item Each cell is estimated from a separate restricted-sample regression comparing the named subgroup to the non-impacted group.",
+    "\\item Because rows come from different restricted samples, observation counts and $R^2$ are not shown in this table format.",
+    "\\item * p$<$0.05, ** p$<$0.01, *** p$<$0.001.",
+    "\\end{tablenotes}",
+    "\\end{threeparttable}",
+    "\\end{table}"
+  )
+
+  out
+}
+```
+
+```{r}
+results_dvs <- c("prisonhelp", "prisonpen")
+
+results_table_tex <- make_restricted_panel_latex_table(
+  dv_vec = results_dvs,
+  model2_list = policy_vs_nonimp_nocontrol_models,
+  model3_list = policy_vs_nonimp_demo_models,
+  caption_text = "OLS Models of Carceral Policy Orientations - No controls to Demographic Controls",
+  label_text = "tab:carceral_policy_orientations_nocontrol_demo",
+  model2_title = "Model 2",
+  model3_title = "Model 3",
+  row_vars = c("impact", "incarc", "knowincarc", "vict"),
+  control_vars = c("Black", "Hispanic", "OtherRace", "gender"),
+  control_labels = c(
+    Black = "Black",
+    Hispanic = "Hispanic",
+    OtherRace = "Other race",
+    gender = "Male"
+  ),
+  robust = TRUE
+)
+
+writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
+
+
+##model for just desor
+
+dep_variable <-(raw_data_cleaned$knowincarc)
+desor_model <- lm(desor_core ~ dep_variable + Black+Hispanic+OtherRace+fiscal_ideology+social_ideology, data = raw_data_cleaned)
+summary(desor_model)
+
+```
+
+```{r}
+# ------------------------------------------------------------
+# 1. RESULTS-SECTION TABLE
+# ------------------------------------------------------------
+results_dvs <- c("prisonhelp", "prisonpen")
+
+results_table_tex <- make_restricted_panel_latex_table(
+  dv_vec = results_dvs,
+  model2_list = policy_vs_nonimp_nocontrol_models,
+  model3_list = policy_vs_nonimp_demo_models,
+  caption_text = "OLS Models of Carceral Policy Orientations - No controls to Demographic Controls",
+  label_text = "tab:carceral_policy_orientations_nocontrol_demo",
+  model2_title = "Model 2",
+  model3_title = "Model 3",
+  row_vars = c("impact", "incarc", "knowincarc", "vict"),
+  control_vars = c("Black", "Hispanic", "OtherRace", "gender"),
+  control_labels = c(
+    Black = "Black",
+    Hispanic = "Hispanic",
+    OtherRace = "Other race",
+    gender = "Male"
+  ),
+  robust = TRUE
+)
+
+writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
+
+# Optional preview in console
+# cat(results_table_tex, sep = "\n")
+
+
+# ------------------------------------------------------------
+# 2. APPENDIX TABLES FOR REMAINING POLICY DVs
+#    Same architecture, chunked two DVs at a time
+# ------------------------------------------------------------
+appendix_dvs <- setdiff(policy_vars, results_dvs)
+
+# You can keep help/punish separated if you want cleaner appendix organization
+appendix_help_dvs <- appendix_dvs[policy_map$section[match(appendix_dvs, policy_map$var)] == "Help"]
+appendix_punish_dvs <- appendix_dvs[policy_map$section[match(appendix_dvs, policy_map$var)] == "Punish"]
+
+appendix_help_chunks <- chunk_vector(appendix_help_dvs, chunk_size = 2)
+appendix_punish_chunks <- chunk_vector(appendix_punish_dvs, chunk_size = 2)
+
+appendix_tables <- list()
+
+# Help tables
+for (i in seq_along(appendix_help_chunks)) {
+  dv_chunk <- appendix_help_chunks[[i]]
+
+  tex <- make_restricted_panel_latex_table(
+    dv_vec = dv_chunk,
+    model2_list = policy_vs_nonimp_nocontrol_models,
+    model3_list = NULL,
+    caption_text = paste0("Restricted-Sample OLS Models of Help-Oriented Policy Outcomes, Appendix Table ", i),
+    label_text = paste0("tab:appendix_help_restricted_", i),
+    model2_title = "Model 2",
+    model3_title = "Model 3",
+    row_vars = c("impact", "incarc", "knowincarc", "vict"),
+    include_placeholder_control_rows = TRUE,
+    robust = TRUE
+  )
+
+  appendix_tables[[paste0("help_", i)]] <- tex
+  writeLines(tex, paste0("appendix_help_restricted_table_", i, ".tex"))
+}
+
+# Punish tables
+for (i in seq_along(appendix_punish_chunks)) {
+  dv_chunk <- appendix_punish_chunks[[i]]
+
+  tex <- make_restricted_panel_latex_table(
+    dv_vec = dv_chunk,
+    model2_list = policy_vs_nonimp_nocontrol_models,
+    model3_list = NULL,
+    caption_text = paste0("Restricted-Sample OLS Models of Punitive Policy Outcomes, Appendix Table ", i),
+    label_text = paste0("tab:appendix_punish_restricted_", i),
+    model2_title = "Model 2",
+    model3_title = "Model 3",
+    row_vars = c("impact", "incarc", "knowincarc", "vict"),
+    include_placeholder_control_rows = TRUE,
+    robust = TRUE
+  )
+
+  appendix_tables[[paste0("punish_", i)]] <- tex
+  writeLines(tex, paste0("appendix_punish_restricted_table_", i, ".tex"))
+}
+```
+
+Looking just at prison help and prison pun after adding in demographic factors
+
+```{r}
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_impact)
+summary(policy_vs_nonimp_demo_models$comp_prisonpen_impact)
+
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_demo_models$comp_prisonpen_incarc)
+
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_knowincarc)
+summary(policy_vs_nonimp_demo_models$comp_prisonpen_knowincarc)
+
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_vict)
+summary(policy_vs_nonimp_demo_models$comp_prisonpen_vict)
+
+
+comp_prisonhelp_incarc     
+comp_prisonhelp_knowincarc  
+comp_prisonhelp_vict       
+comp_prisonpen_impact       
+comp_prisonpen_incarc      
+comp_prisonpen_knowincarc  
+comp_prisonpen_vict        
+
+
+results_dvs <- c("prisonhelp", "prisonpen")
+
+results_table_tex <- make_restricted_panel_latex_table(
+  dv_vec = results_dvs,
+  model2_list = policy_vs_nonimp_nocontrol_models,
+  model3_list = policy_vs_nonimp_demo_models,
+  caption_text = "OLS Models of Carceral Policy Orientations - No controls to Demographic Controls",
+  label_text = "tab:carceral_policy_orientations_nocontrol_demo",
+  model2_title = "Model 2",
+  model3_title = "Model 3",
+  row_vars = c("impact", "incarc", "knowincarc", "vict"),
+  include_placeholder_control_rows = TRUE,
+  robust = TRUE
+)
+
+writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
+```
+
+##. ##. \## 4-8 Policy MV Regressions (non-restricted)
+
+```{r}
+names(raw_data_cleaned)
+#checkin that reported restricted table matches
+#restricted_incarc <- raw_data_cleaned %>%
+#  filter(impact == 0 | incarc == 1)
+
+#m_check <- lm(prisonhelp ~ incarc + Black + Hispanic + OtherRace + #gender + Republican + Democrat + fiscal_ideology + social_ideology #+desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data #= restricted_incarc)
+
+#summary(m_check)
+
+
+#impact - help 
+test_impact_full <- lm(prisonhelp ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_incarc_full <- lm(prisonhelp ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+#knowincarc 
+test_knowincarc_full <- lm(prisonhelp ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_vict_full <- lm(prisonhelp ~ vict + Black + Hispanic + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_impact_full
+test_knowincarc_full
+test_incarc_full
+test_vict_full
+
+#impact - pun 
+test_impact_full_pen <- lm(prisonpen ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_incarc_full_pen <- lm(prisonpen ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+#knowincarc 
+test_knowincarc_full_pen <- lm(prisonpen ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_vict_full_pen <- lm(prisonpen ~ vict + Black + Hispanic + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = raw_data_cleaned)
+
+test_impact_full_pen
+test_knowincarc_full_pen
+test_incarc_full_pen
+test_vict_full_pen
+
+```
+
+Same as above but for policies
+
+```{r}
+policy_dvs <- policy_map %>%
+  dplyr::filter(!var %in% c("prisonhelp", "prisonpen")) %>%
+  dplyr::pull(var)
+
+impact_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+policy_models <- list()
+
+for (dv in policy_dvs) {
+  for (iv in impact_vars) {
+    
+    model_name <- paste0("m_", dv, "_", iv)
+    
+    formula <- as.formula(paste(dv, "~", iv))
+    
+    policy_models[[model_name]] <- lm(formula, data = raw_data_cleaned)
+  }
+}
+
+policy_models_by_dv <- split(
+  policy_models,
+  gsub("m_(.*)_(impact|incarc|knowincarc|vict)", "\\1", names(policy_models))
+)
+
+length(policy_models_by_dv)        # should be 32
+names(policy_models_by_dv)         # all model names
+
+# print one
+summary(policy_models[["m_q23_2_rev_impact"]])
+
+# or loop through all
+lapply(policy_models, summary)
+
+#table for appendix
+library(dplyr)
+library(purrr)
+library(broom)
+library(stringr)
+library(tidyr)
+
+impact_labels <- c(
+  impact = "Any impact",
+  incarc = "Direct incarceration",
+  knowincarc = "Proximal incarceration contact",
+  vict = "Victimization"
+)
+
+comparison_table <- imap_dfr(policy_models, function(model, model_name) {
+  
+  tidied <- broom::tidy(model)
+  glanced <- broom::glance(model)
+  
+  dv <- str_match(model_name, "^m_(.*)_(impact|incarc|knowincarc|vict)$")[,2]
+  iv <- str_match(model_name, "^m_(.*)_(impact|incarc|knowincarc|vict)$")[,3]
+  
+  coef_row <- tidied %>%
+    filter(term == iv)
+  
+  tibble(
+    model_name = model_name,
+    dv = dv,
+    impact_var = iv,
+    impact_label = impact_labels[iv],
+    estimate = coef_row$estimate,
+    std.error = coef_row$std.error,
+    statistic = coef_row$statistic,
+    p.value = coef_row$p.value,
+    n = glanced$nobs,
+    r.squared = glanced$r.squared,
+    adj.r.squared = glanced$adj.r.squared
+  )
+})
+
+#add readable dv labels and significance stars
+comparison_table <- comparison_table %>%
+  left_join(
+    policy_map %>% dplyr::select(var, label, section),
+    by = c("dv" = "var")
+  ) %>%
+  mutate(
+    stars = case_when(
+      p.value < .001 ~ "***",
+      p.value < .01  ~ "**",
+      p.value < .05  ~ "*",
+      p.value < .1   ~ "†",
+      TRUE ~ ""
+    ),
+    coef_with_stars = paste0(sprintf("%.3f", estimate), stars),
+    se_fmt = paste0("(", sprintf("%.3f", std.error), ")"),
+    p_fmt = sprintf("%.3f", p.value),
+    r2_fmt = sprintf("%.3f", r.squared)
+  ) %>%
+  dplyr::select(
+    section, label, dv, impact_label, impact_var,
+    coef_with_stars, se_fmt, p_fmt, n, r2_fmt,
+    estimate, std.error, p.value, r.squared, adj.r.squared, model_name
+  ) %>%
+  arrange(section, label, factor(impact_var, levels = c("impact", "incarc", "knowincarc", "vict")))
+
+appendix_table_wide <- comparison_table %>%
+  dplyr::select(label, section, impact_var, coef_with_stars, se_fmt, n, r2_fmt) %>%
+  mutate(result = paste0(coef_with_stars, " ", se_fmt)) %>%
+  dplyr::select(label, section, impact_var, result, n, r2_fmt) %>%
+  pivot_wider(
+    names_from = impact_var,
+    values_from = c(result, n, r2_fmt),
+    names_glue = "{impact_var}_{.value}"
+  ) %>%
+  relocate(section, label)
+
+View(appendix_table_wide)
+```
+
+1.  
+
+# 4. DV: Deservingness
+
+### 4.1 All Des Means Loop
+
+```{r}
+source("variable_labels.R")
+
+# Optional: prettier target labels
+pretty_target <- function(x) {
+  x %>%
+    str_remove("^d_") %>%
+    str_remove("_abc$|_a$|_b$|_c$") %>%
+    str_replace_all("_", " ") %>%
+    str_to_title()
+}
+
+# -----------------------------
+# 2. Reshape data long
+# -----------------------------
+
+long_df_heatmap <- raw_data_cleaned %>%
+  dplyr::select(all_of(impact_vars), all_of(all_deserving_vars)) %>%
+  pivot_longer(
+    cols = all_of(all_deserving_vars),
+    names_to = "target",
+    values_to = "deservingness"
+  ) %>%
+  pivot_longer(
+    cols = all_of(impact_vars),
+    names_to = "impact_group",
+    values_to = "in_group"
+  ) %>%
+  mutate(
+    target_label = pretty_target(target),
+    impact_group = recode(impact_group, !!!impact_labels)
+  )
+# -----------------------------
+# 3. Summarize means/sd/n
+#    among subgroup == 1
+# -----------------------------
+
+summary_df <- long_df_heatmap %>%
+  filter(in_group == 1, !is.na(deservingness)) %>%
+  group_by(impact_group, target, target_label) %>%
+  summarise(
+    n = n(),
+    mean_score = mean(deservingness, na.rm = TRUE),
+    sd_score = sd(deservingness, na.rm = TRUE),
+    var_score = var(deservingness, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# View or export
+summary_df
+# write.csv(summary_df, "deservingness_by_impact_summary.csv", row.names = FALSE)
+
+# Visual 1: heatmaps of means
+ggplot(summary_df, aes(
+  x = impact_group,
+  y = fct_reorder(target_label, mean_score, .fun = base::mean),
+  fill = mean_score
+)) +
+  geom_tile(color = "white") +
+  labs(
+    x = NULL,
+    y = NULL,
+    fill = "Mean\nDeservingness",
+    title = "Mean Deservingness by Impact Subgroup Across All Targets"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 7),
+    legend.position = "right"
+  )
+```
+
+4-8 looking at means for all by impact
+
+```{r}
+overall_target_means <- raw_data_cleaned %>%
+  dplyr::select(all_of(all_deserving_vars)) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "target",
+    values_to = "deservingness"
+  ) %>%
+  mutate(target_label = pretty_target(target)) %>%
+  group_by(target, target_label) %>%
+  summarise(
+    n = sum(!is.na(deservingness)),
+    mean_score = mean(deservingness, na.rm = TRUE),
+    sd_score = sd(deservingness, na.rm = TRUE),
+    var_score = var(deservingness, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(mean_score))
+
+overall_target_means
+View(overall_target_means)
+
+#lookup table
+target_means_wide <- summary_df %>%
+  dplyr::select(target, target_label, impact_group, mean_score) %>%
+  pivot_wider(
+    names_from = impact_group,
+    values_from = mean_score
+  )
+
+View(target_means_wide)
+write.csv(target_means_wide, "target_means_by_impact_group_wide.csv", row.names = FALSE)
+
+write.csv(overall_target_means, "overall_target_means.csv", row.names = FALSE)
+```
+
+Difference from overall heat map
+
+```{r}
+# -----------------------------
+# 4. Overall means for each target
+# -----------------------------
+
+overall_means <- long_df_heatmap %>%
+  filter(!is.na(deservingness)) %>%
+  group_by(target, target_label) %>%
+  summarise(
+    overall_mean_score = mean(deservingness, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# -----------------------------
+# 5. Merge with subgroup summary and calculate differences
+# -----------------------------
+
+diff_df <- summary_df %>%
+  left_join(overall_means, by = c("target", "target_label")) %>%
+  mutate(
+    diff_from_overall = mean_score - overall_mean_score
+  )
+
+# -----------------------------
+# 6. Order targets by average subgroup deviation
+# -----------------------------
+
+diff_df <- diff_df %>%
+  group_by(target_label) %>%
+  mutate(avg_diff = mean(diff_from_overall, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(
+    target_label = forcats::fct_reorder(target_label, avg_diff)
+  )
+
+# -----------------------------
+# 7. Plot difference-from-overall heatmap
+# -----------------------------
+
+ggplot(diff_df, aes(
+  x = impact_group,
+  y = target_label,
+  fill = diff_from_overall
+)) +
+  geom_tile(color = "white") +
+  labs(
+    x = NULL,
+    y = NULL,
+    fill = "Difference\nfrom overall mean",
+    title = "How Each Impact Subgroup Differs from the Full Sample"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 7),
+    legend.position = "right"
+  )
+
+heatmap_plot <- ggplot(diff_df, aes(
+  x = impact_group,
+  y = target_label,
+  fill = diff_from_overall
+)) +
+  geom_tile(color = "white") +
+  labs(
+    x = NULL,
+    y = NULL,
+    fill = "Difference\nfrom overall mean",
+    title = "How Each Impact Subgroup Differs from the Full Sample"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 6),
+    axis.text.x = element_text(size = 10),
+    plot.title = element_text(size = 12, face = "bold"),
+    legend.position = "right",
+    plot.margin = margin(10, 10, 10, 10)
+  )
+
+heatmap_plot
+
+ggsave(
+  filename = "deservingness_heatmap_diff.png",
+  plot = heatmap_plot,
+  width = 8,
+  height = 24,
+  dpi = 300,
+  bg = "white"
+)
+
+ggsave(
+  filename = "deservingness_heatmap_diff.png",
+  plot = heatmap_plot,
+  width = 9,
+  height = 30,
+  dpi = 300,
+  bg = "white"
+)
+```
+
+### 4.2 Incarc Des Means
+
+-means -density plots
+
+```{r}
+#DVs
+source("variable_labels.R")
+
+#separate object from above for just incarcerated des groups
+
+long_df_table <- raw_data_cleaned %>%
+  dplyr::select(all_of(impact_vars), all_of(deserving_vars)) %>%
+  pivot_longer(
+    cols = all_of(deserving_vars),
+    names_to = "target",
+    values_to = "deservingness"
+  )
+
+get_diff_table <- function(df, group_var) {
+  df %>%
+    dplyr::filter(!is.na(deservingness)) %>%
+    dplyr::group_by(target, !!rlang::sym(group_var)) %>%
+    dplyr::summarise(mean = mean(deservingness, na.rm = TRUE), .groups = "drop") %>%
+    tidyr::pivot_wider(names_from = !!rlang::sym(group_var), values_from = mean) %>%
+    dplyr::mutate(
+      baseline = `0`,
+      diff = `1` - `0`,
+      pct_diff = 100 * (diff / `0`)
+    ) %>%
+    dplyr::select(target, baseline, pct_diff)
+}
+
+names(long_df)
+
+impact_tab <- get_diff_table(long_df_table, "impact")
+incarc_tab <- get_diff_table(long_df_table, "incarc")
+know_tab   <- get_diff_table(long_df_table, "knowincarc")
+vict_tab   <- get_diff_table(long_df_table, "vict")
+
+get_pvals_impact <- function(df) {
+  df %>%
+    dplyr::filter(!is.na(deservingness), !is.na(impact)) %>%
+    dplyr::group_by(target) %>%
+    dplyr::summarise(
+      pval = t.test(deservingness ~ impact)$p.value,
+      .groups = "drop"
+    )
+}
+
+add_stars <- function(p) {
+  dplyr::case_when(
+    p < 0.001 ~ "***",
+    p < 0.01  ~ "**",
+    p < 0.05  ~ "*",
+    TRUE ~ ""
+  )
+}
+
+names(long_df_table)
+
+impact_pvals <- get_pvals_impact(long_df_table)
+
+impact_tab <- impact_tab %>%
+  dplyr::left_join(impact_pvals, by = "target") %>%
+  dplyr::mutate(
+    pct_diff = paste0(round(pct_diff, 1), add_stars(pval))
+  ) %>%
+  dplyr::select(-pval)
+
+density_compare <- function(df, subgroup_var, label, xvar) {
+
+  plot_df <- df %>%
+    dplyr::transmute(
+      d = .data[[xvar]],
+      group = dplyr::case_when(
+        impact == 0 ~ "Not impacted",
+        .data[[subgroup_var]] == 1 ~ label,
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    dplyr::filter(!is.na(group), !is.na(d))
+
+  means_df <- plot_df %>%
+    dplyr::group_by(group) %>%
+    dplyr::summarise(mean_val = mean(d, na.rm = TRUE), .groups = "drop")
+
+  ggplot2::ggplot(plot_df, ggplot2::aes(x = d, color = group)) +
+    ggplot2::geom_density(linewidth = 1.2) +
+    ggplot2::geom_vline(
+      data = means_df,
+      ggplot2::aes(xintercept = mean_val, color = group),
+      linetype = "dashed"
+    ) +
+    ggplot2::labs(x = "Deservingness", y = "Density", color = NULL) +
+    ggplot2::theme_minimal()
+}
+
+## TABLES
+
+impact_tab <- impact_tab %>%
+  dplyr::rename(pct_impact = pct_diff)
+
+incarc_tab <- incarc_tab %>%
+  dplyr::rename(pct_incarc = pct_diff)
+
+know_tab <- know_tab %>%
+  dplyr::rename(pct_knowincarc = pct_diff)
+
+vict_tab <- vict_tab %>%
+  dplyr::rename(pct_vict = pct_diff)
+
+table_out <- impact_tab %>%
+  dplyr::select(target, baseline, pct_impact) %>%
+  dplyr::left_join(
+    incarc_tab %>% dplyr::select(target, pct_incarc),
+    by = "target"
+  ) %>%
+  dplyr::left_join(
+    know_tab %>% dplyr::select(target, pct_knowincarc),
+    by = "target"
+  ) %>%
+  dplyr::left_join(
+    vict_tab %>% dplyr::select(target, pct_vict),
+    by = "target"
+  )
+
+# readable row labels from variable_labels.R
+table_out <- table_out %>%
+  dplyr::mutate(
+    target = unname(targets[target])
+  )
+
+table_out <- table_out %>%
+  dplyr::mutate(
+    baseline = round(baseline, 1),
+    pct_incarc = round(pct_incarc, 1),
+    pct_knowincarc = round(pct_knowincarc, 1),
+    pct_vict = round(pct_vict, 1)
+  )
+
+table_out_print <- table_out %>%
+  dplyr::mutate(
+    pct_impact = paste0(pct_impact, "\\%"),
+    pct_incarc = paste0(pct_incarc, "\\%"),
+    pct_knowincarc = paste0(pct_knowincarc, "\\%"),
+    pct_vict = paste0(pct_vict, "\\%")
+  )
+
+latex_tab <- knitr::kable(
+  table_out_print,
+  format = "latex",
+  booktabs = TRUE,
+  escape = FALSE,
+  col.names = c(
+    "Group",
+    "Not impacted mean",
+    "\\% change: Impacted",
+    "\\% change: Incarcerated",
+    "\\% change: Knows incarcerated",
+    "\\% change: Victim"
+  ),
+  align = c("l", "c", "c", "c", "c", "c")
+)
+
+cat(latex_tab)
+```
+
+#### into plots
+
+```{r}
+
+# -----------------------------
+# 2. helper to build one comparison
+# -----------------------------
+make_plot_df <- function(df, xvar, subgroup_var, subgroup_label, targets) {
+  df %>%
+    transmute(
+      deserving = .data[[xvar]],
+      group = case_when(
+        impact == 0 ~ "Not impacted",
+        .data[[subgroup_var]] == 1 ~ subgroup_label,
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    filter(!is.na(deserving), !is.na(group)) %>%
+    mutate(
+      target = targets,
+      comparison = subgroup_label
+    )
+}
+
+# -----------------------------
+# 3. build full plotting data
+# -----------------------------
+plot_df <- bind_rows(
+  make_plot_df(raw_data_cleaned, "d_incppl_pris_abc", "impact", "Impacted", "Incarcerated people"),
+  make_plot_df(raw_data_cleaned, "d_incppl_pris_abc", "incarc", "Ever incarcerated", "Incarcerated people"),
+  make_plot_df(raw_data_cleaned, "d_incppl_pris_abc", "knowincarc", "Knows incarcerated", "Incarcerated people"),
+  make_plot_df(raw_data_cleaned, "d_incppl_pris_abc", "vict", "Victim", "Incarcerated people"),
+
+  make_plot_df(raw_data_cleaned, "d_crim_abc", "impact", "Impacted", "Criminals"),
+  make_plot_df(raw_data_cleaned, "d_crim_abc", "incarc", "Ever incarcerated", "Criminals"),
+  make_plot_df(raw_data_cleaned, "d_crim_abc", "knowincarc", "Knows incarcerated", "Criminals"),
+  make_plot_df(raw_data_cleaned, "d_crim_abc", "vict", "Victim", "Criminals"),
+
+  make_plot_df(raw_data_cleaned, "d_incwomen_abc", "impact", "Impacted", "Incarcerated women"),
+  make_plot_df(raw_data_cleaned, "d_incwomen_abc", "incarc", "Ever incarcerated", "Incarcerated women"),
+  make_plot_df(raw_data_cleaned, "d_incwomen_abc", "knowincarc", "Knows incarcerated", "Incarcerated women"),
+  make_plot_df(raw_data_cleaned, "d_incwomen_abc", "vict", "Victim", "Incarcerated women")
+)
+
+# order facets nicely
+plot_df <- plot_df %>%
+  mutate(
+    target = factor(
+      target,
+      levels = c("Incarcerated people", "Criminals", "Incarcerated women")
+    ),
+    comparison = factor(
+      comparison,
+      levels = c("Impacted", "Ever incarcerated", "Knows incarcerated", "Victim")
+    ),
+    group = factor(
+      group,
+      levels = c("Not impacted", "Impacted", "Ever incarcerated", "Knows incarcerated", "Victim")
+    )
+  )
+
+# -----------------------------
+# 4. means for dashed lines
+# -----------------------------
+means_df <- plot_df %>%
+  group_by(target, comparison, group) %>%
+  summarise(mean_val = mean(deserving, na.rm = TRUE), .groups = "drop")
+
+# -----------------------------
+# 5. plot
+# -----------------------------
+p <- ggplot(plot_df, aes(x = deserving, color = group)) +
+  geom_density(linewidth = 1) +
+  geom_vline(
+    data = means_df,
+    aes(xintercept = mean_val, color = group),
+    linetype = "dashed",
+    linewidth = 0.8,
+    show.legend = FALSE
+  ) +
+  facet_grid(target ~ comparison) +
+  coord_cartesian(xlim = c(0, 100)) +
+  labs(
+    x = "Deservingness score",
+    y = "Density",
+    color = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold")
+  )
+
+
+
+ggsave(
+  "deservingness_3x4_density.png",
+  plot = p,
+  width = 14,
+  height = 9,
+  dpi = 300,
+  bg = "white"
+)
+
+ggsave(
+  "deservingness_3x4_density.pdf",
+  plot = p,
+  width = 14,
+  height = 9
+)
+```
+
+4-5 the tables aren't working. I just am pivoting to making sure I can print out all the info I need to fix the writing in my analysis.
+
+```{r}
+summary(policy_vs_nonimp_nocontrol_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_partyideo_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_full_models$comp_prisonhelp_incarc)
+
+
+summary(policy_vs_nonimp_nocontrol_models$comp_prisonhelp_i)
+summary(policy_vs_nonimp_demo_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_partyideo_models$comp_prisonhelp_incarc)
+summary(policy_vs_nonimp_full_models$comp_prisonhelp_incarc)
+
+```
+
+```{r}
+# ============================================================
+# EXPORT ALL MODEL SUMMARIES AND ROBUST COEFFICIENT TABLES
+# ============================================================
+
+library(lmtest)
+library(sandwich)
+
+# -----------------------------
+# 1. Collect all model lists
+# -----------------------------
+all_model_lists <- list(
+  goal1_nocontrol   = policy_dummies_models,
+  goal1_demo        = policy_dummies_demo_models,
+  goal1_partyideo   = policy_dummies_partyideo_models,
+  goal1_full        = policy_dummies_full_models,
+  goal2_nocontrol   = policy_vs_nonimp_nocontrol_models,
+  goal2_demo        = policy_vs_nonimp_demo_models,
+  goal2_partyideo   = policy_vs_nonimp_partyideo_models,
+  goal2_full        = policy_vs_nonimp_full_models
+)
+
+# -----------------------------
+# 2. Helper: write one model list
+# -----------------------------
+write_model_list_outputs <- function(model_list, list_name, out_dir = "model_outputs") {
+
+  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+
+  summary_file <- file.path(out_dir, paste0(list_name, "_summary_output.txt"))
+  robust_file  <- file.path(out_dir, paste0(list_name, "_robust_output.txt"))
+
+  # -------- summary() output --------
+  con_sum <- file(summary_file, open = "wt")
+  for (model_name in names(model_list)) {
+    mod <- model_list[[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_sum)
+
+    capture.output(summary(mod), file = con_sum, append = TRUE)
+    writeLines("\n\n", con_sum)
+  }
+  close(con_sum)
+
+  # -------- robust coefficient output --------
+  con_rob <- file(robust_file, open = "wt")
+  for (model_name in names(model_list)) {
+    mod <- model_list[[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_rob)
+
+    robust_tab <- lmtest::coeftest(mod, vcov. = sandwich::vcovHC(mod, type = "HC1"))
+    capture.output(print(robust_tab), file = con_rob, append = TRUE)
+
+    writeLines("\n--- Model fit ---\n", con_rob)
+    fit_info <- c(
+      paste("N   =", nobs(mod)),
+      paste("R2  =", round(summary(mod)$r.squared, 4)),
+      paste("Adj =", round(summary(mod)$adj.r.squared, 4))
+    )
+    writeLines(fit_info, con_rob)
+
+    writeLines("\n\n", con_rob)
+  }
+  close(con_rob)
+
+  invisible(list(
+    summary_file = summary_file,
+    robust_file = robust_file
+  ))
+}
+
+# -----------------------------
+# 3. Run for all model lists
+# -----------------------------
+output_files <- lapply(names(all_model_lists), function(list_name) {
+  write_model_list_outputs(
+    model_list = all_model_lists[[list_name]],
+    list_name = list_name,
+    out_dir = "model_outputs"
+  )
+})
+
+names(output_files) <- names(all_model_lists)
+
+# -----------------------------
+# 4. Optional: make one master file
+# -----------------------------
+master_summary_file <- file.path("model_outputs", "ALL_MODEL_SUMMARIES.txt")
+master_robust_file  <- file.path("model_outputs", "ALL_MODEL_ROBUST.txt")
+
+con_master_sum <- file(master_summary_file, open = "wt")
+for (list_name in names(all_model_lists)) {
+  writeLines(paste0(
+    "\n\n",
+    strrep("#", 100), "\n",
+    "MODEL LIST: ", list_name, "\n",
+    strrep("#", 100), "\n"
+  ), con_master_sum)
+
+  for (model_name in names(all_model_lists[[list_name]])) {
+    mod <- all_model_lists[[list_name]][[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_master_sum)
+
+    capture.output(summary(mod), file = con_master_sum, append = TRUE)
+    writeLines("\n\n", con_master_sum)
+  }
+}
+close(con_master_sum)
+
+con_master_rob <- file(master_robust_file, open = "wt")
+for (list_name in names(all_model_lists)) {
+  writeLines(paste0(
+    "\n\n",
+    strrep("#", 100), "\n",
+    "MODEL LIST: ", list_name, "\n",
+    strrep("#", 100), "\n"
+  ), con_master_rob)
+
+  for (model_name in names(all_model_lists[[list_name]])) {
+    mod <- all_model_lists[[list_name]][[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_master_rob)
+
+    robust_tab <- lmtest::coeftest(mod, vcov. = sandwich::vcovHC(mod, type = "HC1"))
+    capture.output(print(robust_tab), file = con_master_rob, append = TRUE)
+
+    writeLines("\n--- Model fit ---\n", con_master_rob)
+    fit_info <- c(
+      paste("N   =", nobs(mod)),
+      paste("R2  =", round(summary(mod)$r.squared, 4)),
+      paste("Adj =", round(summary(mod)$adj.r.squared, 4))
+    )
+    writeLines(fit_info, con_master_rob)
+
+    writeLines("\n\n", con_master_rob)
+  }
+}
+close(con_master_rob)
+
+# -----------------------------
+# 5. Confirm output locations
+# -----------------------------
+print(output_files)
+cat("\nMaster files written to:\n",
+    master_summary_file, "\n",
+    master_robust_file, "\n")
+```
+
+## deservingness means by target by impact
+
+```{r}
+library(dplyr)
+library(tidyr)
+
+# -----------------------------
+# 1. Define the three targets
+# -----------------------------
+deserving_vars <- c("d_incppl_pris_abc", "d_crim_abc", "d_incwomen_abc")
+
+targets <- c(
+  d_incppl_pris_abc = "Incarcerated people",
+  d_crim_abc = "Criminals",
+  d_incwomen_abc = "Incarcerated women"
+)
+
+# -----------------------------
+# 2. Create simple group flags
+# -----------------------------
+df <- raw_data_cleaned %>%
+  mutate(
+    not_impacted = if_else(impact == 0, 1, 0, missing = 0),
+    impacted_grp = if_else(impact == 1, 1, 0, missing = 0),
+    incarcerated_grp = if_else(incarc == 1, 1, 0, missing = 0),
+    knowincarc_grp = if_else(knowincarc == 1, 1, 0, missing = 0),
+    victim_grp = if_else(vict == 1, 1, 0, missing = 0)
+  )
+
+# -----------------------------
+# 3. Put the data in long format
+# -----------------------------
+long_df <- df %>%
+  dplyr::select(
+    not_impacted, impacted_grp, incarcerated_grp, knowincarc_grp, victim_grp,
+    all_of(deserving_vars)
+  ) %>%
+  pivot_longer(
+    cols = all_of(deserving_vars),
+    names_to = "target",
+    values_to = "score"
+  ) %>%
+  mutate(
+    target = recode(target, !!!targets)
+  )
+
+# -----------------------------
+# 4. Compute means for each group x target
+# -----------------------------
+group_means <- bind_rows(
+  long_df %>%
+    filter(not_impacted == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Not impacted"),
+
+  long_df %>%
+    filter(impacted_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Impacted"),
+
+  long_df %>%
+    filter(incarcerated_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Incarcerated"),
+
+  long_df %>%
+    filter(knowincarc_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Knows incarcerated"),
+
+  long_df %>%
+    filter(victim_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Victim")
+) %>%
+  dplyr::select(group, target, mean_score)
+
+# View the long table
+group_means
+group_means_wide <- group_means %>%
+  pivot_wider(
+    names_from = target,
+    values_from = mean_score
+  )
+
+group_means_wide
+
+group_differences <- group_means_wide %>%
+  mutate(
+    `Incarcerated people - Criminals` =
+      `Incarcerated people` - `Criminals`,
+
+    `Incarcerated women - Criminals` =
+      `Incarcerated women` - `Criminals`,
+
+    `Incarcerated women - Incarcerated people` =
+      `Incarcerated women` - `Incarcerated people`
+  )
+
+group_differences
+
+final_deservingness_table <- group_differences %>%
+  mutate(across(where(is.numeric), ~ round(.x, 2)))
+
+View(final_deservingness_table)
+```
+
+to overleaf
+
+```{r}
+
+kable(
+  final_deservingness_table,
+  format = "latex",
+  booktabs = TRUE,
+  digits = 2,
+  align = c("l", rep("r", ncol(final_deservingness_table) - 1)),
+  caption = "Mean deservingness scores and within-group target differences"
+)
+
+library(knitr)
+
+kable(
+  final_deservingness_table,
+  format = "latex",
+  booktabs = TRUE,
+  digits = 2,
+  align = c("l", rep("r", ncol(final_deservingness_table) - 1)),
+  caption = "Mean deservingness scores and within-group target differences"
+) %>%
+  cat()
+```
+
+## deservingness straight up models with controls
+
+```{r}
+
+m_des_inc_impact <- lm(d_incppl_pris_abc ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_inc_incarc <- lm(d_incppl_pris_abc ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_inc_knowincarc <- lm(d_incppl_pris_abc ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_inc_vict <- lm(d_incppl_pris_abc ~ vict + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+##
+
+m_des_crim_impact <- lm(d_crim_abc ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_crim_incarc <- lm(d_crim_abc ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_crim_knowincarc <- lm(d_crim_abc ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_crim_vict <- lm(d_crim_abc ~ vict + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+##
+
+m_des_incwomen_imp <- lm(d_incwomen_abc ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_incwomen_incarc <- lm(d_incwomen_abc ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_incwomen_knowinc <- lm(d_incwomen_abc ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+m_des_incwomen_vict <- lm(d_incwomen_abc ~ vict + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = raw_data_cleaned)
+
+
+##
+
+
+summary(m_des_inc_impact)
+summary(m_des_inc_incarc)
+summary(m_des_inc_knowincarc)
+summary(m_des_inc_vict)
+
+summary(m_des_crim_impact)
+summary(m_des_crim_incarc)
+summary(m_des_crim_knowincarc)
+summary(m_des_crim_vict)
+
+summary(m_des_incwomen_imp)
+summary(m_des_incwomen_incarc)
+summary(m_des_incwomen_knowinc)
+summary(m_des_incwomen_vict)
+```
+
+## Des Restricted Sample
+
+```{r}
+library(sandwich)
+library(lmtest)
+library(broom)
+##
+# model generation code
+##
+# DVs
+
+
+deserving_vars <- c("d_incppl_pris_abc", "d_crim_abc", "d_incwomen_abc")
+impact_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+model_specs <- list(
+  nocontrols = NULL,
+  demo = demo_controls,
+  full = c(demo_controls, all_attitudinal_controls)
+)
+
+get_restricted_data <- function(data, iv) {
+  if (iv == "impact") {
+    data %>% filter(!is.na(impact))
+  } else {
+    data %>% filter((.data[[iv]] == 1) | (impact == 0))
+  }
+}
+
+restricted_model_list <- list()
+results_df_restricted <- list()
+
+for (dv in deserving_vars) {
+  for (spec_name in names(model_specs)) {
+    controls <- model_specs[[spec_name]]
+    
+    for (iv in impact_vars) {
+      dat_iv <- get_restricted_data(raw_data_cleaned, iv)
+      vars_needed <- c(dv, iv, "impact", controls)
+      dat_iv <- dat_iv %>% filter(complete.cases(across(all_of(vars_needed))))
+      
+      form <- if (is.null(controls)) {
+        as.formula(paste(dv, "~", iv))
+      } else {
+        as.formula(paste(dv, "~", iv, "+", paste(controls, collapse = " + ")))
+      }
+      
+      model <- lm(form, data = dat_iv)
+      robust <- coeftest(model, vcov = vcovHC(model, type = "HC1"))
+      
+      model_name <- paste(dv, spec_name, iv, sep = "_")
+      restricted_model_list[[model_name]] <- list(
+        model = model,
+        robust = robust,
+        data = dat_iv
+      )
+      
+      d0 <- dat_iv
+      d1 <- dat_iv
+      d0[[iv]] <- 0
+      d1[[iv]] <- 1
+      
+      baseline <- mean(predict(model, newdata = d0), na.rm = TRUE)
+      predicted <- mean(predict(model, newdata = d1), na.rm = TRUE)
+      coef_iv <- predicted - baseline
+      pct_change <- ((predicted - baseline) / baseline) * 100
+      
+      results_df_restricted[[model_name]] <- data.frame(
+        baseline = baseline,
+        coef = coef_iv,
+        predicted = predicted,
+        pct_change = pct_change,
+        se = robust[iv, "Std. Error"],
+        p = robust[iv, "Pr(>|t|)"],
+        dv = dv,
+        spec = spec_name,
+        iv = iv,
+        n = nrow(dat_iv),
+        r2 = summary(model)$r.squared,
+        adj_r2 = summary(model)$adj.r.squared
+      )
+    }
+  }
+}
+
+
+results_df_restricted <- do.call(rbind, results_df_restricted)
+View(results_df_restricted)
+
+restricted_model_list[["d_incppl_pris_abc_demo_incarc"]]
+coef(restricted_model_list[["d_incppl_pris_abc_demo_incarc"]]$model)
+restricted_model_list[["d_incppl_pris_abc_demo_incarc"]]$robust
+restricted_model_list[["d_incppl_pris_abc_demo_incarc"]]$robust
+
+
+get_model_table <- function(model_entry) {
+  robust_mat <- model_entry$robust
+  
+  data.frame(
+    term = rownames(robust_mat),
+    estimate = robust_mat[, "Estimate"],
+    se = robust_mat[, "Std. Error"],
+    p = robust_mat[, "Pr(>|t|)"],
+    stringsAsFactors = FALSE,
+    row.names = NULL
+  )
+}
+
+
+#incarc, demo controls
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_demo_impact"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_demo_incarc"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_demo_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_demo_vict"]]))
+
+#crim, demo controls
+print(get_model_table(restricted_model_list[["d_crim_abc_demo_impact"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_demo_incarc"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_demo_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_demo_vict"]]))
+
+#inc women, demo controls
+print(get_model_table(restricted_model_list[["d_incwomen_abc_demo_impact"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_demo_incarc"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_demo_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_demo_vict"]]))
+
+
+#incarc, demo controls
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_full_impact"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_full_incarc"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_full_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_incppl_pris_abc_full_vict"]]))
+
+#crim, demo controls
+print(get_model_table(restricted_model_list[["d_crim_abc_full_impact"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_full_incarc"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_full_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_crim_abc_full_vict"]]))
+
+#inc women, demo controls
+print(get_model_table(restricted_model_list[["d_incwomen_abc_full_impact"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_full_incarc"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_full_knowincarc"]]))
+print(get_model_table(restricted_model_list[["d_incwomen_abc_full_vict"]]))
+
+
+
+
+summary(d_incppl_pris_abc_demo_impact)
+d_incppl_pris_abc_demo_incarc 
+d_incppl_pris_abc_demo_knowincarc
+d_incppl_pris_abc_demo_vict
+
+```
+
+Interpretation: The baseline is the average predicted deservingness score for the comparison group within each restricted sample when the focal IV is set to 0. The comparison group is people with no experience (impact = 0). So the baseline now means: what is the expected deservingness score among non-impacted respondents (within the relevant sample and model specification). The baseline is NOT the regression intercept.
+
+-Predicted: the average predicted score if everyone in that same sample had the focal experience (ie incarc = 1). The coef is the difference between those two quantities, and pct_change is the percent increase relative to the non-impacted baseline. Each row then is answering the questionL how much higher or lower is the predicted deservingness score for people with this type of contact compared to people with no contact.
+
+Substantively, the patterns are quite strong and very consistent across DVs. For incarcerated people, the baseline sits around 43–44 across specifications, and all forms of contact increase deservingness relative to that group. Direct incarceration produces the largest shifts (roughly 22–27% depending on controls), proximal contact is somewhat smaller, and victimization is consistently the smallest and sometimes not statistically significant once you include full controls. That ordering is doing real theoretical work for you: it suggests that experiential proximity to incarceration increases generosity in a graded way, but that victimization is a qualitatively different kind of experience rather than just another form of “contact.”
+
+You see the same structure for “criminals,” but with larger effect sizes. The baseline is lower (around 29–30), and the increases for direct incarceration are much larger (often \~29–33% even with controls). That’s important because “criminals” are the most negatively constructed target in your set, so the fact that contact moves those evaluations substantially is strong evidence that experience is reshaping underlying deservingness judgments, not just marginal preferences. This lines up cleanly with your broader argument about contact altering how people interpret stigmatized groups rather than simply shifting policy opinions at the margin.
+
+For incarcerated women, the baseline is higher (around 50), and the effects are more compressed. You still see positive differences for all forms of contact, but they are smaller and attenuate more with controls. That pattern is also theoretically coherent: respondents already view this group as more deserving, so there is less room for contact to shift evaluations upward. In other words, contact effects are conditional on the prior social construction of the group, which is exactly the kind of mechanism your framework is trying to get at.
+
+The role of controls is also now interpretable in a clean way. Moving from no controls to demo to full controls generally attenuates the percent differences, but does not eliminate them—especially for direct and proximal incarceration. That gives you a defensible claim that these differences are not simply artifacts of race, gender, ideology, or racial attitudes. In your language, it supports the idea that carceral contact is associated with distinct political orientations, rather than just sorting into pre-existing ideological camps. This connects directly to the literature you’re drawing on about how policy experience shapes political views and engagement .
+
+So the bottom line is that this table now does what you need it to do. The baseline is a meaningful “no experience” reference point, the percent changes are interpretable group differences, and the patterns across DVs and specifications are theoretically informative rather than artifacts of model construction.
+
+1.  
+
+2.  
+
+3.  
+
+4.  
+
+5.  
+
+6.  
+
+7.  
+
+8.  
+
+9.  
+
+# "Prelim Paper Only" Analyses Start Here
+
+### 1.1. Main DV: Deservingness of Incarcerated People/Prisoners
+
+About
+
+- mean: 46.13
+
+- median: 50
+
+- SD: 27.96
+
+- variance: 782.03
+
+```{r prechecks}
+#| eval: false
+#| include: false
+#check counts: 
+
+#raw_data_cleaned %>% count(d_incppl_pris_abc)
+
+#summary:
+#summary(raw_data_cleaned$d_incppl_pris_abc)
+
+
+
+#histogram
+incarc_ppl_hist <- hist(raw_data_cleaned$d_incppl_pris_abc, breaks = 20,
+     main = "Deservingness of Incarcerated People/Prisoners",
+     xlab = "Deservingness (0–100)", col = "gray80", border = "white")
+
+
+#mean(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
+
+#sd(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
+
+#var(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
+
+boxplot(raw_data_cleaned$d_incppl_pris_abc)
+
+#density plot
+dv_density_data <- raw_data_cleaned %>%
+  dplyr::select(d_incppl_pris_abc) %>%
+  filter(!is.na(d_incppl_pris_abc))
+
+```
+
+### 1.2. Control: Generalized Deservingness (desor)
+
+```{r}
+#| eval: false
+#| include: false
+
+# Histogram for generalized deservingness control variable
+desor_core_hist <- hist(raw_data_cleaned$desor_core, breaks = 20,
+     main = "'Needy' Deservingness Orientation",
+     xlab = "Average Deservingness of Help-Target Groups (0–100)",
+     col = "gray80", border = "white")
+
+summary(raw_data_cleaned$desor_core)
+sd(raw_data_cleaned$desor_core, na.rm = TRUE)
+
+```
+
+#### 2.1 Without Controls
+
+```{r}
+m1 <- lm(d_incppl_pris_abc ~ impact, data = raw_data_cleaned)
+summary(m1)
+
+```
+
+#### 2.2 M1 Interpretation:\*
+
+- Q: does any carceral contact or victimization change perceived deservingness of incarcerated people (`d_incppl_pris_abc`, 0–100 scale) compared to those without any such contact (`impact = 0`).
+
+- Coefficients:
+
+  - Intercept = 43.39
+
+    - The average deservingness score of incarcerated people, for respondents with no contact (`impact = 0`), is on average 43.31 out of 100 on the deservingness scale. This is higher than I might have thought.
+
+  - impact = 7.17
+
+    - People who have had contact (direct, indirect, or victimization) rate incarcerated people 7.17 points higher on the 0-100 deservingness scale — on average – than those without contact.
+
+    - Significance: The t-val is 5.881 and p is less than 0.001, suggesting this effect is significantly significant and the probability that it is due to chance is very low.
+
+    - Model fit: The R-squared is 0.0156, meaning only 1.6% of the variation in deservingness is explained by this binary variable alone.
+
+```{r, m1plot}
+library(ggplot2)
+# Summarize means and confidence intervals
+plot_data <- raw_data_cleaned %>%
+  filter(!is.na(impact)) %>%  # <- filter out NA values
+  group_by(impact) %>%
+  summarize(
+    mean_deserving = mean(d_incppl_pris_abc, na.rm = TRUE),
+    se = sd(d_incppl_pris_abc, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    impact_label = ifelse(impact == 1, "Any Contact", "No Contact"),
+    ci_lower = mean_deserving - 1.96 * se,
+    ci_upper = mean_deserving + 1.96 * se
+  )
+
+# Plot
+ggplot(plot_data, aes(x = impact_label, y = mean_deserving)) +
+  geom_col(fill = "gray60") +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  labs(
+    x = NULL,
+    y = "Mean Deservingness Rating (0–100)",
+    title = "Deservingness of Incarcerated People by Contact Experience"
+  ) +
+  theme_minimal(base_size = 14)
+
+```
+
+```{r}
+
+
+# Function to create plot comparing no contact vs specific contact type
+create_comparison_plot_data <- function(data, contact_var, 
+                                       contact_label = "Has Contact") {
+  
+  # Create two groups: 
+  # 1. No contact at all (impact == 0)
+  # 2. Has this specific type of contact (contact_var == 1)
+  
+  no_contact <- data %>%
+    filter(impact == 0) %>%
+    summarize(
+      mean_deserving = mean(d_incppl_pris_abc, na.rm = TRUE),
+      se = sd(d_incppl_pris_abc, na.rm = TRUE) / sqrt(n()),
+      n = n(),
+      .groups = "drop"
+    ) %>%
+    mutate(group = "No Contact")
+  
+  has_contact <- data %>%
+    filter(!!sym(contact_var) == 1) %>%
+    summarize(
+      mean_deserving = mean(d_incppl_pris_abc, na.rm = TRUE),
+      se = sd(d_incppl_pris_abc, na.rm = TRUE) / sqrt(n()),
+      n = n(),
+      .groups = "drop"
+    ) %>%
+    mutate(group = contact_label)
+  
+  # Combine the two groups
+  plot_data <- bind_rows(no_contact, has_contact) %>%
+    mutate(
+      ci_lower = mean_deserving - 1.96 * se,
+      ci_upper = mean_deserving + 1.96 * se
+    )
+  
+  return(plot_data)
+}
+
+# Function to create the plot
+create_plot <- function(plot_data, title, y_limits = c(0, 100)) {
+  # Ensure the order is consistent
+  plot_data$group <- factor(plot_data$group, 
+                           levels = c("No Contact", 
+                                    setdiff(unique(plot_data$group), "No Contact")))
+  
+  ggplot(plot_data, aes(x = group, y = mean_deserving)) +
+    geom_col(fill = "gray60") +
+    geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+    geom_text(aes(label = paste0("n=", n)), vjust = -2, size = 3) +
+    labs(
+      x = NULL,
+      y = "Mean Deservingness Rating (0–100)",
+      title = title
+    ) +
+    ylim(y_limits) +
+    theme_minimal(base_size = 12)
+}
+
+# Create plot data for each comparison
+# 1. Overall impact comparison (your original plot)
+impact_data <- raw_data_cleaned %>%
+  filter(!is.na(impact)) %>%
+  group_by(impact) %>%
+  summarize(
+    mean_deserving = mean(d_incppl_pris_abc, na.rm = TRUE),
+    se = sd(d_incppl_pris_abc, na.rm = TRUE) / sqrt(n()),
+    n = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    group = ifelse(impact == 1, "Any Contact", "No Contact"),
+    ci_lower = mean_deserving - 1.96 * se,
+    ci_upper = mean_deserving + 1.96 * se
+  )
+
+# 2. No contact vs. has been incarcerated
+incarc_data <- create_comparison_plot_data(
+  raw_data_cleaned, 
+  "incarc", 
+  "Has Been Incarcerated"
+)
+
+# 3. No contact vs. has been victimized
+vict_data <- create_comparison_plot_data(
+  raw_data_cleaned, 
+  "vict", 
+  "Has Been Victimized"
+)
+
+# 4. No contact vs. knows someone incarcerated
+knowincarc_data <- create_comparison_plot_data(
+  raw_data_cleaned, 
+  "knowincarc", 
+  "Knows Someone Incarcerated"
+)
+
+# Calculate common y-axis limits
+all_data <- list(impact_data, incarc_data, vict_data, knowincarc_data)
+all_ci_upper <- unlist(lapply(all_data, function(x) x$ci_upper))
+all_ci_lower <- unlist(lapply(all_data, function(x) x$ci_lower))
+y_limits <- c(
+  min(0, min(all_ci_lower, na.rm = TRUE) - 5),
+  max(100, max(all_ci_upper, na.rm = TRUE) + 5)
+)
+
+# Create all plots
+plot1 <- create_plot(impact_data, "Overall Impact", y_limits)
+plot2 <- create_plot(incarc_data, "No Contact vs. Has Been Incarcerated", y_limits)
+plot3 <- create_plot(vict_data, "No Contact vs. Has Been Victimized", y_limits)
+plot4 <- create_plot(knowincarc_data, "No Contact vs. Knows Someone Incarcerated", y_limits)
+
+# Display individual plots
+print(plot1)
+print(plot2)
+print(plot3)
+print(plot4)
+
+# Combine all plots
+combined_plot <- (plot1 | plot2) / (plot3 | plot4)
+combined_plot <- combined_plot + 
+  plot_annotation(
+    title = "Deservingness Ratings: No Contact vs. Specific Contact Types",
+    subtitle = "Comparing baseline (no contact) with different forms of contact"
+  )
+print(combined_plot)
+
+#  Fifth plot comparing all groups with multiple contact types
+# This shows people with combinations of contact types
+#multi_contact_data <- raw_data_cleaned %>%
+ # mutate(
+  #  contact_combo = case_when(
+   #   impact == 0 ~ "No Contact",
+    #  incarc == 1 & vict == 1 & knowincarc == 1 ~ "All Three Types",
+     # incarc == 1 & vict == 1 ~ "Incarcerated + Victimized",
+      #incarc == 1 & knowincarc == 1 ~ "Incarcerated + Knows Someone",
+      #vict == 1 & knowincarc == 1 ~ "Victimized + Knows Someone",
+      #incarc == 1 ~ "Only Incarcerated",
+      #vict == 1 ~ "Only Victimized",
+      #knowincarc == 1 ~ "Only Knows Someone",
+      #TRUE ~ "Other"
+    #)
+  #) %>%
+ # filter(contact_combo != "Other") %>%
+#  group_by(contact_combo) %>%
+#  summarize(
+#    mean_deserving = mean(d_incppl_pris_abc, na.rm = TRUE),
+#    se = sd(d_incppl_pris_abc, na.rm = TRUE) / sqrt(n()),
+#    n = n(),
+#    .groups = "drop"
+#  ) %>%
+#  mutate(
+#    ci_lower = mean_deserving - 1.96 * se,
+#    ci_upper = mean_deserving + 1.96 * se
+ # )
+
+# Plot for multiple contact types
+#multi_plot <- ggplot(multi_contact_data, 
+              #       aes(x = reorder(contact_combo, mean_deserving), 
+                #         y = mean_deserving)) +
+#  geom_col(fill = "gray60") +
+#  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+#  geom_text(aes(label = paste0("n=", n)), hjust = -0.2, size = 3) +
+#  labs(
+#    x = NULL,
+#    y = "Mean Deservingness Rating (0–100)",
+#    title = "Deservingness by Combination of Contact Types"
+#  ) +
+#  ylim(y_limits) +
+#  coord_flip() +
+#  theme_minimal(base_size = 12)
+
+#print(multi_plot)
+
+
+```
+
+#### 2.3 (M1c) With Controls
+
+```{r}
+m1c <- lm(d_incppl_pris_abc ~ impact +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+
+m1c_incarc <- lm(d_incppl_pris_abc ~ incarc +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+
+m1c_vict <- lm(d_incppl_pris_abc ~ vict +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+
+m1c_knowincarc <- lm(d_incppl_pris_abc ~ knowincarc +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+
+
+summary(m1c_incarc)
+summary(m1c_vict)
+summary(m1c_knowinc)
+
+summary(m1c)
+```
+
+#### 2.4 Diagnostics
+
+**Variance inflation factors – multi-colinearity**
+
+```{r}
+
+library(car)
+# Run VIFs on  existing model object (replace 'm1' with your model name)
+print(vif(m1c))
+
+```
+
+--\> shows (for all groups) everything 1-2, predictors mostly independent, EXCEPT:
+
+- fiscal_ideology 4.4
+
+- social_ideology 4.7
+
+- --\> moderate correlation
+
+```{r}
+print(vif(m1c_incarc))
+print(vif(m1c_vict))
+print(vif(m1c_knowincarc))
+```
+
+**Inspect for heteroskedasticity & nonlinearity**
+
+```{r}
+
+plot(m1c, which = 1)
+
+plot(m1c_incarc, which = 1)
+
+plot(m1c_vict, which = 1)
+
+plot(m1c_knowincarc, which = 1)
+```
+
+```{r}
+# Normal Q-Q plot
+plot(m1c, which = 2)
+
+plot(m1c_incarc, which = 2)
+
+plot(m1c_vict, which = 2)
+
+plot(m1c_knowincarc, which = 2)
+
+qqnorm(raw_data_cleaned$d_incppl_pris_abc)
+```
+
+The above suggests skewness is afoot.
+
+```{r}
+library(ggplot2)
+
+ggplot(m1c, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(se = FALSE, color = "red") +
+  labs(x = "Fitted Values", y = "Residuals",
+       title = "Residuals vs Fitted (Check for Nonlinearity/Heteroskedasticity)") +
+  theme_minimal()
+
+```
+
+```{r}
+library(lmtest)
+bptest(m1c)
+bptest(m1c_incarc)
+bptest(m1c_vict)
+bptest(m1c_knowincarc)
+
+```
+
+BP Test suggests residuals DO NOT have constant variance – there is evidence of heteroskedasticy. Some subsets of observations have larger/smaller residual spread than others. Coefficient estimates are not biased, but **standard errors are biased.**
+
+--\> I should use robust standard errors
+
+#### 2.5 ROBUST SE's
+
+```{r}
+
+library(lmtest)
+library(sandwich)
+
+coeftest(m1c, vcov = vcovHC(m1c, type = "HC1"))
+
+coeftest(m1c_incarc, vcov = vcovHC(m1c_incarc, type = "HC1"))
+
+coeftest(m1c_vict, vcov = vcovHC(m1c_vict, type = "HC1"))
+
+coeftest(m1c_knowincarc, vcov = vcovHC(m1c_knowincarc, type = "HC1"))
+```
+
+***Using standardized betas – show relative explantory strength, not total explained variance***
+
+```{r, m1cs}
+
+m1cs <- lm(d_incppl_pris_abc ~ impact + Republican + Democrat + fiscal_ideology +
+         social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
+         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         data = raw_data_cleaned)
+
+# 1. Standardized coefficients
+library(broom)
+y_sd <- sd(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
+
+# compute sd for each predictor (binary and continuous)
+sds <- sapply(model.frame(m1cs)[-1], function(x) sd(x, na.rm=TRUE))  # excludes response
+coefs <- coef(m1cs)
+# standardized coef = b * sd(x) / sd(y).  For factor dummies sd(x) is the std dev of 0/1 vector.
+std_coefs <- coefs * c(1, sds / y_sd)   # note: first coef is intercept so alignment matters
+# better to use broom::tidy:
+tidy(m1cs) |> 
+  mutate(std_est = estimate * c(0, sds / y_sd)) 
+```
+
+```{r}
+
+```
+
+#### 2.6 Interpretation
+
+- N = 1,577 observations used – additional 645 deleted for missingness
+
+- Coefficients:
+
+  - Intercept = 2.97 (p = 0.63)
+
+    - The predicted deservingness score when all predictors are 0, [so not particularly meaningful.]{.underline} Means respondent:
+      - is independent or other
+      - has the most conservative ideology
+      - ...is not impacted
+      - is
+      - (add remaining)
+
+  - impact = +4.60\* (p \< 0.001)
+
+    - Being impacted by the CJ system (incarcerated, knows, victimized) increases the predicted deservingness rating by 4.6 points on average out of 100 (4.6%), holding all else constant.
+
+      - Remains statistically significant, particularly because the outcome range is 0-100
+
+      - supports H1
+
+  - Republican = -0.25 (p = 0.90)
+
+    - Compared to Independents/Others, Republicans rate incarcerated people just 0.39 points higher, and this is not statistically significant.
+
+    - **No evidence** that Republican identification alone predicts harsher or more generous deservingness scores in this model (when other factors are controlled).
+
+    - May reflect that **ideology and punitiveness** absorb more of the variance that would otherwise be attributed to party label.
+
+  - Democrat = -0.72 (p = 0.61)
+
+    - Compared to Independents/Others, Democrats score incarcerated people 0.72 points lower on deservingness, but this is not statistically significant.
+
+    - There is **no reliable difference** in prisoner deservingness between Democrats and Independents/Others once we account for ideology, contact, and other controls.
+
+    - Coupled with the Republican coefficient, this suggests **very weak direct effects of party ID per se**, which may be surprising given elite cues—but again, could reflect ideological and experiential absorption.
+
+  - fiscal_ideology = +0.13 (p = 0.88)
+
+    - This is the effect of being more fiscally conservative (scale reversed: higher = more conservative).
+
+    - Not statistically significant, and the coefficient is small.
+
+    - **Fiscal ideology appears unrelated** (ONCE SOCIAL IDEOLOGY INCLUDED) to how respondents rate the deservingness of incarcerated people, net of party, social ideology, punitiveness, and racial attitudes.
+
+    - This aligns with your expectation that deservingness is more influenced by *social/cultural* orientations than by economic/fiscal ideology.
+
+  - social_ideology = -2.03\* (0.017)
+
+    - each unit increase in social conservativism predicts a 2.03 point decrease in deservingness of incarcerated people (on a 0-100 scale)
+
+    - marginally significant (p\~0.014) and in the expected direction
+
+    - some evidence social conservativism is associated with lower perceived deservingness
+
+    - effect size is moderate – but this all goes into the pile of "do further testing to see which controls are meaningful
+
+  - PenalPunitiveness = -1.15 (p \<0.0009)
+
+    - participant view on whether purpose of incarceration is to punish or rehabilitate.
+
+    - a one unit increase in belief that incarceration is primarily about punishment is associated with a 1.15-point decrease in the perceived deservingness of incarcerated people.
+
+    - **substantive significance:** a full-scale shift (from 1 to 7) predicts a 6.8 point drop in deservingness on a 0-100 scale – modest but meaningful, especially in the context of other predictors.
+
+    - this supports the claim that punitive orientations towards the purpose of incarceration shape how people evaluate the deservingness of targets.
+
+    - **modeling implication**: it's not entirely endogenous to deservingness ratings, bc it comes from a distinct question about the penal telos. I think this tells us that deservingness ratings don't exclusively reflect beliefs about what prison is for.
+
+      - However, I'm not sure this variable captures "punitivenness." In part, it bleeds into my questions about affective reactions versus judgement.
+
+  - desor_core = +0.73 (p \< 0.001)
+
+    - Interpretation:
+
+      - For each one-point increase in the average deservingness rating of *help-target groups*, perceived deservingness of incarcerated people increases by 0.73
+
+    - [**Substantive scale:**]{.underline}
+
+      - ranges from 0-100, so a 10-pt increase corresponds to a 7.6 point increase in prisoner deservingness – comperable to but in opp direction of penalpun effect
+
+    - conceptual interpretation:
+
+      - **so far, strongest predictor in the model**. those who generally see "helping" groups as deserving also extend that view to incarcerated people.
+
+      - captures individual-level variation in generalized generosity twoard marginalized/help needing populations.
+
+      - inclusion seems important because it helps isolate target-specific effects, shows that prisoner deservingness is partially embedded in broader affective/moral schemas about who deserves help.
+
+    - Modeling implication: controlling for desor might let me argue that the effect of contact on prisoner deservingness isn't just a byproduct of being generally generous – it's targeted.
+
+  - penalpoint = -1.147 (SE 0.345, p \<0.001) – the more someone views as prison's purpose being punishment, rather than rehabilitation, the slightly less deserving (1.15 points lower) they see incarcerated people.
+
+  - fire_rare = 0.39734 (p = 0.60)
+
+    - agreement that racial problems are rare and isolated, so more rejection of racial minimization (racial empathy) predicts lightly higher deservingness perceptions of incarcerated people.
+
+    - takeaway – not statistically significant, so can't rule out the possibility the relationship is due to chance. But direction aligns with theory.
+
+  - fire_privilege = 0.05353 (p = 0.94)
+
+    - Meaning: Agreement that white people benefit from unearned racial advantages
+
+    - Interpretation: The near-zero, nonsignificant coefficient indicates this belief does not meaningfully predict differences in perceived deservingness of incarcerated people in this model.
+
+    - Note: This item may be less emotionally activated than the others or more subject to social desirability bias, dampening its predictive power
+
+  - fire_angry = 1.18110 (p = 0.16)
+
+    - Meaning: Agreement with *“I am angry that racism exists.”*
+
+    - Interpretation: The positive direction suggests that respondents who are more emotionally angry about racism tend to see incarcerated people as more deserving, consistent with frameworks linking racial empathy to support for equity-enhancing policies.
+
+      - Note: While not significant, this coefficient is substantively large and may become more stable with a larger sample or better scaling.
+
+  - fire_fear (0.30112) (P = 0.73)
+
+    - Meaning: Agreement with *“I am fearful of people of other races.”*
+
+    - Interpretation: Respondents who express more racial fear are (slightly) more likely to rate incarcerated people as less deserving, though the effect is small and nonsignificant
+
+    - This aligns with theories linking racial threat or fear to punitive or exclusionary attitudes.
+
+  - gender = -1.02 (p=0.38 )
+
+    - men estimated to rate incarcerated people as slightly less deserving, but difference is small and not significant
+
+  - Black = rate incarcerated people as slightly lower (3.3) than do white respondents, modest but significant group-level difference (0.045)
+
+  - Hispanic = -3.25 (p= 0.057)
+
+    - rate incarcerated people 3 points less deserving than non-hispanic whites, holding all else constant
+
+  - OtherRace = dropped
+
+Residual SE: 22.6 –\> moderate dispersion, consistent with attitude data
+
+R squared: explains 34% of the variance in deservingness
+
+F = 54.1, p \< 0.001 –\> overal model highly significant.
+
+SUMMARY:
+
+Individuals with personal or proximate contact with the carceral system perceive incarcerated people as significantly more deserving of help or compassion (β = 4.60, p \< 0.001). This relationship remains robust after adjusting for partisanship, ideology, punitiveness, racial attitudes, and demographics. In contrast, more socially conservative and punitive respondents evaluate incarcerated people as substantially less deserving. General deservingness orientations exert the largest effect, suggesting that judgments about incarcerated people reflect broader moral schemas about who merits social support. Race and gender do not systematically differentiate deservingness perceptions, although Hispanic respondents express somewhat lower ratings than White respondents.
+
+BEFORE MOVING ONTO INTERPRETATION
+
+### 2.8 Variable Check -
+
+Confounder, mediator, collider?
+
+- missingness patterns
+
+- variable types
+
+- distributions
+
+- outliers
+
+Univariate explanatory power / how much does each control explain on its own?
+
+```{r}
+
+controls <- c("impact", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+
+results <- data.frame() 
+
+for (v in controls) {
+  f <- as.formula(paste("d_incppl_pris_abc ~", v))
+  fm <- lm(f, data = raw_data_cleaned)
+  results <- rbind(results, 
+                   data.frame(var = v, 
+                              adjR2 = summary(fm)$adj.r.squared, 
+                              AIC = AIC(fm)))
+}
+
+results <- results[order(-results$adjR2), ]
+print(results)
+
+#NEXT -- testing when adding controls in to m1 sequentially
+
+
+for(v in controls[-1])
+{
+  f <- as.formula(paste("d_incppl_pris_abc ~ impact +", v))
+  fm <- lm(f, data = raw_data_cleaned)
+  cat(v, "adjR2 =", summary(fm)$adj.r.squared-summary(m1)$adj.r.squared, "\n")
+}
+
+#AIC - mirrors fit mostly, suggests to check counts for vars
+
+for (v in controls) {
+  f <- as.formula(paste("d_incppl_pris_abc ~", v))
+  fm <- lm(f, data = raw_data_cleaned)
+  cat(v, "N =", nobs(fm), "\n")
+```
+
+Find from adjusted R2 (explaining spread) that:
+
+- desor_core explains 30% of the variation in deservingness scores.
+
+- ideology measures explain 7-8%
+
+- FIRE variables explain 3-6%
+
+- PID 3-4%
+
+- impact explains very little – 1.5%
+
+**Penal Point Variable – Keeping This Here because this Var Keeps on tripping you out – the correlation is -1 so it is in fact reverse coded! You will keep doubting this! Nov 2.**
+
+```{r, echo=FALSE}
+}
+#unedited data
+d <- read_csv("./data/raw/scotg_results.csv")
+
+table(raw_data_cleaned$q62_1, raw_data_cleaned$penalpoint, useNA = "ifany")
+
+library(ggplot2)
+
+# Convert to a data frame for ggplot
+tab_df <- as.data.frame(table(
+  Original = raw_data_cleaned$q62_1,
+  Reversed = raw_data_cleaned$penalpoint
+))
+
+ggplot(tab_df, aes(x = Original, y = Reversed, fill = Freq)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  theme_minimal() +
+  labs(title = "Cross-tab of Original vs. Reversed Values",
+       fill = "Count")
+
+
+mean(raw_data_cleaned$q62_1, na.rm = TRUE)
+mean(raw_data_cleaned$penalpoint, na.rm = TRUE)
+
+cor(raw_data_cleaned$q62_1, raw_data_cleaned$penalpoint, use = "pairwise.complete.obs")
+
+par(mfrow = c(1,2))
+hist(raw_data_cleaned$q62_1, main="Original")
+hist(raw_data_cleaned$penalpoint, main="Reversed")
+
+par(mfrow = c(1,2))
+hist(raw_data_cleaned$q62_1, main="Original (Q62_1)")
+hist(8 - raw_data_cleaned$q62_1, main="What a Reverse Looks Like")
+
+
+```
+
+**Prisonhelp and Prisonpen were more problematic after verification. The takeaway (Nov 2) is:**
+
+- Both prisonhelp and prisonpen now have "don't know" as Prisonhelp is constucted with both 1-5 (5 originally don't know) and 1-3.
+
+Support for punitive and help-oriented criminal justice policies were measured using items from the Q25 and Q23 survey batteries. Each item was originally presented on a four-point Likert scale ranging from *Strongly favor (1)* to *Strongly oppose (4)*, with an additional *Don’t know / No opinion (5)* option. Consistent with conventions in survey research on ambivalence and policy preferences (e.g., Ansolabehere, Rodden, & Snyder 2008; Bartels 2016), “Don’t know” responses were recoded to the midpoint (2.5) to represent a neutral position rather than treated as missing. This approach preserves respondents with low political engagement or weak opinions and aligns the indices with other continuous measures that center on a neutral midpoint (e.g., 0–100 deservingness scales).
+
+The **punitive policy index** (`prisonpen`) averages responses to support for the *death penalty* and *life without parole* (Q25_1, Q25_5). Higher values indicate greater opposition to punitive policy (i.e., a less punitive orientation).
+
+The **help-oriented policy index** (`prisonhelp`) averages six items: four prison policy questions (Q25_2, Q25_3, Q25_4, Q25_6) and two election-related questions (Q23_2, Q23_7) concerning voting rights for currently or formerly incarcerated people. All items were reverse-coded so that higher values reflect stronger support for help-oriented or rehabilitative policies.
+
+Both indices range from 1 (strongly oppose) to 4 (strongly favor), with 2.5 representing a neutral midpoint. Each index thus provides a continuous measure of policy support, facilitating direct comparison across respondents and between punitive and rehabilitative domains.
+
+## 3. M2: by Impact
+
+### 3.1 Incarcerated
+
+```{r, minc}
+
+minc <- lm(d_incppl_pris_abc ~ incarc +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+
+summary(minc)
+
+```
+
+#### 3.1a Robust SEs
+
+```{r}
+coef_table_incarc <- coeftest(minc, vcov = vcovHC(minc, type = "HC1", cluster = NULL)) %>% broom::tidy()
+```
+
+#### 3.1b. Standardized betas
+
+```{r}
+
+minc_s <- lm(d_incppl_pris_abc ~ incarc + Republican + Democrat + fiscal_ideology +
+         social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
+         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         data = raw_data_cleaned)
+
+# 1. Standardized coefficients
+
+inc_sd <- sd(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
+
+# compute sd for each predictor (binary and continuous)
+inc_sds <- sapply(model.frame(minc_s)[-1], function(x) sd(x, na.rm=TRUE))  # excludes response
+coefs <- coef(minc_s)
+
+# standardized coef = b * sd(x) / sd(y).  For factor dummies sd(x) is the std dev of 0/1 vector.
+inc_std_coefs <- coefs * c(NA, inc_sds / inc_sd)   # note: first coef is intercept so alignment matters
+# better to use broom::tidy:
+tidy(minc_s) |> 
+  mutate(std_est = estimate * c(NA, inc_sds / inc_sd)) 
+
+table_std_incarc <- tidy(minc_s) |> mutate(std_est = estimate * c(NA, inc_sds / inc_sd))
+```
+
+#### 3.1c Control Variable Check
+
+```{r}
+
+controls_inc <- c("incarc", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+  
+results_inc <- data.frame() #to reset
+
+for (v_inc in controls_inc) {
+  f_inc <- as.formula(paste("d_incppl_pris_abc ~", v_inc))
+  fm_inc <- lm(f_inc, data = raw_data_cleaned)
+  results_inc <- rbind(results_inc, 
+                   data.frame(var = v_inc, 
+                              adjR2 = summary(fm_inc)$adj.r.squared, 
+                              AIC = AIC(fm_inc)))
+}
+
+results_inc <- results_inc[order(-results_inc$adjR2), ]
+print(results_inc)
+
+#NEXT -- testing when adding controls in to minc sequentially
+
+#first make no control model version
+minc_base <- lm(d_incppl_pris_abc ~ incarc, data = raw_data_cleaned)
+
+minc_incr2 <- for(v_inc in controls_inc[-1])
+{
+  f_inc <- as.formula(paste("d_incppl_pris_abc ~ incarc +", v_inc))
+  fm_inc <- lm(f_inc, data = raw_data_cleaned)
+  cat(v_inc, "adjR2 =", summary(fm_inc)$adj.r.squared-summary(minc_base)$adj.r.squared, "\n")
+}
+
+#semi-partial R2 for each model predictor (how much unique variance each predictor explains in the full model, controlling for all other variables)
+
+sp_r2 <- rsq.partial(minc, type = "sp")
+sp_r2
+
+#in table
+sp_table_inc <- data.frame(
+  variable = sp_r2$variable,
+  semi_partial_R2 = sp_r2$partial.rsq
+)
+
+# largest to smallest
+sp_table_inc <- sp_table %>%
+  arrange(desc(semi_partial_R2))
+
+# round for display
+sp_table_inc$semi_partial_R2 <- round(sp_table_inc$semi_partial_R2, 4)
+
+print(sp_table)
+
+```
+
+Interpretation (Control Variable Check)
+
+Find from adjusted R2 (explaining spread) that:
+
+- desor_core explains 30% of the variation in deservingness scores.
+
+- ideology measures explain 7-8%
+
+- FIRE variables explain 3-6%
+
+- PID 3-4%
+
+- incarceration explains very little – 0.008%
+
+AIC - mirrors fit mostly, suggests to check counts for vars
+
+```{r}
+for (v in controls_inc) {
+  f <- as.formula(paste("d_incppl_pris_abc ~", v))
+  fm <- lm(f, data = raw_data_cleaned)
+  cat(v, "N =", nobs(fm), "\n")
+}
+```
+
+### 3.2 Victimized
+
+```{r, mv}
+
+#10-31 AGAIN checking that I know what I'm talking about re: counts -- YES VICT, 277
+
+mv <- lm(d_incppl_pris_abc ~ vict +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+summary(mv)
+```
+
+#### 3.2a Robust SEs
+
+```{r}
+coef_table_vict <- coeftest(mv, vcov = vcovHC(mv, type = "HC1"))%>% broom::tidy()
+```
+
+#### 3.2b Standardized Betas
+
+```{r}
+
+mvs <- lm(d_incppl_pris_abc ~ vict + Republican + Democrat + fiscal_ideology +
+         social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
+         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         data = raw_data_cleaned)
+
+# 1. Standardized coefficients
+library(broom)
+y_sd_v <- sd(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
+
+# compute sd for each predictor (binary and continuous)
+sds_v <- sapply(model.frame(mvs)[-1], function(x) sd(x, na.rm=TRUE))  # excludes response
+coefs_v <- coef(mvs)
+
+# standardized coef = b * sd(x) / sd(y).  For factor dummies sd(x) is the std dev of 0/1 vector.
+std_coefs_v <- coefs_v * c(NA, sds_v / y_sd_v)   
+
+# better to use broom::tidy:
+tidy(mvs) |> 
+  mutate(std_est_v = estimate * c(NA, sds_v / y_sd_v)) 
+
+table_std_vict   <- tidy(mvs)    |> mutate(std_est_v = estimate * c(NA, sds_v / y_sd_v))
+```
+
+#### 3.2c Control Variable Check
+
+Univariate explanatory power / how much does each control explain on its own?
+
+```{r}
+
+controls_vict <- c("vict", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+
+results_vict <- data.frame()
+
+for (v_vict in controls_vict) {
+  f_vict <- as.formula(paste("d_incppl_pris_abc ~", v_vict))
+  fm_vict <- lm(f_vict, data = raw_data_cleaned)
+  results_vict <- rbind(results_vict, 
+                   data.frame(var = v_vict, 
+                              adjR2 = summary(fm_vict)$adj.r.squared, 
+                              AIC = AIC(fm_vict)))
+}
+
+results_vict <- results_vict[order(-results_vict$adjR2), ]
+
+print(results_vict)
+
+#NEXT -- testing when adding controls in to m1 sequentially--needs fix
+#first make base
+mv_base <- lm(d_incppl_pris_abc ~ vict, data=raw_data_cleaned)
+
+mvict_incr2 <-for(v_v in controls_vict[-1])
+{
+  f_v <- as.formula(paste("d_incppl_pris_abc ~ vict +", v_v))
+  fm_v <- lm(f_v, data = raw_data_cleaned)
+  cat(v_v, "adjR2 =", summary(fm_v)$adj.r.squared-summary(mv_base)$adj.r.squared, "\n")
+}
+
+
+#semi-partial R2 for each model predictor (how much unique variance each predictor explains in the full model, controlling for all other variables)
+
+sp_r2_v <- rsq.partial(mv, type = "sp")
+sp_r2_v
+
+#in table
+sp_table_v <- data.frame(
+  variable_v = sp_r2_v$variable,
+  semi_partial_R2_v = sp_r2_v$partial.rsq
+)
+
+# largest to smallest
+sp_table_v <- sp_table_v %>%
+  arrange(desc(semi_partial_R2_v))
+
+# round for display
+sp_table_v$semi_partial_R2_v <- round(sp_table_v$semi_partial_R2_v, 4)
+
+print(sp_table_v)
+
+
+```
+
+### 3.3 Proximate
+
+```{r}
+
+mki <- lm(d_incppl_pris_abc ~ knowincarc +
+    Republican + Democrat +
+    fiscal_ideology + social_ideology +
+    penalpoint + desor_core +
+    fire_rare + fire_privilege + fire_angry + fire_fear +
+    gender + Black + Hispanic + OtherRace,
+  data = raw_data_cleaned
+)
+summary(mki)
+```
+
+#### 3.3a Robust SEs
+
+```{r}
+coef_table_prox <- coeftest(mki, vcov = vcovHC(mki, type = "HC1"))%>% broom::tidy()
+```
+
+#### 3.3b Standardized Betas
+
+```{r}
+mkis <- lm(d_incppl_pris_abc ~ knowincarc + Republican + Democrat + fiscal_ideology +
+         social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
+         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         data = raw_data_cleaned)
+
+# 1. Standardized coefficients
+library(broom)
+y_sd_prox <- sd(raw_data_cleaned$d_incppl_pris_abc, na.rm = TRUE)
+
+# compute sd for each predictor (binary and continuous)
+sds_prox <- sapply(model.frame(mkis)[-1], function(x) sd(x, na.rm=TRUE))  # excludes response
+coefs_prox <- coef(mkis)
+# standardized coef = b * sd(x) / sd(y).  For factor dummies sd(x) is the std dev of 0/1 vector.
+std_coefs_prox <- coefs_prox * c(NA, sds_prox / y_sd_prox)   # note: first coef is intercept so alignment matters
+# better to use broom::tidy:
+tidy(mkis) |> 
+  mutate(std_est_prox = estimate * c(NA, sds_prox / y_sd_prox))
+
+table_std_prox   <- tidy(mkis)   |> mutate(std_est_prox = estimate * c(NA, sds_prox / y_sd_prox))
+```
+
+#### 3.3c Control Variable Check
+
+Univariate explanatory power / how much does each control explain on its own?
+
+```{r}
+
+controls_prox <- c("knowincarc","Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+
+results_prox <- data.frame()
+
+for (v_prox in controls_prox) {
+  f_prox <- as.formula(paste("d_incppl_pris_abc ~", v_prox))
+  fm_prox <- lm(f_prox, data = raw_data_cleaned)
+  results_prox <- rbind(results_prox, 
+                   data.frame(var = v_prox, 
+                              adjR2 = summary(fm_prox)$adj.r.squared, 
+                              AIC = AIC(fm_prox)))
+}
+
+results_prox <- results_prox[order(-results_prox$adjR2), ]
+
+print(results_prox)
+
+#NEXT -- testing when adding controls in to m1 sequentially--needs fix
+#first make base
+mki_base <- lm(d_incppl_pris_abc ~ knowincarc, data=raw_data_cleaned)
+
+mprox_incr2<-for(v_prox in controls_prox[-1])
+{
+  f_prox <- as.formula(paste("d_incppl_pris_abc ~ knowincarc +", v_prox))
+  fm_prox <- lm(f_prox, data = raw_data_cleaned)
+  cat(v_prox, "adjR2 =", summary(fm_prox)$adj.r.squared-summary(mki_base)$adj.r.squared, "\n")
+}
+
+
+#semi-partial R2 for each model predictor (how much unique variance each predictor explains in the full model, controlling for all other variables)
+
+sp_r2_prox <- rsq.partial(mki, type = "sp")
+sp_r2_prox
+
+#in table
+sp_table_prox <- data.frame(
+  variable_prox = sp_r2_prox$variable,
+  semi_partial_R2_prox = sp_r2_prox$partial.rsq
+)
+
+# largest to smallest
+sp_table_prox <- sp_table_prox %>%
+  arrange(desc(semi_partial_R2_prox))
+
+# round for display
+sp_table_prox$semi_partial_R2_prox <- round(sp_table_prox$semi_partial_R2_prox, 4)
+
+print(sp_table_prox)
+
+
+```
+
+### M2 Tables: Impact
+
+```{r}
+
+key_vars <- c("d_incppl_pris_abc","incarc","knowincarc","vict","desor_core",
+              "fiscal_ideology","social_ideology","penalpoint",
+              "Republican","Democrat","fire_rare","fire_privilege",
+              "fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+
+summary_table <- raw_data_cleaned %>%
+  dplyr::select(all_of(key_vars)) %>%
+  skimr::skim()
+
+
+#count N in each
+# M2 - Incarcerated variable Ns
+ncheck_inc <- sapply(controls_inc, function(v) 
+  nobs(lm(as.formula(paste("d_incppl_pris_abc ~", v)), data = raw_data_cleaned))
+) |> 
+  tibble::enframe(name = "variable", value = "N")
+
+# M2 - Victimized variable Ns
+ncheck_vict <- sapply(controls_vict, function(v)
+  nobs(lm(as.formula(paste("d_incppl_pris_abc ~", v)), data = raw_data_cleaned))
+) |>
+  tibble::enframe(name = "variable", value = "N")
+
+# M2 - Proximate variable Ns
+ncheck_prox <- sapply(controls_prox, function(v)
+  nobs(lm(as.formula(paste("d_incppl_pris_abc ~", v)), data = raw_data_cleaned))
+) |>
+  tibble::enframe(name = "variable", value = "N")
+
+
+
+
+#model comparison
+contact_model_summary <- bind_rows(
+  table_std_incarc %>% dplyr::select(term, std_est) %>% mutate(model = "Incarcerated"),
+  table_std_vict   %>% dplyr::select(term, std_est_v) %>% mutate(model = "Victimized"),
+  table_std_prox   %>% dplyr::select(term, std_est_prox) %>% mutate(model = "Proximate")
+)
+
+
+save(
+  #summary
+  summary_table, dv_density_data, contact_crosstab, incarc_ppl_hist,
+  desor_core_hist,
+  #model coefs
+     coef_table_incarc, coef_table_vict, coef_table_prox,
+  #semi-partial r2
+     sp_table_inc, sp_table_v, sp_table_prox,
+  #standardized betas
+     table_std_incarc, table_std_vict, table_std_prox, 
+  #univar and incremental fit diagnostics
+  results_inc,results_vict,results_prox,
+  minc_incr2,mvict_incr2, mprox_incr2,
+  #N for each
+  ncheck_inc, ncheck_vict, ncheck_prox,
+  #model comparison table
+  contact_model_summary, 
+     file = "data/analysis_objects.RData")
+
+summary_table
+dv_density_data
+contact_crosstab
+incarc_ppl_hist
+desor_core_hist
+  #model coefs
+  coef_table_incarc
+coef_table_vict
+coef_table_prox
+  sp_table_inc
+  sp_table_v
+  sp_table_prox
+  #standardized betas
+    table_std_incarc
+    table_std_vict
+    table_std_prox
+  #univar and incremental fit diagnostics
+  results_inc
+  results_vict
+  results_prox
+  minc_incr2
+  mvict_incr2
+  mprox_incr2
+  #N for each
+  ncheck_inc
+  ncheck_vict
+  ncheck_prox
+  #model comparison table
+  contact_model_summary
+
+```
+
+## 4. M3 & M4 - Deservingness on Carceral Policy
+
+My second core hypothesis (**H2)**:
+
+more generous perceptions of carceral citizens' deservingness will predict greater and more consistent support for assistance-oriented criminal legal policies and reduced support for punitive criminal legal policies.
+
+To test this, I estimate outcome models for two constructed policy indices: prisonhelp and prisonpen. In each model, I include carceral contact (impact) and deservingness (prisonerdeserves) as key independent variables, along with the same controls used in M1.
+
+In each model, $delta_1$ captures the association between carceral contact and policy preferences, controlling for deservingness and covariates. $delta_2$ estimates the relationship between deservingness and policy support, which directly tests H2. A positive and statistically significant $delta_2$ in the help model—and a negative $delta_2$ in the punitive model—would support the hypothesis that warmer evaluations of incarcerated people correspond to greater support for decarceral policies.
+
+### M3 Deservingness on Help Policy
+
+$$\texttt{prisonhelp}_{i} = \delta_0 + \delta_1 \cdot \texttt{impact}_{i} + \delta_2 \cdot \texttt{prisonerdeserves}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}$$
+
+ie: the more someone views incarcerated people as deserving:
+
+- the more they will support assistance-orientated CJ policy
+
+- the more they will oppose punitive policy
+
+Variables needed:
+
+- Mediator: deservingness scores: d_incppl_pris_abc
+
+- any CJ contact vs no CJ contact
+
+  - impact
+
+- types of contact vs no contact
+
+  - knowincarc
+
+  - vict
+
+  - incarc
+
+- outcome indices:
+
+  - prisonhelp
+
+    - continuous 1-4 index with 2.5 as neutral midpoint. 4 = STRONGLY SUPPORT help oriented prison policy
+
+  - prisonpen: continuous 1-4 index with 2.5 as neutral midpoint. 4 = STRONGLY OPPOSE punitive prison policy (lwop and death penalty)
+
+- controls vector
+
+```{r, controls vector}
+var(raw_data_cleaned$prisonhelp, na.rm=TRUE)
+
+names(raw_data_cleaned)
+
+m3_0 <- lm(prisonhelp ~ Republican + Democrat , data = raw_data_cleaned)
+
+summary(m3_0)
+
+```
+
+**Outcome variable: prisonhelp**
+
+Average respondent support for policy items (1-5, 5 is strongly support):
+
+- requiring prison laborers to be paid minimum wage
+
+- eliminating prison phone call costs
+
+- increasing funding for GED/college in prisons
+
+- alternative-to-prison sentencing for convicted parents
+
+- restoring voting rights post-sentence (OG 1-3)
+
+- for bureaucratic requirements enabling voting access while incarcerated (OG 1-3)
+
+Basic Stats:
+
+- variance = 0.488
+
+### 4.\_ Preliminary **Variable check**
+
+First, checking how respondents who identify as Republican vs Democrat differ on average support for help policies (Republican and Democrat are both dummy variables, with Independent/Other as the reference group). Confirmed that Democrats are more supportive of help policies than Republicans on average.
+
+```{r}
+prisonhelp_by_party <- lm(prisonhelp ~ Republican + Democrat, data = raw_data_cleaned)
+prisonpen_by_party <- lm(prisonpen ~ Republican + Democrat, data = raw_data_cleaned)
+
+summary(prisonhelp_by_party)
+summary(prisonpen_by_party)
+```
+
+Second, looking at (a) beliefs in purpose of prison (penalpoint, 1 means you think prison is for rehabilitation 7 for punishment), (b) FIRE variables.
+
+```{r}
+prisonhelp_by_penalpoint <- lm(prisonhelp ~ penalpoint, data = raw_data_cleaned)
+prisonpen_by_penalpoitn <- lm(prisonpen ~ penalpoint, data = raw_data_cleaned)
+
+prison_help_by_fire_rare <- lm(prisonhelp ~ fire_rare, data = raw_data_cleaned)
+prison_pen_by_fire_rare <- lm(prisonpen ~ fire_rare, data = raw_data_cleaned)
+
+prison_help_by_fire_privilege <- lm(prisonhelp ~ fire_privilege, data = raw_data_cleaned)
+prison_pen_by_fire_privilege <- lm(prisonpen ~ fire_privilege, data = raw_data_cleaned)
+
+prison_help_by_fire_angry <- lm(prisonhelp ~ fire_angry, data = raw_data_cleaned)
+prison_pen_by_fire_angry <- lm(prisonpen ~ fire_angry, data = raw_data_cleaned)
+
+prison_help_by_fire_fear <- lm(prisonhelp ~fire_fear, data = raw_data_cleaned)
+prison_pen_by_fire_fear <- lm(prisonpen ~fire_fear, data = raw_data_cleaned)
+
+prison_help_by_fire_rare
+prison_pen_by_fire_rare
+
+prison_help_by_fire_privilege
+prison_pen_by_fire_privilege
+
+prison_help_by_fire_angry
+prison_pen_by_fire_angry
+
+prison_help_by_fire_fear
+prison_pen_by_fire_fear
+
+prisonhelp_by_penalpoint
+prisonpen_by_penalpoitn
+```
+
+Penalpoint – unit increase (see prison as more for punishment) leads to 0.06 decrease in opposition to punitive policy; unit increase (sees prison as more for punishment) leads to unit decrease in support for help policy.
+
+FIRE_Rare – unit increase in disagreement that racial problems are rare (ie, agreement that they are not rare) has 0.25 increase in opposition to punitive policy; a unit increase...ie agreement that racial problems are not rare corresponds to 0.132 increase in support for help policy.
+
+FIRE Privilege - disagreement with white privilege decreases support for prison help policies; decreases opposition to punitive policies.
+
+FIRE Angry - disagreement with anger that racism exists decreases support for prison help policy; decreases opposition to punitive policies.
+
+FIRE Fear – disagreement with being afraid of other raises increases support for prison help policy; slightly increases opposition to punitive prison policies.
+
+### 4.\_ Preliminary M3 & M4 Models without Controls
+
+```{r}
+
+
+#Help
+
+
+mh1_no_cont <- lm(min_wage ~ impact, data = raw_data_cleaned)
+mh2_no_cont <- lm(free_calls ~ impact, data = raw_data_cleaned)
+mh3_no_cont <- lm(ed_funds ~ impact, data = raw_data_cleaned)
+mh4_no_cont <- lm(alt_sentencing ~ impact, data = raw_data_cleaned)
+mh5_no_cont <- lm(q23_2_rev ~ impact, data = raw_data_cleaned)
+mh6_no_cont <- lm(q23_7_rev ~ impact, data = raw_data_cleaned)
+
+
+
+
+mpen1_no_control <- lm(prisonpen_1 ~ impact, data = raw_data_cleaned)
+
+mpen2_no_control <- lm(prisonpen_5 ~ impact, data = raw_data_cleaned)
+
+summary(mh1_no_cont)
+summary(mh2_no_cont)
+summary(mh3_no_cont)
+summary(mh4_no_cont)
+summary(mh5_no_cont)
+summary(mh6_no_cont)
+
+```
+
+### 4.\_ Preliminary M3 & M4 Models with Controls
+
+```{r}
+#character vector of controls vector for m3 m4
+ m3m4controls <- c("d_incppl_pris_abc",
+  "impact","Republican", "Democrat", "fiscal_ideology", "social_ideology",
+  "penalpoint", "desor_core", "fire_rare", "fire_privilege", "fire_angry",
+  "fire_fear", "gender", "Black", "Hispanic", "OtherRace"
+)
+
+#M3 M4 DVs
+m3dv <- "prisonhelp"
+
+m4dv <- "prisonpen"
+
+#Formulas where paste constructs a formula string of controls and turns it into an actual formula object
+m3_controls_formula <- as.formula(
+  paste(m3dv, "~", paste(m3m4controls, collapse = " + "))
+)
+
+m4_controls_formula <- as.formula(
+  paste(m4dv, "~", paste(m3m4controls, collapse = " + "))
+)
+
+#M3 M4 OLS Models
+m3_basic <- lm(m3_controls_formula, data = raw_data_cleaned)
+m4_basic <- lm(m4_controls_formula, data = raw_data_cleaned)
+```
+
+### 4.\_ Interpretation (Preliminary M3 & M4 Models with Controls)
+
+#### M3 Basic Model Interpretation
+
+```{r}
+summary(m3_basic)
+```
+
+The intercept indicates that, holding all controls at 0, the average support for help policies is 2.8 (on a 1-5 scale). This is not super substantive because many predictors are scaled starting at 1.
+
+Coefficients:
+
+- having one unit warmer deservingness perceptions of incarcerated people increases support for help policies by 0.004 points, holding all else constant. So a 10-point increase in deservingness corresponds to a 0.04 point increase in help policy support. This is statistically significant (p\<0.001) but substantively small.
+
+- being impacted in some way increases support for help policies by 0.16 points, holding all else constant. This effect is significant.
+
+- seems funny: being republican instead of independent increases support for help policies. and being a democrat instead of independent decreases support (by 0.12 points for democrats and 0.0005 points for republicans). These effects are not significant.
+
+- fiscal ideology is insignificant.
+
+- social ideology: a unit increase in social policy support decreases support for prison help policies, and the effect is significant.
+
+- penalpoint: each one unit increase (1-7 scale, sees the purpose of prison more about punishment) decreases support for prison help policies decreases support for help policies by 0.05 points, holding all else constant. This is significant (p\<0.001)
+
+- on desor_core: each one unit increase (0-100 scale, more general orientation to see help-needing groups as deserving) decreases support for help policies by 0.003 points, holding all else constant. This is significant.
+
+- All of the FIRE (1-4) questions are statistically significant:
+
+  - a unit increase in *disagreement* that racial problems are rare corresponds with a 0.04 increase in support for help-oriented policy
+
+  - a unit increase in *disagreement* that white people have advantages because of their race corresponds with a 0.07 unit decrease in support for help policy.
+
+  - a unit increase in disagreement that 'I am angry that racism exists' corresponds with a 0.069 decrese in support for help policy
+
+  - a unit increase in disagreement with "I am fearful of people of other races" (ie, respondent is not fearful of other racs) corresponds with an increase in support for prison help policies by 0.075.
+
+Fit Statistics -- the model explains about 37% of variance in help policy support (R2 is 0.3737, adjusted R2 is 0.3373) after adjusting for the number of predictors.
+
+The F-stat and p-val confirm that, collectively, the predictors explain more variance than an intercept only model.
+
+```{r}
+summary(m4_basic)
+```
+
+### 4.\_\_ Diagnostic checks
+
+Variance Inflation/multico. with vif --rule: 1 = no colinearity, less than 5 is sometimes concerning, sometimes stricter threshold is 2.5 - for m3_basic
+
+-for m4_basic Neither model shows concerning multicollinearity according to VIFs. However, fiscal and social ideology are almost 5 for both models.
+
+```{r}
+
+vif(m3_basic)
+
+vif(m4_basic)
+
+```
+
+Influence / leverage check
+
+```{r}
+plot(m3_basic, which=4) # cook's distance
+plot(m4_basic, which=4) # cook's distance
+```
+
+Pairwise correlations and partial check (suppression?)
+
+```{r}
+# Focus on the key attitudinal predictors
+vars_to_check <- c("desor_core", "d_incppl_pris_abc", "penalpoint", "social_ideology", "fiscal_ideology")
+
+# Pairwise correlations
+cor_mat <- raw_data_cleaned %>%
+  dplyr::select(all_of(vars_to_check)) %>%
+  cor(use = "pairwise.complete.obs")
+
+print(round(cor_mat, 3))
+
+car::avPlots(m3_basic, terms = ~ desor_core + d_incppl_pris_abc + penalpoint + social_ideology)
+
+car::avPlots(m4_basic, terms = ~ desor_core + d_incppl_pris_abc + penalpoint + social_ideology)
+
+
+```
+
+Pairwise interpretation:
+
+| Relationship | Interpretation |   |
+|------------------------|------------------------|------------------------|
+| desor_core & inc ppl | strong shared variance, likely suppression |  |
+| desorcore & ideo -0.37 | expected liberal/conservative |  |
+| desorcore & penalpoint: -0.19 | mild relationship |  |
+| fiscal & social ideology | redundant, reason to combine or drop fiscal? |  |
+
+**Takeaway on desorcore negative coefficient:** once I partial out the incarcerated-specific deservingness, `desor_core`’s remaining variance is probably identifying respondents who are generally generous but not especially supportive of carceral “help” (e.g., people who prioritize social welfare but are skeptical when it comes to prison).
+
+Confirmed above with regressing on residual gets 0.07, a small positive correlation (r\~0..07) between the residualized desor_core (removed its overlap with incarcerated ppl deservingness) and prisonhelp. Suggests there is probably a stronger correlation in the bivariate relationship that collapses after residualizing which suggests all (or nearly) the positive relationship between this orientation towards help-needing groups and help-oriented prison policy is shared with deservingness of incarcerated people.
+
+```{r}
+
+# Get residuals within a complete-data framedesor_core on the highly correlated predictor (d_incppl_pris_abc)
+tmp <- raw_data_cleaned %>%
+  dplyr::select(prisonhelp, desor_core, d_incppl_pris_abc) %>%
+  dplyr::filter(complete.cases(.))
+
+desor_resid <- lm(desor_core ~ d_incppl_pris_abc, data = tmp)$residuals
+
+
+# 2. Correlate those residuals with the outcome (prisonhelp)
+cor(tmp$prisonhelp, desor_resid)
+
+
+```
+
+Partial/semi partial R2
+
+```{r}
+rsq::rsq.partial(m3_basic, type = "sp")
+rsq::rsq.partial(m4_basic, type = "sp")
+```
+
+Adjusted R2
+
+```{r}
+
+base_m3 <- lm(prisonhelp ~ d_incppl_pris_abc + impact, data = raw_data_cleaned)
+full <- update(base_m3, . ~ . + desor_core)
+summary(full)$adj.r.squared - summary(base_m3)$adj.r.squared
+
+base_m4 <- lm(prisonpen ~ d_incppl_pris_abc + impact, data = raw_data_cleaned)
+full_m4 <- update(base_m4, . ~ . + desor_core)
+summary(full_m4)$adj.r.squared - summary(base_m4)$adj.r.squared
+```
+
+**First Without Controls -- Help**
+
+```{r, m3_0}
+
+
+m3_0 <- lm(prisonhelp ~ impact)
+
+hist(raw_data_cleaned$prisonhelp)
+
+hist(raw_data_cleaned$prisonpen)
+
+```
+
+```{r, m3}
+
+m3 <- lm(prisonhelp ~ impact + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+
+    data = raw_data_cleaned
+)
+
+summary(m3)
+
+```
+
+### M4 Deservingness on Punitive Policy
+
+**First Without Controls -- Punitive Policy** First, check how respondents who identify as Republican vs Democrat differ on average support for punitive policies (Republican and Democrat are both dummy variables, with Independent/Other as the reference group).
+
+```{r}
+prisonpen_by_party <- lm(prisonhelp ~ Republican + Democrat, data = raw_data_cleaned)
+summary(prisonpen_by_party)
+```
+
+$$\texttt{prisonpen}_{i} = \delta_0 + \delta_1 \cdot \texttt{impact}_{i} + \delta_2 \cdot \texttt{prisonerdeserves}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}$$
+
+In each model, $delta_1$ captures the association between carceral contact and policy preferences, controlling for deservingness and covariates. $delta_2$ estimates the relationship between deservingness and policy support, which directly tests H2. A positive and statistically significant $delta_2$ in the help model—and a negative $delta_2$ in the punitive model—would support the hypothesis that warmer evaluations of incarcerated people correspond to greater support for decarceral policies.
+
+```{r, m4}
+
+m4 <- lm(prisonpen ~ impact + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology + penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+
+    data = raw_data_cleaned
+)
+
+
+summary(m4)
+
+
+
+```
+
+Coefficients:
+
+- having one unit warmer deservingness perceptions of incarcerated people increases opposition to punitive prison policy, holding all else constant, by 0.005 points. Alternatively: a 10-point increase in deservingness corresponds to a 0.05 decrease in support. This is statistically significant (p\<0.001) but substantively small.
+
+- being impacted in some way *increases* *opposition to punitive policy* by 0.08 points, holding all else constant. This effect is significant at that level (0.029)
+
+- being republican instead of independent decreases opposition to punitive policy by 0.05. Being a democrat instead of independent decreases opposition by 0.04 points for democrats. These effects are not significant.
+
+- fiscal ideology - a unit increase in fiscal liberalness decreases opposition – increases support for – punitive prison policy by 0.06 and the effect is significant.
+
+- social ideology: a unit increase in social policy liberalness decreases opposition – increases support for - punitive prison policy, and the effect is significant.
+
+- penalpoint: each one unit increase (1-7 scale, sees the purpose of prison more about punishment) decreases opposition to (increases support for) punitive prison policies holding all else constant. This is significant (p\<0.001). This makes sense: If you think prison is for punishment, you're okay with the death penalty etc.
+
+- on desor_core: each one unit increase (0-100 scale, more general orientation to see help-needing groups as deserving) decreases opposition to punitive prison policy by 0.001 but this isn't significant.
+
+- 3 of the FIRE (1-4) questions are statistically significant:
+
+  - not significant: a unit increase in *disagreement* that racial problems are rare corresponds with a 0.001 decrease in opposition to punitive policy. Ie: the more you agree that racial problems are rare, the more you support punitive policy. But this is not significant.
+
+  - a unit increase in *disagreement* that white people have advantages because of their race (deny white privilege) corresponds with a 0.05 unit *decrease* in opposition to punitive policy – those who agree that white privilege exists are more opposed to punitive policy (p = 0.007)
+
+  - a unit increase in disagreement that 'I am angry that racism exists' corresponds with a 0.05 increase in *opposition* to punitive policy.
+
+    - try this another way: if someone moves towards not being angry that racism exists, their opposition to punitive policy increases. if someone moves towards being angry that racism exist, their opposition to punitive policy goes down. this is surprising.
+
+  - a unit increase in disagreement with "I am fearful of people of other races" (ie, respondent is not fearful of other races) corresponds with 0.05 more support for punitive policy (significant).
+
+Fit Statistics -- the model explains about 16% of variance in help policy support (R2 is 0.1678 adjusted R2 is 0.1593) after adjusting for the number of predictors.
+
+The F-stat is highly significant.
+
+```{r}
+cor(raw_data_cleaned$fire_angry, raw_data_cleaned$prisonpen, use="pairwise.complete.obs")
+
+```
+
+### 4\_ by Incarc
+
+```{r}
+m3_inc <- lm(prisonhelp ~ incarc + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+
+    data = raw_data_cleaned
+)
+
+m4_inc <- lm(prisonpen ~ incarc + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,data = raw_data_cleaned)
+
+summary(m3_inc)
+summary(m4_inc)
+```
+
+### 4\_ by Vict
+
+```{r}
+m3_vict <- lm(prisonhelp ~ vict + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,data = raw_data_cleaned
+)
+
+m4_vict <- lm(prisonpen ~ vict + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,data = raw_data_cleaned
+)
+
+summary(m3_vict)
+summary(m4_vict)
+```
+
+### 4\_ by Knowincarc
+
+```{r}
+
+m3_prox <- lm(prisonhelp ~ knowincarc + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+    data = raw_data_cleaned
+)
+
+m4_prox <- lm(prisonpen ~ knowincarc + d_incppl_pris_abc +
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+    data = raw_data_cleaned
+)
+
+summary(m3_prox)
+summary(m4_prox)
+
+```
+
+## 5 M5 & M6
+
+To formally test whether perceptions of deservingness mediate the effect of carceral contact on policy preferences, I first estimate a set of interaction models to examine whether the relationship between deservingness and policy views differs depending on whether respondents have been directly or proximally impacted by the criminal legal system. This approach allows me to test whether contact moderates how deservingness evaluations translate into policy preferences—i.e., whether deservingness matters more (or less) for those with lived experience.
+
+### M5: Interaction for Support of Carceral Policy Help
+
+$$\texttt{prisonhelp}_{i} = \theta_0 + \theta_1 \cdot \texttt{Deservingness}_{i} + \theta_2 \cdot \texttt{Contact}_{i} + \theta_3 (\texttt{Deservingness}_{i} \times \texttt{Contact}_{i}) + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}$$
+
+A significant interaction term (\$\\theta_3\$) would indicate that the effect of deservingness on policy support varies depending on whether the respondent has had contact with the criminal legal system. These models help determine whether deservingness operates similarly across groups—or if lived experience conditions how moral evaluations shape policy preferences.
+
+```{r, m5}
+
+m5a<- lm(prisonhelp ~ d_incppl_pris_abc * impact,
+            data = raw_data_cleaned)
+summary(m5a)
+
+m5b <- lm(prisonhelp ~ d_incppl_pris_abc * impact,
+            data = raw_data_cleaned)
+
+m5 <- lm(prisonhelp ~ d_incppl_pris_abc * impact + Republican + Democrat + fiscal_ideology + social_ideology + penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace, 
+            data = raw_data_cleaned)
+
+summary(m5)
+
+```
+
+#### M5 Interpretation
+
+The intercept is still n
+
+The coefficient on the interaction term is -0.001
+
+### M5_C : Interaction for Support of Carceral Policy Help with Mean-Centered Deservingness
+
+Centering by subtracting deservingness's mean from each observation so the new mean is 0. This should simplify interpretation of coefficients in the interaction model: the main-effect coefficient for deservingness will represent the effect of deservingness for the average respondent who is not impacted rather than at a value of 0 in the original 0-100 scale.
+
+```{r}
+
+x_data <- raw_data_cleaned |>
+  mutate(
+    d_inc_c = d_incppl_pris_abc - mean(d_incppl_pris_abc, na.rm = TRUE),
+    impact = as.integer(impact == 1)
+  )
+
+```
+
+Rerunning M5 with Mean-Centered Deservingness
+
+```{r}
+
+m5_c<-lm(prisonhelp ~ d_inc_c*impact + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+summary(m5_c)
+
+```
+
+### M5_c Interpretation
+
+- *Main effect of deservingness: 0.005 (p\<0.001*) – For non-impacted respondents, each 1 point increase in deservingness on a 0-100 scale is associated with 0.005 more support for prison help policies, on a 1-5 scale. To put in a larger scale, this also means a 10 point increase in incarcerated people deservingness scores predicts 0.04 more support. However, because deservingness scores for incarcerated people are fairly clustered around the mean, this does not mean a ton. However, it is highly significant (p \<0.001).
+
+- *Main effect of impact (contact)* – Impacted respondents are 0.169 points more supportive of help oriented policy differ significantly in their baseline view of help policy from non-impacted people when deservingness scores for incarcerated people are held at their mean. This effect is significant (p \<0.001)
+
+- Main effect of the interaction – the slope of deservingness scores does not differ significantly between impacted and non impacted groups. Deservingness scores predicts help policy support about the same as they do for impacted and non-impacted respondents.
+
+- On controls:
+
+  - Penal point: a one unit change means a respondent sees the purpose of prison as more about punishment (7) than rehabilitation (1). A one unit change corresponds with a -0.04 decrease in support for helping policies, and it is significant.
+
+  - Ideology: the more conservative, the less supportive of help policy (significant).
+
+  - Desor_core: respondents who tend to view help needing groups as more deserving are somewhat more supportive of prison help policy. This is significant.
+
+The model explains 36-37% of the variance.
+
+Takaway: Deservingness has a positive effect on help-oriented carceral policies, and contact directly increases help-policy support.
+
+### Post-Estimation Validation
+
+```{r}
+
+slopes_m5c <- slopes(m5_c, variables = "d_inc_c", by = "impact")
+slopes_m5c
+
+#predict values
+pred_m5c <- predictions(m5_c, 
+                        newdata = datagrid(d_inc_c = seq(min(x_data$d_inc_c, na.rm = TRUE),
+                                                          max(x_data$d_inc_c, na.rm = TRUE),length = 100),
+                          impact = c(0,1)
+                        ))
+
+print(pred_m5c)
+
+# Semi-partial R² for each predictor
+spr_m5<-rsq.partial(m5_c, adj = FALSE)   # help-policy model
+
+```
+
+Nov 2: these are now old but not hugely changed (signifcance is the big difference post re-run)
+
+*Simple Slopes* – confirms that for both contact groups deservingness has a positive and significant relationship with help policy support. Among non-impacted respondents, each one point increase in deservingness predicts 0.00537. 0.004 (less predictive) for non impacted. Nearly identical and significant slopes confimrs the previous conclusion.
+
+*Predicted Values* – The predicted mean support is 3.1 on a 1-5 scale regardless of contact type. Across the full range of deservingness scores, predicted lines for impacted and non impacted respondents are basically parallel. Basically confirms no interaction.
+
+Both impacted and non-impacted respondents show a statistically identical positive relationship between perceived deservingness of incarcerated people and support for assistance-oriented policies. Each 10-point increase in deservingness corresponds to roughly a 0.04-point rise in policy support (on a 1–5 scale). Contact with the criminal legal system does not alter this association
+
+*SPR2* - deservingness scores account uniquely for 3.6% of prisonhelp; contact adds 2.3% of unique variance,
+
+### Model 6: Interaction for Support of Carceral Policy Punishment
+
+$$\texttt{prisonpen}_{i} = \theta_0 + \theta_1 \cdot \texttt{Deservingness}_{i} + \theta_2 \cdot \texttt{Contact}_{i} + \theta_3 (\texttt{Deservingness}_{i} \times \texttt{Contact}_{i}) + X^{\prime}_{i} \cdot \texttt{controlsvector} + \epsilon_{i}$$
+
+A significant interaction term (\$\\theta_3\$) would indicate that the effect of deservingness on policy support varies depending on whether the respondent has had contact with the criminal legal system. These models help determine whether deservingness operates similarly across groups—or if lived experience conditions how moral evaluations shape policy preferences.
+
+```{r, m6}
+
+m6a<- lm(prisonpen ~ d_incppl_pris_abc * impact,
+            data = raw_data_cleaned)
+
+summary(m6a)
+
+m6b <- lm(prisonpen ~ d_incppl_pris_abc * impact,
+            data = raw_data_cleaned)
+
+m6 <- lm(prisonpen ~ d_incppl_pris_abc * impact + Republican + Democrat + fiscal_ideology + social_ideology + penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace, 
+            data = raw_data_cleaned)
+
+summary(m6)
+```
+
+### M6_C : Interaction for Support of Carceral Policy Punishment with Mean-Centered Deservingness
+
+Centering by subtracting deservingness's mean from each observation so the new mean is 0. This should simplify interpretation of coefficients in the interaction model: the main-effect coefficient for deservingness will represent the effect of deservingness for the average respondent who is not impacted rather than at a value of 0 in the original 0-100 scale.
+
+Rerunning M5 with Mean-Centered Deservingness
+
+```{r}
+
+m6c <- lm(prisonpen ~ d_inc_c*impact + Republican +
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+    
+summary(m6c)
+
+```
+
+M6c Interpretation
+
+- For non-impacted respondents, each 1 point increase in deservingness on a 0-100 scale is associated with 0.005 more opposition to punitive policies (LWOP and the death penalty), on a 1-5 scale. To put in a larger scale, this also means a 10 point increase in incarcerated people deservingness scores predicts 0.05 more opposition. However, because deservingness scores for incarcerated people are fairly clustered around the mean, this does not mean a ton. However, it is highly significant (p \<0.001). It is also not the relationship expected.
+
+- Impacted respondents are 0.076 points more opposed to punitive policy and this effect is significant (when deservingness scores held at mean).
+
+- The interaction (-0.00017, p = 0.89) says that the slope of deservingness scores does not differ significantly between impacted and non impacted groups. Deservingness scores predicts help policy support about the same as they do for impacted and non-impacted respondents.
+
+- Controls:
+
+  - Penal point: a one unit change means a respondent sees the purpose of prison as more about punishment (7) than rehabilitation (1). A one unit change corresponds with a very small but significant decrease in opposition to punitive policy (-0.046) and this effect is significant.
+
+  - Fire_privilege: a unit increase in disagreement with white privilege corresponds with a 0.055 unit decrease in opposition to punitive policy: respondents who discount white privilege are more supportive of punitive policy. This effect is significant.
+
+  - Fire_angry: a unit increase in disagreement with the statement "I am angry racism exists" (ie, not angry) corresponds with a 0.05 increase in opposition to punitive policy. Surprising but significant.
+
+  - Fire_fear: a unit increase in disagreement with being afraid of other races corresponds to a 0.05 decrease in opposition to punitive policy, and this effect is significant.
+
+Takaway: Deservingness has a positive effect on help-oriented carceral policies, and this effect doesn't vary meaningfully between impacted and non impacted people.
+
+### Post-Estimation Validation
+
+```{r}
+
+slopes_m6c <- slopes(m6c, variables = "d_inc_c", by = "impact")
+slopes_m6c
+
+#predicted
+pred_m6c <- predictions(m6c, 
+                        newdata = datagrid(d_inc_c = seq(min(x_data$d_inc_c, na.rm = TRUE),
+                                                          max(x_data$d_inc_c, na.rm = TRUE),length = 100),
+                          impact = c(0,1)
+                        ))
+pred_m6c
+
+#semi-partial r2 comparisons
+library(rsq)
+
+# Semi-partial R² for each predictor
+spr_m6<- rsq.partial(m6c, adj = FALSE)   # punitive-opposition model
+
+```
+
+*Simple slopes –* both contact groups rise in their opposition to punitive policy as deservingness increases, but impacted groups are 0.07 points higher. The lines seem parallel indicateing similar slopes, no interaction.
+
+*Predicted values* show
+
+SPR2 -
+
+PUTTING SPR2 from both models in table:
+
+```{r}
+
+tibble(variable = spr_m5$variable, partial_r2 = round(spr_m5$partial.rsq, 3))
+tibble(variable = spr_m6$variable, partial_r2 = round(spr_m6$partial.rsq, 3))
+```
+
+## 6 M7 & M8
+
+These models let me test how much of the total effect of carceral contact on policy support is indirect via deservingness perceptions.
+
+I decompose the effect of contact on policy attitudes into:
+
+- direct effect (ADE) = effect on policy holding deservingness constant
+
+- indirect effect (ACME) = effect of contact through deservingness
+
+- total effect (TE) = ADE +ACME
+
+### Variable Prep/Check
+
+- mediator (M) = d_incppl_pris_abc (0-100)
+
+- treatment (T) is "impact" (0,1)
+
+- outcomes (Y): prisonhelp, prisonpen
+
+- controls (X) – vector
+
+For each policy domain, will a mediator model and then an outcome model (have these already m1c and m3 m4).
+
+Checks: don't want impact, d\_, prisonhelp and prisonpen to have missing values on the same rows. Checked and I should have 2011 observations going into
+
+```{r}
+summary(is.na(raw_data_cleaned$impact))
+summary(is.na(raw_data_cleaned$d_incppl_pris_abc))
+summary(is.na(raw_data_cleaned$prisonhelp))
+summary(is.na(raw_data_cleaned$prisonpen))
+
+sum(complete.cases(raw_data_cleaned[, c("impact", "d_incppl_pris_abc", "prisonhelp", "prisonpen","Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")]))
+
+#this suggests I would drop about 30% of sample, down to 1577. Worried about the dropped respondents falling evenly ish on both sides of impact. 
+
+#complete case flag
+raw_data_cleaned$complete_case <-
+  complete.cases(raw_data_cleaned[, c(
+    "impact", "d_incppl_pris_abc", "prisonhelp", "prisonpen",
+    "Republican", "Democrat", "fiscal_ideology", "social_ideology",
+    "penalpoint", "desor_core", "fire_rare", "fire_privilege",
+    "fire_angry", "fire_fear", "gender", "Black", "Hispanic", "OtherRace"
+  )])
+
+table(raw_data_cleaned$impact, raw_data_cleaned$complete_case)
+prop.table(table(raw_data_cleaned$impact, raw_data_cleaned$complete_case), 1)
+#chisq to test whether being a complete case is independent of treatment status, get yes/I can reject the null
+chisq.test(table(raw_data_cleaned$impact, raw_data_cleaned$complete_case))
+
+```
+
+Complete-case analysis yielded 1,577 observations. A chi-square test indicated that missingness was not evenly distributed across impact status (p = .002), suggesting potential non-random attrition. Robustness checks with imputed data are warranted.
+
+### M7
+
+s
+
+##### Model 7: Mediation Outcome Model - Support for Assistance Oriented Policy (Second Stage for Mediation Analysis)
+
+$$y_{i}^{\texttt{prisonhelp}} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{des\_or}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + u_{i}$$
+
+##### Model 8: Mediation Outcome Model - Support for Punishment Oriented Policy (Second Stage for Mediation Analysis)
+
+$$y_{i}^{\texttt{prisonpen}} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{des\_or}_{i} + X^{\prime}_{i} \cdot \texttt{controlsvector} + u_{i}$$
+
+where $y_{i}^{\texttt{prisonhelp}}$ is support for assistance-oriented or and $y_{i}^{\texttt{prisonpen}}$ is support for punitive policies. A statistically significant indirect effect would indicate that deservingness mediates part of the relationship between carceral contact and policy preferences.
+
+```{r}
+
+m7 <- mediate(m1c, m3, treat = "impact", mediator = "d_incppl_pris_abc",
+              boot = TRUE, sims = 5000)
+
+m8 <- mediate(m1c, m4, treat = "impact", mediator = "d_incppl_pris_abc",
+              boot = TRUE, sims = 5000)
+
+summary(m8)
+
+m7_sens <- medsens(m7, rho.by = 0.1)
+m8_sens <- medsens(m8, rho.by = 0.1)
+
+summary(m7_sens)
+summary(m8_sens)
+```
+
+The ACME (Average causal Mediation Effect) is the indirect effect of carceral contact on policy support through deservingness perceptions. For m7, it's 0.022 and is statistically significant and positive. That means respondents who are impacted show about 0.02 more support for help policy items on the 1-4 scale via higher deservingness perceptions. For m8, it's 0.0236 and significant: contact increases opposition to punitive policies via higher deservingness perceptions.
+
+The ADE (Average Direct Effect) is the direct effect of contact on policy support, holding deservingness scores constant. For m7, it's 0.168 and is significant, so means that contact independent raises support for help oriented policies, even controlling for deservingness. For m8, it's 0.76 and is less significant but still statistically significant, suggesting there's a connection between direct contact and opposition to punitive policies beyond deservingness.
+
+The total effect (combined direct and indirect) for m7 is 0.19 and is significant. For m8 it's 0.099 and significant.
+
+The proportion mediation is the share of total effect explained by the mediator. For m7 it's 0.117. Roughly 12% of contact's effect on help-policy support operates through increased deservingness perceptions. For m8 it's 0.238 and significant. that means about 24% of the effect of impact on punitive policy views passes through deservingness. The CI here is a little wide though.
+
+For m7: Contact with the carceral system significantly increases support for help-oriented policies. **About one-eighth of that total effect occurs *because* contact makes people see incarcerated individuals as more deserving, while the remaining \~88% is a direct shift in policy orientation not explained by deservingness.** For m8: Contact predicts less punitive attitudes, and nearly **a quarter of that effect** works indirectly through deservingness. The rest reflects a direct reduction in punitiveness not fully captured by changes in perceived deservingness.
+
+Sensitivity analyses using the `medsens()` procedure indicate that the indirect effects are moderately robust to violations of sequential ignorability. For both help-oriented and punitive-policy outcomes, the estimated ACME would be reduced to zero only if the residual correlation between the mediator and outcome equations exceeded approximately ρ = 0.20, corresponding to an unobserved confounder jointly explaining about 4 % of residual variance in both models. This suggests the mediation findings are reasonably stable to modest unmeasured confounding.
+
+(ie: these results are moderately robust to unmeasured confounding)
+
+## 7 M10 – Variance
+
+Goal: test whether deservingness perceptions also predict consistency of support across policy help items.
+
+Need:
+
+- Regular predictors (use centered? d_inc_c) + impact
+
+  - controls
+
+- Individual help policy items, variance per respondent
+
+  - higher less consistent, lower more consistent
+
+  - should also probably record SD for interpretation, and mean(help) to diagnose mean-variance coupling
+
+- decide missing data rule – minimum number of answers. document exclusion count, probably chisquared.
+
+- distribution checks – expect skew.
+
+  - use raw variance, log(variance+error), or SD?
+
+  - choose 1 DV?
+
+Estimation choices
+
+- model: OLS on variance (maybe on log variance) with HC robust SE's
+
+- weights (for now unweighted)
+
+- diagnostics
+
+  - check residual/skew heavy tails. if severe use log variance + e or SD as the DV
+
+  - inspect relation of mean(help) to variance. if strong, include mean as covariate
+
+  - influence (Cook's D), multicolinearity (VIF)
+
+- Interpretation
+
+  - negative beta -\> higher deservingness -\> lower variance -\> more consistent support
+
+- Reporting
+
+  - Main table: coefficients for DV = variance (or log-variance), robust SEs, adj. R².
+
+  - Brief text: magnitude for a **10-point deservingness change** and percent change in variance (if using log scale).
+
+  - Appendix:
+
+    - Alternative DV (SD or log-variance) + with/without mean(help).
+
+    - Weighted version.
+
+    - Plot of variance vs. mean(help) with LOWESS to justify the mean covariate.
+
+      - maybe not needed: entropy dispersion, reliability tie in (Cronbachs alpha, consistency analysis that complements reliability by focusing on individual level dispersion)
+
+      - heterogeneity: interact
+
+#### Individual Help Policy Items, Variance, SD Prep
+
+```{r}
+help_policy_items[!help_policy_items %in% names(x_data)]
+#NOTE: using rescaled jail and post felony ("1 to 4"). For non, drop 1 to 4)
+help_policy_items <- c("min_wage", "free_calls", "ed_funds", "alt_sentencing", "post_felony_vote_rev_1_to_4", "jail_access_rev_1_to_4")
+
+# Check distributions and means
+summary(x_data[, c("min_wage","free_calls","ed_funds","alt_sentencing","post_felony_vote_rev_1_to_4","jail_access_rev_1_to_4")])
+cor(x_data$post_felony_vote_rev_1_to_4, x_data$jail_access_rev_1_to_4, use="pairwise.complete.obs")
+
+# checking if variance changes much when excluding q23s
+x_data <- x_data %>%
+  rowwise() %>%
+  mutate(var_help_no_q23 = var(c_across(c("min_wage","free_calls","ed_funds","alt_sentencing")), na.rm = TRUE))
+cor(x_data$variancehelp, x_data$var_help_no_q23, use="pairwise.complete.obs")
+
+var_help_no_q23
+
+# CONFIRM MISSINGNESS & SET MIN VALID ITEM RULE
+x_data <- x_data %>%
+  rowwise() %>%
+  mutate(valid_help_items = sum(!is.na(c_across(all_of(help_policy_items))))) %>%
+  ungroup()
+
+table(x_data$valid_help_items)
+
+#FOUND MISSINGNESS -- TESTING TO SEE DISTRIBUTION X TREATMENT
+table(x_data$impact, x_data$valid_help_items < 4)
+chisq.test(table(x_data$impact, x_data$valid_help_items < 4))
+
+table(x_data$incarc, x_data$valid_help_items < 4)
+chisq.test(table(x_data$incarc, x_data$valid_help_items < 4))
+
+table(x_data$vict, x_data$valid_help_items < 4)
+chisq.test(table(x_data$vict, x_data$valid_help_items < 4))
+
+table(x_data$knowincarc, x_data$valid_help_items < 4)
+chisq.test(table(x_data$knowincarc, x_data$valid_help_items < 4))
+
+# DISTRIBUTION CHECKS
+table(x_data$valid_help_items)
+
+```
+
+**Testing Missingness When Help Policy Excludes Election Items**
+
+```{r}
+
+
+```
+
+Note:
+
+- My coding of the election related questions (jail voting, rights restoration) may artificially have inflated support for these issues.
+
+  - there's only moderate correlation (r \~ 0.43) between the two election items – they're internally consistent but still measure distinct domains.
+
+- The prison policy items (help) are low correlation (r\~0.3) between the overall variance measure and the 4 item prison only variance. Ie: including election items materially changes how variance behaves.
+
+- --\> the combined variance reflects cross-domain inconsistency
+
+- #option is to report both variance without election items and with election items (latter in analysis plan)
+
+- Missingness: Problems abound! (I Think?) (Maybe not? I get so confused by chi2 interp.
+
+  - Missing Counts
+
+    - 1,690 respondents completed all answers, 345 completed four of the six
+
+    - suggests set the rule to 4 or more responses in order to be included -\> 2,035
+
+  - Chi squared:
+
+    - **The null hypothesis (H₀)**: Missingness (\<4 items completed) **IS independent** of treatment (impact)
+
+    - **The alternative hypothesis (H₁)**: Missingness **IS dependent** on treatment
+
+    - With p = 0.1033 \> 0.05, **fail to reject** the null hypothesis
+
+    - This means
+
+      - I do **not** have sufficient evidence that missingness is related to treatment
+
+      - The data are consistent with missingness being independent of (unrelated to) treatment
+
+      - This actually **supports** the safety of dropping incomplete responses, not the opposite
+
+    - BUT marginal significance is not far from 0.05. combined with counts, potential problem still.
+
+    - x Impact – most missing for know incarc
+
+    - SO:
+
+      - test additional patterns (loop this back up)
+
+      - sensitivity analysis
+
+      - IMPUTATION
+
+***This prompts me to check missingness for each combination of help items***
+
+```{r}
+# binary missing indicator where 1 is missing 0 is answered
+missing_indicators <- x_data[help_policy_items]
+missing_indicators <- is.na(missing_indicators)*1
+
+# make string pattern for pattern of missing questions - ie: 000011 means just election ones missing
+x_data$missing_pattern <- apply(missing_indicators, 1, function(x){paste0(x, collapse = "")})
+
+#count questions answered per respondent
+x_data$n_answered <- 6 - rowSums(missing_indicators)
+
+total_patterns <- x_data %>%
+  group_by(missing_pattern, n_answered) %>%
+  summarise(
+    n = n(),
+    pct = n()/nrow(x_data) * 100
+  ) %>%
+  arrange(desc(n))
+
+print(total_patterns)
+
+patterns_by_impact <- x_data %>%
+  group_by(impact, missing_pattern, n_answered) %>%
+  summarise(
+    n = n()
+  ) %>%
+  group_by(impact) %>%
+  mutate(
+    pct_within_group = n/sum(n) * 100
+  ) %>%
+  arrange(impact, desc(n))
+
+print(patterns_by_impact)
+
+patterns_by_incarc <- x_data %>%
+  group_by(incarc, missing_pattern, n_answered) %>%
+  summarise(
+    n = n()
+  ) %>%
+  group_by(incarc) %>%
+  mutate(
+    pct_within_group = n/sum(n) * 100
+  ) %>%
+  arrange(incarc, desc(n))
+
+print(patterns_by_incarc)
+
+patterns_by_vict <- x_data %>%
+  group_by(vict, missing_pattern, n_answered) %>%
+  summarise(
+    n = n()
+  ) %>%
+  group_by(vict) %>%
+  mutate(
+    pct_within_group = n/sum(n) * 100
+  ) %>%
+  arrange(vict, desc(n))
+
+print(patterns_by_vict)
+
+patterns_by_knowincarc <- x_data %>%
+  group_by(knowincarc, missing_pattern, n_answered) %>%
+  summarise(
+    n = n()
+  ) %>%
+  group_by(knowincarc) %>%
+  mutate(
+    pct_within_group = n/sum(n) * 100
+  ) %>%
+  arrange(knowincarc, desc(n))
+
+print(patterns_by_knowincarc)
+```
+
+#### Variance Test
+
+```{r}
+# OK picking up here with excluding respondents with less than 4 items answered (mostly people who didn't hang on until the elections questions in the survey)
+
+x_data <- x_data %>% filter(valid_help_items>=4)
+
+```
+
+Distribution checks
+
+```{r}
+
+hist(x_data$variancehelp, breaks = 30)
+hist(log(x_data$variancehelp + .001), breaks = 30)
+```
+
+--\> won't use the log as my DV
+
+Compare mean & SD
+
+```{r}
+x_data <- x_data %>%
+  rowwise() %>%
+  mutate(meanhelp = mean(c_across(all_of(help_policy_items)), na.rm = TRUE)) %>%
+  ungroup()
+
+cor(x_data$meanhelp, x_data$variancehelp, use = "pairwise.complete.obs")
+
+```
+
+This shows a mild mean-variance correlation. It's kind of right on the cusp in absolute terms – the concern threshold is usually \|0.3-0.4\|. However, it's also conceptually logical that respondents with higher average support might systematically have less variance – that's kind of the thing I'm interested in. Don't need to use meanhelp as a control (but added potential check on this later).
+
+Next Diagnostic: Checking different distributions to figure out what to use
+
+```{r}
+
+x_data$variancehelp_log <- log(x_data$variancehelp + 0.001)
+x_data$sdhelp <- sqrt(x_data$variancehelp)
+
+summary(x_data$variancehelp)
+summary(x_data$variancehelp_log)
+summary(x_data$sdhelp)
+
+hist(x_data$variancehelp, breaks = 30, main = "Variance of Help Items")
+hist(x_data$variancehelp_log, breaks = 30, main = "Log Variance of Help Items")
+hist(x_data$sdhelp, breaks = 30, main = "Standard Deviation of Help Items")
+
+library(e1071)
+skewness(raw_data_cleaned$variancehelp, na.rm = TRUE)
+skewness(raw_data_cleaned$variancehelp_log, na.rm = TRUE)
+skewness(raw_data_cleaned$sdhelp, na.rm = TRUE)
+```
+
+### OLS with variancehelp as DV (also running log and SD)
+
+```{r}
+#using centered deservingness 
+m10 <- lm(variancehelp ~ d_inc_c + impact + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+m10_vlog <- lm(variancehelp_log ~ d_inc_c + impact + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+m10_sd <- lm(sdhelp ~ d_inc_c + impact + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+coeftest(m10, vcov = vcovHC(m10, type = "HC1"))
+coeftest(m10_vlog, vcov = vcovHC(m10, type = "HC1"))
+coeftest(m10_sd, vcov = vcovHC(m10, type = "HC1"))
+```
+
+FOR LATER - Sensitivity check to find out or show results aren't (tbd) sensitive to mean-variance coupling. If coefficients on `d_inc_c` and `impact` are similar across models, can say that results are robust to controlling for average support across policy items; the mild mean-variance correlation (-0.215) does not meaningfully alter the main findings.
+
+```{r}
+# Model 1: main specification
+m10_log <- lm(variancehelp_log ~ d_inc_c + impact + controls..., data = x_data)
+
+# Model 2: robustness check including meanhelp
+m10_mean <- lm(variancehelp_log ~ d_inc_c + impact + meanhelp + controls..., data = x_data)
+
+# Compare side by side
+library(stargazer)
+stargazer(m10_log, m10_mean, type = "text",
+          title = "Robustness Check: Controlling for Average Support (meanhelp)",
+          dep.var.labels = "Log Variance of Help Policy Responses",
+          covariate.labels = c("Deservingness (centered)", "Impact", "Mean Help Support", "Controls"),
+          omit.stat = c("f", "ser"),
+          notes = "Models estimated with HC1 robust standard errors.")
+
+```
+
+# Robustness Checks
+
+## rc_1
+
+- whether the effect of carceral contact on deservingness varies across ideological groups
+
+- addresses concerns that the relationship between contact and deservingness may simply reflect underlying political ideology
+
+- prior work suggests that while ideology is a powerful predictor of attitudes toward marginalized groups, it may also obscure important conditional variation in how individuals interpret personal or vicarious experiences with the criminal legal system
+
+- Thus, I test the possibility that respondents with different ideological orientations may interpret contact differently
+
+$$\texttt{prisonerdeserves}_{i} = \beta_0 + \beta_1 \cdot \texttt{impact}_{i} + \beta_2 \cdot \texttt{gender}_{i} + \beta_3 \cdot \texttt{race}_{i} + \beta_4 \cdot \texttt{education}_{i} + \beta_5 \cdot \texttt{urban}_{i} + \beta_6 \cdot \texttt{party}_{i} + \beta_7 \cdot \texttt{ideology}_{i} + \beta_8 \cdot \texttt{racialresentment}_{i} + \beta_9 \cdot \texttt{desor}_{i} + \beta_{10} \cdot \texttt{policydisposition}_{i} + \beta_{11} \cdot (\texttt{impact}_{i} \times \texttt{ideology}_{i}) + \beta_{12} \cdot (\texttt{impact}_{i} \times \texttt{race}_{i}) + u_{i}$$
+
+Vars to construct or check:
+
+- policy disposition: support for medicaid (q20), unemployment assistance (q19), views on mimum wage and government support for the poor, and agreement with the importance of helping refugees.
+
+Medicaid, Unemployment Questions -- here, I find and look into odd coding of responses based on survey pdf export that suggests a coding scheme that needs the following recode: 1 = much more assistance 2 = more assistance 3 = the right amount then 4 = much less assistance 5 = don't know 6 = less assistance to 1 = much more assistance 2 = more assistance 3 = the right amount then 4 --\> 5 = much less assistance 5 --\> drop = don't know 6 --\> 4= less assistance
+
+ie. it is a 1-5 scale with 5 being least assistance, but the original coding has 4 and 6 flipped and 5 as don't know.
+
+```{r}
+
+# policy - medicaid and unemployment original coding: much more assistance (1), more assistance (2), about the right about (3), less assistance (6), much less assistnatce (4), don't know (5)
+
+summary(x_data$q20)
+summary(x_data$q19)
+
+hist(x_data$q20)
+hist(x_data$q19)
+
+table(x_data$q20)
+table(x_data$q19)
+
+# looking at relationship with fiscal ideology which is coded 0 very conservative to 5 very liberal
+cor(x_data$q19, x_data$fiscal_ideology, use = "pairwise.complete.obs")
+cor(x_data$q20, x_data$fiscal_ideology, use = "pairwise.complete.obs")
+
+# checking that counts match expected by party
+table(x_data$q19, x_data$Republican)
+table(x_data$q19, x_data$Democrat)
+
+table(x_data$q20, x_data$Republican)
+table(x_data$q20, x_data$Democrat)
+
+#recode
+x_data <- x_data %>%
+  mutate(
+    q19_recoded = case_when(
+      q19 == 1 ~ 1, 
+      q19 == 2 ~ 2,
+      q19 == 3 ~ 3,
+      q19 == 4 ~ 5,
+      q19 == 5 ~ NA_real_,
+      q19 == 6 ~ 4 
+    ),
+    q20_recoded = case_when(
+      q20 == 1 ~ 1,
+      q20 == 2 ~ 2,
+      q20 == 3 ~ 3,
+      q20 == 4 ~ 5,
+      q20 == 5 ~ NA_real_,
+      q20 == 6 ~ 4
+    )
+  )
+
+```
+
+Next policy question (q74_3) is how important do you think it is for the US to "Taking in civilian refugees trying to escape violence and war." Raw coding: not very important (1), not important (2), important (3), very important (4), don't know (5). Here, I'm going to recode 5 to be the middle value so this is also on a 1-5 scale: 1-\>1 2-\>2 3-\>4 4-\>5 5-\>3
+
+```{r}
+x_data <- x_data %>%
+  mutate(
+    q74_3_recoded = case_when(
+      q74_3 == 1 ~ 1,
+      q74_3 == 2 ~ 2,
+      q74_3 == 3 ~ 4,
+      q74_3 == 4 ~ 5,
+      q74_3 == 5 ~ 3
+    )
+  )
+
+```
+
+Next, I am going to flip the scale so that it matches the direction of q19 and q20, before averaging respondent answers to these questions to create a composite.
+
+```{r}
+
+x_data <- x_data %>%
+  mutate(
+    q74_3_recoded_flipped = 6 - q74_3_recoded
+  ) %>%
+  rowwise() %>%
+  mutate(
+    policydisposition = mean(c_across(c("q19_recoded", "q20_recoded", "q74_3_recoded_flipped")), na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+```
+
+Thus, the scale for policydisposition is: 1 = much more assistance + taking in more refugees very important = most liberal 2 = more assistance 3 = the right amount 4 = less assistance 5 = much less assistance + taking in refugees unimportant = most conservative
+
+I explore whether the effect of carceral contact on deservingness varies across ideological groups. This analysis addresses concerns that the relationship between contact and deservingness may simply reflect underlying political ideology. More broadly, prior work suggests that while ideology is a powerful predictor of attitudes toward marginalized groups, it may also obscure important conditional variation in how individuals interpret personal or vicarious experiences with the criminal legal system. Thus, I test the possibility that respondents with different ideological orientations may interpret contact differently.
+
+I model criminal legal contact’s effect on other forms of policy help by regressing aggregated attitudes towards those policies on impact. y_i\^"polorientation" =β_0+β_1⋅〖"impact" 〗\_i+β_2⋅〖"desor" 〗\_i+X_i'⋅"controlsvector"+u_i
+
+```{r}
+
+rc_1 <- lm(policydisposition ~ impact + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+rc_1_inc <- lm(policydisposition ~ incarc + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+rc_1_vict <- lm(policydisposition ~ vict + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
+    gender + Black + Hispanic + OtherRace, data = x_data)
+
+rc_1_knowincarc <- lm(policydisposition ~ knowincarc + Republican + 
+    Democrat + fiscal_ideology + social_ideology + penalpoint + 
+    desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace, data = x_data)
+
+summary(rc_1)
+summary(rc_1_inc)
+summary(rc_1_vict)
+summary(rc_1_knowincarc)
+```
+
+The results indicate that carceral contact significantly predicts a more conservative policy disposition (β₁ = -0.14 , p \< 0.01), even after controlling for political affiliation, ideology, and other relevant covariates. This suggests that individuals with personal or vicarious experience with the criminal legal system tend to favor less assistance-oriented policies overall.
