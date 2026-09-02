@@ -25,12 +25,13 @@ library(readxl)
 library(stringr)
 library(dplyr)
 
+
 ```
 
-## 1. Clean & Basic Prep
-
+# 1. Clean & Basic Prep
 
 Load data
+
 ```{r}
 #| eval: false
 #| include: false
@@ -43,11 +44,49 @@ raw_data <- clean_names(raw_data)
 #names(raw_data)
 
 ```
+
 Standardized and cleaned column names by (1) converting to lowerase, (2) replaces spaces with characters, removes accents, ensures uniqueness by adding numbers to duplicates, removing leading/trailing whitespace, creates syntatically valid names
 
 Checked for changes, main change is made lowercase.
 
-#### a. Cleaned data frame, deleting un-needed vars
+#### a. D&P Labels
+This happens first because it involves a column I want to drop in the next cleaning step.
+
+Assign Deserving & Power Blocks – redefine block using column names. Used the below to create block assignments for participants in A (n=900), B (n=898), and C (N=898) (to ultimately consolidate).
+
+Explanation: Participants were sorted into 3 sections (ABC). For the deservingness and power questions, all 3 participant sections evaluated many of the same groups, but two of the three evaluated extra groups that participants in the other sections did not.
+
+This shows up in the raw data:
+
+- there are 3 versions of the same variables – one corresponding to participants in section a, another in section b, another in section c.
+
+Here, I am creating a block variable to keep track of what block each participant was sorted into, so that when I merge the disparate variables, it is still easy to know which group each participant was assigned to (thus, what groups they would have been prompted to evaluated and also important because it appears that the deserving questions for participants in block A were forced choice and snapped to increments of 10: not the case for B and C).
+
+```{r}
+#| include: false
+# DeservingPower Blocks
+
+#FL_8_DO_Deserving&PowerBlockA %in% names(raw_data)
+#View(raw_data)
+
+# Add participant block variable (group a, b, c)
+raw_data <- raw_data %>%
+  mutate(
+    block = case_when(
+      !is.na(`fl_8_do_deserving_power_block_a`) ~ "A",
+      !is.na(`fl_8_do_deserving_power_block_b`) ~ "B",
+      !is.na(`fl_8_do_deserving_power_block_c`) ~ "C",
+      TRUE ~ NA_character_
+    )
+  )
+
+#count(raw_data, block)
+
+# Save labeled but otherwise unmodified version
+write_csv(raw_data, "./data/cleaned/block_labeled_raw_data.csv")
+
+```
+#### b. Cleaned data frame, deleting un-needed vars
 
 ```{r}
 #| include: false
@@ -70,8 +109,7 @@ raw_data <- raw_data %>%
 
 ```
 
-
-### b. Drop non-consenters
+### c. Drop non-consenters
 
 ```{r}
 #| eval: false
@@ -83,77 +121,38 @@ raw_data <- raw_data %>%
 
 #remove consent col
 
-raw_data_cleaned <- raw_data_cleaned %>%
+raw_data <- raw_data %>%
   select(-consent)
 
 # Save again
 
-write_csv(raw_data_cleaned, "data/cleaned/cleaned_data_consent.csv")
+write_csv(raw_data, "data/cleaned/raw_data_consent.csv")
 ```
+Still using "raw data"
 
+# 2. Clean & Quality
 
-#### b. D&P Labels
+### a. attn checks
 
-Assign Deserving & Power Blocks – redefine block using column names. Used the below to create block assignments for participants in A (n=900), B (n=898), and C (N=898) (to ultimately consolidate).
-
-Explanation: Participants were sorted into 3 sections (ABC). For the deservingness and power questions, all 3 participant sections evaluated many of the same groups, but two of the three evaluated extra groups that participants in the other sections did not.
-
-This shows up in the raw data:
-
--   there are 3 versions of the same variables – one corresponding to participants in section a, another in section b, another in section c.
-
-Here, I am creating a block variable to keep track of what block each participant was sorted into, so that when I merge the disparate variables, it is still easy to know which group each participant was assigned to (thus, what groups they would have been prompted to evaluated and also important because it appears that the deserving questions for participants in block A were forced choice and snapped to increments of 10: not the case for B and C).
+uncleaned: q9, character, can be 1 2 3 4 NA 3 -99 --see 2095 passed, 599 did not q17, character, lots of different responses -2063 passed, 631 not q114_4, character can be 6 5 NA 4 -99
 
 ```{r}
-#| include: false
-# DeservingPower Blocks
-
-#FL_8_DO_Deserving&PowerBlockA %in% names(raw_data)
-#View(raw_data)
-
-# Add participant block variable (group a, b, c)
-raw_data <- raw_data %>%
-  mutate(
-    block = case_when(
-      !is.na(`fl_8_do_deserving_power_block_a`) ~ "A",
-      !is.na(`fl_8_do_deserving_power_block_b`) ~ "B",
-      !is.na(`fl_8_do_deserving_power_block_c`) ~ "C",
-      TRUE ~ NA_character_
-    )
-  )
-#count(raw_data, block)
-# Save labeled but otherwise unmodified version
-write_csv(raw_data, "./data/cleaned/labeled_raw_data.csv")
-
-```
-
-
-## 2. Clean & Quality
-###  attn checks
-uncleaned:
-q9, character, can be 1 2 3 4 NA 3 -99
---see 2095 passed, 599 did not
-q17, character, lots of different responses
--2063 passed, 631 not
-q114_4, character can be 6 5 NA 4 -99
-
-```{r}
-# summary(raw_data_cleaned$q114_4)
+# summary(raw_data$q114_4)
 # 
-# unique(raw_data_cleaned$q17)
+# unique(raw_data$q17)
 # 
-# table(raw_data_cleaned$q9, useNA = "ifany")
-# table(raw_data_cleaned$q17, useNA = "ifany")
-# table(raw_data_cleaned$q114_4, useNA = "ifany")
+# table(raw_data$q9, useNA = "ifany")
+# table(raw_data$q17, useNA = "ifany")
+# table(raw_data$q114_4, useNA = "ifany")
 # 
-# unique(raw_data_cleaned$q114_4)
+# unique(raw_data$q114_4)
 # 
-# raw_data_cleaned %>%
+# raw_data %>%
 #   count(q114_4, sort = TRUE)
 
 ```
 
--   create flags for passed/not each check and people who failed all
+- create flags for passed/not each check and people who failed all
 
 ```{r}
 #| eval: false
@@ -161,44 +160,44 @@ q114_4, character can be 6 5 NA 4 -99
 
 # 1. create logical variable (true/false) that marks whether respondent answered Q9 with 4
 
-raw_data_cleaned$attn_q9_pass = !is.na(raw_data_cleaned$q9) & raw_data_cleaned$q9 == "4"
+raw_data$attn_q9_pass = !is.na(raw_data$q9) & raw_data$q9 == "4"
 
 #true if 4
 
-# table(raw_data_cleaned$q9, useNA = "ifany")
-# table(raw_data_cleaned$attn_q9_pass, useNA = "ifany")
+# table(raw_data$q9, useNA = "ifany")
+# table(raw_data$attn_q9_pass, useNA = "ifany")
 
 
 #2. attention flag -  text responses to Q17, remove leading/trailing spaces, and convert everything to lowercase for standardization)
-attn_text <- tolower(str_trim(raw_data_cleaned$q17))
+attn_text <- tolower(str_trim(raw_data$q17))
 
 #2a. create list of acceptable answers for Q17
 accepted_variants <- c("purple", "urple", "puple","purpel", "\"purple\"", "purpke", "purplee", "prurprle", "purpl", "purp", "💜", "🟣")
 
 #2b. chheck if each cleaned Q17 response is in thhe list of accepted variants. if yes, respondent passed attn check
-raw_data_cleaned$attn_check_q17 <- attn_text %in% accepted_variants
-table(attn_check_q17, useNA = "ifany")
+raw_data$attn_check_q17 <- attn_text %in% accepted_variants
+table(raw_data$attn_check_q17, useNA = "ifany")
 
 #3. attn flag -- Create a flag for whether the respondent answered Q114_4 with a 6 (i.e., passed the third attention check
 
-# table(raw_data_cleaned$q114_4, useNA = "ifany")
+# table(raw_data$q114_4, useNA = "ifany")
 
-raw_data_cleaned$attn_q114_pass = !is.na(raw_data_cleaned$q114_4) & raw_data_cleaned$q114_4 == "6"
+raw_data$attn_q114_pass = !is.na(raw_data$q114_4) & raw_data$q114_4 == "6"
 
 # older version counted NA as passed. lots of NAs likely because late in the survey. For now, only care is that I have passes recorded and in next code chunk will filter out those who failed all 3 checks.
-# attn_check_q1114 <- raw_data_cleaned$q114_4 == 6
+# attn_check_q1114 <- raw_data$q114_4 == 6
 # 
 # #If Q114_4 equals -99 (an invalid code), treat that as a failed check.
-# attn_check_q1114[raw_data_cleaned$q114_4 == -99] <- FALSE
+# attn_check_q1114[raw_data$q114_4 == -99] <- FALSE
 # 
 # #If Q114_4 is NA (they didn’t see the question), count that as a pass because they weren’t shown the question
-# attn_check_q1114[is.na(raw_data_cleaned$q114_4)] <- TRUE  # not shown → pass
+# attn_check_q1114[is.na(raw_data$q114_4)] <- TRUE  # not shown → pass
 ```
 
 attn_q9_pass, attn_check_q17, attn_q114_pass
 
 ```{r}
-raw_data_cleaned <- raw_data_cleaned %>%
+raw_data <- raw_data %>%
   mutate(
     attn_pass_count = rowSums(
       cbind(
@@ -211,23 +210,21 @@ raw_data_cleaned <- raw_data_cleaned %>%
     attn_fail_count = 3 - attn_pass_count
   )
 
-count(raw_data_cleaned, attn_pass_count)
+count(raw_data, attn_pass_count)
 
 raw
 
 ```
-1,604 respondents passed all 3 attn checks
-599 passed none of them
-32 passed 1
-459 passed 2
+
+1,604 respondents passed all 3 attn checks 599 passed none of them 32 passed 1 459 passed 2
 
 ```{r}
-write_csv(raw_data_cleaned, "data/cleaned/cleaned_data_consent_pre_attn_rest.csv")
+write_csv(raw_data, "data/cleaned/raw_data_consent_pre_attn_rest.csv")
 
-data_pre_attn_exclusion <- raw_data_cleaned
+data_pre_attn_exclusion <- raw_data # saving pre exclusion, or just use raw_data
 
-raw_data_cleaned <- raw_data_cleaned %>%
-  filter(attn_pass_count > 0)
+raw_data_cleaned <- raw_data %>%
+  filter(attn_pass_count > 0)#switched to raw_data_cleaned
 
 count(raw_data_cleaned, attn_pass_count)
 
@@ -235,13 +232,9 @@ count(raw_data_cleaned, attn_pass_count)
 
 With dropped respondents (failed all 3), I have 32 respondents who passed 1, 459 who passed 2, and 1,604 who passed all 3. Total = 2,095 respondents retained.
 
-To check specific attention check pass/fail counts:
-attn_q9_pass,
-attn_check_q17,
-attn_q114_pass
-attn_pass_count
+To check specific attention check pass/fail counts: attn_q9_pass, attn_check_q17, attn_q114_pass attn_pass_count
 
-### e. Clean: via survey duration
+### b. survey duration
 
 ```{r}
 #| eval: false
@@ -321,7 +314,9 @@ ggsave(
 )
 
 ```
+
 Grouping ppl into speed
+
 ```{r}
 
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -350,17 +345,16 @@ speed_review <- raw_data_cleaned %>%
 speed_review %>%
   count(speed_group)
 ```
+
 ```{r}
 speed_review %>%
   count(speed_group, attn_fail_count)
 ```
- I should probably remove people who were too fast two slow and only passed one attention check. or flag. 
 
-remember: 
-attn_q9_pass,
-attn_check_q17,
-attn_q114_pass
-attn_pass_count
+I should probably remove people who were too fast two slow and only passed one attention check. or flag.
+
+remember: attn_q9_pass, attn_check_q17, attn_q114_pass attn_pass_count
+
 ```{r}
 speed_review %>%
   group_by(speed_group) %>%
@@ -377,7 +371,9 @@ speed_review %>%
     q1114_fail_pct = mean(attn_q114_pass == FALSE, na.rm = TRUE) * 100
   )
 ```
+
 fast respondents who had another issue
+
 ```{r}
 speed_review %>%
   filter(
@@ -395,6 +391,7 @@ speed_review %>%
   ) %>%
   arrange(duration_minutes)
 ```
+
 ```{r}
 speed_review %>%
   filter(
@@ -433,30 +430,21 @@ speed_review %>%
   )
 ```
 
-### e. completed vars
-for data that has survived screening so far . . .
--which analytically important questions were they eligible to see
--which did they answer
--what pattens of missingness exist
--what consequences could those patterns have for analysis
+### c. completion of vars
 
-q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3, q62_1,q51_1 through q51_8, dem101, q32-38, q111, 
+for data that has survived screening so far . . . -which analytically important questions were they eligible to see -which did they answer -what pattens of missingness exist -what consequences could those patterns have for analysis
 
-### f. completion (all and vars)
+q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3, q62_1,q51_1 through q51_8, dem101, q32-38, q111,
 
-Did these people answer variables I use? 
-AAPOR explicitly distinguishes survey breakoff from item nonresponse. Someone can reach the end but skip questions; someone can break off before the end but still provide usable answers to the crucial variables. AAPOR recommends coding unanswered questions distinctly from substantive answers such as “don't know” and “prefer not to answer,” and emphasizes documenting partial responses rather than automatically treating them as invalid cases.
+Did these people answer variables I use? AAPOR explicitly distinguishes survey breakoff from item nonresponse. Someone can reach the end but skip questions; someone can break off before the end but still provide usable answers to the crucial variables. AAPOR recommends coding unanswered questions distinctly from substantive answers such as “don't know” and “prefer not to answer,” and emphasizes documenting partial responses rather than automatically treating them as invalid cases.
 
-And the breakoff literature gives you another reason not to equate finished == 0 with poor-quality respondent. Breakoff can be related to questionnaire design, burden, where a question occurs, and respondent characteristics. Peytchev found that breakoffs did not simply look like inattentive respondents.
+And the breakoff literature gives another reason not to equate finished == 0 with poor-quality respondent. Breakoff can be related to questionnaire design, burden, where a question occurs, and respondent characteristics. Peytchev found that breakoffs did not simply look like inattentive respondents.
 
-Need to look for:
--loss of information/precision
--selection
+Need to look for: -loss of information/precision -selection
 
-Selection: do people who don't answer policy questions differ systematically in incarceratione xperience, ideology, education, survey engagement, race, underlying policy view? 
+Selection: do people who don't answer policy questions differ systematically in incarceratione xperience, ideology, education, survey engagement, race, underlying policy view?
 
-Missing data lit says percent missing does not tell by itself whether missingness is dangerous/problematic. Ordinary regressions usually perform complete-case/listwise deletion for the variables appearing in that particular model. That means that adding a control variable with missing observations can change the regression sample. Coeficcient can then change partyly becuase added the control but also partialyl because the model is being estimated with a different sample. 
-
+Missing data lit says percent missing does not tell by itself whether missingness is dangerous/problematic. Ordinary regressions usually perform complete-case/listwise deletion for the variables appearing in that particular model. That means that adding a control variable with missing observations can change the regression sample. Coeficcient can then change partyly becuase added the control but also partialyl because the model is being estimated with a different sample.
 
 ## Retained Respondents who did not finish
 
@@ -479,11 +467,11 @@ count(finishers_df, block)
 
 what block are they in?
 
--   18 in A
+- 18 in A
 
--   28 in B
+- 28 in B
 
--   20 in C
+- 20 in C
 
 | Block   | nonfinishers | finishers |
 |---------|--------------|-----------|
@@ -502,11 +490,11 @@ count(nonfinishers_df, block)
 | Victims           | 60           | 267       |
 |                   |              |           |
 
--   8 incarcerated
+- 8 incarcerated
 
--   21 know incarcerated
+- 21 know incarcerated
 
--   60 victims
+- 60 victims
 
 ```{r}
 
@@ -527,8 +515,7 @@ count(finishers_df, q15_1)
 | re enfranchisement       | 35           | 497                      |
 | jail voting              | 35           | 497                      |
 
-
-deservingness scores aside, variables I use/care about (in names at THIS stage): 
+deservingness scores aside, variables I use/care about (in names at THIS stage):
 
 q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3
 
@@ -536,80 +523,18 @@ q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4
 names(raw_data_cleaned)
 ```
 
-
-## 2. Deservingness
+# 3. Deservingness
 
 ### A. Deservingness and Power consolidation
 
 Objective: consolidate blocks (i.e. so only 1 Incarcerated People/Prisoners)
 
-```{r}
-#| eval: false
-#| include: false
-
-mapping <- read_csv("./data/Unified_Deserving_Power_Target_Mapping.csv")
-#view(mapping)
-```
-
-Prep by converting to numeric
-
-```{r}
-#| eval: false
-#| include: false
-# Identify all Deserving and Power columns
-deserving_power_cols <- names(raw_data_cleaned)[str_detect(names(raw_data_cleaned), "^(Deserving|Power) Group")]
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(
-    all_of(deserving_power_cols),
-    as.character
-  ))
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(
-    all_of(deserving_power_cols),
-    ~ as.numeric(na_if(.x, "-99"))
-  ))
-
-#table(raw_data_cleaned$`Deserving Group A_1`, useNA = "always")
-
-```
-
-ALL Evals: Create consolidated variable names for deservingness — OLD(?) can probably remove below because covered by excel loop.
-
-```{r}
-#| eval: false
-#| include: false
-
-new_vars <- c(
- "d_black_afam_abc", "d_native_ind_abc", "d_asianam_abc", "d_latino_his_abc", "d_whiteam_abc",
- "d_mideastam_abc", "d_incwomen_abc", "d_collegewom_abc", "d_enviro_abc", "d_feminists_abc",
- "d_proabort_choice_abc", "d_abortprov_abc", "d_welfare_tanf_abc", "d_fstamps_snap_abc",
- "d_unions_abc", "d_medicaid_abc", "d_medicare_abc", "d_unemployed_abc", "d_police_abc",
- "d_poorfam_abc", "d_wealthy_abc", "d_teachers_abc", "d_sci_experts_abc", "d_child_abc",
- "d_crim_abc", "d_incppl_abc", "d_homeless_abc", "d_immigrants_abc", "d_unauth_undoc_abc",
- "d_gunowners_abc", "d_voters_abc", "d_lgbt_abc", "d_trans_abc", "d_transkids_abc", "d_gunmans_abc",
- "d_ice_abc", "d_socmed_abc", "d_nra_abc", "d_bigbank_abc", "d_bigcorp_abc", "d_uni_abc",
- "d_comcoll_abc", "d_noncit_parent_a", "d_incparents_a", "d_hsteen_a", "d_athiest_a", "d_cath_a",
- "d_evan_a", "d_jews_a", "d_pal_a", "d_muslim_a", "d_blackwom_a", "d_blackmen_a", "d_lds_a",
- "d_longcov_a", "d_exon_a", "d_weed_a", "d_opioid_a", "d_whitecol_a", "d_tech_a", "d_smokers_a",
- "d_genx_a", "d_boomer_a", "d_mill_a", "d_genz_a"
-)
-
-for (var in new_vars) {
- raw_data_cleaned[[var]] <- NA #to initialize
-}
-```
-
-Ran new version of ABC loop to consolidate groups. Verified. After below, dataset in memory has unified variables.
+ABC loop to consolidate groups. Verified. After below, dataset in memory has unified variables.
 
 ```{r consolidation, eval=TRUE}
 
-
-
 # Load the mapping
 mapping <- read_excel("scratch for consolidation.xlsx")
-view(mapping)
 
 # Goal: standardize variable names in the mapping sheet so they match the names in raw_data_cleaned
 # Clean column names and values in mapping to match raw_data_cleaned
@@ -622,112 +547,52 @@ mapping <- mapping %>%
   mutate(
     var_a = str_replace_all(tolower(trimws(var_a)), " ", "_"),# trim removes whitespace
     var_b = str_replace_all(tolower(trimws(var_b)), " ", "_"),#lowercases
-    var_c = str_replace_all(tolower(trimws(var_c)), " ", "_")
+    var_c = str_replace_all(tolower(trimws(var_c)), " ", "_"),
+    target_slug = trimws(target_slug)
   )
 
-
-view(mapping)
 #undiagnostic
 
 for (i in 1:nrow(mapping)) {
-  new_var <- mapping$target_slug[i]
-  var_a <- mapping$var_a[i]
-  var_b <- mapping$var_b[i]
-  var_c <- mapping$var_c[i]
 
-  # Initialize with NAs
+  new_var <- mapping$target_slug[i]
+  var_a   <- mapping$var_a[i]
+  var_b   <- mapping$var_b[i]
+  var_c   <- mapping$var_c[i]
+
   raw_data_cleaned[[new_var]] <- NA_real_
 
-  # Assign A group values
   if (!is.na(var_a) && var_a %in% names(raw_data_cleaned)) {
-    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "A"] <- 
-      as.numeric(raw_data_cleaned[[var_a]][raw_data_cleaned$block == "A"])
+    x <- as.numeric(raw_data_cleaned[[var_a]])
+    x[x == -99] <- NA_real_
+
+    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "A"] <-
+      x[raw_data_cleaned$block == "A"]
   }
 
-  # Assign B group values
   if (!is.na(var_b) && var_b %in% names(raw_data_cleaned)) {
-    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "B"] <- 
-      as.numeric(raw_data_cleaned[[var_b]][raw_data_cleaned$block == "B"])
+    x <- as.numeric(raw_data_cleaned[[var_b]])
+    x[x == -99] <- NA_real_
+
+    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "B"] <-
+      x[raw_data_cleaned$block == "B"]
   }
 
-  # Assign C group values
   if (!is.na(var_c) && var_c %in% names(raw_data_cleaned)) {
-    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "C"] <- 
-      as.numeric(raw_data_cleaned[[var_c]][raw_data_cleaned$block == "C"])
+    x <- as.numeric(raw_data_cleaned[[var_c]])
+    x[x == -99] <- NA_real_
+
+    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "C"] <-
+      x[raw_data_cleaned$block == "C"]
   }
 }
 
 mapping$target_slug %in% names(raw_data_cleaned)
 summary(raw_data_cleaned[mapping$target_slug])
-view(raw_data_cleaned)
-
-
-#NEW VERSION OFdrop block specific variables -- this didn't seem to work -- nothing appears when I look at block_vars_to_drop
-
-#block_vars_to_drop <- grep("^(deserving_group|power_group)_[abc]_", names(raw_data_cleaned), value = TRUE)
-
-#cleaned_data_light <- raw_data_cleaned %>%
-  select(-all_of(block_vars_to_drop))
 
 
 ```
 
-**Old (pre Oct 27 6pm, and pre Oct 27)**
-
-```{r}
-# DELETE FROM HERE?
-
-#full new oct 27
-for (i in 1:nrow(mapping)) {
-  new_var <- mapping$target_slug[i]
-  var_a <- mapping$var_a[i]
-  var_b <- mapping$var_b[i]
-  var_c <- mapping$var_c[i]
-  
-  # Optional: diagnostic check
-  missing_vars <- c(var_a, var_b, var_c)[!c(var_a, var_b, var_c) %in% names(raw_data_cleaned)]
-  if (length(missing_vars) > 0) {
-    message("⚠️ Missing column(s) for ", new_var, ": ", paste(missing_vars, collapse = ", "))
-  }
-  
-  # Main: consolidation
-  raw_data_cleaned[[new_var]] <- with(raw_data_cleaned, case_when(
-    block == "A" & var_a %in% names(raw_data_cleaned) ~ as.numeric(get(var_a)),
-    block == "B" & var_b %in% names(raw_data_cleaned) ~ as.numeric(get(var_b)),
-    block == "C" & var_c %in% names(raw_data_cleaned) ~ as.numeric(get(var_c)),
-    TRUE ~ NA_real_
-  ))
-}
-
-
-
-# Create consolidated variables by starting to loop through each row in mapping spreadsheet. For each target group, new_var will be consolidated name, var_a etc will be the claned name of the A-block specific var
-for (i in 1:nrow(mapping)) {
-  new_var <- mapping$target_slug[i]
-  var_a <- mapping$var_a[i]
-  var_b <- mapping$var_b[i]
-  var_c <- mapping$var_c[i]
-  
-  #  check for whether any source variable names are missing from dataset
-  if (!all(c(var_a, var_b, var_c) %in% names(raw_data_cleaned))) {
-    warning(paste("Missing column(s) for:", new_var))
-  }
-
-
-if (!all(c(var_a, var_b, var_c) %in% names(raw_data_cleaned))) {
-  print(paste("❌ Missing column(s) for:", new_var))
-}
-
-#verify: 
-
-raw_data_cleaned %>%
-  select(block, deserving_group_a_26, d_incppl_pris_abc) %>%
-  filter(block == "A") %>%
-  slice(1:10)
-
-#to here?
-
-```
 
 LIMITED Deserving/power for 1 group only: recode groups directly
 
@@ -738,9 +603,11 @@ LIMITED Deserving/power for 1 group only: recode groups directly
 # Load the split mapping
 split_map <- read.csv("./data/deserving_split.csv")
 
-# Clean and normalize names to match raw_data_cleaned
 split_map <- split_map %>%
-  rename(old_var = `var.name`, new_var = target_slug) %>%
+  rename(
+    old_var = var.name,
+    new_var = target_slug
+  ) %>%
   mutate(
     old_var = str_replace_all(tolower(trimws(old_var)), " ", "_"),
     new_var = trimws(new_var)
@@ -749,31 +616,31 @@ split_map <- split_map %>%
 skipped <- list()
 
 for (i in 1:nrow(split_map)) {
+
   old_var <- split_map$old_var[i]
   new_var <- split_map$new_var[i]
 
-  # Only proceed if old_var is in dataset
   if (!(old_var %in% names(raw_data_cleaned))) {
     skipped[[new_var]] <- paste("Missing column:", old_var)
     next
   }
 
-  # Check if there is *any valid data* (not -99)
-  non_missing <- raw_data_cleaned[[old_var]] != -99 & !is.na(raw_data_cleaned[[old_var]])
-  if (!any(non_missing, na.rm = TRUE)) {
+  x <- as.numeric(raw_data_cleaned[[old_var]])
+  x[x == -99] <- NA_real_
+
+  if (all(is.na(x))) {
     skipped[[new_var]] <- paste("No valid data in", old_var)
     next
   }
 
-  # If we get here: create the new variable
-  raw_data_cleaned[[new_var]] <- raw_data_cleaned[[old_var]]
+  raw_data_cleaned[[new_var]] <- x
 }
 
 if (length(skipped) > 0) {
-  print("⚠️ Skipped variables:")
+  print("Skipped variables:")
   print(skipped)
 } else {
-  print("✅ All group-specific variables renamed successfully.")
+  print("All group-specific variables created successfully.")
 }
 
 names(raw_data_cleaned)
@@ -791,129 +658,69 @@ names(raw_data_cleaned)
 
 ```
 
-##### Clean -99s
-
+Checking this worked before removing the old variables
 ```{r}
-# Combine both sets of variables to clean
-vars_to_clean <- c(mapping$target_slug, split_map$new_var)
+#CHECKS
+# 1. Did every mapped ABC target get created?
+setdiff(mapping$target_slug, names(raw_data_cleaned))
 
-# Only keep variables that exist in the dataset
-vars_to_clean <- vars_to_clean[vars_to_clean %in% names(raw_data_cleaned)]
+# 2. Are there any -99s left in consolidated ABC variables?
 
-# Recode -99 to NA
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(all_of(vars_to_clean), ~ {
-    if (is.character(.x)) {
-      na_if(.x, "-99")  # character version
-    } else if (is.numeric(.x)) {
-      na_if(.x, -99)    # numeric version
-    } else {
-      .x  # leave unchanged
-    }
-  }))
+sapply(
+  raw_data_cleaned[mapping$target_slug],
+  function(x) sum(x == -99, na.rm = TRUE)
+)
 
-sapply(raw_data_cleaned[vars_to_clean], class)
+# 3. Check one important target directly
+raw_data_cleaned %>%
+  select(
+    block,
+    deserving_group_a_26,
+    d_incppl_pris_abc
+  ) %>%
+  filter(block == "A") %>%
+  slice_head(n = 20)
 
 ```
 
+Variables I can now prepare to drop
 ```{r}
+block_vars_to_drop <- grep(
+  "^(deserving_group|power_group)_[abc]_",
+  names(raw_data_cleaned),
+  value = TRUE
+)
+```
 
-
+Check/inspect to make sure right ones to drop
+```{r}
+length(block_vars_to_drop)
+head(block_vars_to_drop, 20)
+tail(block_vars_to_drop, 20)
 
 ```
 
-### FOR NOW - Oct 27 7pm – skip dropping to create the light version (intended to prep for "light" version of csv without old deservingness vars (in lieu of consoldiated and renamed)
+Save pre-dropped version
 
 ```{r}
+clean_with_block_spec_vars <- raw_data_cleaned
+write_csv(clean_with_block_spec_vars, "data/cleaned/clean_with_block_spec_vars.csv")
+```
 
-#TO SKIP: 
-  cleaned_data_light <- raw_data_cleaned
-  
-  
-#vector of old variable names
-block_vars_to_drop <- grep("^(deserving_group|power_group)_[abc]_", names(raw_data_cleaned), value = TRUE)
-
-#create version with them dropped
-#cleaned_data_light <- raw_data_cleaned %>%
-#  select(-all_of(block_vars_to_drop))
-
-view(cleaned_data_light)
+Save analysis dataset without block-spec/deserv vars (cleaned_data_light)
+```{r}
+cleaned_data_light <- raw_data_cleaned %>%
+  dplyr::select(-all_of(block_vars_to_drop))
 
 ```
 
-
-# SAVE: cleaned_light.csv
+# 4. SAVE: cleaned_light.csv
 
 ```{r}
-
-
-write_csv(raw_data_cleaned, "data/cleaned/cleaned_data_consent.csv")
-
 #light csv
 write_csv(cleaned_data_light, "data/cleaned/cleaned_light.csv") # main file to use going forward
 
 testing <- readr::read_csv("data/cleaned/cleaned_light.csv")
 
-sum(is.na(raw_data_cleaned$q51_1))
-
-table(raw_data_cleaned$q51_1, useNA = "ifany")
 ```
 
-# ARCHIVED CODE
-
-
-OLD: consolidating ABCs
-
-```{r blockspecifictargets}
-#| eval: false
-#| include: false
-# Load the spreadsheet with the mappings
-
-mapping <- read_excel("scratch for consolidation.xlsx")
-
-
-#CHECKING
-#view(mapping)
-#view(raw_data_cleaned)
-#colnames(raw_data_cleaned)
-
-#clean mapping col names to match raw_data_cleaned
-mapping <- mapping %>%
-  mutate(
-    `Deserving Group A` = str_replace_all(tolower(trimws(`Deserving Group A`)), " ", "_"),
-    `Deserving Group B` = str_replace_all(tolower(trimws(`Deserving Group B`)), " ", "_"),
-    `Deserving Group C` = str_replace_all(tolower(trimws(`Deserving Group C`)), " ", "_")
-  )
-
-#preview mapping to confirm fix
-mapping %>%
-  select(target_slug, `Deserving Group A`, `Deserving Group B`, `Deserving Group C`) %>%
-  head(10)
-print(
-  mapping %>%
-    select(target_slug, `Deserving Group A`, `Deserving Group B`, `Deserving Group C`) %>%
-    head(10)
-)
-
-dim(mapping)  # shows number of rows and columns
-print(mapping)
-names(mapping)
-
-# Create composite deservingness variables from the correct block column only
-for (i in 1:nrow(mapping)) {
-  new_var <- mapping$target_slug[i]
-  var_a <- mapping$`Deserving Group A`[i]
-  var_b <- mapping$`Deserving Group B`[i]
-  var_c <- mapping$`Deserving Group C`[i]
-
-  raw_data_cleaned[[new_var]] <- case_when(
-    raw_data_cleaned$block == "A" ~ raw_data_cleaned[[var_a]],
-    raw_data_cleaned$block == "B" ~ raw_data_cleaned[[var_b]],
-    raw_data_cleaned$block == "C" ~ raw_data_cleaned[[var_c]],
-    TRUE ~ NA_real_
-  )
-}
-
-names(raw_data_cleaned)
-
-```
