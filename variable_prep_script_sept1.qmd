@@ -56,7 +56,6 @@ Standardize? No -- in my prelim, I write: To ensure that I do not control for a 
 
 12 While constructing composite or control variables involving other deservingness targets, I assess whether their inclusion introduces collinearity or conceptual overlap with the dependent variable. In particular, I examine correlations between group-level deservingness ratings to ensure that any included groups are not too closely tied to perceptions of incarcerated people. If preliminary checks reveal that including a particular group (e.g., “criminals” or “formerly incarcerated individuals”) would obscure key variance or conflate target constructs, I exclude it from the model and treat it as conceptually non-distinct for the purposes of this analysis.
 
-
 ### B. Experiences - Basic Coding
 
 #### Impact Plus (Constructing For-Analysis)
@@ -180,7 +179,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-
 ### F. FIRE controls
 
 ```{r}
@@ -221,21 +219,9 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ### G. Race
 
-q51_
-▢	White  (1) 
-▢	Black or African American  (2) 
-▢	Native American / Alaska Native  (3) 
-▢	Asian / Asian American  (4) 
-▢	Native Hawaiian / Other Pacific Islander  (5) 
-▢	Middle Eastern/ North African  (6) 
-▢	Hispanic/Latino/a/e  (7) 
-▢	My preferred response not listed  (8) 
+q51\_ ▢ White (1) ▢ Black or African American (2) ▢ Native American / Alaska Native (3) ▢ Asian / Asian American (4) ▢ Native Hawaiian / Other Pacific Islander (5) ▢ Middle Eastern/ North African (6) ▢ Hispanic/Latino/a/e (7) ▢ My preferred response not listed (8)
 
--measured as set of binary indicator variables in the survey, rather than as one categorical race variable. 
-- 1 = selected that category
-- 0 = ? did not select?
-- NA =  c
-
+-measured as set of binary indicator variables in the survey, rather than as one categorical race variable. - 1 = selected that category - 0 = ? did not select? - NA = c
 
 ```{r}
 
@@ -256,60 +242,51 @@ table(raw_data_cleaned$q51_1, useNA = "ifany")
 
 ```
 
-White: 
- 0    1 <NA> 
- 422 1181  619 
+White: 0 1 <NA> 422 1181 619
 
 ```{r}
 table(raw_data_cleaned$q51_2, useNA = "ifany")
 ```
 
-Black or African American  (2) 
- 0    1 <NA> 
-1336  267  619 
+Black or African American (2) 0 1 <NA> 1336 267 619
 
 ```{r}
 table(raw_data_cleaned$q51_3, useNA = "ifany")
 ```
 
-▢	Native American / Alaska Native  (3) 
+▢ Native American / Alaska Native (3)
 
- 0    1 <NA> 
-1545   58  619 
+0 1 <NA> 1545 58 619
 
 ```{r}
 table(raw_data_cleaned$q51_4, useNA = "ifany")
 ```
-▢	Asian / Asian American  (4) 
- 0    1 <NA> 
-1525   78  619 
+
+▢ Asian / Asian American (4) 0 1 <NA> 1525 78 619
 
 ```{r}
 table(raw_data_cleaned$q51_5, useNA = "ifany")
 ```
-▢	Native Hawaiian / Other Pacific Islander  (5) 
- 0    1 <NA> 
-1598    5  619 
+
+▢ Native Hawaiian / Other Pacific Islander (5) 0 1 <NA> 1598 5 619
 
 ```{r}
 table(raw_data_cleaned$q51_6, useNA = "ifany")
 ```
-▢	Middle Eastern/ North African  (6) 
- 0    1 <NA> 
-1597    6  619 
+
+▢ Middle Eastern/ North African (6) 0 1 <NA> 1597 6 619
 
 ```{r}
 table(raw_data_cleaned$q51_7, useNA = "ifany")
 ```
-▢	Hispanic/Latino/a/e  (7) 
-  0    1 <NA> 
-1366  237  619 
+
+▢ Hispanic/Latino/a/e (7) 0 1 <NA> 1366 237 619
+
 ```{r}
 table(raw_data_cleaned$q51_8, useNA = "ifany")
 ```
-▢	My preferred response not listed  (8) 
- 0    1 <NA> 
-1583   20  619 
+
+▢ My preferred response not listed (8) 0 1 <NA> 1583 20 619
 
 ```{r}
 unique(raw_data_cleaned$q51_8)
@@ -320,10 +297,6 @@ frame %>% count(q51_1)
 
 frame %>% count(raw_data_cleaned$q51_1, sort = TRUE)
 ```
-
-
-
-
 
 ```{r}
 
@@ -544,6 +517,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 
 ```
+
 Note:
 
 Approximately 561 respondents did not provide responses to the political behavior items (government attention, past vote, intended vote). Missingness is perfectly overlapping across these items, indicating that these questions were likely administered to a subset of respondents rather than reflecting item-level nonresponse.

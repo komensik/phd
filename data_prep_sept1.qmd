@@ -20,11 +20,17 @@ library(tibble)
 library(stringr)
 library(haven)
 library(ggplot2)
+library(ggbeeswarm)
+library(readxl)
+library(stringr)
+library(dplyr)
 
 ```
 
-## 0. Preliminary - Load Data + Troubleshoot
+## 1. Clean & Basic Prep
 
+
+Load data
 ```{r}
 #| eval: false
 #| include: false
@@ -34,29 +40,61 @@ raw_data <- read_csv("./data/raw/scotg_results.csv")
 
 raw_data <- clean_names(raw_data)
  
-names(raw_data)
+#names(raw_data)
 
+```
+Standardized and cleaned column names by (1) converting to lowerase, (2) replaces spaces with characters, removes accents, ensures uniqueness by adding numbers to duplicates, removing leading/trailing whitespace, creates syntatically valid names
 
+Checked for changes, main change is made lowercase.
 
-#standardizes and cleans column names by (1) converting to lowerase, (2) replaces spaces with characters, removes accents, ensures uniqueness by adding numbers to duplicates, removing leading/trailing whitespace, creates syntatically valid names
-#checked for changes:
+#### a. Cleaned data frame, deleting un-needed vars
 
-#original_data <-read_csv("./data/raw/scotg_results.csv")
-#original_names <-names(original_data)
+```{r}
+#| include: false
 
-#data.frame(
-#  original = original_names,
-#  cleaned = names(raw_data)
-#)
+columns_to_drop <- c(
+  "status", "start_date", "end_date", "ip_address", "recipient_last_name", "recipient_first_name", 
+  "recipient_email", "external_reference", "recorded_date", "location_latitude", 
+  "location_longitude", "distribution_channel", "user_language"
+)
 
-# --main change is made lowercase
+# Aggregate all columns containing "_DO" (Display Order)
+
+grep("_do_", names(raw_data), value = TRUE)
+
+do_columns <- grep("_do", names(raw_data), value = TRUE)
+
+# Drop do columns and others
+raw_data <- raw_data %>%
+  select(-all_of(c(columns_to_drop, do_columns)))
+
 ```
 
-## 1. Cleaning
 
-#### a. D&P Labels
+### b. Drop non-consenters
 
-Assign Deserving & Power Blocks – redefine block using column names. Used the below to create block assignments for participants in A, B, and C (to ultimately consolidate).
+```{r}
+#| eval: false
+#| include: false
+
+# Filter to those who consented
+raw_data <- raw_data %>%
+  filter(consent == 1)
+
+#remove consent col
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  select(-consent)
+
+# Save again
+
+write_csv(raw_data_cleaned, "data/cleaned/cleaned_data_consent.csv")
+```
+
+
+#### b. D&P Labels
+
+Assign Deserving & Power Blocks – redefine block using column names. Used the below to create block assignments for participants in A (n=900), B (n=898), and C (N=898) (to ultimately consolidate).
 
 Explanation: Participants were sorted into 3 sections (ABC). For the deservingness and power questions, all 3 participant sections evaluated many of the same groups, but two of the three evaluated extra groups that participants in the other sections did not.
 
@@ -83,103 +121,125 @@ raw_data <- raw_data %>%
       TRUE ~ NA_character_
     )
   )
-
+#count(raw_data, block)
 # Save labeled but otherwise unmodified version
 write_csv(raw_data, "./data/cleaned/labeled_raw_data.csv")
 
 ```
 
-#### b. Create cleaned data frame, deleting un-needed cols
+
+## 2. Clean & Quality
+###  attn checks
+uncleaned:
+q9, character, can be 1 2 3 4 NA 3 -99
+--see 2095 passed, 599 did not
+q17, character, lots of different responses
+-2063 passed, 631 not
+q114_4, character can be 6 5 NA 4 -99
 
 ```{r}
-#| include: false
-#summary(raw_data)
-columns_to_drop <- c(
-  "status", "start_date", "end_date", "ip_address", "recipient_last_name", "recipient_first_name", 
-  "recipient_email", "external_reference", "recorded_date", "location_latitude", 
-  "location_longitude", "distribution_channel", "user_language"
-)
-
-#names(raw_data)
-
-# Drop all columns containing "_DO" (Display Order)
-
-grep("_do_", names(raw_data), value = TRUE)
-
-do_columns <- grep("_do", names(raw_data), value = TRUE)
-
-# Drop everything
-raw_data_cleaned <- raw_data %>%
-  select(-all_of(c(columns_to_drop, do_columns)))
-
-# Check
-length(do_columns)
-
+# summary(raw_data_cleaned$q114_4)
+# 
+# unique(raw_data_cleaned$q17)
+# 
+# table(raw_data_cleaned$q9, useNA = "ifany")
+# table(raw_data_cleaned$q17, useNA = "ifany")
+# table(raw_data_cleaned$q114_4, useNA = "ifany")
+# 
+# unique(raw_data_cleaned$q114_4)
+# 
+# raw_data_cleaned %>%
+#   count(q114_4, sort = TRUE)
 
 ```
 
-### c. Clean: drop non-consenters
-
-```{r}
-#| eval: false
-#| include: false
-
-# Filter to those who consented
-raw_data_cleaned <- raw_data_cleaned %>%
-  filter(consent == 1)
-
-# Save again
-write_csv(raw_data_cleaned, "data/cleaned/cleaned_data_consent.csv")
-
-#remove consent col
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  select(-consent)
-
-```
-
-### d. Clean: attn checks
-
--   first, create flags for passed/not each check and people who failed all
+-   create flags for passed/not each check and people who failed all
 
 ```{r}
 #| eval: false
 #| include: false
 
 # 1. create logical variable (true/false) that marks whether respondent answered Q9 with 4
-attn_check_q9 <- raw_data_cleaned$q9 == 4
 
-#2. attention flag - tae text responses to Q17, remove leading/trailing spaces, and convert everything to lowercase for standardization)
+raw_data_cleaned$attn_q9_pass = !is.na(raw_data_cleaned$q9) & raw_data_cleaned$q9 == "4"
+
+#true if 4
+
+# table(raw_data_cleaned$q9, useNA = "ifany")
+# table(raw_data_cleaned$attn_q9_pass, useNA = "ifany")
+
+
+#2. attention flag -  text responses to Q17, remove leading/trailing spaces, and convert everything to lowercase for standardization)
 attn_text <- tolower(str_trim(raw_data_cleaned$q17))
 
 #2a. create list of acceptable answers for Q17
-accepted_variants <- c("purple", "\"purple\"", "purpke", "purplee", "prurprle", "purpl", "purp", "💜", "🟣")
+accepted_variants <- c("purple", "urple", "puple","purpel", "\"purple\"", "purpke", "purplee", "prurprle", "purpl", "purp", "💜", "🟣")
 
 #2b. chheck if each cleaned Q17 response is in thhe list of accepted variants. if yes, respondent passed attn check
-attn_check_q17 <- attn_text %in% accepted_variants
+raw_data_cleaned$attn_check_q17 <- attn_text %in% accepted_variants
+table(attn_check_q17, useNA = "ifany")
 
 #3. attn flag -- Create a flag for whether the respondent answered Q114_4 with a 6 (i.e., passed the third attention check
-attn_check_q1114 <- raw_data_cleaned$q114_4 == 6
 
-#If Q114_4 equals -99 (an invalid code), treat that as a failed check.
-attn_check_q1114[raw_data_cleaned$q114_4 == -99] <- FALSE
+# table(raw_data_cleaned$q114_4, useNA = "ifany")
 
-#If Q114_4 is NA (they didn’t see the question), count that as a pass because they weren’t shown the question
-attn_check_q1114[is.na(raw_data_cleaned$q114_4)] <- TRUE  # not shown → pass
+raw_data_cleaned$attn_q114_pass = !is.na(raw_data_cleaned$q114_4) & raw_data_cleaned$q114_4 == "6"
 
-# 2. Create score + filter full failures
+# older version counted NA as passed. lots of NAs likely because late in the survey. For now, only care is that I have passes recorded and in next code chunk will filter out those who failed all 3 checks.
+# attn_check_q1114 <- raw_data_cleaned$q114_4 == 6
+# 
+# #If Q114_4 equals -99 (an invalid code), treat that as a failed check.
+# attn_check_q1114[raw_data_cleaned$q114_4 == -99] <- FALSE
+# 
+# #If Q114_4 is NA (they didn’t see the question), count that as a pass because they weren’t shown the question
+# attn_check_q1114[is.na(raw_data_cleaned$q114_4)] <- TRUE  # not shown → pass
+```
+
+attn_q9_pass, attn_check_q17, attn_q114_pass
+
+```{r}
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    attn_q9_pass = attn_check_q9,
-    attn_q17_pass = attn_check_q17,
-    attn_q1114_pass = attn_check_q1114,
-    attn_pass_count = as.integer(attn_q9_pass) + as.integer(attn_q17_pass) + as.integer(attn_q1114_pass)
-  ) %>%
-  filter(attn_pass_count > 0)  # Remove only people who failed all
+    attn_pass_count = rowSums(
+      cbind(
+        as.integer(attn_q9_pass),
+        as.integer(attn_check_q17),
+        as.integer(attn_q114_pass)
+      ),
+      na.rm = TRUE
+    ),
+    attn_fail_count = 3 - attn_pass_count
+  )
 
-#View(raw_data_cleaned)
+count(raw_data_cleaned, attn_pass_count)
+
+raw
 
 ```
+1,604 respondents passed all 3 attn checks
+599 passed none of them
+32 passed 1
+459 passed 2
+
+```{r}
+write_csv(raw_data_cleaned, "data/cleaned/cleaned_data_consent_pre_attn_rest.csv")
+
+data_pre_attn_exclusion <- raw_data_cleaned
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  filter(attn_pass_count > 0)
+
+count(raw_data_cleaned, attn_pass_count)
+
+```
+
+With dropped respondents (failed all 3), I have 32 respondents who passed 1, 459 who passed 2, and 1,604 who passed all 3. Total = 2,095 respondents retained.
+
+To check specific attention check pass/fail counts:
+attn_q9_pass,
+attn_check_q17,
+attn_q114_pass
+attn_pass_count
 
 ### e. Clean: via survey duration
 
@@ -198,8 +258,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 summary(raw_data_cleaned$duration_minutes)
 
 
-summary(raw_data_cleaned$duration_minutes)
-
 quantile(
   raw_data_cleaned$duration_minutes,
   probs = c(.01, .05, .25, .5, .75, .95, .99),
@@ -211,8 +269,23 @@ quantile(
   probs = c(.50, .60, .70, .75, .80, .85, .90, .95, .97, .99),
   na.rm = TRUE
 )
+raw_data_cleaned %>%
+  mutate(
+    duration_group = case_when(
+      duration_minutes < 15 ~ "< 15 min",
+      duration_minutes < 30 ~ "15–29 min",
+      duration_minutes < 45 ~ "30–44 min",
+      duration_minutes < 60 ~ "45–59 min",
+      duration_minutes < 90 ~ "60–89 min",
+      duration_minutes < 120 ~ "90–119 min",
+      duration_minutes < 360 ~ "2–6 hours",
+      TRUE ~ "6+ hours"
+    )
+  ) %>%
+  count(duration_group)
 
-library(ggbeeswarm)
+# visual of response times
+
 uncleaned_response_times <-
 ggplot(raw_data_cleaned,
        aes(x = duration_minutes, y = 0)) +
@@ -234,6 +307,8 @@ ggplot(raw_data_cleaned,
     axis.ticks.y = element_blank()
   )
 
+
+uncleaned_response_times
 # save uncleaned_response_times as image
 
 
@@ -243,25 +318,224 @@ ggsave(
   width = 14,
   height = 9,
   dpi = 300,
-  bg = "white"
 )
+
+```
+Grouping ppl into speed
+```{r}
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  filter(duration_minutes >= 8)
+
+raw_data_cleaned$speeder <- ifelse(raw_data_cleaned$duration_minutes < 12, 1, 0) 
 
 ```
 
 ```{r}
-names(raw_data)
-summary(raw_data$duration_in_seconds)
+speed_review <- raw_data_cleaned %>%
+  filter(duration_minutes >= 8) %>%
+  mutate(
+    speed_group = case_when(
+      duration_minutes < 12 ~ "8–<12 min",
+      duration_minutes < 20 ~ "12–<20 min",
+      TRUE ~ "20+ min"
+    ),
+    
+    attn_fail_count = 3 - attn_pass_count,
+    
+    any_attn_fail = attn_fail_count >= 1,
+    two_attn_fails = attn_fail_count >= 2
+  )
 
-plot(raw_data_cleaned$duration_in_seconds)
+speed_review %>%
+  count(speed_group)
+```
+```{r}
+speed_review %>%
+  count(speed_group, attn_fail_count)
+```
+ I should probably remove people who were too fast two slow and only passed one attention check. or flag. 
+
+remember: 
+attn_q9_pass,
+attn_check_q17,
+attn_q114_pass
+attn_pass_count
+```{r}
+speed_review %>%
+  group_by(speed_group) %>%
+  summarise(
+    n = n(),
+    
+    q9_fail_n = sum(attn_q9_pass == FALSE, na.rm = TRUE),
+    q9_fail_pct = mean(attn_q9_pass == FALSE, na.rm = TRUE) * 100,
+    
+    q17_fail_n = sum(attn_check_q17 == FALSE, na.rm = TRUE),
+    q17_fail_pct = mean(attn_check_q17 == FALSE, na.rm = TRUE) * 100,
+    
+    q1114_fail_n = sum(attn_q114_pass == FALSE, na.rm = TRUE),
+    q1114_fail_pct = mean(attn_q114_pass == FALSE, na.rm = TRUE) * 100
+  )
+```
+fast respondents who had another issue
+```{r}
+speed_review %>%
+  filter(
+    duration_minutes < 12,
+    attn_fail_count >= 1
+  ) %>%
+  select(
+    response_id,
+    duration_minutes,
+    attn_pass_count,
+    attn_fail_count,
+    attn_q9_pass,
+    attn_check_q17,
+    attn_q114_pass
+  ) %>%
+  arrange(duration_minutes)
+```
+```{r}
+speed_review %>%
+  filter(
+    duration_minutes < 20,
+    attn_fail_count >= 1
+  ) %>%
+  select(
+    response_id,
+    duration_minutes,
+    attn_pass_count,
+    attn_fail_count,
+    attn_q9_pass,
+    attn_check_q17,
+    attn_q114_pass
+  ) %>%
+  arrange(duration_minutes) %>%
+  View()
+```
+
+```{r}
+speed_review %>%
+  summarise(
+    # 8 to <12 minutes
+    n_under_12 = sum(duration_minutes < 12),
+    n_under_12_attn_fail =
+      sum(duration_minutes < 12 & any_attn_fail),
+    pct_under_12_attn_fail =
+      mean(any_attn_fail[duration_minutes < 12]) * 100,
+    
+    # 8 to <20 minutes
+    n_under_20 = sum(duration_minutes < 20),
+    n_under_20_attn_fail =
+      sum(duration_minutes < 20 & any_attn_fail),
+    pct_under_20_attn_fail =
+      mean(any_attn_fail[duration_minutes < 20]) * 100
+  )
+```
+
+### e. completed vars
+for data that has survived screening so far . . .
+-which analytically important questions were they eligible to see
+-which did they answer
+-what pattens of missingness exist
+-what consequences could those patterns have for analysis
+
+q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3, q62_1,q51_1 through q51_8, dem101, q32-38, q111, 
+
+### f. completion (all and vars)
+
+Did these people answer variables I use? 
+AAPOR explicitly distinguishes survey breakoff from item nonresponse. Someone can reach the end but skip questions; someone can break off before the end but still provide usable answers to the crucial variables. AAPOR recommends coding unanswered questions distinctly from substantive answers such as “don't know” and “prefer not to answer,” and emphasizes documenting partial responses rather than automatically treating them as invalid cases.
+
+And the breakoff literature gives you another reason not to equate finished == 0 with poor-quality respondent. Breakoff can be related to questionnaire design, burden, where a question occurs, and respondent characteristics. Peytchev found that breakoffs did not simply look like inattentive respondents.
+
+Need to look for:
+-loss of information/precision
+-selection
+
+Selection: do people who don't answer policy questions differ systematically in incarceratione xperience, ideology, education, survey engagement, race, underlying policy view? 
+
+Missing data lit says percent missing does not tell by itself whether missingness is dangerous/problematic. Ordinary regressions usually perform complete-case/listwise deletion for the variables appearing in that particular model. That means that adding a control variable with missing observations can change the regression sample. Coeficcient can then change partyly becuase added the control but also partialyl because the model is being estimated with a different sample. 
 
 
+## Retained Respondents who did not finish
 
-raw_data_cleaned <- raw_data_cleaned %>%
-  filter(duration_in_seconds >= 480)
+```{r}
+
+table(raw_data_cleaned$finished, useNA = "ifany")
+
+finishers_df <- raw_data_cleaned %>% filter(finished==1)
+write_csv(finishers_df, "data/cleaned/finishers.csv")
+
+nonfinishers_df <- raw_data_cleaned %>% filter(finished == 0)
+write_csv(nonfinishers_df, "data/cleaned/nonfinishers.csv")
 
 ```
 
-### e. TBD Clean: ppl who do not answer my IV ??
+```{r}
+count(nonfinishers_df, block)
+count(finishers_df, block)
+```
+
+what block are they in?
+
+-   18 in A
+
+-   28 in B
+
+-   20 in C
+
+| Block   | nonfinishers | finishers |
+|---------|--------------|-----------|
+| Block A | 20           | 680       |
+| Block B | 29           | 685       |
+| Block C | 20           | 661       |
+
+```{r}
+count(nonfinishers_df, block)
+```
+
+| Experiences       | nonfinishers | finishers |
+|-------------------|--------------|-----------|
+| Incarcerated      | 8            | 162       |
+| Know incarcerated | 21           | 668       |
+| Victims           | 60           | 267       |
+|                   |              |           |
+
+-   8 incarcerated
+
+-   21 know incarcerated
+
+-   60 victims
+
+```{r}
+
+count(nonfinishers_df, q23_1)
+
+count(finishers_df, q15_1)
+```
+
+| NAs in                   | nonfinishers | finishers                |
+|--------------------------|--------------|--------------------------|
+| d_crim_abc               |              |                          |
+| d_incppl_pris_abc        |              |                          |
+| d_incwomen_abc           |              |                          |
+| all Police Questions (5) | 16           |                          |
+| all prison questions     | all 16 NAs   | 170 (171 for 25_4 and 6) |
+| q25_1                    | 16           |                          |
+| q25_2                    | ...          |                          |
+| re enfranchisement       | 35           | 497                      |
+| jail voting              | 35           | 497                      |
+
+
+deservingness scores aside, variables I use/care about (in names at THIS stage): 
+
+q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3
+
+```{r}
+names(raw_data_cleaned)
+```
+
 
 ## 2. Deservingness
 
@@ -274,7 +548,7 @@ Objective: consolidate blocks (i.e. so only 1 Incarcerated People/Prisoners)
 #| include: false
 
 mapping <- read_csv("./data/Unified_Deserving_Power_Target_Mapping.csv")
-view(mapping)
+#view(mapping)
 ```
 
 Prep by converting to numeric
@@ -297,7 +571,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
     ~ as.numeric(na_if(.x, "-99"))
   ))
 
-table(raw_data_cleaned$`Deserving Group A_1`, useNA = "always")
+#table(raw_data_cleaned$`Deserving Group A_1`, useNA = "always")
 
 ```
 
@@ -307,40 +581,35 @@ ALL Evals: Create consolidated variable names for deservingness — OLD(?) can p
 #| eval: false
 #| include: false
 
-#new_vars <- c(
-#  "d_black_afam_abc", "d_native_ind_abc", "d_asianam_abc", "d_latino_his_abc", "d_whiteam_abc",
-#  "d_mideastam_abc", "d_incwomen_abc", "d_collegewom_abc", "d_enviro_abc", "d_feminists_abc", 
-#  "d_proabort_choice_abc", "d_abortprov_abc", "d_welfare_tanf_abc", "d_fstamps_snap_abc", 
-#  "d_unions_abc", "d_medicaid_abc", "d_medicare_abc", "d_unemployed_abc", "d_police_abc", 
-#  "d_poorfam_abc", "d_wealthy_abc", "d_teachers_abc", "d_sci_experts_abc", "d_child_abc", 
-#  "d_crim_abc", "d_incppl_abc", "d_homeless_abc", "d_immigrants_abc", "d_unauth_undoc_abc", 
-#  "d_gunowners_abc", "d_voters_abc", "d_lgbt_abc", "d_trans_abc", "d_transkids_abc", "d_gunmans_abc", 
-#  "d_ice_abc", "d_socmed_abc", "d_nra_abc", "d_bigbank_abc", "d_bigcorp_abc", "d_uni_abc", 
-#  "d_comcoll_abc", "d_noncit_parent_a", "d_incparents_a", "d_hsteen_a", "d_athiest_a", "d_cath_a", 
-#  "d_evan_a", "d_jews_a", "d_pal_a", "d_muslim_a", "d_blackwom_a", "d_blackmen_a", "d_lds_a", 
-#  "d_longcov_a", "d_exon_a", "d_weed_a", "d_opioid_a", "d_whitecol_a", "d_tech_a", "d_smokers_a", 
-#  "d_genx_a", "d_boomer_a", "d_mill_a", "d_genz_a"
-#)
-#
-#for (var in new_vars) {
-#  raw_data_cleaned[[var]] <- NA #to initialize
-#}
+new_vars <- c(
+ "d_black_afam_abc", "d_native_ind_abc", "d_asianam_abc", "d_latino_his_abc", "d_whiteam_abc",
+ "d_mideastam_abc", "d_incwomen_abc", "d_collegewom_abc", "d_enviro_abc", "d_feminists_abc",
+ "d_proabort_choice_abc", "d_abortprov_abc", "d_welfare_tanf_abc", "d_fstamps_snap_abc",
+ "d_unions_abc", "d_medicaid_abc", "d_medicare_abc", "d_unemployed_abc", "d_police_abc",
+ "d_poorfam_abc", "d_wealthy_abc", "d_teachers_abc", "d_sci_experts_abc", "d_child_abc",
+ "d_crim_abc", "d_incppl_abc", "d_homeless_abc", "d_immigrants_abc", "d_unauth_undoc_abc",
+ "d_gunowners_abc", "d_voters_abc", "d_lgbt_abc", "d_trans_abc", "d_transkids_abc", "d_gunmans_abc",
+ "d_ice_abc", "d_socmed_abc", "d_nra_abc", "d_bigbank_abc", "d_bigcorp_abc", "d_uni_abc",
+ "d_comcoll_abc", "d_noncit_parent_a", "d_incparents_a", "d_hsteen_a", "d_athiest_a", "d_cath_a",
+ "d_evan_a", "d_jews_a", "d_pal_a", "d_muslim_a", "d_blackwom_a", "d_blackmen_a", "d_lds_a",
+ "d_longcov_a", "d_exon_a", "d_weed_a", "d_opioid_a", "d_whitecol_a", "d_tech_a", "d_smokers_a",
+ "d_genx_a", "d_boomer_a", "d_mill_a", "d_genz_a"
+)
+
+for (var in new_vars) {
+ raw_data_cleaned[[var]] <- NA #to initialize
+}
 ```
 
 Ran new version of ABC loop to consolidate groups. Verified. After below, dataset in memory has unified variables.
 
 ```{r consolidation, eval=TRUE}
-library(readxl)
-library(stringr)
-library(dplyr)
+
 
 
 # Load the mapping
 mapping <- read_excel("scratch for consolidation.xlsx")
 view(mapping)
-
-#clean first? Oc 27 6pm
-
 
 # Goal: standardize variable names in the mapping sheet so they match the names in raw_data_cleaned
 # Clean column names and values in mapping to match raw_data_cleaned
@@ -351,26 +620,11 @@ mapping <- mapping %>%
     var_c = `Deserving Group C`
   ) %>%
   mutate(
-    var_a = str_replace_all(tolower(trimws(var_a)), " ", "_"),#trim removes whitespace
+    var_a = str_replace_all(tolower(trimws(var_a)), " ", "_"),# trim removes whitespace
     var_b = str_replace_all(tolower(trimws(var_b)), " ", "_"),#lowercases
     var_c = str_replace_all(tolower(trimws(var_c)), " ", "_")
   )
 
-#view(mapping)
-
-#new section to try to make data not just variables show up
-
-mapping <- mapping %>%
-  rename(
-    var_a = `Deserving Group A`,
-    var_b = `Deserving Group B`,
-    var_c = `Deserving Group C`
-  ) %>%
-  mutate(
-    var_a = str_replace_all(tolower(trimws(var_a)), " ", "_"),
-    var_b = str_replace_all(tolower(trimws(var_b)), " ", "_"),
-    var_c = str_replace_all(tolower(trimws(var_c)), " ", "_")
-  )
 
 view(mapping)
 #undiagnostic
@@ -409,7 +663,8 @@ view(raw_data_cleaned)
 
 
 #NEW VERSION OFdrop block specific variables -- this didn't seem to work -- nothing appears when I look at block_vars_to_drop
-# block_vars_to_drop <- grep("^(deserving_group|power_group)_[abc]_", names(raw_data_cleaned), value = TRUE)
+
+#block_vars_to_drop <- grep("^(deserving_group|power_group)_[abc]_", names(raw_data_cleaned), value = TRUE)
 
 #cleaned_data_light <- raw_data_cleaned %>%
   select(-all_of(block_vars_to_drop))
@@ -586,96 +841,8 @@ view(cleaned_data_light)
 
 ```
 
-## Retained Respondents who did not finish
 
-```{r}
-
-table(raw_data_cleaned$finished, useNA = "ifany")
-
-finishers_df <- raw_data_cleaned %>% filter(finished==1)
-write_csv(finishers_df, "data/cleaned/finishers.csv")
-
-nonfinishers_df <- raw_data_cleaned %>% filter(finished == 0)
-write_csv(nonfinishers_df, "data/cleaned/nonfinishers.csv")
-
-```
-
-```{r}
-count(nonfinishers_df, block)
-count(finishers_df, block)
-```
-
-what block are they in?
-
--   18 in A
-
--   28 in B
-
--   20 in C
-
-| Block   | nonfinishers | finishers |
-|---------|--------------|-----------|
-| Block A | 18           | 743       |
-| Block B | 28           | 722       |
-| Block C | 20           | 691       |
-
-```{r}
-count(nonfinishers_df, block)
-```
-
-| Experiences       | nonfinishers | finishers |
-|-------------------|--------------|-----------|
-| Incarcerated      | 8            | 162       |
-| Know incarcerated | 21           | 668       |
-| Victims           | 60           | 267       |
-|                   |              |           |
-
--   8 incarcerated
-
--   21 know incarcerated
-
--   60 victims
-
-```{r}
-
-count(nonfinishers_df, q23_1)
-
-count(finishers_df, q15_1)
-```
-
-| NAs in                   | nonfinishers | finishers                |
-|--------------------------|--------------|--------------------------|
-| d_crim_abc               |              |                          |
-| d_incppl_pris_abc        |              |                          |
-| d_incwomen_abc           |              |                          |
-| all Police Questions (5) | 16           |                          |
-| all prison questions     | all 16 NAs   | 170 (171 for 25_4 and 6) |
-| q25_1                    | 16           |                          |
-| q25_2                    | ...          |                          |
-| re enfranchisement       | 35           | 497                      |
-| jail voting              | 35           | 497                      |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-|                          |              |                          |
-
-66 non-finishers
-
-completion times:
-
-d_crim_abc d_incppl_pris_abc d_incwomen_abc q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3
-
-# LAST: Save to file.
+# SAVE: cleaned_light.csv
 
 ```{r}
 
@@ -694,65 +861,6 @@ table(raw_data_cleaned$q51_1, useNA = "ifany")
 
 # ARCHIVED CODE
 
-```{r}
-# Making "unique" combinations that include possible accidental "both incarcerated and none." I'm erring on the side of caution, given these are sensitive questions that might confuse participants. For example, someone might quickly check "myself," but then see "someone you know" followed by "don't know/unsure", and think the latter is in regards to knowing someone who has been incarcerated or victimized. I'll run the models with different versions."
-
-  contact_pattern = c(
-    "100000",  # Incarcerated Only
-    "100001",  # Incarcerated Only
-    "101001",  # Incarcerated Only
-    "101000",  # Incarcerated Only
-    
-    "010000",  # Knows Inc Only
-    "010001",  # Knows Inc Only
-    "011001",  # Knows Inc Only
-    "011000",  # Knows Inc Only
-    
-    "001100",  # Victim Only
-    "001101",  # Victim Only
-    "000100",  # Victim Only
-    "000101",  # Victim Only
-    
-    "110000",  # Inc, Knows Inc
-    "110001",  # Inc, Knows Inc
-    "111001",  # Inc, Knows Inc
-    "111000",  # Inc, Knows Inc
-    
-    
-    "100100",  # Inc, Vict
-    "100101",  # Inc, Vict
-    "101100",  # Inc, Vict
-    "101101",  # Inc, Vict
-    
-    "100010",  # Inc, Knows Vict
-    "101011",  # Inc, Knows Vict
-    "100011",  # Inc, Knows Vict
-    "101010",  # Inc, Knows Vict
-    
-    "010100",  # Knows Inc, Vict
-    "010101",  # Knows Inc, Vict
-    "011101",  # Knows Inc, Vict
-    "011100",  # Knows Inc, Vict
-    
-    "110100",  # Inc, Knows Inc, Vict
-    "110101",  # Inc, Knows Inc, Vict
-    "111101",  # Inc, Knows Inc, Vict
-
-    "010110",  # Knows Inc, Vict, Knows Vict
-    "011111",  # Knows Inc, Vict, Knows Vict
-    "011110",  # Knows Inc, Vict, Knows Vict
-    "010111",  # Knows Inc, Vict, Knows Vict
-    
-    "110110",  # All
-    "111110",  # All
-    "110111",  # All
-    "111111",  # All
-    
-    "011100"   # Also and only KI
-  )
-
-
-```
 
 OLD: consolidating ABCs
 
@@ -760,7 +868,7 @@ OLD: consolidating ABCs
 #| eval: false
 #| include: false
 # Load the spreadsheet with the mappings
-library(readxl)
+
 mapping <- read_excel("scratch for consolidation.xlsx")
 
 
