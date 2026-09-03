@@ -66,7 +66,7 @@ Here, I am creating a block variable to keep track of what block each participan
 #| include: false
 # DeservingPower Blocks
 
-#FL_8_DO_Deserving&PowerBlockA %in% names(raw_data)
+FL_8_DO_Deserving&PowerBlockA %in% names(raw_data)
 #View(raw_data)
 
 # Add participant block variable (group a, b, c)
@@ -174,7 +174,7 @@ attn_text <- tolower(str_trim(raw_data$q17))
 #2a. create list of acceptable answers for Q17
 accepted_variants <- c("purple", "urple", "puple","purpel", "\"purple\"", "purpke", "purplee", "prurprle", "purpl", "purp", "💜", "🟣")
 
-#2b. chheck if each cleaned Q17 response is in thhe list of accepted variants. if yes, respondent passed attn check
+#2b. chheck if each cleaned Q17 response is in the list of accepted variants. if yes, respondent passed attn check
 raw_data$attn_check_q17 <- attn_text %in% accepted_variants
 table(raw_data$attn_check_q17, useNA = "ifany")
 
@@ -212,8 +212,6 @@ raw_data <- raw_data %>%
 
 count(raw_data, attn_pass_count)
 
-raw
-
 ```
 
 1,604 respondents passed all 3 attn checks 599 passed none of them 32 passed 1 459 passed 2
@@ -248,34 +246,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 #get pre-cleaned survey duration info: will want this to justify cleaning cutoffs
 
-summary(raw_data_cleaned$duration_minutes)
-
-
-quantile(
-  raw_data_cleaned$duration_minutes,
-  probs = c(.01, .05, .25, .5, .75, .95, .99),
-  na.rm = TRUE
-)
-
-quantile(
-  raw_data_cleaned$duration_minutes,
-  probs = c(.50, .60, .70, .75, .80, .85, .90, .95, .97, .99),
-  na.rm = TRUE
-)
-raw_data_cleaned %>%
-  mutate(
-    duration_group = case_when(
-      duration_minutes < 15 ~ "< 15 min",
-      duration_minutes < 30 ~ "15–29 min",
-      duration_minutes < 45 ~ "30–44 min",
-      duration_minutes < 60 ~ "45–59 min",
-      duration_minutes < 90 ~ "60–89 min",
-      duration_minutes < 120 ~ "90–119 min",
-      duration_minutes < 360 ~ "2–6 hours",
-      TRUE ~ "6+ hours"
-    )
-  ) %>%
-  count(duration_group)
+#summary(raw_data_cleaned$duration_minutes)
 
 # visual of response times
 
@@ -301,8 +272,7 @@ ggplot(raw_data_cleaned,
   )
 
 
-uncleaned_response_times
-# save uncleaned_response_times as image
+uncleaned_response_times # save uncleaned_response_times as image
 
 
 ggsave(
@@ -430,98 +400,7 @@ speed_review %>%
   )
 ```
 
-### c. completion of vars
-
-for data that has survived screening so far . . . -which analytically important questions were they eligible to see -which did they answer -what pattens of missingness exist -what consequences could those patterns have for analysis
-
-q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3, q62_1,q51_1 through q51_8, dem101, q32-38, q111,
-
-Did these people answer variables I use? AAPOR explicitly distinguishes survey breakoff from item nonresponse. Someone can reach the end but skip questions; someone can break off before the end but still provide usable answers to the crucial variables. AAPOR recommends coding unanswered questions distinctly from substantive answers such as “don't know” and “prefer not to answer,” and emphasizes documenting partial responses rather than automatically treating them as invalid cases.
-
-And the breakoff literature gives another reason not to equate finished == 0 with poor-quality respondent. Breakoff can be related to questionnaire design, burden, where a question occurs, and respondent characteristics. Peytchev found that breakoffs did not simply look like inattentive respondents.
-
-Need to look for: -loss of information/precision -selection
-
-Selection: do people who don't answer policy questions differ systematically in incarceratione xperience, ideology, education, survey engagement, race, underlying policy view?
-
-Missing data lit says percent missing does not tell by itself whether missingness is dangerous/problematic. Ordinary regressions usually perform complete-case/listwise deletion for the variables appearing in that particular model. That means that adding a control variable with missing observations can change the regression sample. Coeficcient can then change partyly becuase added the control but also partialyl because the model is being estimated with a different sample.
-
-## Retained Respondents who did not finish
-
-```{r}
-
-table(raw_data_cleaned$finished, useNA = "ifany")
-
-finishers_df <- raw_data_cleaned %>% filter(finished==1)
-write_csv(finishers_df, "data/cleaned/finishers.csv")
-
-nonfinishers_df <- raw_data_cleaned %>% filter(finished == 0)
-write_csv(nonfinishers_df, "data/cleaned/nonfinishers.csv")
-
-```
-
-```{r}
-count(nonfinishers_df, block)
-count(finishers_df, block)
-```
-
-what block are they in?
-
-- 18 in A
-
-- 28 in B
-
-- 20 in C
-
-| Block   | nonfinishers | finishers |
-|---------|--------------|-----------|
-| Block A | 20           | 680       |
-| Block B | 29           | 685       |
-| Block C | 20           | 661       |
-
-```{r}
-count(nonfinishers_df, block)
-```
-
-| Experiences       | nonfinishers | finishers |
-|-------------------|--------------|-----------|
-| Incarcerated      | 8            | 162       |
-| Know incarcerated | 21           | 668       |
-| Victims           | 60           | 267       |
-|                   |              |           |
-
-- 8 incarcerated
-
-- 21 know incarcerated
-
-- 60 victims
-
-```{r}
-
-count(nonfinishers_df, q23_1)
-
-count(finishers_df, q15_1)
-```
-
-| NAs in                   | nonfinishers | finishers                |
-|--------------------------|--------------|--------------------------|
-| d_crim_abc               |              |                          |
-| d_incppl_pris_abc        |              |                          |
-| d_incwomen_abc           |              |                          |
-| all Police Questions (5) | 16           |                          |
-| all prison questions     | all 16 NAs   | 170 (171 for 25_4 and 6) |
-| q25_1                    | 16           |                          |
-| q25_2                    | ...          |                          |
-| re enfranchisement       | 35           | 497                      |
-| jail voting              | 35           | 497                      |
-
-deservingness scores aside, variables I use/care about (in names at THIS stage):
-
-q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3
-
-```{r}
-names(raw_data_cleaned)
-```
+### c. completion of vars -->
 
 # 3. Deservingness
 

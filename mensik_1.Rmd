@@ -1,10 +1,22 @@
 ---
-title: "mensik_1"
+title: "Experiments Problem Set 1"
+author: Kristina Mensik
 output: pdf_document
 date: "2026-08-31"
 ---
 
-1. An experiment is when all matters under study are under control of the researcher. 
-There's randomization, which means. 
+```{r}
 
-2. 
+```
+
+1a. An experiment is a procedure for estimating a causal quantity of interest, where treatment is randomized: probability of assignment to treatment is a known quantity between but not equal to 0 and 1, and can be replicated, and is equally likely across outcome-relevant observed and unobserved factors. The difference between an experiment and observational study is that in the prior, assignment to treatment is randomized.
+
+Some though argue that to be an experiment, the entire system under study (including assignment to treatment and manipulations) is under the researcher's control.
+
+1b. Unobserved heterogeneity is the unmeasured, unknown, potentially effectively infinite attributes that may distort inference. It is a problem for that reason (some other set of factors could explain a correllational relationship, even between variables that are comprable on observables), but especially a problem because there's no resolution procedure. In other words, there is no way of knowing what you don't know.
+
+2.  This is none of the above -- it is more like an observational study -- because just because the pool of villages is randomly sampled, does not mean that assignment to treatment for the population under study is random.
+
+3.  This study seems to adequately fulfill the criteria for a field experiment. First, demand for household water connections is measured by the percent of uptake on offers for zero-interest credit household water connections – the treatment resembles the intervention of interest. Second, those who would encounter the intervention are households in urban Morocco who might want household water connections (those who do not have them already), and as long as "homeowners without a private connection to the city's water grid" do not have another form of household water connections, the participants indeed resemble the actors of interest. Last, the context of receiving treatment also seems to match, again so long as the subset it random, and the outcomes do too if waterbourne illness, leisure time and social activities are thought of as good indicators of welfare (I think so).
+
+4.  It is reasonable to believe that parachutes are effective even in the abasence of randomized experiments that establish their efficacy because there is very little ambiguity about the potential outcome for the treated in a world where they are not assigned to treatment, nor about what the potential outcome would be if there were in fact a procedure assigning people to be "untreated."

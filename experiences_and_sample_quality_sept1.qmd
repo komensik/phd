@@ -47,7 +47,6 @@ total_no_victim <- sum(raw_data_cleaned$q4_2_3 == 1, na.rm = TRUE)
 
 ```
 
-
 Create fingerprint
 
 - create a new variable named contact_pattern
@@ -79,7 +78,15 @@ count(raw_data_cleaned, contact_pattern)
 
 Some respondents selected both a contact experience (e.g., "been incarcerated") and also marked “none/unsure”, which is logically inconsistent. These may reflect confusion, misclicks, or low-quality responses.
 
-Conflict Type Count Q4_1_1 (Been incarcerated) & Q4_1_3 (None/Unsure) 1 Q4_1_2 (Knows incarcerated) & Q4_1_3 (None/Unsure) 1 Q4_2_1 (Been victimized) & Q4_2_3 (None/Unsure) 10 Q4_2_2 (Knows victim) & Q4_2_3 (None/Unsure) 10
+Conflict Type Count
+
+Q4_1_1 (Been incarcerated) & Q4_1_3 (None/Unsure) 1
+
+Q4_1_2 (Knows incarcerated) & Q4_1_3 (None/Unsure) 1
+
+Q4_2_1 (Been victimized) & Q4_2_3 (None/Unsure) 10
+
+Q4_2_2 (Knows victim) & Q4_2_3 (None/Unsure) 10
 
 ```{r, experiencesfingerprints}
 #table(raw_data_cleaned$Q4_1_3, useNA = "always")
@@ -1044,9 +1051,6 @@ raw_data_cleaned %>%
 
 ```
 
-
-
-
 ### (d) Diagnostics on Lack on Survey Weights
 
 ```{r}
@@ -1099,7 +1103,6 @@ table(raw_data_cleaned$vict, raw_data_cleaned$Republican)
 table(raw_data_cleaned$vict, raw_data_cleaned$Democrat)
 table(raw_data_cleaned$vict, raw_data_cleaned$gender)
 ```
-
 
 ### (e) Table of Impact x Race
 

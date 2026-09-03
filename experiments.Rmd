@@ -1,0 +1,123 @@
+---
+title: "Experiments"
+output: html_notebook
+---
+
+Intro – Maps
+
+Identification Spine (Sections 1.1-1.3)
+
+THE PROBLEM Causal questions are everywhere \| v ATTEMPT 1: Intuition + anecdote fails because: - opposing anecdotes exist for both sides -\> stalemate - even UNANIMOUS intuition can be flatly wrong [Cardiac Arrhythmia Suppression Trial: theory said suppress arrhythmia; 2 of 3 drugs INCREASED deaths] \| v ATTEMPT 2: Raw correlation fails because: correlations arise for reasons unrelated to the causal process [SAT prep; basketball players are taller] kills the "where there's smoke there's fire" defense \| v ATTEMPT 3: Refined correlation \<-- the dominant practice = restrict comparison to units alike on MEASURED attributes (matching, subclassification, regression adjustment) fails because: comparable on observables =/= comparable on unobservables [motivation predicts both prep-course-taking and scores] \| v WHY ATTEMPT 3 CANNOT BE PATCHED "bottomless pit" + "no well-defined stopping rule" - you cannot enumerate the confounder set - a critic can always name one more - the dispute has NO resolution procedure -\> literatures become "mired" \| v ATTEMPT 4: Systematic assignment procedure (alternation) 19th c.: Pasteur, Fibiger, Portuguese army surgeons goal: remove RESEARCHER DISCRETION over who is treated fails because: alternation is predictable -\> systematic differences survive [sicker diphtheria patients arrive on certain weekdays] \| v SOLUTION: RANDOM ASSIGNMENT (Fisher, mid-1920s) severs treatment from ALL outcome-predicting variables, observed AND unobserved you need not name, measure, or even suspect them \| +--\> FAIRNESS SENSE 1: no built-in advantage \| assign but administer nothing -\> no reason to \| expect either group to outperform \| +--\> FAIRNESS SENSE 2: transparent + reproducible anyone can run it; observers can verify; assignment precedes measurement, so analysis can be specified in advance [= the pre-registration argument] \| v WHAT RANDOMIZATION DOES *NOT* BUY any single experiment can over- or underestimate the guarantee is UNBIASEDNESS: a property of the estimator across hypothetical repetitions, not of your one estimate -\> Ch. 2 formalizes; Ch. 3 quantifies the spread \| v RANDOMIZATION IS NOT IMMUNITY noncompliance (Ch. 5-6) attrition (Ch. 7) interference between units (Ch. 8)
+
+Map 2: Fieldness (this is a separate axis (sections 1.4-1.5))
+
+"FIELD EXPERIMENT" is a bad name: "field" names the SETTING, but setting is only one of four things
+
+FOUR DIMENSIONS OF AUTHENTICITY 1. TREATMENT does it resemble the real-world intervention? 2. PARTICIPANTS do subjects resemble actors who normally face it? 3. CONTEXT does the setting resemble the setting of interest? 4. OUTCOMES do measures resemble outcomes actually of interest?
+
+-\> 4 binary dimensions = 16 cells. G&G decline to build the table. Treat "fieldness" as a profile, not a label.
+
+WORKED LADDER (donations -\> legislative access): students role-play schedulers .......... low on 1,2,3,4 real schedulers, simulated exercise .... gains PARTICIPANTS real donations to real legislators, real meeting requests ................ gains TREATMENT, CONTEXT, OUTCOMES
+
+MIXED CASES (the useful ones): Paluck / Rwanda radio: real context + participants, but subjects KNOW they are studied -\> outcome measurement loses unobtrusiveness Eldersveld GOTV: researcher-designed treatment, so a null tells you about HIS campaign, not campaigns in general campus cheating study: field or lab depending on how you define "the field" for your question
+
+WHY GO TO THE FIELD + program evaluation: tests DEPLOYMENT, not just exposure (allows people to miss the ad, ignore it, forget it) + unobtrusiveness: no demand effects / experimenter expectancy + outcomes tracked over TIME, not one sitting [ad effects strong immediately, decay fast] + can vary many treatment arms across a large subject pool [discrimination research]
+
+WHY IT'S HARD - implementation depends on PARTNERS - partners resist randomization (want to treat everyone, or hand-pick) -\> persuading them is a research skill - no unilateral control over the treatment menu - needs pilot testing + constant supervision - lab is easier for fine-grained theoretical variation
+
+Map 3: assignment continuum (section 1.6) WAS THERE AN ACTUAL RANDOMIZATION PROCEDURE?
+
+| YES, by researcher | YES, by an institution     | NO                         |
+|--------------------|----------------------------|----------------------------|
+| Field experiment   | NATURAL EXPERIMENT         | QUASI-EXPERIMENT           |
+| Lab experiment     | draft lottery              | RD / close elections       |
+|                    | judge assignment           | weather, disasters         |
+|                    | school lotteries           | colonial borders           |
+|                    | visa lotteries             | election cycles            |
+|                    | Brazilian audits           | \|                         |
+|                    | roommate assignment        | \| rests on ARGUMENT,      |
+|                    | \|                         | \| not procedure           |
+|                    | \| G&G treat these \~ the  | \|                         |
+|                    | \| same as field expts;    | \| units may SORT          |
+|                    | \| extra work = VERIFY the | \| around the threshold    |
+|                    | \| randomization really    | \| [near-winners differ    |
+|                    | \| happened                | \| in political resources] |
+|                    |                            | \|                         |
+|                    |                            | v                          |
+|                    | EXCLUDED                   | FROM THIS BOOK             |
+
+Vocabulary warning: this taxonomy is G&G's. Dunning and Shadish/Cook/Campbell use "natural experiment" without requiring randomization. Check which convention a paper uses.
+
+DOWNSTREAM EXPERIMENT (-\> Ch. 6): reuse someone's randomization to study a knock-on outcome [randomized boost to HS graduation -\> did turnout rise?]
+
+4x4 LOW FIELDNESS HIGH FIELDNESS +--------------------+--------------------+ RANDOMIZED \| lab experiment \| field experiment \| \| (identified, but \| (identified AND \| \| generalizes on \| generalizes) \| \| assumptions) \| \| +--------------------+--------------------+ NOT RANDOMIZED \| vignette survey, \| quasi-experiment, \| \| correlational lab \| observational \| \| work \| field research \| +--------------------+--------------------+
+
+LEFT-RIGHT = generalization / external validity TOP-BOTTOM = identification / internal validity
+
+These trade off in practice but are conceptually orthogonal. Realism does not identify anything. Randomization does not generalize anything.
+
+Intro -- Review questions.
+
+1.  Reasoning from intuition and anecdote is unreliable because (1) there are many different explanations that might explain the same results and be induced both in favor and opposition; (2) they can favor one side of an argument and be then susceptible to error. T*he method fails even when the anecdotes and intuition all point one direction — a unanimous, well-reasoned, mechanistically plausible story can simply be false.*
+
+2.  In the SAT prep course example, a positive correlation does not establish an effect because the positive correlation other unobserved factors can exist and actually explain the correlation (ie, that those who take prep courses have more money and access to other resources etc that shape test scores).
+
+    1.  Three interchangeable terms G & G give for unmeasured attributes causing the problem are "unobserved factors," "confounders," "lurking variables" or unobserved heterogeneity.
+
+3.  Social science's function to transform "raw correlations into more refined correlations" describes:
+
+4.  The list of potential confounders as a "bottomless pit" with "no well-defined stopping rule" implies that adding more control variables is always an incomplete solution. notice a raw association, then restrict the comparison to observations that look alike on measured background attributes — same gender, age, race, GPA, SES (matching, subclassification, regression adjustment). This does **not** solve the problem – making groups comparable on observables still leaves them potentially different on unobservables. Randomization is a categorically different approach. Emphasis: *the dispute has no resolution procedure.*
+
+5.  If I'm comparing policy attitudes among people who've been incarcerated/not, controlling for race, age, income, education, and region, one plausible unobserved confounder that would survive that adjustment is state exposure -- what other kinds of experiences with the state a person has had -- and another is (often raised in critiques) some kind of underlying trait or attitude that I don't totally think I believe in, that is independent of the experiences that are associated with race, age, income, education, and region. The latter (if I adopt what ppl usually say) would bias it away from zero. I'm not sure how the first would bias it.
+
+    1.  On direction: bias direction depends on the sign of the confounder's relationship to both treatment and outcome. Take the state-exposure variable. If incarcerated people also have more police contact, welfare surveillance, family court involvement — and if each of those independently pushes attitudes in the same direction incarceration would — then the estimate is inflated away from zero.
+
+    2.  However, state exposure isn't cleanly a confounder in the way "underlying trait" is. It's arguably part of the treatment. Incarceration doesn't arrive alone; it arrives bundled. That's a different problem than confounding — it's a question of what the treatment actually is (note chpt 2's excludability assumption).
+
+6.  G & G's basketball height line shows that correlation is not the same as causation. (effect of joining the team)
+
+7.  Random assignment severs backdoor paths from confounding variables to the outcome of interest. Also, severs the relationship between treatment and all variables that predict the outcome (both observed and unobserved).
+
+8.  The goal of assigning subjects alternately was to see if the outcomes differed between treated and untreated.
+
+9.  The point of the cardiac arrythmia trial anecdote is to show that it can be hard to establish cause to push back against intuition-based scientific understandings.
+
+10. skipping this question.
+
+11. experiments are fair because...
+
+    1.  *Fair in the sense of no built-in advantage.* Random assignment means observed and unobserved factors that affect outcomes are equally likely to appear in both groups. If you assigned people and then administered no treatment at all, you'd have no reason to expect either group to outperform the other.
+
+    2.  *Fair in the sense of transparent, reproducible procedure.* Any research group can carry out the steps. Observers can watch the assignment happen and verify it was done faithfully. And because assignment precedes outcome measurement, you can specify the analysis in advance — which limits the researcher discretion that could compromise the test. That second sense is essentially the argument for pre-registration, written before pre-registration was standard.
+
+12. Unbiasedness is a property of the *estimator*: the average of the estimates across hypothetical repetitions equals the true value. It says nothing about how close any single estimate is
+
+    1.  Randomization does not promise that a given studies estimate effect will be the same as the true effect.
+
+13. the dividing line separating experimental from non experimental research is random allocation (we know why some subjects and not others came to receive treatment). Three serious complecations are noncompliance, attrition, and interference between units.
+
+14. "fieldness" should actually be guaged along these 4 dimensions: authenticity of treatments, participants, contexts, and outcome measures, or "whether the treatment used in the study resembles the intervention of interest in the world; whether the participants resemble the actors who ordinarily encounter these interventions, whether the context within which subjects receive treatment resembles the context of interest, and whether the outcome measures resemble the actual outcomes of theoretical or practical interest" (11)
+
+15. skipping this question.
+
+16. skipping for now though good question
+
+17. one advantage in the field is it may be more 'realistic' in the 4 ways noted (authenticity of treatments, participants, contexts, and outcome measures ), and another is it might be more useful for people in the real world, however, they are harder to implement and you don't have control (ie, if you want to test a very specific message that's not among those a campaign is using, you're out of luck).
+
+    1.  The outcome-measurement advantage I was fishing for: lab outcomes are usually whatever can be measured in one sitting, while field studies track behavior over extended periods. G&G's illustration is political advertising, where effects look strong immediately and then decay fast. A one-sitting measurement would have told you the wrong thing. Also relevant for you: unobtrusiveness — subjects don't know they're being studied, so they can't perform the response they think you want.
+
+        Second disadvantage worth having: field experiments depend on partners, and partners frequently balk at randomization. They'd rather treat everyone or hand-pick recipients. G&G (citing Orr and Gueron) treat "argue convincingly that random assignment is feasible and ethical" as a core research skill, not a footnote. If you ever try to run something with a reentry program or a DA's office, that conversation is the project.
+
+18. Question: Distinguish a naturally occurring experiment from a quasi-experiment as G&G define them, and explain why quasi-experiments are excluded from this book. Then: **[apply]** random assignment of defendants to judges is on their list of natural experiments. What makes it qualify, and what would you actually be estimating if you used it — the effect of incarceration on attitudes, or something narrower?
+
+    1.  A **naturally occurring experiment** is one where an actual randomization procedure was carried out — just by a government or institution for its own purposes rather than by a researcher. The Vietnam draft lottery, random assignment of defendants to judges, school choice lotteries, visa lotteries, random audits of Brazilian municipalities. Real randomization, someone else's reasons.
+
+        A **quasi-experiment** has no explicit randomization. Something *near*-random sorts units into conditions: a regression discontinuity at an arbitrary cutoff, weather, disasters, close elections. G&G exclude these because they "rely on argumentation rather than randomization procedures," and they want one coherent framework for the book. They also flag in a footnote that the term "natural experiment" gets used loosely elsewhere to cover both — Dunning and Shadish/Cook/Campbell don't require randomization. So the vocabulary is theirs, not universal. Worth knowing which convention a given paper is using.
+
+        Their skepticism has teeth: critics found systematic differences in political resources between near-winners and near-losers in the close-elections design. Units can sort around a threshold.
+
+        **On judge assignment, specifically.** It qualifies because courts genuinely randomize case-to-judge assignment within a jurisdiction. But be precise about what it buys you. Judges vary in severity, so random assignment gives you exogenous variation in the *probability or length of incarceration* — not in incarceration itself. You're in instrumental variables territory, which you already know from Cunningham.
+
+        Which means the estimand is narrow. You'd be estimating the effect among **compliers**: people who would have been incarcerated by a harsh judge and not by a lenient one. Defendants near the margin. Not people whose cases were so severe that any judge would incarcerate them, and not people who'd walk regardless. So it is *not* the average effect of incarceration on policy attitudes in the population — it's the effect for marginal defendants, whose experience of incarceration is probably shorter and less severe than the population you may care about theoretically.
+
+        For your dissertation that's a real tension. If your argument is that carceral experience restructures *how* people reason about deservingness, marginal short-sentence cases may be exactly where you'd expect the effect to be weakest. Something to state openly rather than let a reviewer find. G&G build all of this out in Chapters 5 and 6.

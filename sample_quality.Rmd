@@ -1,0 +1,538 @@
+---
+title: "Sample and Quality"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,       # Hide code by default
+  warning = FALSE,
+  message = FALSE
+)
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(ggplot2)
+library(ggbeeswarm)
+library(readxl)
+library(stringr)
+library(dplyr)
+```
+
+```{r}
+
+data <- readr::read_csv("data/cleaned/cleaned_light.csv")
+
+names(data)
+```
+
+This RmD asks X questions. It preceeds variable construction. It comes
+after data_prep, so the data employed (cleaned_light.csv) has: - dropped
+non-consenters - dropped respondents who passed all 3 attention checks -
+dropped respondents who took less than 8 minutes to complete the
+survey - consolidated deservingness and power variables - dropped other
+variables
+
+It has not: - excluded respondents just because finished == 0, they
+passed only 2 or only 1 attention checks.
+
+Relevant quality variables created in data prep are:
+
+block attn_q9_pass attn_check_q17 attn_q114_pass attn_pass_count
+attn_fail_count duration_minutes speeder
+
+And the pre-existing quality-check related variables were: progress
+duration_in_seconds finished respondent_id q9 q17 q114_4
+
+## Q 1: response quality within sample
+
+The first question I ask in this Rmd is what response quality looks like
+among respondents who are currently retained.
+
+I'm thinking first of variables that help indicate respondent quality:
+0. maybe progress 1. Their completion speed 2. How many attention checks
+they passed (we've excluded those who failed all 3) 3. Idiosyncratic
+responses. So far, I just know that within the experience variables of
+interest.
+
+Then, we'll turn to completion of my variables. Then, while I look at
+completion of variables, this doubles as looking at who my sample is.
+
+### Progress and Finished
+
+I do not know what the progress variable actually captures. My guess is
+it tracks to the last question a respondent interacted with. The number
+of people who did not finish (finish ==0) and whose last question was
+something other than 100 are the same (1,987).
+
+```{r}
+summary(data$progress)
+sort(unique(data$progress))
+table(data$progress)
+table(data$finished)
+```
+
+Progress ranges from 17 to 100, mean is 97.8, everything else is 100.
+Finished is a 0-1 variable. 66 non-finishers.
+
+| Value | Count |
+|-------|-------|
+| 17    | 2     |
+| 18    | 14    |
+| 23    | 2     |
+| 24    | 2     |
+| 28    | 7     |
+| 30    | 6     |
+| 31    | 1     |
+| 32    | 4     |
+| 34    | 4     |
+| 37    | 4     |
+| 38    | 7     |
+| 41    | 2     |
+| 42    | 2     |
+| 48    | 2     |
+| 49    | 3     |
+| 73    | 1     |
+| 86    | 1     |
+| 100   | 1987  |
+|       |       |
+
+About 3% of the total sample.
+
+### Speed
+
+Completion speed. At first, we just want to know speeds/groups. We have
+already created: - duration_minutes (from duration_in_seconds) -
+speeder: people who finished in less than 12 minutes
+
+Below brackets duration groups -- it lives in data prep but I don't
+think I saved the groups to the data file so recreating here
+
+Basic facts of how long the current sample took to complete the survey:
+
+```{r}
+summary(data$duration_minutes)
+```
+
+```{r}
+quantile(
+  data$duration_minutes,
+  probs = c(.01, .05, .25, .5, .75, .95, .99),
+  na.rm = TRUE
+)
+```
+
+```{r}
+duration_counts <- data %>%
+  mutate(
+    duration_group = case_when(
+      duration_minutes < 8   ~ "< 8 min",
+      duration_minutes < 12  ~ "8–<12 min",
+      duration_minutes < 15  ~ "12–<15 min",
+      duration_minutes < 30  ~ "15–<30 min",
+      duration_minutes < 45  ~ "30–<45 min",
+      duration_minutes < 60  ~ "45–<60 min",
+      duration_minutes < 90  ~ "60–<90 min",
+      duration_minutes < 120 ~ "90–<120 min",
+      duration_minutes < 360 ~ "2–<6 hours",
+      TRUE                   ~ "6+ hours"
+    )
+  ) %>%
+  count(duration_group)
+
+duration_counts
+```
+
+```{r}
+count(data, speeder)
+
+summary(data$duration_minutes[data$speeder == TRUE])
+summary(data$duration_minutes[data$speeder == FALSE])
+```
+
+what have wea learned to this point?
+
+```{r}
+# visual of cleaned response times
+
+cleaned_response_times_1 <-
+ggplot(data,
+       aes(x = duration_minutes, y = 0)) +
+  geom_quasirandom(
+    groupOnX = FALSE,
+    width = .35,
+    alpha = .35,
+    size = 1.2
+  ) +
+  coord_cartesian(xlim = c(0, 120)) +
+  labs(
+    x = "Survey duration (minutes)",
+    y = NULL,
+    title = "Survey Duration"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+
+cleaned_response_times_1 # save cleaned_response_times as image
+
+ggsave(
+  "cleaned_response_times_1.png",
+  plot = cleaned_response_times_1,
+  width = 14,
+  height = 9,
+  dpi = 300,
+)
+```
+
+We have our counts of duration groups.
+
+### Attention checks
+
+We've already removed respondents who failed all three attention checks.
+Each respondents' attention "count" -- how many they passed-- is saved
+in attn_pass_count.
+
+Sept 2 2026: 1,600 respondents passed all three, 428 passed two, and 25
+only passed 1, this reports.
+
+These checks are: attn_q9_pass, attn_check_q17, attn_q114_pass
+
+```{r}
+count(data, attn_pass_count)
+```
+
+```{r}
+count(data, attn_check_q17)
+```
+
+```{r}
+count(data, attn_q114_pass)
+```
+
+###  Idiosyncratic responses.
+
+Contact (Incarceration Victimization) Patterns
+
+This is one variable where respondents could choose as many (3) as
+apply, where one of those 3 was no/unsure.
+
+These two questions (q4_1 and q4_2) are actually coded as three
+questions each:
+
+q4_1_1 (supposed to be 1 if self has been incarcerated, 0 otherrwise)
+q4_1_2 (supposed to be 1 if someone known has been incarcerated, 0
+otherwise) q4_1_3 (supposed to be 1 if "no/don't know", 0 otherwise)
+
+and
+
+4_2_1 (supposed to be 1 if self has been incarcerated, 0 otherrwise)
+4_2_2 (supposed to be 1 if someone known has been incarcerated, 0
+otherwise) 4_2_3 (supposed to be 1 if "no/don't know", 0 otherwise)
+
+Idiosyncratic responses then are when q4_1_3 == 1 and another q4_1 = 1,
+and/or when q4_2_3 == 1 and another q4_2 = 1.
+
+```{r}
+data <- data %>%
+  mutate(
+    idiosync_inc = if_else(
+      q4_1_3 == 1 & (q4_1_1 == 1 | q4_1_2 == 1),
+      TRUE,
+      FALSE,
+      missing = NA
+    ),
+
+    idiosync_vict = if_else(
+      q4_2_3 == 1 & (q4_2_1 == 1 | q4_2_2 == 1),
+      TRUE,
+      FALSE,
+      missing = NA
+    )
+  )
+
+data <- data %>%
+  mutate(
+    idiosync_impact = case_when(
+      idiosync_inc == TRUE | idiosync_vict == TRUE ~ TRUE,
+      idiosync_inc == FALSE & idiosync_vict == FALSE ~ FALSE,
+      TRUE ~ NA
+    )
+  )
+```
+
+Idiosyncratic responses that appear
+```{r}
+count(data, idiosync_inc)
+```
+
+```{r}
+count(data, idiosync_vict)
+```
+
+```{r}
+count(data, idiosync_impact)
+```
+
+THE POINT: flagging these people as funny data so that I can describe my respondents and then also later decide if I need to drop more.
+
+To inspect:
+```{r}
+data <- data %>%
+  mutate(
+    contact_pattern_inc = paste0(
+      if_else(is.na(q4_1_1), "NA", as.character(q4_1_1)),
+      "_",
+      if_else(is.na(q4_1_2), "NA", as.character(q4_1_2)),
+      "_",
+      if_else(is.na(q4_1_3), "NA", as.character(q4_1_3))
+    ),
+
+    contact_pattern_vict = paste0(
+      if_else(is.na(q4_2_1), "NA", as.character(q4_2_1)),
+      "_",
+      if_else(is.na(q4_2_2), "NA", as.character(q4_2_2)),
+      "_",
+      if_else(is.na(q4_2_3), "NA", as.character(q4_2_3))
+    )
+  )
+```
+
+
+### Crosstabs
+
+```{r}
+count(data, attn_pass_count, speeder)
+```
+
+```{r}
+count(data, attn_pass_count, finished)
+```
+
+
+fast respondents who had another issue
+
+```{r}
+speed_review %>%
+  filter(
+    duration_minutes < 12,
+    attn_fail_count >= 1
+  ) %>%
+  select(
+    response_id,
+    duration_minutes,
+    attn_pass_count,
+    attn_fail_count,
+    attn_q9_pass,
+    attn_check_q17,
+    attn_q114_pass
+  ) %>%
+  arrange(duration_minutes)
+```
+
+```{r}
+speed_review %>%
+  filter(
+    duration_minutes < 20,
+    attn_fail_count >= 1
+  ) %>%
+  select(
+    response_id,
+    duration_minutes,
+    attn_pass_count,
+    attn_fail_count,
+    attn_q9_pass,
+    attn_check_q17,
+    attn_q114_pass
+  ) %>%
+  arrange(duration_minutes) %>%
+  View()
+```
+
+```{r}
+speed_review %>%
+  summarise(
+    # 8 to <12 minutes
+    n_under_12 = sum(duration_minutes < 12),
+    n_under_12_attn_fail =
+      sum(duration_minutes < 12 & any_attn_fail),
+    pct_under_12_attn_fail =
+      mean(any_attn_fail[duration_minutes < 12]) * 100,
+    
+    # 8 to <20 minutes
+    n_under_20 = sum(duration_minutes < 20),
+    n_under_20_attn_fail =
+      sum(duration_minutes < 20 & any_attn_fail),
+    pct_under_20_attn_fail =
+      mean(any_attn_fail[duration_minutes < 20]) * 100
+  )
+```
+
+for data that has survived screening so far . . . -which analytically
+important questions were they eligible to see -which did they answer
+-what pattens of missingness exist -what consequences could those
+patterns have for analysis
+
+q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1
+q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3, q62_1,q51_1 through q51_8, dem101,
+q32-38, q111,
+
+Did these people answer variables I use? AAPOR explicitly distinguishes
+survey breakoff from item nonresponse. Someone can reach the end but
+skip questions; someone can break off before the end but still provide
+usable answers to the crucial variables. AAPOR recommends coding
+unanswered questions distinctly from substantive answers such as “don't
+know” and “prefer not to answer,” and emphasizes documenting partial
+responses rather than automatically treating them as invalid cases.
+
+And the breakoff literature gives another reason not to equate finished
+== 0 with poor-quality respondent. Breakoff can be related to
+questionnaire design, burden, where a question occurs, and respondent
+characteristics. Peytchev found that breakoffs did not simply look like
+inattentive respondents.
+
+Need to look for: -loss of information/precision -selection
+
+Selection: do people who don't answer policy questions differ
+systematically in incarceratione xperience, ideology, education, survey
+engagement, race, underlying policy view?
+
+Missing data lit says percent missing does not tell by itself whether
+missingness is dangerous/problematic. Ordinary regressions usually
+perform complete-case/listwise deletion for the variables appearing in
+that particular model. That means that adding a control variable with
+missing observations can change the regression sample. Coeficcient can
+then change partyly becuase added the control but also partialyl because
+the model is being estimated with a different sample.
+
+### Crosstabs
+
+Retained Respondents who did not finish
+
+```{r}
+
+table(data$finished, useNA = "ifany")
+
+finishers_df <- data %>% filter(finished==1)
+write_csv(finishers_df, "data/cleaned/finishers.csv")
+
+nonfinishers_df <- data %>% filter(finished == 0)
+write_csv(nonfinishers_df, "data/cleaned/nonfinishers.csv")
+
+```
+
+```{r}
+count(nonfinishers_df, block)
+count(finishers_df, block)
+```
+
+what block are they in?
+
+- 18 in A
+
+- 28 in B
+
+- 20 in C
+
+| Block   | nonfinishers | finishers |
+|---------|--------------|-----------|
+| Block A | 20           | 680       |
+| Block B | 29           | 685       |
+| Block C | 20           | 661       |
+
+```{r}
+count(nonfinishers_df, block)
+```
+
+| Experiences       | nonfinishers | finishers |
+|-------------------|--------------|-----------|
+| Incarcerated      | 8            | 162       |
+| Know incarcerated | 21           | 668       |
+| Victims           | 60           | 267       |
+|                   |              |           |
+
+- 8 incarcerated
+
+- 21 know incarcerated
+
+- 60 victims
+
+```{r}
+
+count(nonfinishers_df, q23_1)
+
+count(finishers_df, q15_1)
+```
+
+| NAs in                   | nonfinishers | finishers                |
+|--------------------------|--------------|--------------------------|
+| d_crim_abc               |              |                          |
+| d_incppl_pris_abc        |              |                          |
+| d_incwomen_abc           |              |                          |
+| all Police Questions (5) | 16           |                          |
+| all prison questions     | all 16 NAs   | 170 (171 for 25_4 and 6) |
+| q25_1                    | 16           |                          |
+| q25_2                    | ...          |                          |
+| re enfranchisement       | 35           | 497                      |
+| jail voting              | 35           | 497                      |
+
+deservingness scores aside, variables I use/care about (in names at THIS
+stage):
+
+q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1
+q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3
+
+```{r}
+names(data)
+```
+
+Grouping ppl into speed
+
+```{r}
+
+data <- data %>%
+  filter(duration_minutes >= 8)
+
+data$speeder <- ifelse(data$duration_minutes < 12, 1, 0) 
+
+```
+
+```{r}
+speed_review <- data %>%
+  filter(duration_minutes >= 8) %>%
+  mutate(
+    speed_group = case_when(
+      duration_minutes < 12 ~ "8–<12 min",
+      duration_minutes < 20 ~ "12–<20 min",
+      TRUE ~ "20+ min"
+    ),
+    
+    attn_fail_count = 3 - attn_pass_count,
+    
+    any_attn_fail = attn_fail_count >= 1,
+    two_attn_fails = attn_fail_count >= 2
+  )
+
+speed_review %>%
+  count(speed_group)
+```
+
+```{r}
+speed_review %>%
+  count(speed_group, attn_fail_count)
+```
+
+I should probably remove people who were too fast two slow and only
+passed one attention check. or flag.

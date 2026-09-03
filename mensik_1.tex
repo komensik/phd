@@ -1,0 +1,126 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Experiments Problem Set 1},
+  pdfauthor={Kristina Mensik},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Experiments Problem Set 1}
+\author{Kristina Mensik}
+\date{2026-08-31}
+
+\begin{document}
+\maketitle
+
+1a. An experiment is a procedure for estimating a causal quantity of
+interest, where treatment is randomized: probability of assignment to
+treatment is a known quantity between but not equal to 0 and 1, and can
+be replicated, and is equally likely across outcome-relevant observed
+and unobserved factors. The difference between an experiment and
+observational study is that in the prior, assignment to treatment is
+randomized.
+
+Some though argue that to be an experiment, the entire system under
+study (including assignment to treatment and manipulations) is under the
+researcher's control.
+
+1b. Unobserved heterogeneity is the unmeasured, unknown, potentially
+effectively infinite attributes that may distort inference. It is a
+problem for that reason (some other set of factors could explain a
+correllational relationship, even between variables that are comprable
+on observables), but especially a problem because there's no resolution
+procedure. In other words, there is no way of knowing what you don't
+know.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  This is none of the above -- it is more like an observational study --
+  because just because the pool of villages is randomly sampled, does
+  not mean that assignment to treatment for the population under study
+  is random.
+\item
+  This study seems to adequately fulfill the criteria for a field
+  experiment. First, demand for household water connections is measured
+  by the percent of uptake on offers for zero-interest credit household
+  water connections -- the treatment resembles the intervention of
+  interest. Second, those who would encounter the intervention are
+  households in urban Morocco who might want household water connections
+  (those who do not have them already), and as long as ``homeowners
+  without a private connection to the city's water grid'' do not have
+  another form of household water connections, the participants indeed
+  resemble the actors of interest. Last, the context of receiving
+  treatment also seems to match, again so long as the subset it random,
+  and the outcomes do too if waterbourne illness, leisure time and
+  social activities are thought of as good indicators of welfare (I
+  think so).
+\item
+  It is reasonable to believe that parachutes are effective even in the
+  abasence of randomized experiments that establish their efficacy
+  because there is very little ambiguity about the potential outcome for
+  the treated in a world where they are not assigned to treatment, nor
+  about what the potential outcome would be if there were in fact a
+  procedure assigning people to be ``untreated.''
+\end{enumerate}
+
+\end{document}
