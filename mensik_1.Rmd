@@ -6,7 +6,7 @@ date: "2026-08-31"
 ---
 
 ```{r}
-
+tinytex::install_tinytex()
 ```
 
 1a. An experiment is a procedure for estimating a causal quantity of interest, where treatment is randomized: probability of assignment to treatment is a known quantity between but not equal to 0 and 1, and can be replicated, and is equally likely across outcome-relevant observed and unobserved factors. The difference between an experiment and observational study is that in the prior, assignment to treatment is randomized.
