@@ -1,0 +1,41 @@
+---
+title: "mensik_experiments_2"
+author: "Kristina Mensik"
+date: "2026-09-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1.  Potential outcomes notation questions.
+
+2.  suppose treatment indicator $d_i$ is either 1 (treated) or 0 (untreated). Define the average treatment effect among the treated, or ATT, as
+
+question is asking us to write a proof that the ATE would be = ATT provided random assignment.
+
+think about properties of random assignment.
+
+left and 
+
+orthogonal property
+
+equal in expectation, not for a single draw/individual
+
+E[Y]
+
+mean treatment effect for treated and untreated, iterative expectations 
+
+-property of expected value can be separated
+-equations in textbook tells us that when orhogonal, expected value doesn't depend on treatment status
+
+
+10. 
+researchers distribute letter (theoretically) saying they'll be invited to ..
+
+excludability 
+
+Z->D->Y
+Z->Y ?? excludability would X this out
+treatment: go to dorms, 

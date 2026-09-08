@@ -50,6 +50,7 @@ Standardized and cleaned column names by (1) converting to lowerase, (2) replace
 Checked for changes, main change is made lowercase.
 
 #### a. D&P Labels
+
 This happens first because it involves a column I want to drop in the next cleaning step.
 
 Assign Deserving & Power Blocks – redefine block using column names. Used the below to create block assignments for participants in A (n=900), B (n=898), and C (N=898) (to ultimately consolidate).
@@ -66,7 +67,7 @@ Here, I am creating a block variable to keep track of what block each participan
 #| include: false
 # DeservingPower Blocks
 
-FL_8_DO_Deserving&PowerBlockA %in% names(raw_data)
+#FL_8_DO_Deserving&PowerBlockA %in% names(raw_data)
 #View(raw_data)
 
 # Add participant block variable (group a, b, c)
@@ -86,6 +87,7 @@ raw_data <- raw_data %>%
 write_csv(raw_data, "./data/cleaned/block_labeled_raw_data.csv")
 
 ```
+
 #### b. Cleaned data frame, deleting un-needed vars
 
 ```{r}
@@ -128,6 +130,7 @@ raw_data <- raw_data %>%
 
 write_csv(raw_data, "data/cleaned/raw_data_consent.csv")
 ```
+
 Still using "raw data"
 
 # 2. Clean & Quality
@@ -162,19 +165,48 @@ uncleaned: q9, character, can be 1 2 3 4 NA 3 -99 --see 2095 passed, 599 did not
 
 raw_data$attn_q9_pass = !is.na(raw_data$q9) & raw_data$q9 == "4"
 
+raw_data$attn_q9_typo = !is.na(raw_data$q9) & raw_data$q9 == "1"
+
+#table(raw_data$q9)
 #true if 4
 
+#looking at people who said strongly disagree
+# 
+# whoops <- raw_data %>%
+#   filter(q9 == 1) %>% 
+# 
+# view(whoops)
+# 
+# hist(as.numeric(whoops$q4_2_1))
+# 
+# 
 # table(raw_data$q9, useNA = "ifany")
 # table(raw_data$attn_q9_pass, useNA = "ifany")
 
 
 #2. attention flag -  text responses to Q17, remove leading/trailing spaces, and convert everything to lowercase for standardization)
+
 attn_text <- tolower(str_trim(raw_data$q17))
+table(attn_text)
 
 #2a. create list of acceptable answers for Q17
-accepted_variants <- c("purple", "urple", "puple","purpel", "\"purple\"", "purpke", "purplee", "prurprle", "purpl", "purp", "💜", "🟣")
+accepted_variants <- c(
+  "purple",
+  "\"purple\"",
+  "pruple",
+  "purpke",
+  "purplee",
+  "purplre",
+  "💜",
+  "🟣",
+  "purple🟣",
+  "purple6"
+)
 
-#2b. chheck if each cleaned Q17 response is in the list of accepted variants. if yes, respondent passed attn check
+table(accepted_variants)
+
+
+#2b. check if each cleaned Q17 response is in the list of accepted variants. if yes, respondent passed attn check
 raw_data$attn_check_q17 <- attn_text %in% accepted_variants
 table(raw_data$attn_check_q17, useNA = "ifany")
 
@@ -400,7 +432,7 @@ speed_review %>%
   )
 ```
 
-### c. completion of vars -->
+### c. completion of vars --\>
 
 # 3. Deservingness
 
@@ -472,7 +504,6 @@ summary(raw_data_cleaned[mapping$target_slug])
 
 ```
 
-
 LIMITED Deserving/power for 1 group only: recode groups directly
 
 ```{r}
@@ -538,6 +569,7 @@ names(raw_data_cleaned)
 ```
 
 Checking this worked before removing the old variables
+
 ```{r}
 #CHECKS
 # 1. Did every mapped ABC target get created?
@@ -563,6 +595,7 @@ raw_data_cleaned %>%
 ```
 
 Variables I can now prepare to drop
+
 ```{r}
 block_vars_to_drop <- grep(
   "^(deserving_group|power_group)_[abc]_",
@@ -572,6 +605,7 @@ block_vars_to_drop <- grep(
 ```
 
 Check/inspect to make sure right ones to drop
+
 ```{r}
 length(block_vars_to_drop)
 head(block_vars_to_drop, 20)
@@ -587,6 +621,7 @@ write_csv(clean_with_block_spec_vars, "data/cleaned/clean_with_block_spec_vars.c
 ```
 
 Save analysis dataset without block-spec/deserv vars (cleaned_data_light)
+
 ```{r}
 cleaned_data_light <- raw_data_cleaned %>%
   dplyr::select(-all_of(block_vars_to_drop))
@@ -602,4 +637,3 @@ write_csv(cleaned_data_light, "data/cleaned/cleaned_light.csv") # main file to u
 testing <- readr::read_csv("data/cleaned/cleaned_light.csv")
 
 ```
-
