@@ -201,8 +201,6 @@ accepted_variants <- c(
   "purple6"
 )
 
-
-
 #2b. check if each cleaned Q17 response is in the list of accepted variants. if yes, respondent passed attn check
 raw_data$attn_check_q17 <- attn_text %in% accepted_variants
 table(raw_data$attn_check_q17, useNA = "ifany")
@@ -263,7 +261,7 @@ raw_data <- raw_data %>%
   )
 ```
 
-1,604 respondents passed all 3 attn checks 599 passed none of them 32 passed 1 459 passed 2
+1,604 respondents passed all 3 attn checks 599 did not supply correct answers none of them 32 passed 1 459 passed 2
 
 
 ### b. survey duration
@@ -279,43 +277,8 @@ raw_data <- raw_data %>%
 #get pre-cleaned survey duration info: will want this to justify cleaning cutoffs
 
 #summary(raw_data_cleaned$duration_minutes)
-
-# visual of response times
-
-uncleaned_response_times <-
-ggplot(raw_data,
-       aes(x = duration_minutes, y = 0)) +
-  geom_quasirandom(
-    groupOnX = FALSE,
-    width = .35,
-    alpha = .35,
-    size = 1.2
-  ) +
-  coord_cartesian(xlim = c(0, 120)) +
-  labs(
-    x = "Survey duration (minutes)",
-    y = NULL,
-    title = "Survey Duration"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.y = element_blank(),
-    axis.ticks.y = element_blank()
-  )
-
-
-uncleaned_response_times # save uncleaned_response_times as image
-
-
-ggsave(
-  "uncleaned_response_times.png",
-  plot = uncleaned_response_times,
-  width = 14,
-  height = 9,
-  dpi = 300,
-)
-
 ```
+
 
 Grouping ppl into speed categories
 
@@ -729,17 +692,13 @@ raw_data <- raw_data %>%
   )
 ```
 
-```{r}
-summary(raw_data$na_count)
-summary(raw_data$common_na_count)
-summary(raw_data$block_na_count)
-```
 
 # 5. Description of Consented, pre-screening sample
 
 
 
 ```{r}
+ncol(raw_data)
 nrow(raw_data)
 count(raw_data, block)
 ```
@@ -751,7 +710,7 @@ count(raw_data, attn_pass_count)
 count(raw_data, attn_answered_count)
 ```
 
-Overall, 1,604 respondents passed all 3 checks. 462 passed 2, 29 passed 1, and 599 respondents failed all 3 checks.
+Overall, 1,604 respondents passed all 3 checks. 462 passed 2, 29 passed 1, and 599 respondents "failed" all 3 checks -- or they did not supply correct answers. 
 
 table:
 ```{r}
@@ -839,6 +798,44 @@ raw_data %>%
 what does survey duration actually look like? 
 
 ```{r}
+# visual of response times
+
+uncleaned_response_times <-
+ggplot(raw_data,
+       aes(x = duration_minutes, y = 0)) +
+  geom_quasirandom(
+    groupOnX = FALSE,
+    width = .35,
+    alpha = .35,
+    size = 1.2
+  ) +
+  coord_cartesian(xlim = c(0, 120)) +
+  labs(
+    x = "Survey duration (minutes)",
+    y = NULL,
+    title = "Survey Duration"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+
+uncleaned_response_times # save uncleaned_response_times as image
+
+
+ggsave(
+  "uncleaned_response_times.png",
+  plot = uncleaned_response_times,
+  width = 14,
+  height = 9,
+  dpi = 300,
+)
+
+```
+
+```{r}
 summary(raw_data$duration_minutes)
 ```
 Took respondents from less than a second to days to "complete" the survey. 
@@ -897,6 +894,243 @@ raw_data %>%
 table(raw_data$finished, useNA = "ifany")
 ```
 Of the 2,694 consenting respondents, 83% finished (as in, reached the end of the survey, irregardless of skipped questions) (n = 2,231) and 17% did not (n = 463).
+
+## missingness? 
+
+```{r}
+summary(raw_data$na_count)
+summary(raw_data$common_na_count)
+summary(raw_data$block_na_count)
+
+```
+
+
+```{r}
+# visual of nas/missingness
+
+uncleaned_missingness <-
+ggplot(raw_data,
+       aes(x = na_count, y = 0)) +
+  geom_quasirandom(
+    groupOnX = FALSE,
+    width = .35,
+    alpha = .35,
+    size = 1.2
+  ) +
+  coord_cartesian(xlim = c(0, 120)) +
+  labs(
+    x = "na count",
+    y = NULL,
+    title = "na count"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+
+uncleaned_missingness 
+
+
+ggsave(
+  "uncleaned_missingness.png",
+  plot = uncleaned_missingness,
+  width = 14,
+  height = 9,
+  dpi = 300,
+)
+```
+
+
+```{r}
+raw_data %>%
+  group_by(finished) %>%
+  summarise(
+    n = n(),
+    min_na = min(na_count, na.rm = TRUE),
+    q1_na = quantile(na_count, .25, na.rm = TRUE),
+    median_na = median(na_count, na.rm = TRUE),
+    mean_na = mean(na_count, na.rm = TRUE),
+    q3_na = quantile(na_count, .75, na.rm = TRUE),
+    max_na = max(na_count, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+raw_data %>%
+  group_by(block) %>%
+  summarise(
+    n = n(),
+    median_na = median(na_count, na.rm = TRUE),
+    mean_na = mean(na_count, na.rm = TRUE),
+    q75_na = quantile(na_count, .75, na.rm = TRUE),
+    q90_na = quantile(na_count, .90, na.rm = TRUE),
+    max_na = max(na_count, na.rm = TRUE)
+  )
+```
+
+```{r}
+raw_data %>%
+  mutate(
+    progress_group = case_when(
+      progress < 25  ~ "<25%",
+      progress < 50  ~ "25–<50%",
+      progress < 75  ~ "50–<75%",
+      progress < 100 ~ "75–<100%",
+      progress == 100 ~ "100%",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  group_by(progress_group) %>%
+  summarise(
+    n = n(),
+    median_na = median(na_count, na.rm = TRUE),
+    mean_na = mean(na_count, na.rm = TRUE),
+    min_na = min(na_count, na.rm = TRUE),
+    max_na = max(na_count, na.rm = TRUE)
+  )
+```
+
+```{r}
+raw_data %>%
+  group_by(attn_answered_count) %>%
+  summarise(
+    n = n(),
+    median_na = median(na_count, na.rm = TRUE),
+    mean_na = mean(na_count, na.rm = TRUE),
+    median_progress = median(progress, na.rm = TRUE),
+    pct_finished = mean(finished == 1, na.rm = TRUE) * 100
+  )
+```
+```{r}
+raw_data %>%
+  group_by(finished) %>%
+  summarise(
+    n = n(),
+    
+    median_progress =
+      median(progress, na.rm = TRUE),
+    
+    median_na =
+      median(na_count, na.rm = TRUE),
+    
+    median_common_na =
+      median(common_na_count, na.rm = TRUE),
+    
+    median_block_na =
+      median(block_na_count, na.rm = TRUE),
+    
+    median_attn_answered =
+      median(attn_answered_count, na.rm = TRUE),
+    
+    median_attn_passed =
+      median(attn_pass_count, na.rm = TRUE)
+  )
+```
+
+
+
+## clustering of indicators?
+
+overlap summary
+```{r}
+overlap_summary <- tibble(
+  check = c("Q9", "Q17", "Q114"),
+  
+  total_n = nrow(raw_data),
+  
+  answered_n = c(
+    sum(raw_data$attn_q9_answered),
+    sum(raw_data$attn_q17_answered),
+    sum(raw_data$attn_q114_answered)
+  ),
+  
+  nonanswer_n = c(
+    sum(!raw_data$attn_q9_answered),
+    sum(!raw_data$attn_q17_answered),
+    sum(!raw_data$attn_q114_answered)
+  ),
+  
+  pass_n = c(
+    sum(raw_data$attn_q9_pass),
+    sum(raw_data$attn_check_q17),
+    sum(raw_data$attn_q114_pass)
+  )
+) %>%
+  mutate(
+    # Answered, but did not pass
+    wrong_n = answered_n - pass_n,
+    
+    # Everyone who did not pass: wrong answer + nonanswer
+    nonpass_n = total_n - pass_n,
+    
+    answered_pct = answered_n / total_n * 100,
+    
+    # Your current percentages
+    pass_pct_all = pass_n / total_n * 100,
+    
+    # More useful for actual attention performance:
+    # Of people who either didn't answer or got all 3 , how many passed?
+    pass_pct_answered = pass_n / answered_n * 100,
+    
+    # Of all apparent non-passes, what % are just nonanswers?
+    nonanswer_pct_of_nonpass =
+      nonanswer_n / nonpass_n * 100,
+    
+    # Of people who answered, what % actually got it wrong?
+    wrong_pct_answered =
+      wrong_n / answered_n * 100
+  )
+
+overlap_summary
+
+```
+
+### enough usable measurements?
+Ie, did respondents supply enough of the questionnaire to furnish usable measurements?
+
+Among people who broke off—or among finishers with substantial missingness—what analytically important information is actually present?
+
+q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1
+q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3
+
+q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1
+q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3, q62_1,q51_1, q51_2, q51_3, q51_4, q51_5, q51_6, q51_7, q51_8, dem101,
+
+q32, q33, q34, q35, q36, q37, q38, q111,
+
+used variables
+```{r}
+
+used_vars <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc","q15_1", "q15_2", "q15_3", "q15_4", "q15_5",
+"q25_1", "q25_2", "q25_3", "q25_4", "q4_1_1", "q4_1_2", "q4_1_3", "q4_2_1", "q4_2_2", "q4_2_3","q15_1", "q15_2", "q15_3", "q15_4", "q15_5", "q25_1", "q25_2", "q25_3", "q25_4", "q25_1", "q62_1", "q23_2","q23_7",
+"q4_1_1", "q4_1_2", "q4_1_3", "q4_2_1", "q4_2_2", "q4_2_3",
+"q62_1","q51_1", "q51_2", "q51_3", "q51_4", "q51_5", "q51_6", "q51_7", "q51_8","dem101","q32", "q33", "q34", "q35", "q36", "q37", "q38", "q111"
+)
+
+used_var_missing <- raw_data %>% 
+  summarise(
+    across(
+      all_of(used_vars),
+      ~sum(is.na(.))
+    )
+  ) %>%
+  pivot_longer(
+    everything(),
+    names_to = "variable",
+    values_to = "n_missing"
+  ) %>%
+  mutate(
+    n_answered = nrow(raw_data)- n_missing,
+    pct_missing = n_missing/nrow(raw_data) * 100,
+    pct_answered = n_answered/nrow(raw_data) *100
+  ) %>%
+  arrange(desc(pct_missing))
+
+View(used_var_missing)
+```
 
 # 4. SAVE: cleaned_light.csv
 
