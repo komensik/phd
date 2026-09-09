@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=TRUE}
 knitr::opts_chunk$set(
   echo = FALSE,       # Hide code by default
   warning = FALSE,
@@ -28,13 +28,16 @@ library(dplyr)
 
 ```
 
-# 1. Clean & Basic Prep
+OVERALL:
+I start by constructing the relevant info first (with the exception of excluding respondents who don't consent), then describing what that info says, then I make exclusion (potentially additional flag) decisions last. 
+
+# 1. Basic Prep
 
 Load data
 
 ```{r}
-#| eval: false
-#| include: false
+
+#| include: true
 # Unzip and load data
 
 raw_data <- read_csv("./data/raw/scotg_results.csv")
@@ -64,7 +67,7 @@ This shows up in the raw data:
 Here, I am creating a block variable to keep track of what block each participant was sorted into, so that when I merge the disparate variables, it is still easy to know which group each participant was assigned to (thus, what groups they would have been prompted to evaluated and also important because it appears that the deserving questions for participants in block A were forced choice and snapped to increments of 10: not the case for B and C).
 
 ```{r}
-#| include: false
+#| include: true
 # DeservingPower Blocks
 
 #FL_8_DO_Deserving&PowerBlockA %in% names(raw_data)
@@ -88,10 +91,11 @@ write_csv(raw_data, "./data/cleaned/block_labeled_raw_data.csv")
 
 ```
 
+
 #### b. Cleaned data frame, deleting un-needed vars
 
 ```{r}
-#| include: false
+#| include: true
 
 columns_to_drop <- c(
   "status", "start_date", "end_date", "ip_address", "recipient_last_name", "recipient_first_name", 
@@ -99,24 +103,35 @@ columns_to_drop <- c(
   "location_longitude", "distribution_channel", "user_language"
 )
 
+#confirming (07-08-26) these all exist still because I'm getting an error when I try to run the drop line
+
+# columns_to_drop %in% names(raw_data)
+
 # Aggregate all columns containing "_DO" (Display Order)
 
 grep("_do_", names(raw_data), value = TRUE)
 
 do_columns <- grep("_do", names(raw_data), value = TRUE)
 
+
+#confirming (07-08-26) these all exist still because I'm getting an error when I try to run the drop line
+
+# do_columns %in% names(raw_data)
+
+
 # Drop do columns and others
 raw_data <- raw_data %>%
   select(-all_of(c(columns_to_drop, do_columns)))
 
+#09-08-26 above drop line ran
+
+#view(raw_data)
 ```
 
 ### c. Drop non-consenters
 
 ```{r}
-#| eval: false
-#| include: false
-
+#| include: true
 # Filter to those who consented
 raw_data <- raw_data %>%
   filter(consent == 1)
@@ -133,7 +148,7 @@ write_csv(raw_data, "data/cleaned/raw_data_consent.csv")
 
 Still using "raw data"
 
-# 2. Clean & Quality
+# 2. Initial Clean & Quality
 
 ### a. attn checks
 
@@ -158,8 +173,7 @@ uncleaned: q9, character, can be 1 2 3 4 NA 3 -99 --see 2095 passed, 599 did not
 - create flags for passed/not each check and people who failed all
 
 ```{r}
-#| eval: false
-#| include: false
+#| include: true
 
 # 1. create logical variable (true/false) that marks whether respondent answered Q9 with 4
 
@@ -167,27 +181,11 @@ raw_data$attn_q9_pass = !is.na(raw_data$q9) & raw_data$q9 == "4"
 
 raw_data$attn_q9_typo = !is.na(raw_data$q9) & raw_data$q9 == "1"
 
-#table(raw_data$q9)
-#true if 4
-
-#looking at people who said strongly disagree
-# 
-# whoops <- raw_data %>%
-#   filter(q9 == 1) %>% 
-# 
-# view(whoops)
-# 
-# hist(as.numeric(whoops$q4_2_1))
-# 
-# 
-# table(raw_data$q9, useNA = "ifany")
-# table(raw_data$attn_q9_pass, useNA = "ifany")
-
 
 #2. attention flag -  text responses to Q17, remove leading/trailing spaces, and convert everything to lowercase for standardization)
 
 attn_text <- tolower(str_trim(raw_data$q17))
-table(attn_text)
+#table(attn_text)
 
 #2a. create list of acceptable answers for Q17
 accepted_variants <- c(
@@ -203,7 +201,6 @@ accepted_variants <- c(
   "purple6"
 )
 
-table(accepted_variants)
 
 
 #2b. check if each cleaned Q17 response is in the list of accepted variants. if yes, respondent passed attn check
@@ -216,6 +213,7 @@ table(raw_data$attn_check_q17, useNA = "ifany")
 
 raw_data$attn_q114_pass = !is.na(raw_data$q114_4) & raw_data$q114_4 == "6"
 
+
 # older version counted NA as passed. lots of NAs likely because late in the survey. For now, only care is that I have passes recorded and in next code chunk will filter out those who failed all 3 checks.
 # attn_check_q1114 <- raw_data$q114_4 == 6
 # 
@@ -227,6 +225,20 @@ raw_data$attn_q114_pass = !is.na(raw_data$q114_4) & raw_data$q114_4 == "6"
 ```
 
 attn_q9_pass, attn_check_q17, attn_q114_pass
+```{r}
+raw_data <- raw_data %>%
+  mutate(
+    # Was each attention check actually answered?
+    attn_q9_answered =
+      !is.na(q9) & q9 != "-99",
+    
+    attn_q17_answered =
+      !is.na(q17) & str_trim(q17) != "",
+    
+    attn_q114_answered =
+      !is.na(q114_4) & q114_4 != "-99"
+  )
+```
 
 ```{r}
 raw_data <- raw_data %>%
@@ -242,38 +254,26 @@ raw_data <- raw_data %>%
     attn_fail_count = 3 - attn_pass_count
   )
 
-count(raw_data, attn_pass_count)
-
+raw_data <- raw_data %>%
+  mutate(
+    attn_answered_count =
+      attn_q9_answered +
+      attn_q17_answered +
+      attn_q114_answered
+  )
 ```
 
 1,604 respondents passed all 3 attn checks 599 passed none of them 32 passed 1 459 passed 2
 
-```{r}
-write_csv(raw_data, "data/cleaned/raw_data_consent_pre_attn_rest.csv")
-
-data_pre_attn_exclusion <- raw_data # saving pre exclusion, or just use raw_data
-
-raw_data_cleaned <- raw_data %>%
-  filter(attn_pass_count > 0)#switched to raw_data_cleaned
-
-count(raw_data_cleaned, attn_pass_count)
-
-```
-
-With dropped respondents (failed all 3), I have 32 respondents who passed 1, 459 who passed 2, and 1,604 who passed all 3. Total = 2,095 respondents retained.
-
-To check specific attention check pass/fail counts: attn_q9_pass, attn_check_q17, attn_q114_pass attn_pass_count
 
 ### b. survey duration
 
 ```{r}
-#| eval: false
-#| include: false
-
-raw_data_cleaned <- raw_data_cleaned %>%
+#| include: true
+raw_data <- raw_data %>%
  mutate(duration_in_seconds = as.numeric(duration_in_seconds))
 
-raw_data_cleaned <- raw_data_cleaned %>%
+raw_data <- raw_data %>%
   mutate(duration_minutes = duration_in_seconds / 60)
 
 #get pre-cleaned survey duration info: will want this to justify cleaning cutoffs
@@ -283,7 +283,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 # visual of response times
 
 uncleaned_response_times <-
-ggplot(raw_data_cleaned,
+ggplot(raw_data,
        aes(x = duration_minutes, y = 0)) +
   geom_quasirandom(
     groupOnX = FALSE,
@@ -317,126 +317,80 @@ ggsave(
 
 ```
 
-Grouping ppl into speed
+Grouping ppl into speed categories
 
 ```{r}
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  filter(duration_minutes >= 8)
-
-raw_data_cleaned$speeder <- ifelse(raw_data_cleaned$duration_minutes < 12, 1, 0) 
-
-```
-
-```{r}
-speed_review <- raw_data_cleaned %>%
-  filter(duration_minutes >= 8) %>%
+summary(raw_data$duration_minutes)
+raw_data <- raw_data %>%
   mutate(
-    speed_group = case_when(
-      duration_minutes < 12 ~ "8–<12 min",
-      duration_minutes < 20 ~ "12–<20 min",
-      TRUE ~ "20+ min"
-    ),
-    
-    attn_fail_count = 3 - attn_pass_count,
-    
-    any_attn_fail = attn_fail_count >= 1,
-    two_attn_fails = attn_fail_count >= 2
+    sub_8  = if_else(duration_minutes <= 8, 1, 0),
+    sub_12 = if_else(duration_minutes <= 12, 1, 0),
+    sub_20 = if_else(duration_minutes <= 20, 1, 0),
+    sub_30 = if_else(duration_minutes <= 30, 1, 0),
+    over_52 = if_else(duration_minutes >= 52, 1, 0),
+    over_180 = if_else(duration_minutes >= 180, 1, 0)
   )
 
-speed_review %>%
-  count(speed_group)
 ```
 
-```{r}
-speed_review %>%
-  count(speed_group, attn_fail_count)
-```
-
-I should probably remove people who were too fast two slow and only passed one attention check. or flag.
-
-remember: attn_q9_pass, attn_check_q17, attn_q114_pass attn_pass_count
+### c. progress/finished 
 
 ```{r}
-speed_review %>%
-  group_by(speed_group) %>%
-  summarise(
-    n = n(),
-    
-    q9_fail_n = sum(attn_q9_pass == FALSE, na.rm = TRUE),
-    q9_fail_pct = mean(attn_q9_pass == FALSE, na.rm = TRUE) * 100,
-    
-    q17_fail_n = sum(attn_check_q17 == FALSE, na.rm = TRUE),
-    q17_fail_pct = mean(attn_check_q17 == FALSE, na.rm = TRUE) * 100,
-    
-    q1114_fail_n = sum(attn_q114_pass == FALSE, na.rm = TRUE),
-    q1114_fail_pct = mean(attn_q114_pass == FALSE, na.rm = TRUE) * 100
+
+raw_data <- raw_data %>%
+ mutate(progress = as.numeric(progress))
+
+raw_data <- raw_data %>%
+  mutate(
+    nonfinisher = if_else(finished == 0, 1, 0)
   )
+
+
+
 ```
 
-fast respondents who had another issue
+visualization of respondent progress
 
 ```{r}
-speed_review %>%
-  filter(
-    duration_minutes < 12,
-    attn_fail_count >= 1
-  ) %>%
-  select(
-    response_id,
-    duration_minutes,
-    attn_pass_count,
-    attn_fail_count,
-    attn_q9_pass,
-    attn_check_q17,
-    attn_q114_pass
-  ) %>%
-  arrange(duration_minutes)
-```
+# visual of response times
 
-```{r}
-speed_review %>%
-  filter(
-    duration_minutes < 20,
-    attn_fail_count >= 1
-  ) %>%
-  select(
-    response_id,
-    duration_minutes,
-    attn_pass_count,
-    attn_fail_count,
-    attn_q9_pass,
-    attn_check_q17,
-    attn_q114_pass
-  ) %>%
-  arrange(duration_minutes) %>%
-  View()
-```
-
-```{r}
-speed_review %>%
-  summarise(
-    # 8 to <12 minutes
-    n_under_12 = sum(duration_minutes < 12),
-    n_under_12_attn_fail =
-      sum(duration_minutes < 12 & any_attn_fail),
-    pct_under_12_attn_fail =
-      mean(any_attn_fail[duration_minutes < 12]) * 100,
-    
-    # 8 to <20 minutes
-    n_under_20 = sum(duration_minutes < 20),
-    n_under_20_attn_fail =
-      sum(duration_minutes < 20 & any_attn_fail),
-    pct_under_20_attn_fail =
-      mean(any_attn_fail[duration_minutes < 20]) * 100
+uncleaned_progress <-
+ggplot(raw_data,
+       aes(x = progress, y = 0)) +
+  geom_quasirandom(
+    groupOnX = FALSE,
+    width = .35,
+    alpha = .35,
+    size = 1.2
+  ) +
+  coord_cartesian(xlim = c(0, 120)) +
+  labs(
+    x = "Survey progress (number)",
+    y = NULL,
+    title = "Raw Survey Progress"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
   )
+
+
+uncleaned_progress # save uncleaned_response_times as image
+
+
+ggsave(
+  "uncleaned_progress.png",
+  plot = uncleaned_progress,
+  width = 14,
+  height = 9,
+  dpi = 300,
+)
 ```
 
-### c. completion of vars --\>
+### d. NAs & completion of vars -> end
 
-# 3. Deservingness
-
-### A. Deservingness and Power consolidation
+### ***Des and pwr consolidation
 
 Objective: consolidate blocks (i.e. so only 1 Incarcerated People/Prisoners)
 
@@ -471,35 +425,35 @@ for (i in 1:nrow(mapping)) {
   var_b   <- mapping$var_b[i]
   var_c   <- mapping$var_c[i]
 
-  raw_data_cleaned[[new_var]] <- NA_real_
+  raw_data[[new_var]] <- NA_real_
 
-  if (!is.na(var_a) && var_a %in% names(raw_data_cleaned)) {
-    x <- as.numeric(raw_data_cleaned[[var_a]])
+  if (!is.na(var_a) && var_a %in% names(raw_data)) {
+    x <- as.numeric(raw_data[[var_a]])
     x[x == -99] <- NA_real_
 
-    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "A"] <-
-      x[raw_data_cleaned$block == "A"]
+    raw_data[[new_var]][raw_data$block == "A"] <-
+      x[raw_data$block == "A"]
   }
 
-  if (!is.na(var_b) && var_b %in% names(raw_data_cleaned)) {
-    x <- as.numeric(raw_data_cleaned[[var_b]])
+  if (!is.na(var_b) && var_b %in% names(raw_data)) {
+    x <- as.numeric(raw_data[[var_b]])
     x[x == -99] <- NA_real_
 
-    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "B"] <-
-      x[raw_data_cleaned$block == "B"]
+    raw_data[[new_var]][raw_data$block == "B"] <-
+      x[raw_data$block == "B"]
   }
 
-  if (!is.na(var_c) && var_c %in% names(raw_data_cleaned)) {
-    x <- as.numeric(raw_data_cleaned[[var_c]])
+  if (!is.na(var_c) && var_c %in% names(raw_data)) {
+    x <- as.numeric(raw_data[[var_c]])
     x[x == -99] <- NA_real_
 
-    raw_data_cleaned[[new_var]][raw_data_cleaned$block == "C"] <-
-      x[raw_data_cleaned$block == "C"]
+    raw_data[[new_var]][raw_data$block == "C"] <-
+      x[raw_data$block == "C"]
   }
 }
 
-mapping$target_slug %in% names(raw_data_cleaned)
-summary(raw_data_cleaned[mapping$target_slug])
+mapping$target_slug %in% names(raw_data)
+summary(raw_data[mapping$target_slug])
 
 
 ```
@@ -507,9 +461,7 @@ summary(raw_data_cleaned[mapping$target_slug])
 LIMITED Deserving/power for 1 group only: recode groups directly
 
 ```{r}
-#| eval: false
-#| include: false
-
+#| include: true
 # Load the split mapping
 split_map <- read.csv("./data/deserving_split.csv")
 
@@ -530,12 +482,12 @@ for (i in 1:nrow(split_map)) {
   old_var <- split_map$old_var[i]
   new_var <- split_map$new_var[i]
 
-  if (!(old_var %in% names(raw_data_cleaned))) {
+  if (!(old_var %in% names(raw_data))) {
     skipped[[new_var]] <- paste("Missing column:", old_var)
     next
   }
 
-  x <- as.numeric(raw_data_cleaned[[old_var]])
+  x <- as.numeric(raw_data[[old_var]])
   x[x == -99] <- NA_real_
 
   if (all(is.na(x))) {
@@ -543,7 +495,7 @@ for (i in 1:nrow(split_map)) {
     next
   }
 
-  raw_data_cleaned[[new_var]] <- x
+  raw_data[[new_var]] <- x
 }
 
 if (length(skipped) > 0) {
@@ -553,7 +505,7 @@ if (length(skipped) > 0) {
   print("All group-specific variables created successfully.")
 }
 
-names(raw_data_cleaned)
+names(raw_data)
 
 # OLD
 # Loop through and rename each variable
@@ -563,7 +515,7 @@ names(raw_data_cleaned)
 #  new_var <- split_map$target_slug[i]  # e.g., "d_noncit_parent_a"
   
   # Just copy the values over
-#  raw_data_cleaned[[new_var]] <- raw_data_cleaned[[old_var]]
+#  raw_data[[new_var]] <- raw_data[[old_var]]
 #}
 
 ```
@@ -573,17 +525,17 @@ Checking this worked before removing the old variables
 ```{r}
 #CHECKS
 # 1. Did every mapped ABC target get created?
-setdiff(mapping$target_slug, names(raw_data_cleaned))
+setdiff(mapping$target_slug, names(raw_data))
 
 # 2. Are there any -99s left in consolidated ABC variables?
 
 sapply(
-  raw_data_cleaned[mapping$target_slug],
+  raw_data[mapping$target_slug],
   function(x) sum(x == -99, na.rm = TRUE)
 )
 
-# 3. Check one important target directly
-raw_data_cleaned %>%
+# 3. Checking q26 (inc ppl) as ex to be used target directly
+raw_data %>%
   select(
     block,
     deserving_group_a_26,
@@ -599,7 +551,7 @@ Variables I can now prepare to drop
 ```{r}
 block_vars_to_drop <- grep(
   "^(deserving_group|power_group)_[abc]_",
-  names(raw_data_cleaned),
+  names(raw_data),
   value = TRUE
 )
 ```
@@ -616,17 +568,335 @@ tail(block_vars_to_drop, 20)
 Save pre-dropped version
 
 ```{r}
-clean_with_block_spec_vars <- raw_data_cleaned
-write_csv(clean_with_block_spec_vars, "data/cleaned/clean_with_block_spec_vars.csv")
+unclean_with_block_spec_vars <- raw_data
+write_csv(unclean_with_block_spec_vars, "data/cleaned/unclean_with_block_spec_vars.csv")
 ```
 
-Save analysis dataset without block-spec/deserv vars (cleaned_data_light)
+Save for analysis dataset without block-spec/deserv vars (uncleaned_data_light, later to be cleaned_data_light)
 
 ```{r}
-cleaned_data_light <- raw_data_cleaned %>%
+raw_data <- raw_data %>%
   dplyr::select(-all_of(block_vars_to_drop))
 
 ```
+
+
+### 2d. NAs & completion of vars
+I want to understand basic distribution of missingness/NAs, but because of the block specific variables I need to do so seperately for the trhee. 
+```{r}
+# Block-specific variables -----------------------------------------------
+
+block_a_vars <- c(
+  "d_noncit_parent_a",
+  "d_incparents_a",
+  "d_hsteen_a",
+  "d_athiest_a",
+  "d_cath_a",
+  "d_evan_a",
+  "d_jews_a",
+  "d_pal_a",
+  "d_muslim_a",
+  "d_blackwom_a",
+  "d_blackmen_a",
+  "d_lds_a",
+  "d_longcov_a",
+  "d_exon_a",
+  "d_weed_a",
+  "d_opioid_a",
+  "d_whitecol_a",
+  "d_tech_a",
+  "d_smokers_a",
+  "d_genx_a",
+  "d_boomer_a",
+  "d_mill_a",
+  "d_genz_a"
+)
+
+block_b_vars <- c(
+  "d_metoo_b",
+  "d_christnat_b",
+  "d_ruralam_b",
+  "d_urbanam_b",
+  "d_suburbam_b",
+  "d_billion_b",
+  "d_blm_b",
+  "d_maga_b",
+  "d_progs_b",
+  "d_soc_b",
+  "d_proudboys_b",
+  "d_attnys_b",
+  "d_military_b",
+  "d_vets_b",
+  "d_solds_b",
+  "d_essentials_b",
+  "d_nurses_b",
+  "d_drs_b",
+  "d_dems_b",
+  "d_reps_b",
+  "d_media_b"
+)
+
+block_c_vars <- c(
+  "d_bluecol_c",
+  "d_working_c",
+  "d_midclass_c",
+  "d_migrantwork_c",
+  "d_smallbiz_c",
+  "d_taxpayers_c",
+  "d_elderly_c",
+  "d_moms_c",
+  "d_retires_c",
+  "d_sexoffenders_c",
+  "d_sexhar_vict_c",
+  "d_sexharrasser_c",
+  "d_formerlyinc_c",
+  "d_homeown_c",
+  "d_regufee_c",
+  "d_gunvi_vict_c",
+  "d_polbrut_vict_c",
+  "d_unins_c",
+  "d_mentill_c",
+  "d_aids_c",
+  "d_gay_c",
+  "d_lesbians_c"
+)
+
+all_block_vars <- c(
+  block_a_vars,
+  block_b_vars,
+  block_c_vars
+)
+
+quality_derived_vars <- c(
+  "attn_q9_pass",
+  "attn_q9_typo",
+  "attn_check_q17",
+  "attn_q114_pass",
+  "attn_pass_count",
+  "attn_nonpass_count",
+  "attn_answered_count",
+  "duration_minutes",
+  "sub_8",
+  "sub_12",
+  "sub_20",
+  "sub_30",
+  "sub_52",
+  "sub_180",
+  "nonfinisher",
+  "common_na_count",
+  "block_na_count",
+  "na_count"
+)
+
+non_question_vars <- c(
+  "response_id",
+  "respondent_id",
+  "block",
+  "duration_in_seconds",
+  "progress",
+  "finished"
+)
+
+common_vars <- setdiff(
+  names(raw_data),
+  c(
+    all_block_vars,
+    quality_derived_vars,
+    non_question_vars
+  )
+)
+```
+
+```{r}
+raw_data <- raw_data %>%
+  mutate(
+    
+    # NAs among variables available to everyone
+    common_na_count = rowSums(
+      is.na(pick(all_of(common_vars)))
+    ),
+    
+    # NAs only within the block the respondent was assigned
+    block_na_count = case_when(
+      block == "A" ~ rowSums(is.na(pick(all_of(block_a_vars)))),
+      block == "B" ~ rowSums(is.na(pick(all_of(block_b_vars)))),
+      block == "C" ~ rowSums(is.na(pick(all_of(block_c_vars)))),
+      TRUE ~ NA_real_
+    ),
+    
+    # Total meaningful NAs
+    na_count = common_na_count + block_na_count
+  )
+```
+
+```{r}
+summary(raw_data$na_count)
+summary(raw_data$common_na_count)
+summary(raw_data$block_na_count)
+```
+
+# 5. Description of Consented, pre-screening sample
+
+
+
+```{r}
+nrow(raw_data)
+count(raw_data, block)
+```
+## attention checks
+
+How'd they do on attention checks?
+```{r}
+count(raw_data, attn_pass_count)
+count(raw_data, attn_answered_count)
+```
+
+Overall, 1,604 respondents passed all 3 checks. 462 passed 2, 29 passed 1, and 599 respondents failed all 3 checks.
+
+table:
+```{r}
+raw_data %>%
+  summarise(
+    n = n(),
+
+    q9_pass_n = sum(attn_q9_pass),
+    q9_pass_pct = mean(attn_q9_pass) * 100,
+    
+    attn_q9_typo_n = sum(attn_q9_typo),
+    attn_q9_typo_pct = mean(attn_q9_typo) * 100,
+
+    q17_pass_n = sum(attn_check_q17),
+    q17_pass_pct = mean(attn_check_q17) * 100,
+
+    q114_pass_n = sum(attn_q114_pass),
+    q114_pass_pct = mean(attn_q114_pass) * 100
+  )
+```
+Among pre-cleaned, consenting respondents (n = 2694), 78% (n=2095) passed the first check, 6.8% (n = 182) at least selected "strongly" (selected strongly disagree instead of strongly agree); 76% (n = 2066) passed the second attention check by typing purple or a very mild mispelling of it (ommitting a single letter, for example); and 60% (n = 1604) passed the last attention check or indicated that they never use a fake social media platform.
+
+table factoring in answered
+```{r}
+attn_check_summary <- tibble(
+  check = c("Q9", "Q17", "Q114"),
+  
+  total_n = nrow(raw_data),
+  
+  answered_n = c(
+    sum(raw_data$attn_q9_answered),
+    sum(raw_data$attn_q17_answered),
+    sum(raw_data$attn_q114_answered)
+  ),
+  
+  nonanswer_n = c(
+    sum(!raw_data$attn_q9_answered),
+    sum(!raw_data$attn_q17_answered),
+    sum(!raw_data$attn_q114_answered)
+  ),
+  
+  pass_n = c(
+    sum(raw_data$attn_q9_pass),
+    sum(raw_data$attn_check_q17),
+    sum(raw_data$attn_q114_pass)
+  )
+) %>%
+  mutate(
+    # Answered, but did not pass
+    wrong_n = answered_n - pass_n,
+    
+    # Everyone who did not pass: wrong answer + nonanswer
+    nonpass_n = total_n - pass_n,
+    
+    answered_pct = answered_n / total_n * 100,
+    
+    # Your current percentages
+    pass_pct_all = pass_n / total_n * 100,
+    
+    # More useful for actual attention performance:
+    # Of people who ANSWERED, how many passed?
+    pass_pct_answered = pass_n / answered_n * 100,
+    
+    # Of all apparent non-passes, what % are just nonanswers?
+    nonanswer_pct_of_nonpass =
+      nonanswer_n / nonpass_n * 100,
+    
+    # Of people who answered, what % actually got it wrong?
+    wrong_pct_answered =
+      wrong_n / answered_n * 100
+  )
+
+attn_check_summary
+```
+Attention checks themselves actually show respondent drop-off. The first check was answered by 2,298 respondents, the second was answered by 2,075 respondents, and the third was only answered by 1,663 respondents. For the first, of those who answered, 203 answered incorrectly and 2,095 answered correctly. For the second, 9 answered incorrectly and 2,066 passed. For the third, 59 answered incorrectly and 1,604 passed. 
+
+**save that table for overleaf. 
+
+```{r}
+raw_data %>%
+  count(attn_pass_count, attn_answered_count)
+```
+
+## duration
+what does survey duration actually look like? 
+
+```{r}
+summary(raw_data$duration_minutes)
+```
+Took respondents from less than a second to days to "complete" the survey. 
+flags:
+-sub_8
+-sub_12
+-sub_20
+-sub_30
+-over_52
+-over_180
+
+```{r}
+raw_data %>%
+  summarise(
+    n = n(),
+
+    sub_8_n = sum(sub_8),
+    sub_8_pct = mean(sub_8) * 100,
+    
+    sub_12_n = sum(sub_12),
+    sub_12_pct = mean(sub_12) * 100,
+
+    sub_20_n = sum(sub_20),
+    sub_20_pct = mean(sub_20) * 100,
+
+    sub_30_n = sum(sub_30),
+    sub_30_pct = mean(sub_30) * 100,
+    
+    over_52_n = sum(over_52),
+    over_52_pct = mean(over_52) * 100,
+    
+    over_180_n = sum(over_180),
+    over_180_pct = mean(over_180) * 100
+  )
+```
+Of the 2,694 consenting respondents, 13% (n = 352) reached the end of the survey in less or equal to 8 minutes; 20% (n = 539) in less than or equal to 12 minutes; 38% (n = 1021) in less than or equal to 20 minutes, 59% (n = 1592) in or less than 30, 21% (n = 563) in 52 minutes or more, and 7% or 200 respondents took two hours or more. 
+
+## finishers
+
+nonfinisher
+
+```{r}
+
+raw_data %>%
+  summarise(
+    n = n(),
+    
+    finished_n = sum(finished == 1),
+    finished_pct = finished_n / n,
+    
+    nonfinished_n = sum(nonfinisher),
+    nonfinished_pct = nonfinished_n / n
+  )
+
+
+table(raw_data$finished, useNA = "ifany")
+```
+Of the 2,694 consenting respondents, 83% finished (as in, reached the end of the survey, irregardless of skipped questions) (n = 2,231) and 17% did not (n = 463).
 
 # 4. SAVE: cleaned_light.csv
 
