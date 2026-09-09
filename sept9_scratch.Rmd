@@ -1,0 +1,166 @@
+---
+title: "scratch"
+output: html_document
+date: "2026-09-08"
+---
+
+
+
+
+you are moving flags to a first part of data_prep_script so that you can find out the counts across the whole sample before applying exclusions. 
+
+Leave in data_prep_sept1 those lines of code that create flags.Here, I'm just paste the parts that will ultimately be bumped to the end of the flag-creating section
+
+vars:
+raw_data$attn_q9_pass
+raw_data$attn_q9_typo
+attn_check_q17
+accepted_varients
+attn_q114_pass
+attn_q9_answered
+attn_q17_answered
+attn_q114_answered
+attn_fail_count
+attn_pass_count
+attn_answered_count
+duration_in_minutes
+
+speed categories
+sub_8
+sub_12
+sub_20
+sub_30
+over_52
+over_180
+
+progress
+nonfinished
+finished
+
+common_vars
+all_block_vars
+quality_derived_vars
+non_question_vars
+
+common_na_count
+block_na_count
+na_count
+
+Goes to application of exclusion:
+
+From attention check section
+```{r}
+
+count(raw_data, attn_pass_count)
+
+
+write_csv(raw_data, "data/cleaned/raw_data_consent_pre_attn_rest.csv")
+
+data_pre_attn_exclusion <- raw_data # saving pre exclusion, or just use raw_data
+
+raw_data_cleaned <- raw_data %>%
+  filter(attn_pass_count > 0)#switched to raw_data_cleaned
+
+count(raw_data_cleaned, attn_pass_count)
+
+```
+
+With dropped respondents (failed all 3), I have 32 respondents who passed 1, 459 who passed 2, and 1,604 who passed all 3. Total = 2,095 respondents retained.
+
+To check specific attention check pass/fail counts: attn_q9_pass, attn_check_q17, attn_q114_pass attn_pass_count
+
+Speeds
+-have created sub_8 variable and sub_12 variable
+
+
+```{r}
+speed_review <- raw_data_cleaned %>%
+  filter(duration_minutes >= 8) %>%
+  mutate(
+    speed_group = case_when(
+      duration_minutes < 12 ~ "8–<12 min",
+      duration_minutes < 20 ~ "12–<20 min",
+      TRUE ~ "20+ min"
+    ),
+    
+    attn_fail_count = 3 - attn_pass_count,
+    
+    any_attn_fail = attn_fail_count >= 1,
+    two_attn_fails = attn_fail_count >= 2
+  )
+
+speed_review %>%
+  count(speed_group)
+```
+
+
+
+
+
+```{r}
+speed_review %>%
+  count(speed_group, attn_fail_count)
+```
+
+I should probably remove people who were too fast two slow and only passed one attention check. or flag.
+
+remember: attn_q9_pass, attn_check_q17, attn_q114_pass attn_pass_count
+
+fast respondents who had another issue
+
+```{r}
+speed_review %>%
+  filter(
+    duration_minutes < 12,
+    attn_fail_count >= 1
+  ) %>%
+  select(
+    response_id,
+    duration_minutes,
+    attn_pass_count,
+    attn_fail_count,
+    attn_q9_pass,
+    attn_check_q17,
+    attn_q114_pass
+  ) %>%
+  arrange(duration_minutes)
+```
+
+```{r}
+speed_review %>%
+  filter(
+    duration_minutes < 20,
+    attn_fail_count >= 1
+  ) %>%
+  select(
+    response_id,
+    duration_minutes,
+    attn_pass_count,
+    attn_fail_count,
+    attn_q9_pass,
+    attn_check_q17,
+    attn_q114_pass
+  ) %>%
+  arrange(duration_minutes) %>%
+  View()
+```
+
+```{r}
+speed_review %>%
+  summarise(
+    # 8 to <12 minutes
+    n_under_12 = sum(duration_minutes < 12),
+    n_under_12_attn_fail =
+      sum(duration_minutes < 12 & any_attn_fail),
+    pct_under_12_attn_fail =
+      mean(any_attn_fail[duration_minutes < 12]) * 100,
+    
+    # 8 to <20 minutes
+    n_under_20 = sum(duration_minutes < 20),
+    n_under_20_attn_fail =
+      sum(duration_minutes < 20 & any_attn_fail),
+    pct_under_20_attn_fail =
+      mean(any_attn_fail[duration_minutes < 20]) * 100
+  )
+```
+

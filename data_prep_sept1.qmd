@@ -24,6 +24,7 @@ library(ggbeeswarm)
 library(readxl)
 library(stringr)
 library(dplyr)
+library(kableExtra)
 
 
 ```
@@ -95,7 +96,6 @@ write_csv(raw_data, "./data/cleaned/block_labeled_raw_data.csv")
 #### b. Cleaned data frame, deleting un-needed vars
 
 ```{r}
-#| include: true
 
 columns_to_drop <- c(
   "status", "start_date", "end_date", "ip_address", "recipient_last_name", "recipient_first_name", 
@@ -693,6 +693,25 @@ raw_data <- raw_data %>%
 ```
 
 
+###e. patterns
+
+If for the deservingness questions, respondent has set all to same number or many in a row same number
+
+if all block a, block b, or block c vars are same number
+
+items under a question -- all are 'strongly support' or 'no/unsure' etc
+
+"q15_1", "q15_2", "q15_3", "q15_4", "q15_5",
+
+"q25_1", "q25_2", "q25_3", "q25_4",
+
+"q23_2", "q23_2","q23_7",
+
+"q32", "q33", "q34", "q35", "q36", "q37", "q38",
+
+"q51_1", "q51_2", "q51_3", "q51_4", "q51_5", "q51_6", "q51_7", "q51_8",
+
+
 # 5. Description of Consented, pre-screening sample
 
 
@@ -701,6 +720,8 @@ raw_data <- raw_data %>%
 ncol(raw_data)
 nrow(raw_data)
 count(raw_data, block)
+
+names(raw_data)
 ```
 ## attention checks
 
@@ -1130,14 +1151,75 @@ used_var_missing <- raw_data %>%
   arrange(desc(pct_missing))
 
 View(used_var_missing)
+
 ```
+
+for overleaf
+ 
+```{r}
+used_var_missing_table <- used_var_missing %>%
+    mutate(
+    pct_missing = round(pct_missing, 1),
+    pct_answered = round(pct_answered, 1)
+  ) %>%
+  rename(
+    Variable = variable,
+    `N Missing` = n_missing,
+    `N Answered` = n_answered,
+    `% Missing` = pct_missing,
+    `% Answered` = pct_answered
+  )
+
+
+used_var_missing_latex <- used_var_missing_table  %>%
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    longtable = TRUE,
+    caption = "Missingness and Response Rates for Employed Survey Items",
+    label = "tab:used_var_missingness",
+    align = c("l", "r", "r", "r", "r"),
+    digits = 1
+  ) %>%
+  kable_styling(
+    latex_options = c("repeat_header"),
+    font_size = 9
+  )
+
+writeLines(
+  used_var_missing_latex,
+  "used_var_missing.tex"
+)
+```
+ 
+```{r}
+all_item_missingness <- raw_data %>%
+  summarise(
+    across(
+      all_of(common_vars),
+      ~ sum(is.na(.))
+    )
+  ) %>%
+  pivot_longer(
+    everything(),
+    names_to = "variable",
+    values_to = "n_missing"
+  ) %>%
+  mutate(
+    pct_missing = n_missing / nrow(raw_data) * 100
+  ) %>%
+  arrange(desc(pct_missing))
+
+all_item_missingness
+```
+
 
 # 4. SAVE: cleaned_light.csv
 
 ```{r}
 #light csv
-write_csv(cleaned_data_light, "data/cleaned/cleaned_light.csv") # main file to use going forward
+#write_csv(cleaned_data_light, "data/cleaned/cleaned_light.csv") # main file to use going forward
 
-testing <- readr::read_csv("data/cleaned/cleaned_light.csv")
+#testing <- readr::read_csv("data/cleaned/cleaned_light.csv")
 
 ```
