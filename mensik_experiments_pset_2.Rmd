@@ -2,40 +2,192 @@
 title: "mensik_experiments_2"
 author: "Kristina Mensik"
 date: "2026-09-04"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-1.  Potential outcomes notation questions.
+## Question 1
 
-2.  suppose treatment indicator $d_i$ is either 1 (treated) or 0 (untreated). Define the average treatment effect among the treated, or ATT, as
+### (a). 
 
-question is asking us to write a proof that the ATE would be = ATT provided random assignment.
+$Y_i(0)$ is the potential outcome for unit $i$ in a world where it does not receive the treatment.
 
-think about properties of random assignment.
+### (b). 
 
-left and 
+$Y_i(0)|D_i = 1$ is, for a unit $i$ assigned to treatment by a hypothetical distribution of treatments, the untreated potential outcome. $Y_i(0)|d_i=1$ is the untreated potential outcome for a unit ($i$) that is actually treated.
 
-orthogonal property
+$D$ in the first equation is a matrix composed of all possible hypothetical assignment vectors, so $Y_i(0)$ is the potential outcome over all included assignment vectors where $d_i = 1$. $d_i = 1$ then is just one in that list of vectors, and we might actually observe it.
 
-equal in expectation, not for a single draw/individual
+### (c) 
 
-E[Y]
+Where $Y_i(0)$ is the untreated potential outcome for a unit $i$, $Y_i(0)|D_i=0$ is the untreated potential outcome for a unit $i$ given that it is not assigned treatment, by some hypothetical distribution and withholding of treatment.
 
-mean treatment effect for treated and untreated, iterative expectations 
+### (d) 
 
--property of expected value can be separated
--equations in textbook tells us that when orhogonal, expected value doesn't depend on treatment status
+$Y_i(0)|D_i=1$ is the untreated potential outcome for unit $i$ given that under a hypothetical distribution of treatments it is amongst the treated. $Y_i(0)|D_i=0$ is the untreated potential outcome for a unit $i$ but one that is, under a hypothetical distribution of all potential treatments, assigned to treatment.
+
+### (e)
+
+$E[Y_i(0)]$ is an expectation of a random variable $Y_i(0)$ untreated untreated value, so the weighted average of that variable when untreated in the population. $E[Y_i(0)|D_i = 1]$ means the expected untreated value of a random variable $Y_i$, given that it is treated -- we could only observe this value if we fabricated data (or assumed a sharp null?).
+
+### (f)
+
+In the equation: $E[Y_i(1)|D_i = 1] - E[Y_i(0)|D_i = 0] = E[Y_i(1) - Y_i(0)|D_i=1]+E[Y_i(0)|D_i=1]-E[Y_i(0)|D_i = 0])$ selection bias is this term: $E[Y_i(0)|D_i=1]-E[Y_i(0)|D_i = 0])$.
+
+Randomization produces assignments to treatment and control that are (the assignments) independent of potential outcomes, observed and unobserved variables; in turn, the distribution of $Y_i(0)$ for treated and untreated groups is the same, so $E[Y_i(0)|D_i=1]$ is equal to $E[Y_i(0)|D_i = 0])$.
+
+## Question 2
+
+```{r, echo=TRUE}
+untreated_obs <- c(10, 15, 20, 20, 10, 15, 15)
+untreated_xpo <- sum(untreated_obs) /7 
+
+treated_obs <- c(15, 15, 30, 15, 20, 15, 30)
+treated_xpo <- sum(treated_obs) /7
+
+one_way <- untreated_xpo - treated_xpo
+print(one_way)
+```
+
+```{r, echo=TRUE}
+another_way <- sum(untreated_obs - treated_obs) /7
+print(another_way)
+```
+
+```{r, echo=TRUE}
+print(one_way == another_way)
+
+```
+
+## Question 3
 
 
-10. 
-researchers distribute letter (theoretically) saying they'll be invited to ..
+| Y_i(0)                  | Y_i(1) |     |     |                         |
+|-------------------------|--------|-----|-----|-------------------------|
+|                         | 15     | 20  | 30  | Marginal dist of Y_i(0) |
+| 10                      | 1      | 1   | 0   | 2/7                     |
+| 15                      | 2      | 0   | 1   | 3/7                     |
+| 20                      | 1      | 0   | 1   | 2/7                     |
+| marginal dist of Y_i(1) | 4/7    | 1/7 | 2/7 | 1                       |
+|                         |        |     |     |                         |
 
-excludability 
+Conditional expectation that $E[Y_i(0)|Y_i(1) >15$ = 10 + 15 + 20 / 3 = 45 / 3 = 15.
 
-Z->D->Y
-Z->Y ?? excludability would X this out
-treatment: go to dorms, 
+Conditional expectation that $E[Y_i(0)|Y_i(0) >15$ = 15+30 / 2 = 45/2 = 22.5.
+
+## Question 4
+
+ATT: ATE among the treated
+
+We're given the ATT written as $$\frac{\sum_{i}^{N} \tau_{d_i}}{\sum_{i}^{N} d_i}$$
+
+$\tau_i$ is $Y_i(1)-Y_i(0)$. So we can also write that the expected value on average among units assigned to treatments is $E[Y_i(1) - Y_i(0)|D_i=1]$. By the property demonstrated in question 2, we can distribute the conditional, so write $E[Y_i(1)|D_i=1] - E[Y_i(0)|D_i=1]$. $E[Y_i(1)|D_i=1] = E[Y_i(1)]$ (2.9 in the book), and $E[Y-i(0)|D_i = 1] = E[Y_i(0)]$ so this becomes $E[Y_i(1)] - E[Y_i(0)]$.Assuming random assignment is excludable and there is non-interference, we have orthogonality in expectation and both of these groups potential outcomes should be the same as the panels or everyone else's. We can rewrite this replacing "E[]" with summation operators and dividing by N:
+
+$$\frac{1}{N}\sum_{i}^{N} [Y_i(1) - Y_i(0)]$$
+
+## Question 5
+
+### a. 
+Two types of randomization procedures are described: simple randomization and complete randomization. The prior is afoot with the coin flip. Unlike complete randomization (at work with the card and slips/envelope shuffling procedures) there's a possibility that all subjects will be assigned to treatment or all to control, or some other unbalanced distribution will occur. 
+
+Both the card and paper slip methods avoid this problem and let the researcher could also design a balanced sample. They could also design a purposefully unbalanced sample that will have a larger or smaller treated population as called for (re: Robinhood). That might be unwise in this scenario however because it could inflate a risk that the card or slip dealer or recipient figures out treatment assignments. 
+
+An advantage the slips-in-envelop approach has over both the coin flip and the cards is that it seems most likely to prevent the researcher and research subjects from knowing assignments. 
+
+### b. 
+
+My answer would change in two ways. First, the coin flip route becomes more appealing because as the N increases, the likelihood of a decidedly unbalanced sample decreases. Second, a larger sample reduces the likelyhood that research subjects could glean their treatment condition if the researcher has a purposefully unbalanced sample. The tradeoffs of these two approaches (beyond added work, writing cards and stuffing slips) is not dramatically altered, but rather the risk of route 1 (unbalanced sample) seems somewhat mollified. 
+ 
+### c. 
+
+30 x 1/2 + 60 x 1/2 = 45 minutes if the coin toss is used; 3x30 + 3x60 / 6 or also 45 minutes if the sealed envelop is used.
+
+## Question 7
+
+### a. 
+An unbiased estimator is one where the expected value of its estimates converges on the true parameter of interest. 
+
+### b. 
+Estimates cannot themselves be biased (estimators can); estimates that are themselves higher or lower than the true value are only by definition that (higher or lower) not by default indicative of bias (which they can't and only the estimator can have). For that reason the Table 2.1 estimates are not biased. In expectation, estimates from the difference in means estimator may still equal those of the ATE as long as the assignment of villages is random. 
+
+### c. 
+In this scenario there was not randomization: the treatment was assigned based on properties of the villages that could directly shape those villages outcomes. This highlights what's been recouped: a statistical relationship between the treatment itself and variables that condition the outcomes of interest. The limitation of regression is this problem is not resolvable unless the relationship is severed: we cannot know, let alone list and control, the relationships that may be at work shaping our outcome variable.
+
+## Question 8
+
+### a. 
+
+Control: 20/21 * 100 = 95.24%
+NGO: 18/18 * 100 = 100%
+RTIA: 23/23 * 100 = 100% 
+Bribe: 24/24 * 100 = 100%
+
+Treatments are associated with an approximately 5% percentage point increase in the proportion of confederates who had their residence verified.
+
+### b. 
+
+Applications who received a card in the year since condition:
+
+Control: 5/21 * 100 = ~23.81%
+NGO: 3/18 * 100 = ~16.67%
+RTIA: 20/23 * 100 = ~87%
+Bribe: 24/24 * 100 = 100%
+
+It looks like the NGO's ration card intervention is associated with worse outcomes for applicants. In terms of the proportion who actually received a ration card in the next year and compared to the control, they fared 7 percentage points worse. Those in RTIA and bribery conditions are associated with improved outcomes ranging from 63 to 76 percentage points better than those of the control group. 
+
+### c. 
+
+RTIA does not appear to be associated with faster verification processes relative to the control, but it does seem to be better than either for receiving a ration card within one year. 
+
+## Question 9
+### a
+
+The assumption that the amount that people report having one is random because lottery winners are chosen at random is misled. First, the pool of potential lottery winners is not necessarily a representative or non-random one: those who have an equal chance at being chosen for 'treatment' may already be different in a way that informs whether and how often they play (potentially how much they win over time), their pre-existing attitudes towards taxation, whether a $10,000 or any given winning is a windfall or personally insignificant, and perhaps even what they report (ie, whether 'boasting' about money is uncouth). Last, the cutoff here (at least 10k versus "little or none") is peculiar.
+
+### b
+If the researcher restricted the sample to people who'd played at least once during the year, it eliminates the risk of systematic differences between people who do not play the lottery at all and those who do at least once, but it's still insufficient. My above commentary still holds. 
+As an example, a friend and I have a habit of telling one another to go buy a $5 lottery ticket when something bad has happened or we have had a run of "bad luck" (ie, my friend insisted I go buy a lottery ticket after I got in a bike accident). The joke is that because something bad has happened, the probability that another bad thing happens (lose the lottery) immediately after should be karmically decreased. My friend or I might appear in the "treated" sample in this study. Neither of us has won anything, but I suspect that we might still look more like non-players than high-dollar (possibly frequent or costly lotto-ticket-buying) players in our untreated potential outcomes.
+
+## Question 10. 
+
+### a. 
+The exclusion restriction holds that potential outcomes ($Y_i$) are only responding to treatment ($d_i$), and not to assignment or biproduct of assignment. Here, the problem is the letter itself ($z_i$) may make a student who would not otherwise seek out information about politics. 
+
+The potential outcome when $z = z_i$ and $d_i = d$ is $Y_i(z, d)$. In this case, rather than $Y_i(z = 1, d) = Y_i(z = 0, d)$, whether $z_i$ takes on the value of 1 or 0 could shape the potential outcomes.  
+
+### b. 
+Under non-interference, we assume that $i$s potential outcomes are indicative only of their status as 0 or 1. That is, if your subjects are all clustered together in a crowded room, $i$'s potential outcome should not be influenced by the fact that the five people immediately besides them are treated. Here, there are risks. Untreated students may happen upon and peruse these papers in the cafeteria on the one hand. On the other, contrarian students in the treatment group might be put off by the throngs of newspaper reading treated students and quietly vow to ignore the newspapers and disband with political opinions for the rest of the study. 
+
+## Question 11
+
+### a. 
+
+There is a minimum age at which one can get a learners permit and drivers' license, and that those who take the driving course obtain licenses faster than the students who don't suggests they're younger when they get behind the wheel than others in the treatment group. These age differences might be small, but could mean treated subjects are a little rasher and more likely to get in accidents. It could also be that students who take the course obtain licenses faster than those who don't because they have a stay at home parent who can do practice hours with them, or drive them to the DMV when the moment strikes.
+
+### b. 
+Adjusting the outcome measure still does not address the aforementioned concerns about systematic differences between treated and untreated groups. 
+
+### c. 
+Measuring outcomes over a period of three years with an equal starting point improves symmetry, this doesn't change that those assigned to treatment are likely to get their licenses earlier than those in the control, so they may do more of their driving solo and be more accident prone whereas those who have not gotten their licesnes may be doing more supervised driving and thus more cautious. 
+
+## Question 12. 
+
+### a. 
+Whether or not someone who is incarcerated can read for three hours a day is likely shaped by where they are incarcerated, their "privileges," and other resources. For example, in some prisons whether one has access to a prison library is conditioned by their unit, which are often assigned by race; people's privileges (i.e., access to a library, what can be kept in their cell, and less officially, how closely their cell is monitored for 'contriband' which can include reading materials) can be conditioned by the outcome here. Prison staff for example may harass an incarcerated person or instigate a violent encounter, and the incarcerated person could loose access to reading materials or be penalized by being sent to "isolation" or someplace that changes their likelyhood of reading. 
+
+### b. 
+Excludability requires that reading is the only behavior affecting the number of violent outcomes. However, it could be that prison staff are less likely to instigate violent encounters with people who are reading by themselves (whether because they have less yard/rec time so are reading in their cells, or they are reading by themselves in the yard or elsewhere in the prison) than they are to instigate violent encounters with people who, for example, are standing in a group or are elsewhere in the prison (at work, going to/from programs). 
+
+### c. 
+Non-interference assumes that one person reading for more than 3 hours does not affect the potential outcome of those who are reading for fewer than 3 hours a day. 
+
+### d.
+
+While requiring conditions where people in prison can read for three hours a day sounds like a good thing, there's nothing from this experiment that supports a call to require three hours of reading and claim that observed effects will generalize. 
+
+First, that is because the treatment effects on this first "treated" group may have little to do with the treatment and thus leave treatment effects when everyone is treated a black box. Second, such a requirement could give grounds for prison staff to instigate or harass incarcerated people: given that a mandated reading requirement was part of none of these people's sentences, it's imposition could be experienced as yet another petty form of surveillance and generate friction, or come at the expense of important resources like access to visitation and phone time, the diminishment of which generates more friction between people who work for and are housed in prisons.

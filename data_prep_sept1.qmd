@@ -29,8 +29,7 @@ library(kableExtra)
 
 ```
 
-OVERALL:
-I start by constructing the relevant info first (with the exception of excluding respondents who don't consent), then describing what that info says, then I make exclusion (potentially additional flag) decisions last. 
+OVERALL: I start by constructing the relevant info first (with the exception of excluding respondents who don't consent), then describing what that info says, then I make exclusion (potentially additional flag) decisions last.
 
 # 1. Basic Prep
 
@@ -91,7 +90,6 @@ raw_data <- raw_data %>%
 write_csv(raw_data, "./data/cleaned/block_labeled_raw_data.csv")
 
 ```
-
 
 #### b. Cleaned data frame, deleting un-needed vars
 
@@ -223,6 +221,7 @@ raw_data$attn_q114_pass = !is.na(raw_data$q114_4) & raw_data$q114_4 == "6"
 ```
 
 attn_q9_pass, attn_check_q17, attn_q114_pass
+
 ```{r}
 raw_data <- raw_data %>%
   mutate(
@@ -263,7 +262,6 @@ raw_data <- raw_data %>%
 
 1,604 respondents passed all 3 attn checks 599 did not supply correct answers none of them 32 passed 1 459 passed 2
 
-
 ### b. survey duration
 
 ```{r}
@@ -276,9 +274,9 @@ raw_data <- raw_data %>%
 
 #get pre-cleaned survey duration info: will want this to justify cleaning cutoffs
 
-#summary(raw_data_cleaned$duration_minutes)
+summary(raw_data$duration_minutes)
 ```
-
+median: 25.35
 
 Grouping ppl into speed categories
 
@@ -286,8 +284,8 @@ Grouping ppl into speed categories
 summary(raw_data$duration_minutes)
 raw_data <- raw_data %>%
   mutate(
-    sub_8  = if_else(duration_minutes <= 8, 1, 0),
-    sub_12 = if_else(duration_minutes <= 12, 1, 0),
+    sub_8.45  = if_else(duration_minutes <= 8.45, 1, 0),
+    sub_12.6 = if_else(duration_minutes <= 12.6, 1, 0),
     sub_20 = if_else(duration_minutes <= 20, 1, 0),
     sub_30 = if_else(duration_minutes <= 30, 1, 0),
     over_52 = if_else(duration_minutes >= 52, 1, 0),
@@ -296,7 +294,7 @@ raw_data <- raw_data %>%
 
 ```
 
-### c. progress/finished 
+### c. progress/finished
 
 ```{r}
 
@@ -351,9 +349,9 @@ ggsave(
 )
 ```
 
-### d. NAs & completion of vars -> end
+### d. NAs & completion of vars -\> end
 
-### ***Des and pwr consolidation
+### \*\*\*Des and pwr consolidation
 
 Objective: consolidate blocks (i.e. so only 1 Incarcerated People/Prisoners)
 
@@ -543,9 +541,10 @@ raw_data <- raw_data %>%
 
 ```
 
-
 ### 2d. NAs & completion of vars
-I want to understand basic distribution of missingness/NAs, but because of the block specific variables I need to do so seperately for the trhee. 
+
+I want to understand basic distribution of missingness/NAs, but because of the block specific variables I need to do so seperately for the trhee.
+
 ```{r}
 # Block-specific variables -----------------------------------------------
 
@@ -692,7 +691,6 @@ raw_data <- raw_data %>%
   )
 ```
 
-
 ###e. patterns
 
 If for the deservingness questions, respondent has set all to same number or many in a row same number
@@ -711,10 +709,7 @@ items under a question -- all are 'strongly support' or 'no/unsure' etc
 
 "q51_1", "q51_2", "q51_3", "q51_4", "q51_5", "q51_6", "q51_7", "q51_8",
 
-
 # 5. Description of Consented, pre-screening sample
-
-
 
 ```{r}
 ncol(raw_data)
@@ -723,17 +718,18 @@ count(raw_data, block)
 
 names(raw_data)
 ```
+
 ## attention checks
 
-How'd they do on attention checks?
 ```{r}
 count(raw_data, attn_pass_count)
 count(raw_data, attn_answered_count)
 ```
 
-Overall, 1,604 respondents passed all 3 checks. 462 passed 2, 29 passed 1, and 599 respondents "failed" all 3 checks -- or they did not supply correct answers. 
+Overall, 1,604 respondents passed all 3 checks. 462 passed 2, 29 passed 1, and 599 respondents "failed" all 3 checks -- or they did not supply correct answers.
 
 table:
+
 ```{r}
 raw_data %>%
   summarise(
@@ -752,9 +748,11 @@ raw_data %>%
     q114_pass_pct = mean(attn_q114_pass) * 100
   )
 ```
+
 Among pre-cleaned, consenting respondents (n = 2694), 78% (n=2095) passed the first check, 6.8% (n = 182) at least selected "strongly" (selected strongly disagree instead of strongly agree); 76% (n = 2066) passed the second attention check by typing purple or a very mild mispelling of it (ommitting a single letter, for example); and 60% (n = 1604) passed the last attention check or indicated that they never use a fake social media platform.
 
 table factoring in answered
+
 ```{r}
 attn_check_summary <- tibble(
   check = c("Q9", "Q17", "Q114"),
@@ -806,9 +804,10 @@ attn_check_summary <- tibble(
 
 attn_check_summary
 ```
-Attention checks themselves actually show respondent drop-off. The first check was answered by 2,298 respondents, the second was answered by 2,075 respondents, and the third was only answered by 1,663 respondents. For the first, of those who answered, 203 answered incorrectly and 2,095 answered correctly. For the second, 9 answered incorrectly and 2,066 passed. For the third, 59 answered incorrectly and 1,604 passed. 
 
-**save that table for overleaf. 
+Attention checks themselves actually show respondent drop-off. The first check was answered by 2,298 respondents, the second was answered by 2,075 respondents, and the third was only answered by 1,663 respondents. For the first, of those who answered, 203 answered incorrectly and 2,095 answered correctly. For the second, 9 answered incorrectly and 2,066 passed. For the third, 59 answered incorrectly and 1,604 passed.
+
+\*\*save that table for overleaf.
 
 ```{r}
 raw_data %>%
@@ -816,7 +815,8 @@ raw_data %>%
 ```
 
 ## duration
-what does survey duration actually look like? 
+
+what does survey duration actually look like?
 
 ```{r}
 # visual of response times
@@ -859,25 +859,19 @@ ggsave(
 ```{r}
 summary(raw_data$duration_minutes)
 ```
-Took respondents from less than a second to days to "complete" the survey. 
-flags:
--sub_8
--sub_12
--sub_20
--sub_30
--over_52
--over_180
+
+Took respondents from less than a second to days to "complete" the survey. flags: -sub_8 -sub_12 -sub_20 -sub_30 -over_52 -over_180
 
 ```{r}
 raw_data %>%
   summarise(
     n = n(),
 
-    sub_8_n = sum(sub_8),
-    sub_8_pct = mean(sub_8) * 100,
+    sub_8_n = sum(sub_8.45),
+    sub_8_pct = mean(sub_8.45) * 100,
     
-    sub_12_n = sum(sub_12),
-    sub_12_pct = mean(sub_12) * 100,
+    sub_12_n = sum(sub_12.6),
+    sub_12_pct = mean(sub_12.6) * 100,
 
     sub_20_n = sum(sub_20),
     sub_20_pct = mean(sub_20) * 100,
@@ -892,7 +886,8 @@ raw_data %>%
     over_180_pct = mean(over_180) * 100
   )
 ```
-Of the 2,694 consenting respondents, 13% (n = 352) reached the end of the survey in less or equal to 8 minutes; 20% (n = 539) in less than or equal to 12 minutes; 38% (n = 1021) in less than or equal to 20 minutes, 59% (n = 1592) in or less than 30, 21% (n = 563) in 52 minutes or more, and 7% or 200 respondents took two hours or more. 
+
+Of the 2,694 consenting respondents, 13% (n = 352) reached the end of the survey in less or equal to 8 minutes; 20% (n = 539) in less than or equal to 12 minutes; 38% (n = 1021) in less than or equal to 20 minutes, 59% (n = 1592) in or less than 30, 21% (n = 563) in 52 minutes or more, and 7% or 200 respondents took two hours or more.
 
 ## finishers
 
@@ -914,9 +909,10 @@ raw_data %>%
 
 table(raw_data$finished, useNA = "ifany")
 ```
+
 Of the 2,694 consenting respondents, 83% finished (as in, reached the end of the survey, irregardless of skipped questions) (n = 2,231) and 17% did not (n = 463).
 
-## missingness? 
+## missingness?
 
 ```{r}
 summary(raw_data$na_count)
@@ -924,7 +920,6 @@ summary(raw_data$common_na_count)
 summary(raw_data$block_na_count)
 
 ```
-
 
 ```{r}
 # visual of nas/missingness
@@ -963,7 +958,6 @@ ggsave(
 )
 ```
 
-
 ```{r}
 raw_data %>%
   group_by(finished) %>%
@@ -977,7 +971,6 @@ raw_data %>%
     max_na = max(na_count, na.rm = TRUE)
   )
 ```
-
 
 ```{r}
 raw_data %>%
@@ -1025,6 +1018,7 @@ raw_data %>%
     pct_finished = mean(finished == 1, na.rm = TRUE) * 100
   )
 ```
+
 ```{r}
 raw_data %>%
   group_by(finished) %>%
@@ -1051,11 +1045,10 @@ raw_data %>%
   )
 ```
 
-
-
 ## clustering of indicators?
 
 overlap summary
+
 ```{r}
 overlap_summary <- tibble(
   check = c("Q9", "Q17", "Q114"),
@@ -1110,19 +1103,19 @@ overlap_summary
 ```
 
 ### enough usable measurements?
+
 Ie, did respondents supply enough of the questionnaire to furnish usable measurements?
 
 Among people who broke off—or among finishers with substantial missingness—what analytically important information is actually present?
 
-q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1
-q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3
+q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3
 
-q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1
-q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3, q62_1,q51_1, q51_2, q51_3, q51_4, q51_5, q51_6, q51_7, q51_8, dem101,
+q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3, q62_1,q51_1, q51_2, q51_3, q51_4, q51_5, q51_6, q51_7, q51_8, dem101,
 
 q32, q33, q34, q35, q36, q37, q38, q111,
 
 used variables
+
 ```{r}
 
 used_vars <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc","q15_1", "q15_2", "q15_3", "q15_4", "q15_5",
@@ -1155,7 +1148,7 @@ View(used_var_missing)
 ```
 
 for overleaf
- 
+
 ```{r}
 used_var_missing_table <- used_var_missing %>%
     mutate(
@@ -1191,7 +1184,7 @@ writeLines(
   "used_var_missing.tex"
 )
 ```
- 
+
 ```{r}
 all_item_missingness <- raw_data %>%
   summarise(
@@ -1213,12 +1206,103 @@ all_item_missingness <- raw_data %>%
 all_item_missingness
 ```
 
+Branch questions: 
+109
+112
+dem
+q53
+
+Demographics
+q51_n (racial dem)
+q56 (gender) (_1 is women, _2 man, _3 queer, _4 other)
+
+
+Info I will need about respondents who answer DVs
+- race
+- gender
+- political identity
+
+Race vars uncleaned are 0, 1, NA, -99 
+
+```{r}
+#white respondents
+class(raw_data$q51_1)
+table(raw_data$q51_1, useNA = "ifany")
+```
+425 not-white respondents who made it to this question
+1184 white respondents who made it to this question
+1082 started but didn't make it to this question 
+
+```{r}
+#Black respondents
+unique(raw_data$q51_2)
+table(raw_data$q51_2, useNA = "ifany")
+```
+268 black respondents
+1341 not black respondents
+1082 NA
+
+```{r}
+#Hispanic respondents
+table(raw_data$q51_7, useNA = "ifany")
+```
+237 Hispanic respondents
+1372 not hispanic respondents
+1082 NA
+
+
+
+# 6. Flag and or drop
+
+### attn checks
+```{r}
+
+raw_data <- raw_data %>%
+  mutate(
+    attn_wrong_count = attn_answered_count - attn_pass_count
+  )
+```
+
+### duration
+
+-already did sub 8 through 30, over 52 over 180
+Hillygus: standard is to drop 1/3 median, flag 1/2 median
+
+median: 25.35
+1/3 is 8.43
+
+### progress/finished
+```{r}
+raw_data <- raw_data %>%
+  mutate(
+    breakoff = finished == 0,
+    early_breakoff = progress < 25,
+    sub_mean_breakoff = progress < 84.68
+  )
+
+
+```
+
+DROP -- faster than 1/3 the median, so sub 8.43 min responders
+
+```{r}
+pre_speed_drop <- raw_data
+```
+
+```{r}
+
+raw_data_cleaned <- raw_data %>%
+  filter(duration_minutes >= 8.43)
+
+```
+
+
 
 # 4. SAVE: cleaned_light.csv
 
 ```{r}
 #light csv
-#write_csv(cleaned_data_light, "data/cleaned/cleaned_light.csv") # main file to use going forward
+write_csv(raw_data_cleaned , "data/cleaned/cleaned_light.csv") # main file to use going forward
 
 #testing <- readr::read_csv("data/cleaned/cleaned_light.csv")
 

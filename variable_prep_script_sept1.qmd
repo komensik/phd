@@ -23,6 +23,7 @@ library(tibble)
 library(gt)
 library(psych)
 library(ggplot2)
+library(tidyverse)
 
 ```
 
@@ -40,6 +41,7 @@ raw_data_cleaned <- readr::read_csv("data/cleaned/cleaned_light.csv")
 
 names(raw_data_cleaned)
 
+nrow(raw_data_cleaned)
 ```
 
 ## 2. Variables
@@ -163,13 +165,22 @@ raw_data_cleaned <- raw_data_cleaned %>%
 # 
 # table(raw_data_cleaned$q6, useNA = "ifany")
 
+
+ raw_data_cleaned <- raw_data_cleaned %>%
+   rename(
+     ration_scripts = q6,
+     ration_period = q7,
+     ration_food = q8
+   )
+
+
 # clean and transform
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
-    c(q6, q7, q8), 
+    c(ration_scripts, ration_period, ration_food), 
     ~ na_if(as.numeric(.x), -99)
     )) %>% mutate(across(
-    c(q6, q7, q8),
+    c(ration_scripts, ration_period, ration_food),
     ~ factor(.x, levels = 1:4,
              labels = c("Frequently", "Sometimes", "Rarely", "Never"),
              ordered = TRUE)
@@ -190,14 +201,14 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #raw_data_cleaned %>% count(Q34)
 
 #raw_data_cleaned %>% count(Q111)
-# 
-# raw_data_cleaned <- raw_data_cleaned %>%
-#   rename(
-#     fire_rare = q32,
-#     fire_privilege = q33,
-#     fire_angry = q34,
-#     fire_fear = q111
-#   )
+ 
+raw_data_cleaned <- raw_data_cleaned %>%
+  rename(
+    fire_rare = q32,
+    fire_privilege = q33,
+    fire_angry = q34,
+    fire_fear = q111
+  )
 
 fire_vars <- c("fire_rare", "fire_privilege", "fire_angry", "fire_fear")
 
@@ -224,125 +235,138 @@ q51\_ ▢ White (1) ▢ Black or African American (2) ▢ Native American / Alas
 -measured as set of binary indicator variables in the survey, rather than as one categorical race variable. - 1 = selected that category - 0 = ? did not select? - NA = c
 
 ```{r}
-
 #convert + clean
 race_vars <- paste0("q51_", 1:8)
 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(all_of(race_vars), ~ na_if(as.numeric(.x), -99)))
-```
 
-```{r}
-
-sum(is.na(raw_data_cleaned$q51_1))
-
-table(raw_data_cleaned$q51_1, useNA = "ifany")
-
-442+1181+619
-
-```
-
-White: 0 1 <NA> 422 1181 619
-
-```{r}
-table(raw_data_cleaned$q51_2, useNA = "ifany")
-```
-
-Black or African American (2) 0 1 <NA> 1336 267 619
-
-```{r}
-table(raw_data_cleaned$q51_3, useNA = "ifany")
-```
-
-▢ Native American / Alaska Native (3)
-
-0 1 <NA> 1545 58 619
-
-```{r}
-table(raw_data_cleaned$q51_4, useNA = "ifany")
-```
-
-▢ Asian / Asian American (4) 0 1 <NA> 1525 78 619
-
-```{r}
-table(raw_data_cleaned$q51_5, useNA = "ifany")
-```
-
-▢ Native Hawaiian / Other Pacific Islander (5) 0 1 <NA> 1598 5 619
-
-```{r}
-table(raw_data_cleaned$q51_6, useNA = "ifany")
-```
-
-▢ Middle Eastern/ North African (6) 0 1 <NA> 1597 6 619
-
-```{r}
-table(raw_data_cleaned$q51_7, useNA = "ifany")
-```
-
-▢ Hispanic/Latino/a/e (7) 0 1 <NA> 1366 237 619
-
-```{r}
-table(raw_data_cleaned$q51_8, useNA = "ifany")
-```
-
-▢ My preferred response not listed (8) 0 1 <NA> 1583 20 619
-
-```{r}
-unique(raw_data_cleaned$q51_8)
-
-class(raw_data_cleaned$q51_8)
-
-frame %>% count(q51_1)
-
-frame %>% count(raw_data_cleaned$q51_1, sort = TRUE)
-```
-
-```{r}
-
-
-
-# REPLACE current race dummies w
+#rename
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(
-    # Ethnicity first: Hispanic gets priority
-    Hispanic = ifelse(q51_7 == 1, 1, 0),
+  rename(
+    white = q51_1,
+    black = q51_2,
+    hisp_latino = q51_7,
+    asian_am = q51_4,
+    native_am = q51_3,
+    pac_island = q51_5,
+    mena = q51_6,
+    race_notlisted = q51_8
+  )
 
-    # Among non-Hispanics, assign Black and White
-    Black    = ifelse(q51_2 == 1 & q51_7 != 1, 1, 0),
-    White    = ifelse(q51_1 == 1 & q51_7 != 1, 1, 0)
-  ) %>%
+race_vars <- c("white", "black", "hisp_latino", "asian_am",
+               "native_am", "pac_island", "mena", "race_notlisted")
+```
+
+Responses -- noting consistent NAs so NAs are missing
+```{r}
+raw_data_cleaned %>%
+  select(all_of(race_vars)) %>%
+  pivot_longer(everything(), names_to = "var", values_to = "val") %>%
+  count(var, val) %>%
+  pivot_wider(names_from = val, values_from = n, values_fill = 0)
+```
+
+
+How many multiracial respondents?
+```{r}
+#row level counts
+race_df <- raw_data_cleaned %>%
   mutate(
-    # Everyone else with any race selection becomes OtherRace (mutually exclusive)
-    OtherRace = ifelse(
-      (Black + Hispanic + White) == 0 &
-        rowSums(dplyr::select(., dplyr::all_of(race_vars)), na.rm = TRUE) > 0,
-      1, 0
+    n_races   = rowSums(across(all_of(race_vars), ~ .x == 1), na.rm = TRUE),
+    n_missing = rowSums(across(all_of(race_vars), is.na)),
+    race_item_answered = n_races > 0,
+    multiracial = case_when(
+      !race_item_answered ~ NA,
+      n_races >= 2        ~ TRUE,
+      n_races == 1        ~ FALSE
     )
   )
+
+count(race_df, n_races)
+count(race_df, multiracial)
+```
+
+
+```{r}
+# combinations
+combo_counts <- raw_data_cleaned %>%
+  mutate(.id = row_number()) %>%
+  select(.id, all_of(race_vars)) %>%
+  pivot_longer(-.id, names_to = "race", values_to = "selected") %>%
+  filter(selected == 1) %>%                      # drops both 0s and NAs
+  mutate(race = factor(race, levels = race_vars)) %>%
+  arrange(.id, race) %>%
+  group_by(.id) %>%
+  summarise(
+    n_races    = n(),
+    race_combo = paste(race, collapse = " + "),
+    .groups = "drop"
+  ) %>%
+  count(n_races, race_combo, name = "n") %>%
+  arrange(desc(n))
+
+combo_counts                                # everything
+filter(combo_counts, n_races >= 2)          # multiracial combos only
+```
+
+
+```{r}
+# pairs
+race_mat <- raw_data_cleaned %>%
+  select(all_of(race_vars)) %>%
+  mutate(across(everything(), ~ replace_na(as.integer(.x == 1), 0L))) %>%
+  as.matrix()
+
+co_occur <- crossprod(race_mat)   # diagonal = marginal totals
+co_occur
+```
+
+```{r}
+
+
+
+# # REPLACE current race dummies w
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(
+#     # Ethnicity first: Hispanic gets priority
+#     Hispanic = ifelse(q51_7 == 1, 1, 0),
+# 
+#     # Among non-Hispanics, assign Black and White
+#     Black    = ifelse(q51_2 == 1 & q51_7 != 1, 1, 0),
+#     White    = ifelse(q51_1 == 1 & q51_7 != 1, 1, 0)
+#   ) %>%
+#   mutate(
+#     # Everyone else with any race selection becomes OtherRace (mutually exclusive)
+#     OtherRace = ifelse(
+#       (Black + Hispanic + White) == 0 &
+#         rowSums(dplyr::select(., dplyr::all_of(race_vars)), na.rm = TRUE) > 0,
+#       1, 0
+#     )
+#   )
 
 ```
 
 DOUBLE CHECK
 
 ```{r}
-
-# no overlaps among the 4 dummies
-sum((raw_data_cleaned$Black + raw_data_cleaned$White +
-     raw_data_cleaned$Hispanic + raw_data_cleaned$OtherRace) > 1, na.rm = TRUE)
-
-# counts by category (mutually exclusive)
-table(
-  with(raw_data_cleaned,
-       dplyr::case_when(
-         Hispanic == 1 ~ "Hispanic",
-         Black    == 1 ~ "Black",
-         White    == 1 ~ "White",
-         OtherRace== 1 ~ "OtherRace",
-         TRUE          ~ NA_character_
-       )),
-  useNA = "ifany"
-)
+# 
+# # no overlaps among the 4 dummies
+# sum((raw_data_cleaned$Black + raw_data_cleaned$White +
+#      raw_data_cleaned$Hispanic + raw_data_cleaned$OtherRace) > 1, na.rm = TRUE)
+# 
+# # counts by category (mutually exclusive)
+# table(
+#   with(raw_data_cleaned,
+#        dplyr::case_when(
+#          Hispanic == 1 ~ "Hispanic",
+#          Black    == 1 ~ "Black",
+#          White    == 1 ~ "White",
+#          OtherRace== 1 ~ "OtherRace",
+#          TRUE          ~ NA_character_
+#        )),
+#   useNA = "ifany"
+# )
 
 
 ```
@@ -375,6 +399,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
   )
 
 #clean ideology
+#ummary(raw_data_cleaned$q46)
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     q46 = na_if(as.numeric(q46), -99),
@@ -383,10 +408,19 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    fiscal_ideology = ifelse(!is.na(q46), 6 - q46, NA),
+    fiscal_ideology = ifelse(!is.na(q46), 6 - q46, NA),#now 0 = very lib, 5 = very conservative (left to right)
     social_ideology = ifelse(!is.na(q47), 6 - q47, NA)
   )
 
+#summary(raw_data_cleaned$fiscal_ideology)
+
+#self-reported ideo ident
+table(raw_data_cleaned$politcs) # already coded so that left to right
+
+raw_data_cleaned <- raw_data_cleaned %>%
+   rename(
+     self_ideo = politcs
+     )
 
 ```
 
