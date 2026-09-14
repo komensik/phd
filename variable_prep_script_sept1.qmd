@@ -42,6 +42,7 @@ raw_data_cleaned <- readr::read_csv("data/cleaned/cleaned_light.csv")
 names(raw_data_cleaned)
 
 nrow(raw_data_cleaned)
+
 ```
 
 ## 2. Variables

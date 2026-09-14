@@ -124,9 +124,12 @@ raw_data <- raw_data %>%
 #09-08-26 above drop line ran
 
 #view(raw_data)
-```
 
-### c. Drop non-consenters
+```
+### c. 
+
+it will make sense to move all data renaming here, but will require searching and replacing all scripts. 
+### d. Drop non-consenters
 
 ```{r}
 #| include: true
@@ -179,6 +182,7 @@ raw_data$attn_q9_pass = !is.na(raw_data$q9) & raw_data$q9 == "4"
 
 raw_data$attn_q9_typo = !is.na(raw_data$q9) & raw_data$q9 == "1"
 
+summary(raw_data$attn_q9_pass)
 
 #2. attention flag -  text responses to Q17, remove leading/trailing spaces, and convert everything to lowercase for standardization)
 
@@ -235,6 +239,8 @@ raw_data <- raw_data %>%
     attn_q114_answered =
       !is.na(q114_4) & q114_4 != "-99"
   )
+
+
 ```
 
 ```{r}
@@ -258,6 +264,8 @@ raw_data <- raw_data %>%
       attn_q17_answered +
       attn_q114_answered
   )
+
+table(raw_data$attn_pass_count)
 ```
 
 1,604 respondents passed all 3 attn checks 599 did not supply correct answers none of them 32 passed 1 459 passed 2
@@ -656,7 +664,18 @@ non_question_vars <- c(
   "block",
   "duration_in_seconds",
   "progress",
-  "finished"
+  "finished",
+  "q113_first_click",
+  "q113_last_lick",
+  "q113_page_submit",
+  "q113_click_count"
+)
+
+branch_vars <- c(
+  "q112",
+  "q109",
+  "dem",
+  "q54"
 )
 
 common_vars <- setdiff(
@@ -665,6 +684,7 @@ common_vars <- setdiff(
     all_block_vars,
     quality_derived_vars,
     non_question_vars
+
   )
 )
 ```
@@ -689,6 +709,8 @@ raw_data <- raw_data %>%
     # Total meaningful NAs
     na_count = common_na_count + block_na_count
   )
+
+
 ```
 
 ###e. patterns
@@ -726,7 +748,7 @@ count(raw_data, attn_pass_count)
 count(raw_data, attn_answered_count)
 ```
 
-Overall, 1,604 respondents passed all 3 checks. 462 passed 2, 29 passed 1, and 599 respondents "failed" all 3 checks -- or they did not supply correct answers.
+Overall, 1,604 respondents passed all 3 checks. 462 passed 2, 29 passed 1, and 599 respondents "failed" all 3 checks -- or they did not supply correct answers.This can include NAs. 
 
 table:
 
@@ -1290,13 +1312,154 @@ pre_speed_drop <- raw_data
 ```
 
 ```{r}
+speeders_df <- raw_data%>%
+  filter(duration_minutes <= 8.43)
+write_csv(speeders_df, "data/cleaned/likely_speeders.csv")
+```
+I looked at the 8.43 people. Among them, 277 did not answer any of the 3 attentioon checks. These folks (faster than a third the median and didn not answer attention checks) can go. 
 
-raw_data_cleaned <- raw_data %>%
-  filter(duration_minutes >= 8.43)
+```{r}
+raw_data <- raw_data %>%
+  mutate(
+    exclude_fast_no_attn = 
+      !is.na(duration_minutes) &
+      duration_minutes < 8.43 &
+      attn_answered_count == 0
+  )
+
+
+#raw_data_cleaned <- raw_data %>%
+#  filter(attn_answered_count > 1)
+
+table(raw_data$exclude_fast_no_attn, useNA = "ifany")
+
+raw_data %>%
+  filter(exclude_fast_no_attn) %>%
+  select(
+    respondent_id,
+    duration_minutes,
+    attn_answered_count,
+    attn_pass_count,
+    attn_wrong_count
+  )
+
+raw_data <- raw_data %>%
+  filter(!exclude_fast_no_attn)
+
+count(raw_data)
+```
+This brings the N to 2417.
+
+What about those who were faster than 1/3 the median but failed all three? 
+```{r}
+
+raw_data <- raw_data %>%
+  mutate(
+    exclude_fast_bad_attn =
+      duration_minutes < 8.43 &
+      attn_answered_count == 3 &
+      attn_pass_count == 0
+  )
+
+table(raw_data$exclude_fast_bad_attn, useNA = "ifany")
+```
+There's just one. We can remove that person. 
+
+```{r}
+
+raw_data <- raw_data %>%
+  filter(!exclude_fast_bad_attn)
+
+count(raw_data)
+
+```
+Now the N is 2416.
+
+```{r}
+#raw_data_cleaned <- raw_data %>%
+#  filter(raw_dataduration_minutes >= 8.43)
+
+```
+
+Remaining respondents who were under a third of the median? 
+
+```{r}
+remaining_speeders <- raw_data%>%
+  filter(duration_minutes <= 8.43)
 
 ```
 
 
+```{r}
+speeder_missing <- remaining_speeders %>%
+  summarise(
+    across(
+      all_of(common_vars),
+      ~ sum(is.na(.))
+    )
+  ) %>%
+  pivot_longer(
+    everything(),
+    names_to = "variable",
+    values_to = "n_missing"
+  ) %>%
+  mutate(
+    pct_missing = n_missing / nrow(raw_data) * 100
+  ) %>%
+  arrange(desc(pct_missing))
+
+speeder_missing
+```
+
+If you went sub 1/3 the median, have progress less than 100 and answered fewer than all 3 attention checks (or failed), probably should go.
+
+```{r}
+
+raw_data <- raw_data %>%
+  mutate(
+    exclude_fast_incomplete = coalesce(
+      duration_minutes <= 8.43 &
+      progress < 100 &
+      (attn_pass_count < 3 | attn_answered_count < 3),
+      FALSE
+    )
+  )
+
+sum(raw_data$exclude_fast_incomplete)
+```
+only 4 people
+
+```{r}
+raw_data <- raw_data %>%
+  filter(!exclude_fast_incomplete)
+
+nrow(raw_data)
+```
+
+down to 2412 respondents
+
+NOTE TO SELF: Have still not excluded all sub 1/3 the median. 
+
+```{r}
+
+remaining_speeders <- raw_data%>%
+  filter(duration_minutes <= 8.43)
+
+View(remaining_speeders)
+```
+
+85 ???
+Sept 14 -- you can come back to this later, for now focus on what's up without these 85, apply the rule, talk about differences between remaining all answer and remaining only answer controls
+
+```{r}
+raw_data_cleaned <- raw_data %>%
+  filter(raw_data$duration_minutes >= 8.43)
+
+nrow(raw_data_cleaned)
+```
+n is 2,327
+
+(dropped th 85)
 
 # 4. SAVE: cleaned_light.csv
 

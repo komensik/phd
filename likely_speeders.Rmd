@@ -1,0 +1,605 @@
+---
+title: "Likely Speeders"
+output: html_notebook
+---
+
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(
+  echo = FALSE,       # Hide code by default
+  warning = FALSE,
+  message = FALSE
+)
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(ggplot2)
+library(ggbeeswarm)
+library(readxl)
+library(stringr)
+library(dplyr)
+library(kableExtra)
+
+
+```
+
+```{r}
+df <- read_csv("data/cleaned/likely_speeders.csv")
+```
+
+# 5. Description of Consented, pre-screening sample
+
+```{r}
+ncol(df)
+nrow(df)
+count(df, block)
+
+
+```
+
+## attention checks
+
+```{r}
+count(df, attn_pass_count)
+count(df, attn_answered_count)
+```
+
+
+table:
+
+```{r}
+df %>%
+  summarise(
+    n = n(),
+
+    q9_pass_n = sum(attn_q9_pass),
+    q9_pass_pct = mean(attn_q9_pass) * 100,
+    
+    attn_q9_typo_n = sum(attn_q9_typo),
+    attn_q9_typo_pct = mean(attn_q9_typo) * 100,
+
+    q17_pass_n = sum(attn_check_q17),
+    q17_pass_pct = mean(attn_check_q17) * 100,
+
+    q114_pass_n = sum(attn_q114_pass),
+    q114_pass_pct = mean(attn_q114_pass) * 100
+  )
+```
+
+
+
+```{r}
+attn_check_summary <- tibble(
+  check = c("Q9", "Q17", "Q114"),
+  
+  total_n = nrow(df),
+  
+  answered_n = c(
+    sum(df$attn_q9_answered),
+    sum(df$attn_q17_answered),
+    sum(df$attn_q114_answered)
+  ),
+  
+  nonanswer_n = c(
+    sum(!df$attn_q9_answered),
+    sum(!df$attn_q17_answered),
+    sum(!df$attn_q114_answered)
+  ),
+  
+  pass_n = c(
+    sum(df$attn_q9_pass),
+    sum(df$attn_check_q17),
+    sum(df$attn_q114_pass)
+  )
+) %>%
+  mutate(
+    # Answered, but did not pass
+    wrong_n = answered_n - pass_n,
+    
+    # Everyone who did not pass: wrong answer + nonanswer
+    nonpass_n = total_n - pass_n,
+    
+    answered_pct = answered_n / total_n * 100,
+    
+    # Your current percentages
+    pass_pct_all = pass_n / total_n * 100,
+    
+    # More useful for actual attention performance:
+    # Of people who ANSWERED, how many passed?
+    pass_pct_answered = pass_n / answered_n * 100,
+    
+    # Of all apparent non-passes, what % are just nonanswers?
+    nonanswer_pct_of_nonpass =
+      nonanswer_n / nonpass_n * 100,
+    
+    # Of people who answered, what % actually got it wrong?
+    wrong_pct_answered =
+      wrong_n / answered_n * 100
+  )
+
+attn_check_summary
+```
+
+
+
+\*\*save that table for overleaf.
+
+```{r}
+df %>%
+  count(attn_pass_count, attn_answered_count)
+```
+
+## duration
+
+what does survey duration actually look like?
+
+```{r}
+# visual of response times
+
+uncleaned_response_times <-
+ggplot(df,
+       aes(x = duration_minutes, y = 0)) +
+  geom_quasirandom(
+    groupOnX = FALSE,
+    width = .35,
+    alpha = .35,
+    size = 1.2
+  ) +
+  coord_cartesian(xlim = c(0, 120)) +
+  labs(
+    x = "Survey duration (minutes)",
+    y = NULL,
+    title = "Survey Duration"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+
+uncleaned_response_times # save uncleaned_response_times as image
+
+
+# ggsave(
+#   "uncleaned_response_times.png",
+#   plot = uncleaned_response_times,
+#   width = 14,
+#   height = 9,
+#   dpi = 300,
+# )
+
+```
+
+```{r}
+summary(df$duration_minutes)
+```
+
+Took respondents from less than a second to days to "complete" the survey. flags: -sub_8 -sub_12 -sub_20 -sub_30 -over_52 -over_180
+
+```{r}
+df %>%
+  summarise(
+    n = n(),
+
+    sub_8_n = sum(sub_8.45),
+    sub_8_pct = mean(sub_8.45) * 100,
+    
+    sub_12_n = sum(sub_12.6),
+    sub_12_pct = mean(sub_12.6) * 100,
+
+    sub_20_n = sum(sub_20),
+    sub_20_pct = mean(sub_20) * 100,
+
+    sub_30_n = sum(sub_30),
+    sub_30_pct = mean(sub_30) * 100,
+    
+    over_52_n = sum(over_52),
+    over_52_pct = mean(over_52) * 100,
+    
+    over_180_n = sum(over_180),
+    over_180_pct = mean(over_180) * 100
+  )
+```
+
+Of the 2,694 consenting respondents, 13% (n = 352) reached the end of the survey in less or equal to 8 minutes; 20% (n = 539) in less than or equal to 12 minutes; 38% (n = 1021) in less than or equal to 20 minutes, 59% (n = 1592) in or less than 30, 21% (n = 563) in 52 minutes or more, and 7% or 200 respondents took two hours or more.
+
+## finishers
+
+nonfinisher
+
+```{r}
+
+df %>%
+  summarise(
+    n = n(),
+    
+    finished_n = sum(finished == 1),
+    finished_pct = finished_n / n,
+    
+    nonfinished_n = sum(nonfinisher),
+    nonfinished_pct = nonfinished_n / n
+  )
+
+
+table(df$finished, useNA = "ifany")
+```
+
+Of the 2,694 consenting respondents, 83% finished (as in, reached the end of the survey, irregardless of skipped questions) (n = 2,231) and 17% did not (n = 463).
+
+## missingness?
+
+```{r}
+summary(df$na_count)
+summary(df$common_na_count)
+summary(df$block_na_count)
+
+```
+
+```{r}
+# visual of nas/missingness
+
+uncleaned_missingness <-
+ggplot(df,
+       aes(x = na_count, y = 0)) +
+  geom_quasirandom(
+    groupOnX = FALSE,
+    width = .35,
+    alpha = .35,
+    size = 1.2
+  ) +
+  coord_cartesian(xlim = c(0, 120)) +
+  labs(
+    x = "na count",
+    y = NULL,
+    title = "na count"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+
+uncleaned_missingness 
+
+# 
+# ggsave(
+#   "uncleaned_missingness.png",
+#   plot = uncleaned_missingness,
+#   width = 14,
+#   height = 9,
+#   dpi = 300,
+# )
+```
+
+```{r}
+df %>%
+  group_by(finished) %>%
+  summarise(
+    n = n(),
+    min_na = min(na_count, na.rm = TRUE),
+    q1_na = quantile(na_count, .25, na.rm = TRUE),
+    median_na = median(na_count, na.rm = TRUE),
+    mean_na = mean(na_count, na.rm = TRUE),
+    q3_na = quantile(na_count, .75, na.rm = TRUE),
+    max_na = max(na_count, na.rm = TRUE)
+  )
+```
+
+```{r}
+df %>%
+  group_by(block) %>%
+  summarise(
+    n = n(),
+    median_na = median(na_count, na.rm = TRUE),
+    mean_na = mean(na_count, na.rm = TRUE),
+    q75_na = quantile(na_count, .75, na.rm = TRUE),
+    q90_na = quantile(na_count, .90, na.rm = TRUE),
+    max_na = max(na_count, na.rm = TRUE)
+  )
+```
+
+```{r}
+df %>%
+  mutate(
+    progress_group = case_when(
+      progress < 25  ~ "<25%",
+      progress < 50  ~ "25–<50%",
+      progress < 75  ~ "50–<75%",
+      progress < 100 ~ "75–<100%",
+      progress == 100 ~ "100%",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  group_by(progress_group) %>%
+  summarise(
+    n = n(),
+    median_na = median(na_count, na.rm = TRUE),
+    mean_na = mean(na_count, na.rm = TRUE),
+    min_na = min(na_count, na.rm = TRUE),
+    max_na = max(na_count, na.rm = TRUE)
+  )
+```
+
+```{r}
+df %>%
+  group_by(attn_answered_count) %>%
+  summarise(
+    n = n(),
+    median_na = median(na_count, na.rm = TRUE),
+    mean_na = mean(na_count, na.rm = TRUE),
+    median_progress = median(progress, na.rm = TRUE),
+    pct_finished = mean(finished == 1, na.rm = TRUE) * 100
+  )
+```
+
+```{r}
+df %>%
+  group_by(finished) %>%
+  summarise(
+    n = n(),
+    
+    median_progress =
+      median(progress, na.rm = TRUE),
+    
+    median_na =
+      median(na_count, na.rm = TRUE),
+    
+    median_common_na =
+      median(common_na_count, na.rm = TRUE),
+    
+    median_block_na =
+      median(block_na_count, na.rm = TRUE),
+    
+    median_attn_answered =
+      median(attn_answered_count, na.rm = TRUE),
+    
+    median_attn_passed =
+      median(attn_pass_count, na.rm = TRUE)
+  )
+```
+
+## clustering of indicators?
+
+overlap summary
+
+```{r}
+overlap_summary <- tibble(
+  check = c("Q9", "Q17", "Q114"),
+  
+  total_n = nrow(df),
+  
+  answered_n = c(
+    sum(df$attn_q9_answered),
+    sum(df$attn_q17_answered),
+    sum(df$attn_q114_answered)
+  ),
+  
+  nonanswer_n = c(
+    sum(!df$attn_q9_answered),
+    sum(!df$attn_q17_answered),
+    sum(!df$attn_q114_answered)
+  ),
+  
+  pass_n = c(
+    sum(df$attn_q9_pass),
+    sum(df$attn_check_q17),
+    sum(df$attn_q114_pass)
+  )
+) %>%
+  mutate(
+    # Answered, but did not pass
+    wrong_n = answered_n - pass_n,
+    
+    # Everyone who did not pass: wrong answer + nonanswer
+    nonpass_n = total_n - pass_n,
+    
+    answered_pct = answered_n / total_n * 100,
+    
+    # Your current percentages
+    pass_pct_all = pass_n / total_n * 100,
+    
+    # More useful for actual attention performance:
+    # Of people who either didn't answer or got all 3 , how many passed?
+    pass_pct_answered = pass_n / answered_n * 100,
+    
+    # Of all apparent non-passes, what % are just nonanswers?
+    nonanswer_pct_of_nonpass =
+      nonanswer_n / nonpass_n * 100,
+    
+    # Of people who answered, what % actually got it wrong?
+    wrong_pct_answered =
+      wrong_n / answered_n * 100
+  )
+
+overlap_summary
+
+```
+
+### enough usable measurements?
+
+Ie, did respondents supply enough of the questionnaire to furnish usable measurements?
+
+Among people who broke off—or among finishers with substantial missingness—what analytically important information is actually present?
+
+q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3
+
+q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3, q62_1,q51_1, q51_2, q51_3, q51_4, q51_5, q51_6, q51_7, q51_8, dem101,
+
+q32, q33, q34, q35, q36, q37, q38, q111,
+
+used variables
+
+```{r}
+
+used_vars <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc","q15_1", "q15_2", "q15_3", "q15_4", "q15_5",
+"q25_1", "q25_2", "q25_3", "q25_4", "q4_1_1", "q4_1_2", "q4_1_3", "q4_2_1", "q4_2_2", "q4_2_3","q15_1", "q15_2", "q15_3", "q15_4", "q15_5", "q25_1", "q25_2", "q25_3", "q25_4", "q25_1", "q62_1", "q23_2","q23_7",
+"q4_1_1", "q4_1_2", "q4_1_3", "q4_2_1", "q4_2_2", "q4_2_3",
+"q62_1","q51_1", "q51_2", "q51_3", "q51_4", "q51_5", "q51_6", "q51_7", "q51_8","dem101","q32", "q33", "q34", "q35", "q36", "q37", "q38", "q111"
+)
+
+used_var_missing <- df %>% 
+  summarise(
+    across(
+      all_of(used_vars),
+      ~sum(is.na(.))
+    )
+  ) %>%
+  pivot_longer(
+    everything(),
+    names_to = "variable",
+    values_to = "n_missing"
+  ) %>%
+  mutate(
+    n_answered = nrow(df)- n_missing,
+    pct_missing = n_missing/nrow(df) * 100,
+    pct_answered = n_answered/nrow(df) *100
+  ) %>%
+  arrange(desc(pct_missing))
+
+View(used_var_missing)
+
+```
+
+for overleaf
+
+```{r}
+used_var_missing_table <- used_var_missing %>%
+    mutate(
+    pct_missing = round(pct_missing, 1),
+    pct_answered = round(pct_answered, 1)
+  ) %>%
+  rename(
+    Variable = variable,
+    `N Missing` = n_missing,
+    `N Answered` = n_answered,
+    `% Missing` = pct_missing,
+    `% Answered` = pct_answered
+  )
+
+
+used_var_missing_latex <- used_var_missing_table  %>%
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    longtable = TRUE,
+    caption = "Missingness and Response Rates for Employed Survey Items",
+    label = "tab:used_var_missingness",
+    align = c("l", "r", "r", "r", "r"),
+    digits = 1
+  ) %>%
+  kable_styling(
+    latex_options = c("repeat_header"),
+    font_size = 9
+  )
+# 
+# writeLines(
+#   used_var_missing_latex,
+#   "used_var_missing.tex"
+)
+```
+
+```{r}
+all_item_missingness <- df %>%
+  summarise(
+    across(
+      all_of(common_vars),
+      ~ sum(is.na(.))
+    )
+  ) %>%
+  pivot_longer(
+    everything(),
+    names_to = "variable",
+    values_to = "n_missing"
+  ) %>%
+  mutate(
+    pct_missing = n_missing / nrow(df) * 100
+  ) %>%
+  arrange(desc(pct_missing))
+
+all_item_missingness
+```
+
+Branch questions: 
+109
+112
+dem
+q53
+
+Demographics
+q51_n (racial dem)
+q56 (gender) (_1 is women, _2 man, _3 queer, _4 other)
+
+
+Info I will need about respondents who answer DVs
+- race
+- gender
+- political identity
+
+Race vars uncleaned are 0, 1, NA, -99 
+
+```{r}
+#white respondents
+class(df$q51_1)
+table(df$q51_1, useNA = "ifany")
+```
+425 not-white respondents who made it to this question
+1184 white respondents who made it to this question
+1082 started but didn't make it to this question 
+
+```{r}
+#Black respondents
+unique(df$q51_2)
+table(df$q51_2, useNA = "ifany")
+```
+268 black respondents
+1341 not black respondents
+1082 NA
+
+```{r}
+#Hispanic respondents
+table(df$q51_7, useNA = "ifany")
+```
+237 Hispanic respondents
+1372 not hispanic respondents
+1082 NA
+
+
+
+# 6. Flag and or drop
+
+### attn checks
+```{r}
+
+df <- df %>%
+  mutate(
+    attn_wrong_count = attn_answered_count - attn_pass_count
+  )
+```
+
+### duration
+
+-already did sub 8 through 30, over 52 over 180
+Hillygus: standard is to drop 1/3 median, flag 1/2 median
+
+median: 25.35
+1/3 is 8.43
+
+### progress/finished
+```{r}
+df <- df %>%
+  mutate(
+    breakoff = finished == 0,
+    early_breakoff = progress < 25,
+    sub_mean_breakoff = progress < 84.68
+  )
+
+
+```
