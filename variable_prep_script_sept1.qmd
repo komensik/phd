@@ -187,8 +187,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
              ordered = TRUE)
   ))
 
- raw_data_cleaned %>% count(q8)
-
 ```
 
 ### F. FIRE controls
@@ -400,7 +398,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
   )
 
 #clean ideology
-#ummary(raw_data_cleaned$q46)
+#summary(raw_data_cleaned$q46)
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     q46 = na_if(as.numeric(q46), -99),
@@ -422,8 +420,20 @@ raw_data_cleaned <- raw_data_cleaned %>%
    rename(
      self_ideo = politcs
      )
-
 ```
+
+```{r}
+pol_tude_vars <- c("fiscal_ideology", "social_ideology", "self_ideo")
+
+pol_tude <- raw_data_cleaned %>%
+  select(all_of(pol_tude_vars))
+
+cor(pol_tude,
+    use = "pairwise.complete.obs")
+
+print(psych::corr.test(pol_tude))
+```
+
 
 ### I. Gender
 
@@ -562,7 +572,7 @@ Approximately 561 respondents did not provide responses to the political behavio
 ```{r}
 
 names(raw_data_cleaned)
-write_csv(raw_data_cleaned, "data/cleaned/coded_data__08_2026_3.csv")
+write_csv(raw_data_cleaned, "data/cleaned/coded_data__09_14_26.csv")
 #write_csv(raw_data_cleaned, "data/cleaned/coded_data_may9.csv")
 
 ```
