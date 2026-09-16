@@ -25,14 +25,16 @@ library(tibble)
 library(gt)
 library(psych)
 library(ggplot2)
+library(kableExtra)
 
+source("variable_labels.R")
 ```
 
 # Setup
 
 ```{r}
 
-raw_data_cleaned <- readr::read_csv("data/cleaned/sept_14.csv") 
+data_full <- readr::read_csv("data/cleaned/sept_14.csv") 
 
 ```
 ```{r}
@@ -40,12 +42,12 @@ raw_data_cleaned <- readr::read_csv("data/cleaned/sept_14.csv")
 used <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc",
           "impact", "incarc", "knowincarc", "vict",
           "q15_1", "q15_2", "q15_3", "q15_4", "q15_5","dpen", "min_wage", "free_calls", "ed_funds", "alt_sentencing", "lwop",
-"gov_attn", "vote2020", "willvote", "auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access_rev", 
-"white", "black", "native_am", "asian_am", "pac_island", "mena", "hisp_latino", "race_notlisted", "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology", "Democrat", "Republican", "gender", "q58_1", "q58_2"
+"gov_attn", "vote2020", "willvote", "auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access_rev", "White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am",  "Pac_Island", "MENA", "race_notlisted",
+  "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology", "Democrat", "Republican", "gender", "q58_1", "q58_2"
 
 )
 
-used_missing <- raw_data_cleaned %>% 
+used_missing <- data_full %>% 
   summarise(
     across(
       all_of(used),
@@ -59,76 +61,268 @@ used_missing <- raw_data_cleaned %>%
   ) %>%
   mutate(
     n_answered = nrow(raw_data_cleaned)- n_missing,
-    pct_missing = n_missing/nrow(raw_data_cleaned) * 100,
-    pct_answered = n_answered/nrow(raw_data_cleaned) *100
+    pct_missing = n_missing/nrow(data_full) * 100,
+    pct_answered = n_answered/nrow(data_full) *100
   ) %>%
   arrange(desc(pct_missing))
 
-View(used_missing)
+#View(used_missing)
 
 ```
 
-for overleaf
-
 ```{r}
-used_var_missing_table <- used_var_missing %>%
-    mutate(
-    pct_missing = round(pct_missing, 1),
-    pct_answered = round(pct_answered, 1)
-  ) %>%
-  rename(
-    Variable = variable,
-    `N Missing` = n_missing,
-    `N Answered` = n_answered,
-    `% Missing` = pct_missing,
-    `% Answered` = pct_answered
-  )
 
-
-used_var_missing_latex <- used_var_missing_table  %>%
-  kable(
-    format = "latex",
-    booktabs = TRUE,
-    longtable = TRUE,
-    caption = "Missingness and Response Rates for Employed Survey Items",
-    label = "tab:used_var_missingness",
-    align = c("l", "r", "r", "r", "r"),
-    digits = 1
-  ) %>%
-  kable_styling(
-    latex_options = c("repeat_header"),
-    font_size = 9
-  )
-
-writeLines(
-  used_var_missing_latex,
-  "used_var_missing.tex"
+demos <- c(
+  "White",
+  "Black",
+  "Hisp_Latino",
+  "Asian_Am",
+  "Native_Am",
+  "Pac_Island",
+  "MENA",
+  "race_notlisted",
+  "gender", "q58_1", "q58_2", "self_ideo", "Democrat", "Republican", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology"
 )
+
+
+data_full <- data_full %>%
+  mutate(
+    no_controls = if_all(
+      all_of(demos),
+      is.na
+    )
+  )
+
+data_full <- data_full %>%
+  mutate(
+    missing_controls = if_any(
+      all_of(demos),
+      is.na
+    )
+  )
+
+nrow(data_full$missing_controls)
+
+data_full <- data_full %>%
+    filter(!missing_controls)
+
+data_full %>%
+  filter() %>%
+  select(
+    missing_controls
+  )
 ```
 
 ```{r}
-all_item_missingness <- raw_data %>%
-  summarise(
-    across(
-      all_of(common_vars),
-      ~ sum(is.na(.))
-    )
+summary(data_full$impact)
+```
+
+### (e) Table of Impact x Race
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(stringr)
+
+total_n <- nrow(data_full)
+
+#----------------------------
+# impact x race table
+#----------------------------
+impact_race_table <- map_dfr(impact_vars, function(iv) {
+  
+  row_dat <- data_full %>%
+    filter(.data[[iv]] == 1)
+  
+  tibble(
+    Impact = impact_labels[[iv]],
+    Total_n = nrow(row_dat),
+    Total_pct = 100 * nrow(row_dat) / total_n
   ) %>%
+    bind_cols(
+      map_dfc(race_vars, function(rv) {
+        n_cell <- sum(row_dat[[rv]] == 1, na.rm = TRUE)
+        pct_cell <- 100 * n_cell / total_n
+        
+        tibble(!!race_labels[[rv]] := sprintf("%d (%.1f%%)", n_cell, pct_cell))
+      })
+    ) %>%
+    mutate(
+      Total = sprintf("%d (%.1f%%)", Total_n, Total_pct)
+    ) %>%
+    dplyr::select(Impact, all_of(unname(race_labels)), Total)
+})
+
+#----------------------------
+# Adding overall sample row
+#----------------------------
+
+overall_row <- tibble(
+  Impact = "Overall sample",
+  White = sprintf("%d (%.1f%%)", sum(data_full$White == 1, na.rm = TRUE),
+                  100 * sum(data_full$White == 1, na.rm = TRUE) / total_n),
+  Black = sprintf("%d (%.1f%%)", sum(data_full$Black == 1, na.rm = TRUE),
+                  100 * sum(data_full$Black == 1, na.rm = TRUE) / total_n),
+  Hispanic = sprintf("%d (%.1f%%)", sum(data_full$Hispanic == 1, na.rm = TRUE),
+                     100 * sum(data_full$Hispanic == 1, na.rm = TRUE) / total_n),
+  `Other Race` = sprintf("%d (%.1f%%)", sum(data_full$OtherRace == 1, na.rm = TRUE),
+                         100 * sum(data_full$OtherRace == 1, na.rm = TRUE) / total_n),
+  Total = sprintf("%d (100.0%%)", total_n)
+)
+
+impact_race_table <- bind_rows(impact_race_table, overall_row)
+
+View(impact_race_table)
+
+impact_race_table
+```
+
+Bar plots of impact x race
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
+
+#----------------------------
+# 1. Reshape race indicators long
+#----------------------------
+race_impact_long <- data_full %>%
+  dplyr::select(all_of(race_vars), all_of(impact_vars)) %>%
   pivot_longer(
-    everything(),
-    names_to = "variable",
-    values_to = "n_missing"
+    cols = all_of(race_vars),
+    names_to = "race_var",
+    values_to = "in_race"
+  ) %>%
+  filter(in_race == 1) %>%
+  mutate(
+    race = recode(race_var, !!!race_labels)
+  )
+
+#----------------------------
+# 2. Plot ANY impact by race
+#----------------------------
+impact_by_race <- race_impact_long %>%
+  group_by(race) %>%
+  summarise(
+    pct_impacted = mean(impact, na.rm = TRUE),
+    n_race = n(),
+    .groups = "drop"
+  )
+
+ggplot(impact_by_race, aes(x = fct_reorder(race, pct_impacted), y = pct_impacted)) +
+  geom_col() +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    x = NULL,
+    y = "Share with any impact",
+    title = "Proportion of each racial group with any carceral contact"
+  ) +
+  coord_flip() +
+  theme_minimal()
+```
+
+```{r}
+impact_by_race_type <- race_impact_long %>%
+  pivot_longer(
+    cols = all_of(impact_vars),
+    names_to = "impact_var",
+    values_to = "has_impact"
   ) %>%
   mutate(
-    pct_missing = n_missing / nrow(raw_data) * 100
+    impact_type = recode(impact_var, !!!impact_labels)
   ) %>%
-  arrange(desc(pct_missing))
+  group_by(race, impact_type) %>%
+  summarise(
+    pct = mean(has_impact, na.rm = TRUE),
+    .groups = "drop"
+  )
 
-all_item_missingness
+ggplot(impact_by_race_type, aes(x = race, y = pct, fill = impact_type)) +
+  geom_col(position = position_dodge(width = 0.8)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    x = NULL,
+    y = "Share within racial group",
+    fill = NULL,
+    title = "Sample Carceral Contact by Race"
+  ) +
+  theme_minimal()
+
 ```
 
-```{r}
+Turning above into 4 tables
 
-  )
+```{r}
+library(dplyr)
+library(purrr)
+library(tibble)
+
+# race vars and labels
+race_vars <- c("White", "Black", "Hispanic", "OtherRace")
+
+race_labels <- c(
+  White = "White",
+  Black = "Black",
+  Hispanic = "Hispanic",
+  OtherRace = "Other Race"
+)
+
+impact_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+impact_labels <- c(
+  impact = "Any Impact",
+  incarc = "Direct",
+  knowincarc = "Proximal",
+  vict = "Victim"
+)
+
+# function: one table for one racial group
+make_race_impact_table <- function(race_var) {
+  
+  dat_race <- data_full %>%
+    dplyr::filter(.data[[race_var]] == 1)
+  
+  race_n <- nrow(dat_race)
+  
+  tibble(
+    Impact = unname(impact_labels),
+    n = purrr::map_int(impact_vars, ~ sum(dat_race[[.x]] == 1, na.rm = TRUE))
+  ) %>%
+    dplyr::mutate(
+      pct = round(100 * n / race_n, 1),
+      `n (%)` = sprintf("%d (%.1f\\%%)", n, pct)
+    ) %>%
+    dplyr::select(Impact, `n (%)`)
+}
+
+# create all four tables as a named list
+race_impact_tables <- setNames(
+  lapply(race_vars, make_race_impact_table),
+  unname(race_labels)
+)
+
+# view one example
+race_impact_tables[["White"]]
+race_impact_tables[["Black"]]
+race_impact_tables[["Hispanic"]]
+race_impact_tables[["Other Race"]]
+
+
+
+latex_tables <- imap(race_impact_tables, ~ knitr::kable(
+  .x,
+  format = "latex",
+  booktabs = TRUE,
+  escape = FALSE,
+  caption = paste("Carceral contact among", .y, "respondents")
+))
+
+cat(latex_tables[["White"]])
+cat(latex_tables[["Black"]])
+cat(latex_tables[["Hispanic"]])
+cat(latex_tables[["Other Race"]])
 ```
 

@@ -125,15 +125,48 @@ political_behavior_labels <- c(
 
 ## CONTROLS
 
-# race vars used in basic impact table
-
-race_vars <- c("White", "Black", "Hispanic", "OtherRace")
+# Condensed race variables
+race_vars <- c(
+  "White",
+  "Black",
+  "Hisp_Latino",
+  "Asian_Am",
+  "Native_Am",
+  "OtherRace"
+)
 
 race_labels <- c(
-  White = "White",
-  Black = "Black",
-  Hispanic = "Hispanic",
-  OtherRace = "Other Race"
+  White       = "White",
+  Black       = "Black",
+  Hisp_Latino = "Hispanic/Latino",
+  Asian_Am    = "Asian American",
+  Native_Am   = "Native American",
+  OtherRace   = "Other Race"
+)
+
+# Full/disaggregated race variables
+all_race_vars <- c(
+  "White",
+  "Black",
+  "Hisp_Latino",
+  "Asian_Am",
+  "Native_Am",
+  "Pac_Island",
+  "MENA",
+  "race_notlisted",
+  "multiracial"
+)
+
+all_race_labels <- c(
+  White          = "White",
+  Black          = "Black",
+  Hisp_Latino    = "Hispanic/Latino",
+  Asian_Am       = "Asian American",
+  Native_Am      = "Native American",
+  Pac_Island     = "Pacific Islander",
+  MENA           = "Middle Eastern/North African",
+  race_notlisted = "Race Not Listed",
+  multiracial    = "Multiracial"
 )
 
 ##

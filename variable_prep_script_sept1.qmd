@@ -39,7 +39,7 @@ File created in data_prep.qmd
 raw_data_cleaned <- readr::read_csv("data/cleaned/cleaned_light.csv") 
 #CONTINGENT note that alhough this is called raw_data_cleaned, it is the equivalent of "cleaned_data_light" from data_prep.qmd. See that file to pull the version with old var names for D and P. Note: no power here.
 
-names(raw_data_cleaned)
+#names(raw_data_cleaned)
 
 nrow(raw_data_cleaned)
 
@@ -235,45 +235,46 @@ q51\_ ▢ White (1) ▢ Black or African American (2) ▢ Native American / Alas
 
 ```{r}
 #convert + clean
-race_vars <- paste0("q51_", 1:8)
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(all_of(race_vars), ~ na_if(as.numeric(.x), -99)))
+# race_vars <- paste0("q51_", 1:8)
 
 #rename
 raw_data_cleaned <- raw_data_cleaned %>%
   rename(
-    white = q51_1,
-    black = q51_2,
-    hisp_latino = q51_7,
-    asian_am = q51_4,
-    native_am = q51_3,
-    pac_island = q51_5,
-    mena = q51_6,
+    White = q51_1,
+    Black = q51_2,
+    Hisp_Latino = q51_7,
+    Asian_Am = q51_4,
+    Native_Am = q51_3,
+    Pac_Island = q51_5,
+    MENA = q51_6,
     race_notlisted = q51_8
   )
 
-race_vars <- c("white", "black", "hisp_latino", "asian_am",
-               "native_am", "pac_island", "mena", "race_notlisted")
+all_race_vars <- c("White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "Pac_Island", "MENA", "race_notlisted")
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(all_of(all_race_vars), ~ na_if(as.numeric(.x), -99)))
+
 ```
 
 Responses -- noting consistent NAs so NAs are missing
 ```{r}
+
 raw_data_cleaned %>%
-  select(all_of(race_vars)) %>%
+  select(all_of(all_race_vars)) %>%
   pivot_longer(everything(), names_to = "var", values_to = "val") %>%
   count(var, val) %>%
   pivot_wider(names_from = val, values_from = n, values_fill = 0)
-```
 
+```
 
 How many multiracial respondents?
 ```{r}
 #row level counts
 race_df <- raw_data_cleaned %>%
   mutate(
-    n_races   = rowSums(across(all_of(race_vars), ~ .x == 1), na.rm = TRUE),
-    n_missing = rowSums(across(all_of(race_vars), is.na)),
+    n_races   = rowSums(across(all_of(all_race_vars), ~ .x == 1), na.rm = TRUE),
+    n_missing = rowSums(across(all_of(all_race_vars), is.na)),
     race_item_answered = n_races > 0,
     multiracial = case_when(
       !race_item_answered ~ NA,
@@ -284,6 +285,29 @@ race_df <- raw_data_cleaned %>%
 
 count(race_df, n_races)
 count(race_df, multiracial)
+
+summary(race_df$n_races)
+```
+
+I have 218 multiracial respondents. 
+
+#### multiracial var
+```{r}
+
+raw_data_cleaned$multiracial <- race_df$multiracial
+
+all_race_vars <- c(
+  "White",
+  "Black",
+  "Hisp_Latino",
+  "Asian_Am",
+  "Native_Am",
+  "Pac_Island",
+  "MENA",
+  "race_notlisted",
+  "multiracial"
+)
+
 ```
 
 
@@ -291,10 +315,10 @@ count(race_df, multiracial)
 # combinations
 combo_counts <- raw_data_cleaned %>%
   mutate(.id = row_number()) %>%
-  select(.id, all_of(race_vars)) %>%
+  select(.id, all_of(all_race_vars)) %>%
   pivot_longer(-.id, names_to = "race", values_to = "selected") %>%
   filter(selected == 1) %>%                      # drops both 0s and NAs
-  mutate(race = factor(race, levels = race_vars)) %>%
+  mutate(race = factor(race, levels = all_race_vars)) %>%
   arrange(.id, race) %>%
   group_by(.id) %>%
   summarise(
@@ -305,7 +329,8 @@ combo_counts <- raw_data_cleaned %>%
   count(n_races, race_combo, name = "n") %>%
   arrange(desc(n))
 
-combo_counts                                # everything
+View(combo_counts)                                # everything
+
 filter(combo_counts, n_races >= 2)          # multiracial combos only
 ```
 
@@ -313,7 +338,7 @@ filter(combo_counts, n_races >= 2)          # multiracial combos only
 ```{r}
 # pairs
 race_mat <- raw_data_cleaned %>%
-  select(all_of(race_vars)) %>%
+  select(all_of(all_race_vars)) %>%
   mutate(across(everything(), ~ replace_na(as.integer(.x == 1), 0L))) %>%
   as.matrix()
 
@@ -321,56 +346,31 @@ co_occur <- crossprod(race_mat)   # diagonal = marginal totals
 co_occur
 ```
 
+#### condensed race var
+
 ```{r}
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    OtherRace = case_when(
+      MENA == 1 | Pac_Island == 1 | race_notlisted == 1 ~ 1,
+      MENA == 0 & Pac_Island == 0 & race_notlisted == 0 ~ 0,
+      TRUE ~ NA_real_
+    )
+  )
 
+#table(raw_data_cleaned$OtherRace, useNA = "ifany")
 
-
-# # REPLACE current race dummies w
-# raw_data_cleaned <- raw_data_cleaned %>%
-#   mutate(
-#     # Ethnicity first: Hispanic gets priority
-#     Hispanic = ifelse(q51_7 == 1, 1, 0),
-# 
-#     # Among non-Hispanics, assign Black and White
-#     Black    = ifelse(q51_2 == 1 & q51_7 != 1, 1, 0),
-#     White    = ifelse(q51_1 == 1 & q51_7 != 1, 1, 0)
-#   ) %>%
-#   mutate(
-#     # Everyone else with any race selection becomes OtherRace (mutually exclusive)
-#     OtherRace = ifelse(
-#       (Black + Hispanic + White) == 0 &
-#         rowSums(dplyr::select(., dplyr::all_of(race_vars)), na.rm = TRUE) > 0,
-#       1, 0
-#     )
-#   )
+race_vars <- c(
+  "White",
+  "Black",
+  "Hisp_Latino",
+  "Asian_Am",
+  "Native_Am",
+  "OtherRace"
+)
 
 ```
 
-DOUBLE CHECK
-
-```{r}
-# 
-# # no overlaps among the 4 dummies
-# sum((raw_data_cleaned$Black + raw_data_cleaned$White +
-#      raw_data_cleaned$Hispanic + raw_data_cleaned$OtherRace) > 1, na.rm = TRUE)
-# 
-# # counts by category (mutually exclusive)
-# table(
-#   with(raw_data_cleaned,
-#        dplyr::case_when(
-#          Hispanic == 1 ~ "Hispanic",
-#          Black    == 1 ~ "Black",
-#          White    == 1 ~ "White",
-#          OtherRace== 1 ~ "OtherRace",
-#          TRUE          ~ NA_character_
-#        )),
-#   useNA = "ifany"
-# )
-
-
-```
-
-Diagnosed problem in model where Black + Other dropped - Oct 27 Suggests all Black respondents had missing data so were dropped
 
 ### H. Party + Ideology controls
 
@@ -473,7 +473,14 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-### J. Victim Analysis Vars
+### J. State/County
+
+```{r}
+#
+```
+
+
+### K. Victim Analysis Vars
 
 ```{r}
 
