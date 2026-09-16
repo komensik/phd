@@ -27,7 +27,7 @@ library(psych)
 library(ggplot2)
 library(kableExtra)
 
-source("variable_labels.R")
+
 ```
 
 # Setup
@@ -37,6 +37,8 @@ source("variable_labels.R")
 data_full <- readr::read_csv("data/cleaned/sept_14.csv") 
 
 ```
+OG N is 2075 
+
 ```{r}
 
 used <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc",
@@ -113,8 +115,50 @@ data_full %>%
   )
 ```
 
+Basic Look first
 ```{r}
-summary(data_full$impact)
+table(data_full$impact)
+
+data_full %>%
+  group_by(incarc) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  )
+
+```
+```{r}
+data_full %>%
+  group_by(impact) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+data_full %>%
+  group_by(vict) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  )
 ```
 
 ### (e) Table of Impact x Race
@@ -124,6 +168,8 @@ library(dplyr)
 library(tidyr)
 library(purrr)
 library(stringr)
+
+source("variable_labels.R")
 
 total_n <- nrow(data_full)
 
@@ -164,8 +210,12 @@ overall_row <- tibble(
                   100 * sum(data_full$White == 1, na.rm = TRUE) / total_n),
   Black = sprintf("%d (%.1f%%)", sum(data_full$Black == 1, na.rm = TRUE),
                   100 * sum(data_full$Black == 1, na.rm = TRUE) / total_n),
-  Hispanic = sprintf("%d (%.1f%%)", sum(data_full$Hispanic == 1, na.rm = TRUE),
-                     100 * sum(data_full$Hispanic == 1, na.rm = TRUE) / total_n),
+  Hispanic = sprintf("%d (%.1f%%)", sum(data_full$Hisp_Latino == 1, na.rm = TRUE),
+                     100 * sum(data_full$Hisp_Latino == 1, na.rm = TRUE) / total_n),
+  Asian = sprintf("%d (%.1f%%)", sum(data_full$Asian_Am == 1, na.rm = TRUE),
+                     100 * sum(data_full$Asian_Am == 1, na.rm = TRUE) / total_n),
+  Native_Am = sprintf("%d (%.1f%%)", sum(data_full$Native_Am == 1, na.rm = TRUE),
+                     100 * sum(data_full$Native_Am == 1, na.rm = TRUE) / total_n),
   `Other Race` = sprintf("%d (%.1f%%)", sum(data_full$OtherRace == 1, na.rm = TRUE),
                          100 * sum(data_full$OtherRace == 1, na.rm = TRUE) / total_n),
   Total = sprintf("%d (100.0%%)", total_n)
