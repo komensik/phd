@@ -157,6 +157,21 @@ table(df_no_control$ration_food)
 
 ```
 
+## save
+save the csv of df of only non missing ("full")
+```{r}
+
+write_csv(data_full, "data/cleaned_control_data.csv")
+
+```
+
+save the csv of those not in the above 
+```{r}
+write_csv(df_no_control, "data/cleaned_sans_control_data.csv")
+```
+
+
+# who is my sample
 
 ## df full race impact
 ```{r}

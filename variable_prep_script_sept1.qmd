@@ -476,7 +476,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ### J. State/County
 -numeric variables that are (I think) Qualtrics drill down internal answer codes
 ```{r}
-unique(raw_data_cleaned$state)
+#unique(raw_data_cleaned$state)
 
 ```
 
