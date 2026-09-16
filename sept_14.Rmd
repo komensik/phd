@@ -157,6 +157,13 @@ table(df_no_control$ration_food)
 
 ```
 
+## policy pref means x two dfs
+
+## desor_core mean x two dfs
+
+## target desserts mean x two dfs
+
+
 ## save
 save the csv of df of only non missing ("full")
 ```{r}

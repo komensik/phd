@@ -40,8 +40,16 @@ library(knitr)
 
 here::here()
 #raw_data_cleaned <- readr::read_csv("data/cleaned/...")
-raw_data_cleaned <- readr::read_csv("data/cleaned/sept_14.csv") 
+#raw_data_cleaned <- readr::read_csv("data/cleaned/sept_14.csv") 
+raw_data_cleaned <- readr::read_csv("data/cleaned_control_data.csv")
 source("variable_labels.R")
+
+#excluded no control responders: 
+
+excluded <- readr::read_csv("data/cleaned_sans_control_data.csv")
+
+nrow(raw_data_cleaned)
+nrow(excluded)
 #raw_data_cleaned
 #names(raw_data_cleaned)
 ```
@@ -1170,11 +1178,13 @@ make_restricted_panel_latex_table <- function(
     model2_title = "Model 2",
     model3_title = "Model 3",
     row_vars = c("impact", "incarc", "knowincarc", "vict"),
-    control_vars = c("Black", "Hispanic", "OtherRace", "gender"),
+    control_vars = c("Black", "Hisp_Latino", "Asian_Am", "Native_Am", "OtherRace", "gender"),
     control_labels = c(
       Black = "Black",
-      Hispanic = "Hispanic",
-      OtherRace = "Other race",
+      Hisp_Latino = "Hispanic/Latino",
+      Asian_Am    = "Asian American",
+      Native_Am   = "Native American",
+      OtherRace = "Other Race",
       gender = "Male"
     ),
     robust = TRUE
@@ -1352,11 +1362,14 @@ results_table_tex <- make_restricted_panel_latex_table(
   model2_title = "Model 2",
   model3_title = "Model 3",
   row_vars = c("impact", "incarc", "knowincarc", "vict"),
-  control_vars = c("Black", "Hispanic", "OtherRace", "gender"),
+  control_vars = c("Black", "Hispanic/Latino", "Asian_Am",
+                   "Native_Am", "OtherRace", "gender"),
   control_labels = c(
     Black = "Black",
-    Hispanic = "Hispanic",
-    OtherRace = "Other race",
+    Hispanic = "Hispanic/Latino",
+    Asian_Am    = "Asian American",
+    Native_Am   = "Native American",
+    OtherRace = "Other Race",
     gender = "Male"
   ),
   robust = TRUE
@@ -1388,10 +1401,13 @@ results_table_tex <- make_restricted_panel_latex_table(
   model2_title = "Model 2",
   model3_title = "Model 3",
   row_vars = c("impact", "incarc", "knowincarc", "vict"),
-  control_vars = c("Black", "Hispanic", "OtherRace", "gender"),
+  control_vars = c("Black", "Hispanic/Latino", "Asian_Am",
+                   "Native_Am", "OtherRace", "gender"),
   control_labels = c(
     Black = "Black",
-    Hispanic = "Hispanic",
+    Hispanic = "Hispanic/Latino",
+    Asian_Am    = "Asian American",
+    Native_Am   = "Native American",
     OtherRace = "Other race",
     gender = "Male"
   ),
@@ -3359,7 +3375,7 @@ Univariate explanatory power / how much does each control explain on its own?
 
 ```{r}
 
-controls <- c("impact", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+controls <- c("impact", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic/Latino","OtherRace")
 
 results <- data.frame() 
 
@@ -3513,7 +3529,7 @@ table_std_incarc <- tidy(minc_s) |> mutate(std_est = estimate * c(NA, inc_sds / 
 
 ```{r}
 
-controls_inc <- c("incarc", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+controls_inc <- c("incarc", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic/Latino","OtherRace")
   
 results_inc <- data.frame() #to reset
 
@@ -3643,7 +3659,7 @@ Univariate explanatory power / how much does each control explain on its own?
 
 ```{r}
 
-controls_vict <- c("vict", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+controls_vict <- c("vict", "Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic/Latino","OtherRace")
 
 results_vict <- data.frame()
 
@@ -3746,7 +3762,7 @@ Univariate explanatory power / how much does each control explain on its own?
 
 ```{r}
 
-controls_prox <- c("knowincarc","Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+controls_prox <- c("knowincarc","Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic/Latino","OtherRace")
 
 results_prox <- data.frame()
 
@@ -3805,7 +3821,7 @@ print(sp_table_prox)
 key_vars <- c("d_incppl_pris_abc","incarc","knowincarc","vict","desor_core",
               "fiscal_ideology","social_ideology","penalpoint",
               "Republican","Democrat","fire_rare","fire_privilege",
-              "fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")
+              "fire_angry","fire_fear","gender","Black","Hispanic/Latino","OtherRace")
 
 summary_table <- raw_data_cleaned %>%
   dplyr::select(all_of(key_vars)) %>%
@@ -4064,7 +4080,7 @@ summary(mh6_no_cont)
  m3m4controls <- c("d_incppl_pris_abc",
   "impact","Republican", "Democrat", "fiscal_ideology", "social_ideology",
   "penalpoint", "desor_core", "fire_rare", "fire_privilege", "fire_angry",
-  "fire_fear", "gender", "Black", "Hispanic", "OtherRace"
+  "fire_fear", "gender", "Black", "Hispanic/Latino", "OtherRace"
 )
 
 #M3 M4 DVs
@@ -4174,7 +4190,7 @@ car::avPlots(m4_basic, terms = ~ desor_core + d_incppl_pris_abc + penalpoint + s
 Pairwise interpretation:
 
 | Relationship | Interpretation |   |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | desor_core & inc ppl | strong shared variance, likely suppression |  |
 | desorcore & ideo -0.37 | expected liberal/conservative |  |
 | desorcore & penalpoint: -0.19 | mild relationship |  |
@@ -4598,7 +4614,7 @@ summary(is.na(raw_data_cleaned$d_incppl_pris_abc))
 summary(is.na(raw_data_cleaned$prisonhelp))
 summary(is.na(raw_data_cleaned$prisonpen))
 
-sum(complete.cases(raw_data_cleaned[, c("impact", "d_incppl_pris_abc", "prisonhelp", "prisonpen","Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic","OtherRace")]))
+sum(complete.cases(raw_data_cleaned[, c("impact", "d_incppl_pris_abc", "prisonhelp", "prisonpen","Republican","Democrat","fiscal_ideology","social_ideology","penalpoint","desor_core","fire_rare", "fire_privilege","fire_angry","fire_fear","gender","Black","Hispanic/Latino","OtherRace")]))
 
 #this suggests I would drop about 30% of sample, down to 1577. Worried about the dropped respondents falling evenly ish on both sides of impact. 
 
@@ -4608,7 +4624,7 @@ raw_data_cleaned$complete_case <-
     "impact", "d_incppl_pris_abc", "prisonhelp", "prisonpen",
     "Republican", "Democrat", "fiscal_ideology", "social_ideology",
     "penalpoint", "desor_core", "fire_rare", "fire_privilege",
-    "fire_angry", "fire_fear", "gender", "Black", "Hispanic", "OtherRace"
+    "fire_angry", "fire_fear", "gender", "Black", "Hispanic/Latino", "OtherRace"
   )])
 
 table(raw_data_cleaned$impact, raw_data_cleaned$complete_case)
