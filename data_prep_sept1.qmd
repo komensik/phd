@@ -447,7 +447,7 @@ for (i in 1:nrow(mapping)) {
 }
 
 mapping$target_slug %in% names(raw_data)
-summary(raw_data[mapping$target_slug])
+#summary(raw_data[mapping$target_slug])
 
 
 ```
@@ -499,7 +499,7 @@ if (length(skipped) > 0) {
   print("All group-specific variables created successfully.")
 }
 
-names(raw_data)
+#names(raw_data)
 
 # OLD
 # Loop through and rename each variable

@@ -32,7 +32,7 @@ library(ggplot2)
 ```{r}
 
 raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__09_14_26.csv") 
-# note: check q 6 q 7 q 8 q 112-- why would they be logical 
+
 ```
 
 # Deservingness Scores
@@ -921,7 +921,7 @@ print(combined_alpha)
 # Write and Save Data
 ```{r}
 #sept 14 -- saving to now look at completeness problem (+ representativeness)
-
+nrow(raw_data_cleaned)
 write_csv(raw_data_cleaned, "data/cleaned/sept_14.csv")
 
 #names(raw_data_cleaned)

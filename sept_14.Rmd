@@ -37,7 +37,7 @@ library(kableExtra)
 data_full <- readr::read_csv("data/cleaned/sept_14.csv") 
 
 ```
-OG N is 2075 
+sept 15 N is 2327
 
 ```{r}
 
@@ -45,7 +45,7 @@ used <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc",
           "impact", "incarc", "knowincarc", "vict",
           "q15_1", "q15_2", "q15_3", "q15_4", "q15_5","dpen", "min_wage", "free_calls", "ed_funds", "alt_sentencing", "lwop",
 "gov_attn", "vote2020", "willvote", "auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access_rev", "White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am",  "Pac_Island", "MENA", "race_notlisted",
-  "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology", "Democrat", "Republican", "gender", "q58_1", "q58_2"
+  "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology", "Democrat", "Republican", "gender", "state", "county"
 
 )
 
@@ -83,7 +83,7 @@ demos <- c(
   "Pac_Island",
   "MENA",
   "race_notlisted",
-  "gender", "q58_1", "q58_2", "self_ideo", "Democrat", "Republican", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology"
+  "gender", "self_ideo", "Democrat", "Republican", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology"
 )
 
 
@@ -103,22 +103,63 @@ data_full <- data_full %>%
     )
   )
 
-nrow(data_full$missing_controls)
+data_full <- data_full %>%
+  mutate(
+    no_controls = if_all(
+      all_of(demos),
+      is.na
+    ),
+    missing_controls = if_any(
+      all_of(demos),
+      is.na
+    ),
+    
+    control_status = case_when(
+      no_controls ~ "No controls",
+      missing_controls ~ "Some controls missing",
+      TRUE ~ "All controls present"
+    )
+  )
 
+#how many
+data_full %>%
+  count(control_status)
+
+#version of just ppl w no controls for comparison
+df_no_control <- data_full %>%
+  filter(missing_controls)
+
+#remove ppl without controls from missing controls
 data_full <- data_full %>%
     filter(!missing_controls)
 
-data_full %>%
-  filter() %>%
-  select(
-    missing_controls
-  )
+
 ```
 
-Basic Look first
+## impact x two dfs
 ```{r}
+table(data_full$incarc)
+table(data_full$knowincarc)
+table(data_full$vict)
 table(data_full$impact)
 
+table(df_no_control$impact)
+```
+
+## ration x two dfs
+```{r}
+
+table(data_full$ration_scripts)
+table(df_no_control$ration_scripts)
+
+table(data_full$ration_food)
+table(df_no_control$ration_food)
+
+```
+
+
+## df full race impact
+```{r}
 data_full %>%
   group_by(incarc) %>%
   summarise(
@@ -374,5 +415,26 @@ cat(latex_tables[["White"]])
 cat(latex_tables[["Black"]])
 cat(latex_tables[["Hispanic"]])
 cat(latex_tables[["Other Race"]])
+
 ```
 
+## states
+```{r}
+
+data_full %>%
+  group_by(state) %>%
+  summarise(
+    n = n(),
+    incarc = sum(incarc, na.rm = TRUE),
+    knowincarc = sum(knowincarc, na.rm = TRUE),
+    vict = sum(vict, na.rm = TRUE)
+  )
+
+data_full %>%
+  group_by(state) %>%
+  summarise(
+    n = n(),
+    impact = sum(incarc, na.rm = TRUE)
+  )
+
+```
