@@ -923,7 +923,8 @@ print(combined_alpha)
 #sept 14 -- saving to now look at completeness problem (+ representativeness)
 
 write_csv(raw_data_cleaned, "data/cleaned/sept_14.csv")
-names(raw_data_cleaned)
+
+#names(raw_data_cleaned)
 
 ```
 

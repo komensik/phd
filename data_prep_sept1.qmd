@@ -25,6 +25,7 @@ library(readxl)
 library(stringr)
 library(dplyr)
 library(kableExtra)
+library(readxl)
 
 
 ```
@@ -45,6 +46,30 @@ raw_data <- read_csv("./data/raw/scotg_results.csv")
 raw_data <- clean_names(raw_data)
  
 #names(raw_data)
+
+#sept 2026 adding character state county
+respondent_state_county <- read_excel(
+  "./data/raw/respondent_state_county.xlsx"
+)
+
+# lookup table
+state_county_lookup <- respondent_state_county %>%
+  select(response_id, q58_1, q58_2) %>%
+  rename(
+    state  = q58_1,
+    county = q58_2
+  ) %>%
+  mutate(
+    state  = as.character(state),
+    county = as.character(county)
+  )
+
+# paste to data
+raw_data <- raw_data %>%
+  left_join(
+    state_county_lookup,
+    by = "response_id"
+  )
 
 ```
 
