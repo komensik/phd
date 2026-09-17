@@ -114,7 +114,7 @@ raw_data <- raw_data %>%
 # Save labeled but otherwise unmodified version
 write_csv(raw_data, "./data/cleaned/block_labeled_raw_data.csv")
 
-names(raw_data)
+
 ```
 
 #### b1. Re-name variables here that you can at this point
@@ -124,9 +124,8 @@ Here, I'm renaming the ones that don't involve cleaning or recoding -- just wher
 -Not doing deservingness and power here
 
 ```{r}
-#| eval: false
-#| include: false
-raw_data_cleaned <- raw_data_cleaned %>%
+
+raw_data <- raw_data %>%
   rename(
     # Experiences
     incarc           = q4_1_1,
@@ -245,7 +244,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
     public_college_funding      = q69_5,
     college_no_race_admissions  = q69_6,
     college_ben_beat_costs = q69_7,
-    colleges_out_touch = q69_8
+    colleges_out_touch = q69_8,
     
     #immigration
     increase_deportations      = q74_1,
@@ -259,14 +258,14 @@ raw_data_cleaned <- raw_data_cleaned %>%
     reg_banks = q70,
     reg_socmedia = q71,
     reg_six_fig = q72,
-    reg_biz = q73
+    reg_biz = q73,
     
     #gov
     gets_issues = q29,
     gov_attn = q30,
     vote2020 = q31,
     willvote = q110,
-    livew_guns = q48
+    livew_guns = q48,
     
     # FIRE
     fire_rare        = q32,
@@ -278,18 +277,18 @@ raw_data_cleaned <- raw_data_cleaned %>%
     aa_special_favors = q35,
     aa_been_cheated = q36,
     aa_try_harder = q37,
-    legacy_slavery = q38
+    legacy_slavery = q38,
    
     #sexism
     women_power = q40,
     women_xagg = q41,
     women_leash = q42,
-    feminist = q43
+    feminist = q43,
     
      # Ideology
     fiscal_ideology  = q46,
     social_ideology  = q47,
-    self_ideo        = politics,
+    self_ideo        = politcs,
 
     #social media
     facebook = q114_1,
@@ -299,7 +298,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
     parlor1 = q114_6,
     reddit = q114_7,
     tiktok = q114_8,
-    parlor2 = q114_9
+    parlor2 = q114_9,
     
     #who you know
     no_known_gay = q49_1,
@@ -307,7 +306,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
     gay_fam = q49_3,
     no_known_trans = q50_1,
     trans_friend = q50_2,
-    trans_fam = q50_3
+    trans_fam = q50_3,
     
     # Race
     White            = q51_1,
@@ -321,9 +320,9 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
     # Relig
     relig = q52,
-    relig_text = q52_5_text
+    relig_text = q52_5_text,
     born_again = q53,
-    relig_import = q54
+    relig_import = q54,
     
     # Gender
     trans            = q55,
@@ -973,7 +972,7 @@ if all block a, block b, or block c vars are same number
 
 items under a question -- all are 'strongly support' or 'no/unsure' etc
 
-"q15_1", "q15_2", "q15_3", "q15_4", "q15_5",
+"q15_1", "local_police", "q15_3", "q15_4", "charge_police",
 
 "q25_1", "q25_2", "q25_3", "q25_4",
 
@@ -1382,20 +1381,14 @@ Ie, did respondents supply enough of the questionnaire to furnish usable measure
 
 Among people who broke off—or among finishers with substantial missingness—what analytically important information is actually present?
 
-q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3
 
-q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3, q62_1,q51_1, q51_2, q51_3, q51_4, q51_5, q51_6, q51_7, q51_8, dem101,
-
-q32, q33, q34, q35, q36, q37, q38, q111,
 
 used variables
 
 ```{r}
 
-used_vars <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc","q15_1", "q15_2", "q15_3", "q15_4", "q15_5",
-"q25_1", "q25_2", "q25_3", "q25_4", "q4_1_1", "q4_1_2", "q4_1_3", "q4_2_1", "q4_2_2", "q4_2_3","q15_1", "q15_2", "q15_3", "q15_4", "q15_5", "q25_1", "q25_2", "q25_3", "q25_4", "q25_1", "q62_1", "q23_2","q23_7",
-"q4_1_1", "q4_1_2", "q4_1_3", "q4_2_1", "q4_2_2", "q4_2_3",
-"q62_1","q51_1", "q51_2", "q51_3", "q51_4", "q51_5", "q51_6", "q51_7", "q51_8","dem101","q32", "q33", "q34", "q35", "q36", "q37", "q38", "q111"
+used_vars <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc","local_police", "local_police", "police_tracker", "police_training", "charge_police",
+"dpen", "min_wage", "free_calls", "ed_funds", "incarc", "knowincarc", "noincarc", "vict", "knowvict", "novict", "lwop", "alt_sentencing", "post_felony_vote","jail_access", "prison_purpose","White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "Pac_Island", "MENA", "race_notlisted","dem101","fire_rare", "fire_privilege", "fire_angry", "fire_fear", "aa_special_favors", "aa_been_cheated", "aa_try_harder", "legacy_slavery"
 )
 
 used_var_missing <- raw_data %>% 

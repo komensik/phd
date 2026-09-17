@@ -1,0 +1,215 @@
+raw_data <- raw_data %>%
+  rename(
+    # Experiences
+    incarc           = q4_1_1,
+    knowincarc       = q4_1_2,
+    noincarc         = q4_1_3,
+    vict             = q4_2_1,
+    knowvict         = q4_2_2,
+    novict           = q4_2_3,
+    on_medicaid      = q4_3_1,
+    knowmedicaid     = q4_3_2,
+    no_medicaid      = q4_3_3,
+    tanf             = q4_4_1,
+    knowtanf         = q4_4_2,
+    notanf           = q4_4_3,
+    snap             = q4_5_1,
+    knowsnap         = q4_5_2,
+    nosnap           = q4_5_3,
+    immigrated       = q4_6_1,
+    knowimmigrated   = q4_6_2,
+    noimmigrated     = q4_6_3,
+    unionmember      = q4_7_1,
+    knowunion        = q4_7_2,
+    nounion          = q4_7_3,
+    aborted          = q4_8_1,
+    knowaborted      = q4_8_2,
+    noaborted        = q4_8_3,
+    unemployed       = q4_9_1,
+    knowunemployed   = q4_9_2,
+    nounemployed     = q4_9_3,
+    uninsured        = q4_10_1,
+    knowuninsured    = q4_10_2,
+    nouninsured      = q4_10_3,
+    unable_vote      = q4_11_1,
+    know_unable_vote = q4_11_2,
+    no_unable_vote   = q4_11_3,
+
+    # Material hardship
+    ration_scripts   = q6,
+    ration_period    = q7,
+    ration_food      = q8,
+
+    # Police policy
+    local_police     = q15_1,
+    no_strangle      = q15_2,
+    police_tracker   = q15_3,
+    police_training  = q15_4,
+    charge_police    = q15_5,
+
+    # Prison attitudes
+    prison_purpose   = q62_1,
+
+    # Policy outcomes
+    dpen             = q25_1,
+    min_wage         = q25_2,
+    free_calls       = q25_3,
+    ed_funds         = q25_4,
+    lwop             = q25_5,
+    alt_sentencing   = q25_6,
+
+    # Social programs
+    medicare         = q18,
+    medicaid         = q19,
+    unemployment_ins = q20,
+
+    # Inequality policies
+    reduce_ineq_minwage  = q22_1,
+    reduce_ineq_studdebt = q22_2,
+    reduce_ineq_taxrich  = q22_3,
+    reduce_ineq_moremedcare = q22_4,
+    reduce_ineq_lessmig  = q22_5,
+    reduce_ineq_poorben  = q22_6,
+    reduce_ineq_morecoll = q22_7,
+
+    # Voting policy
+    auto_reg         = q23_1,
+    post_felony_vote = q23_2,
+    early_vote       = q23_3,
+    election_holiday = q23_4,
+    voter_id         = q23_5,
+    noncit_local     = q23_6,
+    jail_access      = q23_7,
+
+    # Guns
+    gun_sales        = q24,
+    guns_1           = q26_1,
+    guns_2           = q26_2,
+    guns_3           = q26_3,
+    guns_4           = q26_4,
+    guns_5           = q26_5,
+    guns_6           = q26_6,
+
+    # Abortion
+    abortion_op      = q27,
+    abortion_death   = q28_1,
+    abortion_health  = q28_2,
+    abortion_rape    = q28_3,
+    abortion_defect  = q28_4,
+    abortion_miscar  = q28_5,
+    abortion_debt    = q28_6,
+    abortion_violence = q28_7,
+    abortion_incarc  = q28_8,
+    abortion_teen    = q28_9,
+    abortion_want    = q28_10,
+    abortion_ability = q28_11,
+
+    # LGBT policy
+    lgbt_employers   = q63_1,
+    lgbt_medical     = q63_2,
+    lgbt_business    = q63_3,
+
+    #higher ed
+    college_econ_wellbeing      = q69_1,
+    college_indoctrination      = q69_2,
+    more_attend_college         = q69_3,
+    college_diverse_students    = q69_4,
+    public_college_funding      = q69_5,
+    college_no_race_admissions  = q69_6,
+    college_ben_beat_costs = q69_7,
+    colleges_out_touch = q69_8,
+    
+    #immigration
+    increase_deportations      = q74_1,
+    increase_border_security   = q74_2,
+    accept_refugees            = q74_3,
+    easier_family_sponsorship  = q74_4,
+    allow_daca_stay            = q74_5,
+    legal_status_undocumented  = q74_6,
+        
+    #regs
+    reg_banks = q70,
+    reg_socmedia = q71,
+    reg_six_fig = q72,
+    reg_biz = q73,
+    
+    #gov
+    gets_issues = q29,
+    gov_attn = q30,
+    vote2020 = q31,
+    willvote = q110,
+    livew_guns = q48,
+    
+    # FIRE
+    fire_rare        = q32,
+    fire_privilege   = q33,
+    fire_angry       = q34,
+    fire_fear        = q111,
+
+    #racial resent
+    aa_special_favors = q35,
+    aa_been_cheated = q36,
+    aa_try_harder = q37,
+    legacy_slavery = q38,
+   
+    #sexism
+    women_power = q40,
+    women_xagg = q41,
+    women_leash = q42,
+    feminist = q43,
+    
+     # Ideology
+    fiscal_ideology  = q46,
+    social_ideology  = q47,
+    self_ideo        = politcs,
+
+    #social media
+    facebook = q114_1,
+    twitter = q114_2,
+    youtube = q114_3,
+    truthsocial = q114_5,
+    parlor1 = q114_6,
+    reddit = q114_7,
+    tiktok = q114_8,
+    parlor2 = q114_9,
+    
+    #who you know
+    no_known_gay = q49_1,
+    gay_friend = q49_2,
+    gay_fam = q49_3,
+    no_known_trans = q50_1,
+    trans_friend = q50_2,
+    trans_fam = q50_3,
+    
+    # Race
+    White            = q51_1,
+    Black            = q51_2,
+    Hisp_Latino      = q51_7,
+    Asian_Am         = q51_4,
+    Native_Am        = q51_3,
+    Pac_Island       = q51_5,
+    MENA             = q51_6,
+    race_notlisted   = q51_8,
+
+    # Relig
+    relig = q52,
+    relig_text = q52_5_text,
+    born_again = q53,
+    relig_import = q54,
+    
+    # Gender
+    trans            = q55,
+    woman            = q56_1,
+    man              = q56_2,
+    gqueer           = q56_3,
+    g_other          = q56_4,
+
+    # Sexuality 
+    hetero           = q78_1,
+    lesbian          = q78_7,
+    bi               = q78_2,
+    gay              = q78_3,
+    queer            = q78_4,
+    other_sexuality  = q78_6
+  
+  )
