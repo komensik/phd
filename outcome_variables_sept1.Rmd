@@ -148,14 +148,14 @@ raw_alpha: 0.9078 and 0.9142 internal consistency -- suggests items hang togethe
 
 #Originally 62_1 with 1 = purpose = punish and 7 = purpose = rehabilitate people
 
-summary(raw_data_cleaned$q62_1)
+summary(raw_data_cleaned$prison_purpose)
 
 # Rename 
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(q62_1 = na_if(as.numeric(q62_1), -99))
+  mutate(q62_1 = na_if(as.numeric(prison_purpose), -99))
 
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(penalpoint = 8 - q62_1) #reverse coded so 7 = most punitive
+  mutate(penalpoint = 8 - prison_purpose) #reverse coded so 7 = most punitive
 
 # summary(raw_data_cleaned$penalpoint) #confirmed I flipped
 
@@ -183,8 +183,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #rename, -99, ensure numeric
 raw_data_cleaned <- raw_data_cleaned %>% 
   mutate(
-    dpen         = na_if(as.numeric(q25_1), -99),
-    lwop = na_if(as.numeric(q25_5), -99)
+    dpen         = na_if(as.numeric(dpen), -99),
+    lwop = na_if(as.numeric(lwop), -99)
   )
 
 pen_raw_vars <- c("dpen", "lwop") #character vector 
@@ -362,7 +362,7 @@ ggsave(
 ```{r, prisonhelp}
 # Originally 1 = strong favor, 4 = strong oppose, 5 = don't know
 # Define Q25 help-oriented items
-q25_help_items <- c("q25_2", "q25_3", "q25_4", "q25_6")
+q25_help_items <- c("min_wage", "free_calls", "ed_funds", "alt_sentencing")
 
 # Step 1: Recode -99 to NA and ensure numeric
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -386,14 +386,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 # now, raw dta cleaned has q25_n_rev (each reverse coded so that higher number means more support)
 
-# step 3
-raw_data_cleaned <- raw_data_cleaned %>%
-  rename(
-    min_wage       = q25_2_rev,
-    free_calls     = q25_3_rev,
-    ed_funds       = q25_4_rev,
-    alt_sentencing = q25_6_rev
-  )
+# step 3 (renamed now in data prep)
+
 
 # step 4: save just the means of q25 help questions as prisonhelp
 
@@ -608,13 +602,13 @@ names(raw_data_cleaned) %>% stringr::str_subset("q25|q23")
 #rename, -99, ensure numeric
 raw_data_cleaned <- raw_data_cleaned %>% 
   mutate(
-    auto_reg         = na_if(as.numeric(q23_1), -99),
-    post_felony_vote = na_if(as.numeric(q23_2), -99),
-    early_vote       = na_if(as.numeric(q23_3), -99),
-    election_holiday = na_if(as.numeric(q23_4), -99),
-    voter_id         = na_if(as.numeric(q23_5), -99),
-    noncit_local     = na_if(as.numeric(q23_6), -99),
-    jail_access      = na_if(as.numeric(q23_7), -99)
+    auto_reg         = na_if(as.numeric(auto_reg), -99),
+    post_felony_vote = na_if(as.numeric(post_felony_vote), -99),
+    early_vote       = na_if(as.numeric(early_vote), -99),
+    election_holiday = na_if(as.numeric(election_holiday), -99),
+    voter_id         = na_if(as.numeric(voter_id), -99),
+    noncit_local     = na_if(as.numeric(noncit_local), -99),
+    jail_access      = na_if(as.numeric(jail_access), -99)
   )
 
 all_electoral_vars <- c("auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access") #character vector 

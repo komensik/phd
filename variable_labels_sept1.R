@@ -48,28 +48,28 @@ policy_map <- tibble::tribble(
 ##
 
 police_items_1_to_5 <- c(
-  "q15_1_1_to_5",
-  "q15_2_1_to_5",
-  "q15_3_1_to_5",
-  "q15_4_1_to_5",
-  "q15_5_1_to_5"
+  "local_police,",
+  "no_strangle",
+  "police_tracker",
+  "police_training",
+  "charge_police"
 )
 
 police_items_labels <- c(
-  q15_1_1_to_5 = "Local Police",
-  q15_2_1_to_5 = "No Strangle",
-  q15_3_1_to_5 = "Police Tracker",
-  q15_4_1_to_5 = "Police Training",
-  q15_5_1_to_5 = "Charge Police"
+  local_police = "Local Police",
+  no_strangle = "No Strangle",
+  police_tracker = "Police Tracker",
+  police_training = "Police Training",
+  charge_police = "Charge Police"
 )
 
 police_map <- tibble::tribble(
   ~var,          ~label,                                              ~section,
-  "q15_1_1_to_5",  "Local Police",                              "Misc. Police",
-  "q15_2_1_to_5",   "No Strangle",                          "Police Violence",
-  "q15_3_1_to_5",   "Police Tracker",                          "Police Police",
-  "q15_4_1_to_5",   "Police Training",                       "Police Violence",
-  "q15_5_1_to_5",   "Charge Police",                           "Police Police",
+  "local_police",  "Local Police",                              "Misc. Police",
+  "no_strangle",   "No Strangle",                          "Police Violence",
+  "police_tracker",   "Police Tracker",                          "Police Police",
+  "police_training",   "Police Training",                       "Police Violence",
+  "charge_police",   "Charge Police",                           "Police Police",
 )
 
 
@@ -195,6 +195,11 @@ party_ideo_controls_labels <- c(
   fiscal_ideology = "Fiscal ideology",
   social_ideology = "Social ideology"
 )
+
+pol_tude_vars <- c("fiscal_ideology", "social_ideology", "self_ideo")
+
+
+
 
 #below is missing policy disposition index bc problems so deprioritized
 

@@ -200,14 +200,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #raw_data_cleaned %>% count(Q34)
 
 #raw_data_cleaned %>% count(Q111)
- 
-raw_data_cleaned <- raw_data_cleaned %>%
-  rename(
-    fire_rare = q32,
-    fire_privilege = q33,
-    fire_angry = q34,
-    fire_fear = q111
-  )
 
 fire_vars <- c("fire_rare", "fire_privilege", "fire_angry", "fire_fear")
 
@@ -401,14 +393,14 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #summary(raw_data_cleaned$q46)
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    q46 = na_if(as.numeric(q46), -99),
-    q47 = na_if(as.numeric(q47), -99)
+    fiscal_ideology = na_if(as.numeric(fiscal_ideology), -99),
+    social_ideology = na_if(as.numeric(social_ideology), -99)
   )
 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    fiscal_ideology = ifelse(!is.na(q46), 6 - q46, NA),#now 0 = very lib, 5 = very conservative (left to right)
-    social_ideology = ifelse(!is.na(q47), 6 - q47, NA)
+    fiscal_ideology = ifelse(!is.na(fiscal_ideology), 6 - fiscal_ideology, NA),#now 0 = very lib, 5 = very conservative (left to right)
+    social_ideology = ifelse(!is.na(social_ideology), 6 - social_ideology, NA)
   )
 
 #summary(raw_data_cleaned$fiscal_ideology)
@@ -443,19 +435,19 @@ print(psych::corr.test(pol_tude))
 #trans clean
 
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(q55 = na_if(as.numeric(q55), -99))
+  mutate(trans = na_if(as.numeric(trans), -99))
 
 #trans indicator
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(trans_id = case_when(
-    q55 == 1 ~ 1,
-    q55 %in% c(2, 3) ~ 0,  # Conservative approach: counts only self-identified trans as 1
+    trans == 1 ~ 1,
+    trans %in% c(2, 3) ~ 0,  # Conservative approach: counts only self-identified trans as 1
     TRUE ~ NA_real_
   ))
 
 
 #gender clean
-gender_vars <- paste0("q56_", 1:4)
+gender_vars <- c("woman", "man", "gqueer", "g_other")
 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(all_of(gender_vars), ~ na_if(as.numeric(.x), -99)))
@@ -464,9 +456,9 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #constructing the gender binary
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(gender = case_when(
-    q56_2 == 1 ~ 1,  # Selected man
-    q56_1 == 1 & (q56_2 != 1 | is.na(q56_2)) ~ 0,  # Woman only or with genderqueer/other
-    q56_3 == 1 | q56_4 == 1 ~ 0,  # Genderqueer or other, no man selected
+    man == 1 ~ 1,  # Selected man
+    woman == 1 & (q56_2 != 1 | is.na(q56_2)) ~ 0,  # Woman only or with genderqueer/other
+    gqueer == 1 | g_other == 1 ~ 0,  # Genderqueer or other, no man selected
     TRUE ~ NA_real_
   ))
 
@@ -490,7 +482,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 # Originally 6 = strong oppose, 7= somewhat oppose, 8 = neutral, 9 = somewhat support, 10 = strong support
 
 # Define Q25 police items
-police_items <- c("q15_1", "q15_2", "q15_3", "q15_4", "q15_5")
+police_items <- c("local_police", "no_strangle", "police_tracker", "police_training", "charge_police")
 
 # Step 1: Recode -99 to NA and ensure numeric
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -517,11 +509,11 @@ raw_data_cleaned <- raw_data_cleaned %>%
   ))
 
 police_items_1_to_5 <- c(
-  "q15_1_1_to_5",
-  "q15_2_1_to_5",
-  "q15_3_1_to_5",
-  "q15_4_1_to_5",
-  "q15_5_1_to_5"
+  "local_police",
+  "no_strangle",
+  "police_tracker",
+  "police_training",
+  "charge_police"
 )
 
 ```
