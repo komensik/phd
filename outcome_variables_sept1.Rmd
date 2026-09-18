@@ -31,7 +31,7 @@ library(ggplot2)
 
 ```{r}
 
-raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__09_14_26.csv") 
+raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__09_18_26.csv") 
 
 ```
 
@@ -1003,6 +1003,23 @@ raw_data_cleaned <- raw_data_cleaned %>%
   )
 
 
+## "gets issues"
+summary(raw_data_cleaned$gets_issues)
+unique(raw_data_cleaned$gets_issues)
+
+# recode so higher = gets issues very well
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    gets_issues = case_when(
+      as.numeric(gets_issues) == -99 ~ NA_real_,
+      as.numeric(gets_issues) == 1 ~ 5,
+      as.numeric(gets_issues) == 2 ~ 4,
+      as.numeric(gets_issues) == 3 ~ 3,
+      as.numeric(gets_issues) == 4 ~ 2,
+      as.numeric(gets_issues) == 5 ~ 1,
+      TRUE ~ NA_real_
+    )
+  )
 ```
 
 Note:
@@ -1012,7 +1029,7 @@ Approximately 561 respondents did not provide responses to the political behavio
 ```{r}
 #sept 14 -- saving to now look at completeness problem (+ representativeness)
 nrow(raw_data_cleaned)
-write_csv(raw_data_cleaned, "data/cleaned/sept_14.csv")
+write_csv(raw_data_cleaned, "data/cleaned/all_vars_over_8.csv")
 
 #names(raw_data_cleaned)
 
