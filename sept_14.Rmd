@@ -34,7 +34,7 @@ library(kableExtra)
 
 ```{r}
 
-data_full <- readr::read_csv("data/cleaned/all_vars_over_8.csv") 
+data_full <- readr::read_csv("data/cleaned/all_vars_over_8.csv")
 
 ```
 sept 15 N is 2327
@@ -132,6 +132,7 @@ df_no_control <- data_full %>%
 data_full <- data_full %>%
     filter(!missing_controls)
 
+nrow(data_full)
 
 ```
 
@@ -156,12 +157,6 @@ table(df_no_control$ration_food)
 
 ```
 
-## policy pref means x two dfs
-
-## desor_core mean x two dfs
-
-## target desserts mean x two dfs
-
 
 ## save
 save the csv of df of only non missing ("full")
@@ -177,11 +172,61 @@ save the csv of those not in the above
 write_csv(df_no_control, "data/cleaned_sans_control_data.csv")
 ```
 
+# quality of samples
+
+```{r}
+
+summary(data_full$duration_minutes)
+
+```
 
 # who is my sample
 
+## state, county
+
 ```{r}
+install.packages("usmap")
+library(usmap)
+
+
+data_full %>%
+  group_by(state) %>%
+  summarise(
+  n = n())
+
+
+view(data_full %>%
+  group_by(state) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  ))
+
+```
+
+
+
+
+
+## policy pref means x two dfs
+
+## desor_core mean x two dfs
+
+## target desserts mean x two dfs
+
+
+
+
+
+```{r}
+
 source("variable_labels.R")
+
 ```
 
 ## race

@@ -404,22 +404,6 @@ Still using "raw data"
 
 uncleaned: q9, character, can be 1 2 3 4 NA 3 -99 --see 2095 passed, 599 did not q17, character, lots of different responses -2063 passed, 631 not q114_4, character can be 6 5 NA 4 -99
 
-```{r}
-# summary(raw_data$q114_4)
-# 
-# unique(raw_data$q17)
-# 
-# table(raw_data$q9, useNA = "ifany")
-# table(raw_data$q17, useNA = "ifany")
-# table(raw_data$q114_4, useNA = "ifany")
-# 
-# unique(raw_data$q114_4)
-# 
-# raw_data %>%
-#   count(q114_4, sort = TRUE)
-
-```
-
 - create flags for passed/not each check and people who failed all
 
 ```{r}
