@@ -378,9 +378,7 @@ raw_data <- raw_data %>%
 
 ```
 
-### c.
-
-it will make sense to move all data renaming here, but will require searching and replacing all scripts. \### d. Drop non-consenters
+### c. Drop non-consenters
 
 ```{r}
 #| include: true
@@ -793,7 +791,7 @@ unclean_with_block_spec_vars <- raw_data
 write_csv(unclean_with_block_spec_vars, "data/cleaned/unclean_with_block_spec_vars.csv")
 ```
 
-Save for analysis dataset without block-spec/deserv vars (uncleaned_data_light, later to be cleaned_data_light)
+Save for analysis dataset without block-spec/deserv vars
 
 ```{r}
 raw_data <- raw_data %>%
@@ -927,7 +925,7 @@ branch_vars <- c(
   "q112",
   "q109",
   "dem",
-  "q54"
+  "relig_import"
 )
 
 common_vars <- setdiff(
@@ -990,7 +988,7 @@ ncol(raw_data)
 nrow(raw_data)
 count(raw_data, block)
 
-names(raw_data)
+#names(raw_data)
 ```
 
 ## attention checks
@@ -1699,7 +1697,7 @@ n is 2,327
 
 ```{r}
 #light csv
-write_csv(raw_data_cleaned , "data/cleaned/cleaned_light.csv") # main file to use going forward
+write_csv(raw_data_cleaned , "data/cleaned/over_8_cleaned.csv") # main file to use going forward, prev called cleaned_light
 
 #testing <- readr::read_csv("data/cleaned/cleaned_light.csv")
 
