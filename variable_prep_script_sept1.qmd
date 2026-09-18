@@ -36,8 +36,8 @@ File created in data_prep.qmd
 ```{r}
 #view(raw_data_cleaned)
 
-raw_data_cleaned <- readr::read_csv("data/cleaned/cleaned_light.csv") 
-#CONTINGENT note that alhough this is called raw_data_cleaned, it is the equivalent of "cleaned_data_light" from data_prep.qmd. See that file to pull the version with old var names for D and P. Note: no power here.
+raw_data_cleaned <- readr::read_csv("data/cleaned/over_8_cleaned.csv") 
+
 
 #names(raw_data_cleaned)
 
@@ -59,7 +59,7 @@ Standardize? No -- in my prelim, I write: To ensure that I do not control for a 
 
 12 While constructing composite or control variables involving other deservingness targets, I assess whether their inclusion introduces collinearity or conceptual overlap with the dependent variable. In particular, I examine correlations between group-level deservingness ratings to ensure that any included groups are not too closely tied to perceptions of incarcerated people. If preliminary checks reveal that including a particular group (e.g., “criminals” or “formerly incarcerated individuals”) would obscure key variance or conflate target constructs, I exclude it from the model and treat it as conceptually non-distinct for the purposes of this analysis.
 
-### B. Experiences - Basic Coding
+### B. CJ Experiences - Basic Coding
 
 #### Impact Plus (Constructing For-Analysis)
 
@@ -110,7 +110,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #### Extra binaries (incarc, KI, vict)
 
 ```{r}
-
+#extra binary
  raw_data_cleaned <- raw_data_cleaned %>%
    mutate(
      incarc_bin = if_else(
@@ -120,15 +120,13 @@ raw_data_cleaned <- raw_data_cleaned %>%
        missing = NA_real_
      )
    )
-
- raw_data_cleaned <- raw_data_cleaned %>%
-   mutate(
-     noincarc_bin = if_else(
-       incarc == 0 | knowincarc == 0 | noincarc == 1,
-       1, 0,
-       missing = NA_real_
-     )
-   )
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    noincarc_bin = if_else(
+  (incarc == 0 & knowincarc == 0) | noincarc == 1,
+  1, 0,
+  missing = NA_real_
+))
 
 
  raw_data_cleaned <- raw_data_cleaned %>%
@@ -154,26 +152,163 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-### C. Q6, 7, 8 - Ration Block
+### C. Other Experiences
+#### Impact Plus (Constructing For-Analysis)
+
+Coding in same way as CJ experiences but in giant loop
 
 ```{r}
 
-#inspect
-# 
-# raw_data %>% select(q6, q7, q8) %>% summarise_all(~ list(unique(.)))
-# 
-# table(raw_data$q6, useNA = "ifany")
-# 
-# table(raw_data_cleaned$q6, useNA = "ifany")
+# Function to code one experience family ---------------------------------
 
- # 
- # raw_data_cleaned <- raw_data_cleaned %>%
- #   rename(
- #     ration_scripts = q6,
- #     ration_period = q7,
- #     ration_food = q8
- #   )
+code_experience <- function(data, self_var, know_var, no_var, prefix) {
+  
+  impact_var   <- paste0(prefix, "_impact")
+  self_bin     <- paste0(self_var, "_bin")
+  know_bin     <- paste0(know_var, "_bin")
+  no_bin       <- paste0(no_var, "_bin")
+  
+  data %>%
+    # 1. Overall exposure:
+    #    1 = self OR know someone
+    #    0 = neither
+    mutate(
+      !!impact_var := if_else(
+        .data[[self_var]] == 1 | .data[[know_var]] == 1,
+        1, 0,
+        missing = NA_real_
+      )
+    ) %>%
+    
+    # 2. Recode self/know variables:
+    #    1 = this specific kind of exposure
+    #    0 = completely unexposed
+    #    NA = exposed, but not in this particular way
+    mutate(
+      !!self_var := case_when(
+        .data[[self_var]] == 1 ~ 1,
+        .data[[impact_var]] == 0 ~ 0,
+        TRUE ~ NA_real_
+      ),
+      
+      !!know_var := case_when(
+        .data[[know_var]] == 1 ~ 1,
+        .data[[impact_var]] == 0 ~ 0,
+        TRUE ~ NA_real_
+      )
+    ) %>%
+    
+    # 3. Binary versions
+    mutate(
+      !!self_bin := if_else(
+        .data[[self_var]] == 1,
+        1, 0,
+        missing = NA_real_
+      ),
+      
+      !!know_bin := if_else(
+        .data[[know_var]] == 1,
+        1, 0,
+        missing = NA_real_
+      ),
+      
+      # 1 = explicitly in neither category
+      #     OR explicitly selected the "no" option
+      !!no_bin := if_else(
+        (.data[[self_var]] == 0 & .data[[know_var]] == 0) |
+          .data[[no_var]] == 1,
+        1, 0,
+        missing = NA_real_
+      )
+    )
+}
 
+```
+
+9 experience groups
+```{r}
+experience_sets <- list(
+  
+  medicaid = c(
+    self = "on_medicaid",
+    know = "knowmedicaid",
+    no   = "no_medicaid"
+  ),
+  
+  tanf = c(
+    self = "tanf",
+    know = "knowtanf",
+    no   = "notanf"
+  ),
+  
+  snap = c(
+    self = "snap",
+    know = "knowsnap",
+    no   = "nosnap"
+  ),
+  
+  immigrated = c(
+    self = "immigrated",
+    know = "knowimmigrated",
+    no   = "noimmigrated"
+  ),
+  
+  union = c(
+    self = "unionmember",
+    know = "knowunion",
+    no   = "nounion"
+  ),
+  
+  abortion = c(
+    self = "aborted",
+    know = "knowaborted",
+    no   = "noaborted"
+  ),
+  
+  unemployment = c(
+    self = "unemployed",
+    know = "knowunemployed",
+    no   = "nounemployed"
+  ),
+  
+  uninsured = c(
+    self = "uninsured",
+    know = "knowuninsured",
+    no   = "nouninsured"
+  ),
+  
+  unable_vote = c(
+    self = "unable_vote",
+    know = "know_unable_vote",
+    no   = "no_unable_vote"
+  )
+)
+```
+
+apply experience groups
+```{r}
+for (experience in names(experience_sets)) {
+  
+  vars <- experience_sets[[experience]]
+  
+  raw_data_cleaned <- code_experience(
+    data     = raw_data_cleaned,
+    self_var = vars["self"],
+    know_var = vars["know"],
+    no_var   = vars["no"],
+    prefix   = experience
+  )
+}
+
+
+```
+
+
+### D. Q6, 7, 8 - Ration Block
+
+### 
+
+```{r}
 
 # clean and transform
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -193,13 +328,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```{r}
 
-#raw_data_cleaned %>% count(q32)
-
-#raw_data_cleaned %>% count(Q33)
-
-#raw_data_cleaned %>% count(Q34)
-
-#raw_data_cleaned %>% count(Q111)
 
 fire_vars <- c("fire_rare", "fire_privilege", "fire_angry", "fire_fear")
 
@@ -226,21 +354,6 @@ q51\_ ▢ White (1) ▢ Black or African American (2) ▢ Native American / Alas
 -measured as set of binary indicator variables in the survey, rather than as one categorical race variable. - 1 = selected that category - 0 = ? did not select? - NA = c
 
 ```{r}
-#convert + clean
-# race_vars <- paste0("q51_", 1:8)
-
-#rename
-# raw_data_cleaned <- raw_data_cleaned %>%
-#   rename(
-#     White = q51_1,
-#     Black = q51_2,
-#     Hisp_Latino = q51_7,
-#     Asian_Am = q51_4,
-#     Native_Am = q51_3,
-#     Pac_Island = q51_5,
-#     MENA = q51_6,
-#     race_notlisted = q51_8
-#   )
 
 all_race_vars <- c("White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "Pac_Island", "MENA", "race_notlisted")
 
@@ -250,6 +363,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ```
 
 Responses -- noting consistent NAs so NAs are missing
+
 ```{r}
 
 raw_data_cleaned %>%
@@ -261,6 +375,7 @@ raw_data_cleaned %>%
 ```
 
 How many multiracial respondents?
+
 ```{r}
 
 #row level counts
@@ -283,9 +398,10 @@ summary(race_df$n_races)
 
 ```
 
-I have 218 multiracial respondents. 
+I have 218 multiracial respondents.
 
 #### multiracial var
+
 ```{r}
 
 raw_data_cleaned$multiracial <- race_df$multiracial
@@ -303,7 +419,6 @@ all_race_vars <- c(
 )
 
 ```
-
 
 ```{r}
 # combinations
@@ -327,7 +442,6 @@ View(combo_counts)                                # everything
 
 filter(combo_counts, n_races >= 2)          # multiracial combos only
 ```
-
 
 ```{r}
 # pairs
@@ -364,7 +478,6 @@ race_vars <- c(
 )
 
 ```
-
 
 ### H. Party + Ideology controls
 
@@ -428,7 +541,6 @@ cor(pol_tude,
 print(psych::corr.test(pol_tude))
 ```
 
-
 ### I. Gender
 
 ```{r, gender}
@@ -468,21 +580,20 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ```
 
 ### J. State/County
+
 -numeric variables that are (I think) Qualtrics drill down internal answer codes
+
 ```{r}
 #unique(raw_data_cleaned$state)
 
 ```
 
-
-
-
 ### K. LAST OF CLEANING - WRITE CSV
 
 ```{r}
 
-names(raw_data_cleaned)
-write_csv(raw_data_cleaned, "data/cleaned/coded_data__09_14_26.csv")
+#nrow(raw_data_cleaned)
+write_csv(raw_data_cleaned, "data/cleaned/coded_data__09_18_26.csv")
 #write_csv(raw_data_cleaned, "data/cleaned/coded_data_may9.csv")
 
 ```
