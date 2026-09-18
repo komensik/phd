@@ -19,7 +19,7 @@ impact_labels <- c(
 
 ## Outcome A: Policy Questions
 
-q25_help_vars <- c("min_wage", "free_calls","ed_funds","q25_6_rev")
+q25_help_vars <- c("min_wage", "free_calls","ed_funds","alt_sentencing")
 
 policy_vars <- c("prisonhelp", "prisonpen",
   "post_felony_vote_rev", "jail_access_rev", "min_wage", "free_calls", "ed_funds", "alt_sentencing",

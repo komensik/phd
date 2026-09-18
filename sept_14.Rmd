@@ -43,7 +43,7 @@ sept 15 N is 2327
 
 used <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc",
           "impact", "incarc", "knowincarc", "vict",
-          "q15_1", "q15_2", "q15_3", "q15_4", "q15_5","dpen", "min_wage", "free_calls", "ed_funds", "alt_sentencing", "lwop",
+          "local_police", "no_strangle", "police_tracker", "police_training", "charge_police","dpen", "min_wage", "free_calls", "ed_funds", "alt_sentencing", "lwop",
 "gov_attn", "vote2020", "willvote", "auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access_rev", "White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am",  "Pac_Island", "MENA", "race_notlisted",
   "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology", "Democrat", "Republican", "gender"
 )
@@ -169,6 +169,7 @@ save the csv of df of only non missing ("full")
 
 write_csv(data_full, "data/cleaned_control_data.csv")
 
+nrow(data_full)
 ```
 
 save the csv of those not in the above 
@@ -178,6 +179,52 @@ write_csv(df_no_control, "data/cleaned_sans_control_data.csv")
 
 
 # who is my sample
+
+```{r}
+source("variable_labels.R")
+```
+
+## race
+
+```{r}
+
+
+data_full %>%
+  select(all_of(all_race_vars)) %>%
+  pivot_longer(everything(), names_to = "var", values_to = "val") %>%
+  count(var, val) %>%
+  pivot_wider(names_from = val, values_from = n, values_fill = 0)
+
+race_pct_of_sample
+
+
+```
+
+
+```{r}
+# combinations
+combo_counts <- data_full %>%
+  mutate(.id = row_number()) %>%
+  select(.id, all_of(all_race_vars)) %>%
+  pivot_longer(-.id, names_to = "race", values_to = "selected") %>%
+  filter(selected == 1) %>%                      # drops both 0s and NAs
+  mutate(race = factor(race, levels = all_race_vars)) %>%
+  arrange(.id, race) %>%
+  group_by(.id) %>%
+  summarise(
+    n_races    = n(),
+    race_combo = paste(race, collapse = " + "),
+    .groups = "drop"
+  ) %>%
+  count(n_races, race_combo, name = "n") %>%
+  arrange(desc(n))
+
+View(combo_counts)                                # everything
+
+filter(combo_counts, n_races >= 2)          # multiracial combos only
+```
+
+
 
 ## df full race impact
 ```{r}

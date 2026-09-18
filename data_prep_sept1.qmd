@@ -377,10 +377,10 @@ raw_data <- raw_data %>%
 #view(raw_data)
 
 ```
-### c. 
 
-it will make sense to move all data renaming here, but will require searching and replacing all scripts. 
-### d. Drop non-consenters
+### c.
+
+it will make sense to move all data renaming here, but will require searching and replacing all scripts. \### d. Drop non-consenters
 
 ```{r}
 #| include: true
@@ -535,6 +535,7 @@ raw_data <- raw_data %>%
 
 summary(raw_data$duration_minutes)
 ```
+
 median: 25.35
 
 Grouping ppl into speed categories
@@ -999,7 +1000,7 @@ count(raw_data, attn_pass_count)
 count(raw_data, attn_answered_count)
 ```
 
-Overall, 1,604 respondents passed all 3 checks. 462 passed 2, 29 passed 1, and 599 respondents "failed" all 3 checks -- or they did not supply correct answers.This can include NAs. 
+Overall, 1,604 respondents passed all 3 checks. 462 passed 2, 29 passed 1, and 599 respondents "failed" all 3 checks -- or they did not supply correct answers.This can include NAs.
 
 table:
 
@@ -1381,8 +1382,6 @@ Ie, did respondents supply enough of the questionnaire to furnish usable measure
 
 Among people who broke off—or among finishers with substantial missingness—what analytically important information is actually present?
 
-
-
 used variables
 
 ```{r}
@@ -1473,55 +1472,41 @@ all_item_missingness <- raw_data %>%
 all_item_missingness
 ```
 
-Branch questions: 
-109
-112
-dem
-q53
+Branch questions: 109 112 dem q53
 
-Demographics
-q51_n (racial dem)
-q56 (gender) (_1 is women, _2 man, _3 queer, _4 other)
+Demographics q51_n (racial dem) q56 (gender) (\_1 is women, \_2 man, \_3 queer, \_4 other)
 
+Info I will need about respondents who answer DVs - race - gender - political identity
 
-Info I will need about respondents who answer DVs
-- race
-- gender
-- political identity
-
-Race vars uncleaned are 0, 1, NA, -99 
+Race vars uncleaned are 0, 1, NA, -99
 
 ```{r}
 #white respondents
 class(raw_data$q51_1)
 table(raw_data$q51_1, useNA = "ifany")
 ```
-425 not-white respondents who made it to this question
-1184 white respondents who made it to this question
-1082 started but didn't make it to this question 
+
+425 not-white respondents who made it to this question 1184 white respondents who made it to this question 1082 started but didn't make it to this question
 
 ```{r}
 #Black respondents
 unique(raw_data$q51_2)
 table(raw_data$q51_2, useNA = "ifany")
 ```
-268 black respondents
-1341 not black respondents
-1082 NA
+
+268 black respondents 1341 not black respondents 1082 NA
 
 ```{r}
 #Hispanic respondents
 table(raw_data$q51_7, useNA = "ifany")
 ```
-237 Hispanic respondents
-1372 not hispanic respondents
-1082 NA
 
-
+237 Hispanic respondents 1372 not hispanic respondents 1082 NA
 
 # 6. Flag and or drop
 
 ### attn checks
+
 ```{r}
 
 raw_data <- raw_data %>%
@@ -1532,13 +1517,12 @@ raw_data <- raw_data %>%
 
 ### duration
 
--already did sub 8 through 30, over 52 over 180
-Hillygus: standard is to drop 1/3 median, flag 1/2 median
+-already did sub 8 through 30, over 52 over 180 Hillygus: standard is to drop 1/3 median, flag 1/2 median
 
-median: 25.35
-1/3 is 8.43
+median: 25.35 1/3 is 8.43
 
 ### progress/finished
+
 ```{r}
 raw_data <- raw_data %>%
   mutate(
@@ -1561,7 +1545,8 @@ speeders_df <- raw_data%>%
   filter(duration_minutes <= 8.43)
 write_csv(speeders_df, "data/cleaned/likely_speeders.csv")
 ```
-I looked at the 8.43 people. Among them, 277 did not answer any of the 3 attentioon checks. These folks (faster than a third the median and didn not answer attention checks) can go. 
+
+I looked at the 8.43 people. Among them, 277 did not answer any of the 3 attentioon checks. These folks (faster than a third the median and didn not answer attention checks) can go.
 
 ```{r}
 raw_data <- raw_data %>%
@@ -1593,9 +1578,11 @@ raw_data <- raw_data %>%
 
 count(raw_data)
 ```
+
 This brings the N to 2417.
 
-What about those who were faster than 1/3 the median but failed all three? 
+What about those who were faster than 1/3 the median but failed all three?
+
 ```{r}
 
 raw_data <- raw_data %>%
@@ -1608,7 +1595,8 @@ raw_data <- raw_data %>%
 
 table(raw_data$exclude_fast_bad_attn, useNA = "ifany")
 ```
-There's just one. We can remove that person. 
+
+There's just one. We can remove that person.
 
 ```{r}
 
@@ -1618,6 +1606,7 @@ raw_data <- raw_data %>%
 count(raw_data)
 
 ```
+
 Now the N is 2416.
 
 ```{r}
@@ -1626,14 +1615,13 @@ Now the N is 2416.
 
 ```
 
-Remaining respondents who were under a third of the median? 
+Remaining respondents who were under a third of the median?
 
 ```{r}
 remaining_speeders <- raw_data%>%
   filter(duration_minutes <= 8.43)
 
 ```
-
 
 ```{r}
 speeder_missing <- remaining_speeders %>%
@@ -1672,6 +1660,7 @@ raw_data <- raw_data %>%
 
 sum(raw_data$exclude_fast_incomplete)
 ```
+
 only 4 people
 
 ```{r}
@@ -1683,7 +1672,7 @@ nrow(raw_data)
 
 down to 2412 respondents
 
-NOTE TO SELF: Have still not excluded all sub 1/3 the median. 
+NOTE TO SELF: Have still not excluded all sub 1/3 the median.
 
 ```{r}
 
@@ -1693,8 +1682,7 @@ remaining_speeders <- raw_data%>%
 View(remaining_speeders)
 ```
 
-85 ???
-Sept 14 -- you can come back to this later, for now focus on what's up without these 85, apply the rule, talk about differences between remaining all answer and remaining only answer controls
+85 ??? Sept 14 -- you can come back to this later, for now focus on what's up without these 85, apply the rule, talk about differences between remaining all answer and remaining only answer controls
 
 ```{r}
 raw_data_cleaned <- raw_data %>%
@@ -1702,6 +1690,7 @@ raw_data_cleaned <- raw_data %>%
 
 nrow(raw_data_cleaned)
 ```
+
 n is 2,327
 
 (dropped th 85)

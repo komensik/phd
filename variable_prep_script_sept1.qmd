@@ -70,7 +70,7 @@ Standardize? No -- in my prelim, I write: To ensure that I do not control for a 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     impact = if_else(
-      q4_1_1 == 1 | q4_1_2 == 1 | q4_2_1 == 1,
+      incarc == 1 | knowincarc == 1 | vict == 1,
       1, 0,
       missing = NA_real_
     )
@@ -81,7 +81,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     incarc = case_when(
-      q4_1_1 == 1 ~ 1, 
+      incarc == 1 ~ 1, 
       impact == 0 ~ 0, 
       TRUE ~ NA_real_ #"otherwise, assign NA"
     )
@@ -90,7 +90,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     knowincarc = case_when(
-      q4_1_2 == 1 ~ 1, 
+      knowincarc == 1 ~ 1, 
       impact == 0 ~ 0, 
       TRUE ~ NA_real_ #"otherwise, assign NA"
     )
@@ -99,7 +99,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     vict = case_when(
-      q4_2_1 == 1 ~ 1, 
+      vict == 1 ~ 1, 
       impact == 0 ~ 0, 
       TRUE ~ NA_real_ #"otherwise, assign NA"
     )
@@ -114,7 +114,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
  raw_data_cleaned <- raw_data_cleaned %>%
    mutate(
      incarc_bin = if_else(
-       q4_1_1 == 1,
+       incarc == 1,
        1,
        0,
        missing = NA_real_
@@ -124,7 +124,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
  raw_data_cleaned <- raw_data_cleaned %>%
    mutate(
      noincarc_bin = if_else(
-       q4_1_1 == 0 | q4_1_2 == 0 | q4_1_3 == 1,
+       incarc == 0 | knowincarc == 0 | noincarc == 1,
        1, 0,
        missing = NA_real_
      )
@@ -134,7 +134,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
  raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     knowincarc_bin = if_else(
-      q4_1_2 == 1,
+      knowincarc == 1,
       1,
       0,
       missing = NA_real_
@@ -144,7 +144,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
  raw_data_cleaned <- raw_data_cleaned %>%
    mutate(
      vict_bin = if_else(
-       q4_2_1 == 1,
+       vict == 1,
        1,
        0,
        missing = NA_real_
@@ -166,13 +166,13 @@ raw_data_cleaned <- raw_data_cleaned %>%
 # 
 # table(raw_data_cleaned$q6, useNA = "ifany")
 
-
- raw_data_cleaned <- raw_data_cleaned %>%
-   rename(
-     ration_scripts = q6,
-     ration_period = q7,
-     ration_food = q8
-   )
+ # 
+ # raw_data_cleaned <- raw_data_cleaned %>%
+ #   rename(
+ #     ration_scripts = q6,
+ #     ration_period = q7,
+ #     ration_food = q8
+ #   )
 
 
 # clean and transform
@@ -230,17 +230,17 @@ q51\_ ▢ White (1) ▢ Black or African American (2) ▢ Native American / Alas
 # race_vars <- paste0("q51_", 1:8)
 
 #rename
-raw_data_cleaned <- raw_data_cleaned %>%
-  rename(
-    White = q51_1,
-    Black = q51_2,
-    Hisp_Latino = q51_7,
-    Asian_Am = q51_4,
-    Native_Am = q51_3,
-    Pac_Island = q51_5,
-    MENA = q51_6,
-    race_notlisted = q51_8
-  )
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   rename(
+#     White = q51_1,
+#     Black = q51_2,
+#     Hisp_Latino = q51_7,
+#     Asian_Am = q51_4,
+#     Native_Am = q51_3,
+#     Pac_Island = q51_5,
+#     MENA = q51_6,
+#     race_notlisted = q51_8
+#   )
 
 all_race_vars <- c("White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "Pac_Island", "MENA", "race_notlisted")
 
@@ -262,6 +262,7 @@ raw_data_cleaned %>%
 
 How many multiracial respondents?
 ```{r}
+
 #row level counts
 race_df <- raw_data_cleaned %>%
   mutate(
@@ -279,6 +280,7 @@ count(race_df, n_races)
 count(race_df, multiracial)
 
 summary(race_df$n_races)
+
 ```
 
 I have 218 multiracial respondents. 
@@ -407,11 +409,11 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 #self-reported ideo ident
 table(raw_data_cleaned$politcs) # already coded so that left to right
-
-raw_data_cleaned <- raw_data_cleaned %>%
-   rename(
-     self_ideo = politcs
-     )
+# 
+# raw_data_cleaned <- raw_data_cleaned %>%
+#    rename(
+#      self_ideo = politcs
+#      )
 ```
 
 ```{r}
@@ -457,7 +459,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(gender = case_when(
     man == 1 ~ 1,  # Selected man
-    woman == 1 & (q56_2 != 1 | is.na(q56_2)) ~ 0,  # Woman only or with genderqueer/other
+    woman == 1 & (man != 1 | is.na(man)) ~ 0,  # Woman only or with genderqueer/other
     gqueer == 1 | g_other == 1 ~ 0,  # Genderqueer or other, no man selected
     TRUE ~ NA_real_
   ))
@@ -473,99 +475,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ```
 
 
-### K. Victim Analysis Vars
 
-```{r}
-
-# police policies
-
-# Originally 6 = strong oppose, 7= somewhat oppose, 8 = neutral, 9 = somewhat support, 10 = strong support
-
-# Define Q25 police items
-police_items <- c("local_police", "no_strangle", "police_tracker", "police_training", "charge_police")
-
-# Step 1: Recode -99 to NA and ensure numeric
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(all_of(police_items), ~ na_if(as.numeric(.), -99)))
-
-# Step 2: Recode so 1-5 (6 = strong oppose → 1 = strong oppose, 
-# 7 = somewhat oppose → 2 = somewhat oppose, 
-# 8 = neutral → 3 = neutral, 
-# 9 = somewhat support → 4 = somewhat support,
-#10 = strong support → 5 = strong support)
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(
-    all_of(police_items),
-    ~ case_when(
-    . == 6 ~ 1,          
-    . == 7 ~ 2,
-    . == 8 ~ 3,
-    . == 9 ~ 4,
-    . == 10 ~ 5,        
-    TRUE ~ NA_real_
-  ),  
-    .names = "{.col}_1_to_5"
-  ))
-
-police_items_1_to_5 <- c(
-  "local_police",
-  "no_strangle",
-  "police_tracker",
-  "police_training",
-  "charge_police"
-)
-
-```
-
-```{r}
-
-## trust in government 
-
-summary(raw_data_cleaned$q30)
-unique(raw_data_cleaned$gov_attn)
-
-# Originally 1 = a lot, 2 = some, 3 = not muc
-
-# rename
-## trust in government attention
-# q30 originally: 1 = a lot, 2 = some, 3 = not much
-# recode so higher = more government attention/trust
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(
-    gov_attn = case_when(
-      as.numeric(q30) == -99 ~ NA_real_,
-      as.numeric(q30) == 1 ~ 3,
-      as.numeric(q30) == 2 ~ 2,
-      as.numeric(q30) == 3 ~ 1,
-      TRUE ~ NA_real_
-    )
-  )
-
-hist(raw_data_cleaned$gov_attn)
-
-## did vote in 2020
-# q31: 1 = no, not eligible; 2 = no, eligible; 3 = yes
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(
-    vote2020 = na_if(as.numeric(q31), -99)
-  )
-
-
-## plans to vote
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(
-    willvote = na_if(as.numeric(q110), -99)
-  )
-
-
-```
-
-Note:
-
-Approximately 561 respondents did not provide responses to the political behavior items (government attention, past vote, intended vote). Missingness is perfectly overlapping across these items, indicating that these questions were likely administered to a subset of respondents rather than reflecting item-level nonresponse.
 
 ### K. LAST OF CLEANING - WRITE CSV
 

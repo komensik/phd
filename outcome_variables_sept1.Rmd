@@ -379,9 +379,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
     . == 4 ~ 1,
     . == 5 ~ 2.5,         # DK = neutral midpoint
     TRUE ~ NA_real_
-  ),  # note: we skip 5 = DK
-    .names = "{.col}_rev"
-  ))
+  )))
 
 
 # now, raw dta cleaned has q25_n_rev (each reverse coded so that higher number means more support)
@@ -912,6 +910,104 @@ print(combined_alpha)
 ```
 
 
+## Police
+
+```{r}
+
+# police policies
+
+# Originally 6 = strong oppose, 7= somewhat oppose, 8 = neutral, 9 = somewhat support, 10 = strong support
+
+# Define Q25 police items
+police_items <- c("local_police", "no_strangle", "police_tracker", "police_training", "charge_police")
+
+# Step 1: Recode -99 to NA and ensure numeric
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(all_of(police_items), ~ na_if(as.numeric(.), -99)))
+
+# Step 2: Recode so 1-5 (6 = strong oppose → 1 = strong oppose, 
+# 7 = somewhat oppose → 2 = somewhat oppose, 
+# 8 = neutral → 3 = neutral, 
+# 9 = somewhat support → 4 = somewhat support,
+#10 = strong support → 5 = strong support)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    all_of(police_items),
+    ~ case_when(
+    . == 6 ~ 1,          
+    . == 7 ~ 2,
+    . == 8 ~ 3,
+    . == 9 ~ 4,
+    . == 10 ~ 5,        
+    TRUE ~ NA_real_
+  ),  
+    .names = "{.col}_1_to_5"
+  ))
+
+police_items_1_to_5 <- c(
+  "local_police",
+  "no_strangle",
+  "police_tracker",
+  "police_training",
+  "charge_police"
+)
+
+```
+
+# Civics
+
+```{r}
+
+## trust in government 
+
+summary(raw_data_cleaned$gov_attn)
+unique(raw_data_cleaned$gov_attn)
+
+# Originally 1 = a lot, 2 = some, 3 = not muc
+
+# rename
+## trust in government attention
+# q30 originally: 1 = a lot, 2 = some, 3 = not much
+# recode so higher = more government attention/trust
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    gov_attn = case_when(
+      as.numeric(gov_attn) == -99 ~ NA_real_,
+      as.numeric(gov_attn) == 1 ~ 3,
+      as.numeric(gov_attn) == 2 ~ 2,
+      as.numeric(gov_attn) == 3 ~ 1,
+      TRUE ~ NA_real_
+    )
+  )
+
+table(raw_data_cleaned$gov_attn)
+
+##add gets issues
+##unique(raw_data$gets_issues)
+
+## did vote in 2020
+# q31: 1 = no, not eligible; 2 = no, eligible; 3 = yes
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    vote2020 = na_if(as.numeric(vote2020), -99)
+  )
+
+
+## plans to vote
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    willvote = na_if(as.numeric(willvote), -99)
+  )
+
+
+```
+
+Note:
+
+Approximately 561 respondents did not provide responses to the political behavior items (government attention, past vote, intended vote). Missingness is perfectly overlapping across these items, indicating that these questions were likely administered to a subset of respondents rather than reflecting item-level nonresponse.
 # Write and Save Data
 ```{r}
 #sept 14 -- saving to now look at completeness problem (+ representativeness)
