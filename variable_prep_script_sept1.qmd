@@ -153,6 +153,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 ```
 
 ### C. Other Experiences
+
 #### Impact Plus (Constructing For-Analysis)
 
 Coding in same way as CJ experiences but in giant loop
@@ -226,6 +227,7 @@ code_experience <- function(data, self_var, know_var, no_var, prefix) {
 ```
 
 9 experience groups
+
 ```{r}
 experience_sets <- list(
   
@@ -286,6 +288,7 @@ experience_sets <- list(
 ```
 
 apply experience groups
+
 ```{r}
 for (experience in names(experience_sets)) {
   
@@ -302,7 +305,6 @@ for (experience in names(experience_sets)) {
 
 
 ```
-
 
 ### D. Q6, 7, 8 - Ration Block
 
