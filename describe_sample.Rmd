@@ -92,7 +92,7 @@ view(data_full %>%
     White = sum(White, na.rm = TRUE), 
     Black = sum(Black, na.rm = TRUE),
     Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
-    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE), 
     Native_am = sum(Native_Am, na.rm = TRUE),
     OtherRace = sum(OtherRace, na.rm = TRUE)
   ))
