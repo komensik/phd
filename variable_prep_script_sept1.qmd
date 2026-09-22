@@ -553,17 +553,14 @@ print(psych::corr.test(pol_tude))
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(trans = na_if(as.numeric(trans), -99))
 
-#trans indicator
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(trans_id = case_when(
-    trans == 1 ~ 1,
-    trans %in% c(2, 3) ~ 0,  # Conservative approach: counts only self-identified trans as 1
-    TRUE ~ NA_real_
-  ))
 
+#trans indicator 
+raw_data_cleaned <- raw_data_cleaned %>% mutate(trans_id = case_when( trans == 1 ~ 1, trans %in% c(2, 3) ~ 0, # Conservative approach: counts only self-identified trans as 1 TRUE ~ NA_real_ ))
 
 #gender clean
 gender_vars <- c("woman", "man", "gqueer", "g_other")
+
+table(raw_data_cleaned$trans)
 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(all_of(gender_vars), ~ na_if(as.numeric(.x), -99)))
