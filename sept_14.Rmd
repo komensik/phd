@@ -2,7 +2,7 @@
 title: "sept_14"
 output: html_notebook
 ---
-
+In this script, I just break into those who finished the survey (ie demographic questions) and those who did not.
 
 
 ```{r setup, include=FALSE}
@@ -45,8 +45,7 @@ used <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc",
           "impact", "incarc", "knowincarc", "vict",
           "local_police", "no_strangle", "police_tracker", "police_training", "charge_police","dpen", "min_wage", "free_calls", "ed_funds", "alt_sentencing", "lwop",
 "gov_attn", "vote2020", "willvote", "auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access_rev", "White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am",  "Pac_Island", "MENA", "race_notlisted",
-  "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology", "Democrat", "Republican", "gender"
-)
+  "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology", "Democrat", "Republican")
 
 used_missing <- data_full %>% 
   summarise(
@@ -82,7 +81,7 @@ demos <- c(
   "Pac_Island",
   "MENA",
   "race_notlisted",
-  "gender", "self_ideo", "Democrat", "Republican", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology"
+   "self_ideo", "Democrat", "Republican", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology"
 )
 
 
@@ -172,44 +171,6 @@ save the csv of those not in the above
 write_csv(df_no_control, "data/cleaned_sans_control_data.csv")
 ```
 
-# quality of samples
-
-```{r}
-
-summary(data_full$duration_minutes)
-
-```
-
-# who is my sample
-
-## state, county
-
-```{r}
-install.packages("usmap")
-library(usmap)
-
-
-data_full %>%
-  group_by(state) %>%
-  summarise(
-  n = n())
-
-
-view(data_full %>%
-  group_by(state) %>%
-  summarise(
-    n = n(),
-    White = sum(White, na.rm = TRUE), 
-    Black = sum(Black, na.rm = TRUE),
-    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
-    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
-    Native_am = sum(Native_Am, na.rm = TRUE),
-    OtherRace = sum(OtherRace, na.rm = TRUE)
-  ))
-
-```
-
-
 
 
 
@@ -220,14 +181,6 @@ view(data_full %>%
 ## target desserts mean x two dfs
 
 
-
-
-
-```{r}
-
-source("variable_labels.R")
-
-```
 
 ## race
 

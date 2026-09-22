@@ -4,3 +4,139 @@ output: html_notebook
 ---
 
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(tibble)
+library(gt)
+library(psych)
+library(ggplot2)
+library(kableExtra)
+
+source("variable_labels.R")
+```
+
+Read in data
+```{r}
+data_full <- read_csv("data/cleaned_control_data.csv")
+
+not_full <- read_csv("data/cleaned_sans_control_data.csv")
+
+```
+
+# quality of samples
+
+```{r}
+
+summary(data_full$duration_minutes)
+
+```
+
+# who is my sample
+## gender, sexual ID
+
+```{r}
+table(data_full$trans)
+
+view(data_full %>%
+       group_by(trans)%>%
+  summarise(
+    n = n(),
+    man = sum(man, na.rm = TRUE), 
+    woman = sum(woman, na.rm = TRUE),
+    gqueer       = sum(gqueer, na.rm = TRUE),
+    g_other = sum(g_other, na.rm = TRUE)
+  ))
+
+view(data_full %>%
+  group_by(man) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  ))
+
+view(data_full %>%
+  group_by(woman) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  ))
+
+view(data_full %>%
+  group_by(gqueer) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  ))
+
+
+view(data_full %>%
+  group_by(g_other) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  ))
+```
+
+*don't really have gender data for those excluded
+
+## state, county
+
+```{r}
+install.packages("usmap")
+library(usmap)
+
+
+data_full %>%
+  group_by(state) %>%
+  summarise(
+  n = n())
+
+
+view(data_full %>%
+  group_by(state) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  ))
+
+```
+
