@@ -230,6 +230,5 @@ fire_controls_labels <- c(
 all_attitudinal_controls <- c(
   party_ideo_controls,
   desor_core,
-  fire_controls,
-  desor_core
+  fire_controls
 )
