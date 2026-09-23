@@ -193,7 +193,7 @@ data_full %>%
   count(var, val) %>%
   pivot_wider(names_from = val, values_from = n, values_fill = 0)
 
-race_pct_of_sample
+
 
 
 ```
