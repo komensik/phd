@@ -25,6 +25,7 @@ library(gt)
 library(psych)
 library(ggplot2)
 library(kableExtra)
+library(usmap)
 
 source("variable_labels.R")
 ```
@@ -116,15 +117,37 @@ view(data_full %>%
 ## state, county
 
 ```{r}
-install.packages("usmap")
-library(usmap)
 
 
-data_full %>%
+state_percent_2020 <- read_csv("state_percent_2020.csv")
+
+state_percent_2020 <- state_percent_2020 %>%
+  mutate(
+    percent_2020 = readr::parse_number(oct)
+  )
+
+view(state_percent_2020)
+
+where <- data_full %>%
+  filter(!is.na(state)) %>%
   group_by(state) %>%
   summarise(
-  n = n())
+    n = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    percent = 100 * n / nrow(data_full)
+  ) %>%
+  left_join(
+    state_percent_2020,
+    by = "state"
+  ) %>%
+    mutate(
+    delta = (percent - percent_2020)
+  ) %>%
+  arrange(desc(n))
 
+View(where)
 
 view(data_full %>%
   group_by(state) %>%
