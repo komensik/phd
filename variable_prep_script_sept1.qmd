@@ -61,6 +61,51 @@ Standardize? No -- in my prelim, I write: To ensure that I do not control for a 
 
 ### B. CJ Experiences - Basic Coding
 
+#### Extra binaries (incarc, KI, vict)
+
+```{r}
+#extra binary
+ raw_data_cleaned <- raw_data_cleaned %>%
+   mutate(
+     incarc_bin = if_else(
+       incarc == 1,
+       1,
+       0,
+       missing = NA_real_
+     )
+   )
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    noincarc_bin = if_else(
+  (incarc == 0 & knowincarc == 0) | noincarc == 1,
+  1, 0,
+  missing = NA_real_
+))
+
+
+ raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    knowincarc_bin = if_else(
+      knowincarc == 1,
+      1,
+      0,
+      missing = NA_real_
+    )
+  )
+
+ raw_data_cleaned <- raw_data_cleaned %>%
+   mutate(
+     vict_bin = if_else(
+       vict == 1,
+       1,
+       0,
+       missing = NA_real_
+     )
+   )
+
+
+```
+
 #### Impact Plus (Constructing For-Analysis)
 
 ```{r, impactvar}
@@ -107,50 +152,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-#### Extra binaries (incarc, KI, vict)
-
-```{r}
-#extra binary
- raw_data_cleaned <- raw_data_cleaned %>%
-   mutate(
-     incarc_bin = if_else(
-       incarc == 1,
-       1,
-       0,
-       missing = NA_real_
-     )
-   )
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(
-    noincarc_bin = if_else(
-  (incarc == 0 & knowincarc == 0) | noincarc == 1,
-  1, 0,
-  missing = NA_real_
-))
-
-
- raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(
-    knowincarc_bin = if_else(
-      knowincarc == 1,
-      1,
-      0,
-      missing = NA_real_
-    )
-  )
-
- raw_data_cleaned <- raw_data_cleaned %>%
-   mutate(
-     vict_bin = if_else(
-       vict == 1,
-       1,
-       0,
-       missing = NA_real_
-     )
-   )
-
-
-```
 
 ### C. Other Experiences
 
@@ -603,7 +604,13 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 
 #trans indicator 
-raw_data_cleaned <- raw_data_cleaned %>% mutate(trans_id = case_when( trans == 1 ~ 1, trans %in% c(2, 3) ~ 0, #Conservative approach: counts only self-identified trans as 1 TRUE ~ NA_real_ ))
+raw_data_cleaned <- raw_data_cleaned %>% mutate(trans_id = case_when(
+  trans == 1 ~ 1,
+  trans %in% c(2, 3) ~ 0,
+  TRUE ~ NA_real_
+)) 
+#Conservative approach: counts only self-identified trans as 1 TRUE ~ NA_real_ 
+
 
 #gender clean
 gender_vars <- c("woman", "man", "gqueer", "g_other")

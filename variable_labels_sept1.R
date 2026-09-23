@@ -177,7 +177,7 @@ demo_controls <- c(
 
 demo_controls_labels <- c(
   Black = "Black",
-  Hispanic = "Hispanic", 
+  Hisp_Latino    = "Hispanic/Latino", 
   OtherRace = "Other Race", 
   gender = "Male"
 )

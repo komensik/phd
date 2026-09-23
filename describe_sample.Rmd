@@ -306,6 +306,122 @@ table(data_full$pid_3)
 
 ```
 
+## race
+
+```{r}
+data_full %>%
+  select(all_of(all_race_vars)) %>%
+  pivot_longer(everything(), names_to = "var", values_to = "val") %>%
+  count(var, val) %>%
+  pivot_wider(names_from = val, values_from = n, values_fill = 0)
+```
+```{r}
+
+rid_2020 <- read_csv("race_vs_2020.csv")
+
+view(rid_2020)
+
+rid_2020_table <- rid_2020 %>%
+  mutate(
+    race_ethnicity = recode(
+      rid,
+      "Asian_Am"    = "Asian",
+      "Black"       = "Black or African American",
+      "Hisp_Latino" = "Hispanic or Latino",
+      "MENA"        = "Middle Eastern or North African",
+      "Native_Am"   = "American Indian or Alaska Native",
+      "Pac_Island"  = "Native Hawaiian or Other Pacific Islander",
+      "White"       = "White"
+    ),
+
+    # pct_sample is currently stored as a proportion
+    sample_pct = sprintf("%.1f\\%%", pct_sample * 100),
+
+    # 2020_pct is already stored as a percent, e.g. 7.2
+    census_pct = sprintf("%.1f\\%%", `2020_pct`),
+
+    # Format Census population in millions
+    census_n = sprintf("%.1f", `2020_n_million`)
+  ) %>%
+  select(
+    race_ethnicity,
+    n,
+    sample_pct,
+    census_n,
+    census_pct
+  )
+
+
+rid_table_appendix <- rid_2020_table %>%
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    escape = FALSE,
+    align = c("l", "r", "r", "r", "r"),
+    col.names = c(
+      "Race/Ethnicity",
+      "Sample $N$",
+      "Sample \\%",
+      "2020 U.S. Population (millions)",
+      "2020 Census \\%"
+    ),
+    caption = "Racial and Ethnic Composition of the Survey Sample and 2020 U.S. Population",
+    label = "tab:race_census_comparison"
+  ) %>%
+  kable_styling(
+    latex_options = "hold_position"
+  ) %>%
+  footnote(
+    general = paste(
+      "Sample racial categories are non-mutually exclusive; respondents could identify with more than one race.",
+      "Accordingly, percentages need not sum to 100 percent.",
+      "Census race estimates report each racial group alone or in combination with one or more other races.",
+      "Hispanic or Latino origin is measured by the Census as an ethnicity and includes persons of any race.",
+      "In the 2020 Census, Middle Eastern or North African (MENA) was not a separate race category and was formally classified within White;",
+      "the MENA estimate shown here uses detailed Census responses identifying MENA origin and therefore overlaps with the Census White category.",
+      "Census benchmarks refer to the total 2020 U.S. population."
+    ),
+    general_title = "Note:",
+    threeparttable = TRUE,
+    escape = FALSE
+  )
+
+
+writeLines(
+  as.character(rid_table_appendix),
+  "rid_2020_table_2.tex"
+)
+
+```
+
+
+
+```{r}
+# combinations
+combo_counts <- data_full %>%
+  mutate(.id = row_number()) %>%
+  select(.id, all_of(all_race_vars)) %>%
+  pivot_longer(-.id, names_to = "race", values_to = "selected") %>%
+  filter(selected == 1) %>%                      # drops both 0s and NAs
+  mutate(race = factor(race, levels = all_race_vars)) %>%
+  arrange(.id, race) %>%
+  group_by(.id) %>%
+  summarise(
+    n_races    = n(),
+    race_combo = paste(race, collapse = " + "),
+    .groups = "drop"
+  ) %>%
+  count(n_races, race_combo, name = "n") %>%
+  arrange(desc(n))
+
+#View(combo_counts)                                # everything
+
+#filter(combo_counts, n_races >= 2)          # multiracial combos only
+
+
+```
+
+
 ```{r}
 view(data_full %>%
   group_by(state) %>%
@@ -318,6 +434,334 @@ view(data_full %>%
     Native_am = sum(Native_Am, na.rm = TRUE),
     OtherRace = sum(OtherRace, na.rm = TRUE)
   ))
+
+```
+
+# Experiences
+
+## CJ
+
+```{r}
+
+table(data_full$vict_bin, useNA = "ifany")
+
+table(data_full$vict, useNA = "ifany")
+```
+
+```{r}
+table(not_full$vict, useNA = "ifany")
+```
+
+
+
+
+```{r}
+table(data_full$incarc, useNA = "ifany")
+table(data_full$incarc_bin, useNA = "ifany")
+
+table(not_full$incarc, useNA = "ifany")
+```
+
+
+```{r}
+table(data_full$knowincarc, useNA = "ifany")
+table(data_full$knowincarc_bin, useNA = "ifany")
+
+table(not_full$knowincarc, useNA = "ifany")
+```
+```{r}
+
+table(data_full$impact, useNA = "ifany")
+
+table(not_full$impact, useNA = "ifany")
+```
+
+
+```{r}
+
+data_full %>%
+  group_by(impact)%>%
+  summarise(
+    n=n(),
+    incarc = sum(incarc, na.rm = TRUE),
+    knowincarc = sum(knowincarc, na.rm = TRUE),
+    vict = sum(vict)
+  )
+
+```
+
+
+## df full race impact
+```{r}
+data_full %>%
+  group_by(incarc) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  )
+
+```
+```{r}
+data_full %>%
+  group_by(impact) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+data_full %>%
+  group_by(vict) %>%
+  summarise(
+    n = n(),
+    White = sum(White, na.rm = TRUE), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE),
+    OtherRace = sum(OtherRace, na.rm = TRUE)
+  )
+```
+
+### (e) Table of Impact x Race
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(stringr)
+source("variable_labels.R")
+
+total_n <- nrow(data_full)
+
+#----------------------------
+# Impact x race table
+#----------------------------
+
+impact_race_table <- map_dfr(impact_vars, function(iv) {
+  
+  row_dat <- data_full %>%
+    filter(.data[[iv]] == 1)
+  
+  tibble(
+    Impact = impact_labels[[iv]],
+    Total_n = nrow(row_dat),
+    Total_pct = 100 * nrow(row_dat) / total_n
+  ) %>%
+    bind_cols(
+      map_dfc(race_vars, function(rv) {
+        
+        n_cell <- sum(row_dat[[rv]] == 1, na.rm = TRUE)
+        pct_cell <- 100 * n_cell / total_n
+        
+        tibble(
+          !!race_labels[[rv]] :=
+            sprintf("%d (%.1f%%)", n_cell, pct_cell)
+        )
+      })
+    ) %>%
+    mutate(
+      Total = sprintf("%d (%.1f%%)", Total_n, Total_pct)
+    ) %>%
+    select(
+      Impact,
+      all_of(unname(race_labels)),
+      Total
+    )
+})
+
+
+#----------------------------
+# Overall sample row
+#----------------------------
+
+overall_row <- tibble(
+  Impact = "Overall sample"
+) %>%
+  bind_cols(
+    map_dfc(race_vars, function(rv) {
+      
+      n_cell <- sum(data_full[[rv]] == 1, na.rm = TRUE)
+      pct_cell <- 100 * n_cell / total_n
+      
+      tibble(
+        !!race_labels[[rv]] :=
+          sprintf("%d (%.1f%%)", n_cell, pct_cell)
+      )
+    })
+  ) %>%
+  mutate(
+    Total = sprintf("%d (100.0%%)", total_n)
+  )
+
+
+# Add overall row
+impact_race_table <- bind_rows(
+  impact_race_table,
+  overall_row
+)
+
+impact_race_table
+```
+
+Bar plots of impact x race
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
+
+#----------------------------
+# 1. Reshape race indicators long
+#----------------------------
+race_impact_long <- data_full %>%
+  dplyr::select(all_of(race_vars), all_of(impact_vars)) %>%
+  pivot_longer(
+    cols = all_of(race_vars),
+    names_to = "race_var",
+    values_to = "in_race"
+  ) %>%
+  filter(in_race == 1) %>%
+  mutate(
+    race = recode(race_var, !!!race_labels)
+  )
+
+#----------------------------
+# 2. Plot ANY impact by race
+#----------------------------
+impact_by_race <- race_impact_long %>%
+  group_by(race) %>%
+  summarise(
+    pct_impacted = mean(impact, na.rm = TRUE),
+    n_race = n(),
+    .groups = "drop"
+  )
+
+ggplot(impact_by_race, aes(x = fct_reorder(race, pct_impacted), y = pct_impacted)) +
+  geom_col() +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    x = NULL,
+    y = "Share with any impact",
+    title = "Proportion of each racial group with any carceral contact"
+  ) +
+  coord_flip() +
+  theme_minimal()
+```
+
+```{r}
+impact_by_race_type <- race_impact_long %>%
+  pivot_longer(
+    cols = all_of(impact_vars),
+    names_to = "impact_var",
+    values_to = "has_impact"
+  ) %>%
+  mutate(
+    impact_type = recode(impact_var, !!!impact_labels)
+  ) %>%
+  group_by(race, impact_type) %>%
+  summarise(
+    pct = mean(has_impact, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ggplot(impact_by_race_type, aes(x = race, y = pct, fill = impact_type)) +
+  geom_col(position = position_dodge(width = 0.8)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    x = NULL,
+    y = "Share within racial group",
+    fill = NULL,
+    title = "Sample Carceral Contact by Race"
+  ) +
+  theme_minimal()
+
+```
+
+Turning above into 4 tables
+
+```{r}
+library(dplyr)
+library(purrr)
+library(tibble)
+
+# race vars and labels
+race_vars <- c("White", "Black", "Hispanic", "OtherRace")
+
+race_labels <- c(
+  White = "White",
+  Black = "Black",
+  Hispanic = "Hispanic",
+  OtherRace = "Other Race"
+)
+
+impact_vars <- c("impact", "incarc", "knowincarc", "vict")
+
+impact_labels <- c(
+  impact = "Any Impact",
+  incarc = "Direct",
+  knowincarc = "Proximal",
+  vict = "Victim"
+)
+
+# function: one table for one racial group
+make_race_impact_table <- function(race_var) {
+  
+  dat_race <- data_full %>%
+    dplyr::filter(.data[[race_var]] == 1)
+  
+  race_n <- nrow(dat_race)
+  
+  tibble(
+    Impact = unname(impact_labels),
+    n = purrr::map_int(impact_vars, ~ sum(dat_race[[.x]] == 1, na.rm = TRUE))
+  ) %>%
+    dplyr::mutate(
+      pct = round(100 * n / race_n, 1),
+      `n (%)` = sprintf("%d (%.1f\\%%)", n, pct)
+    ) %>%
+    dplyr::select(Impact, `n (%)`)
+}
+
+# create all four tables as a named list
+race_impact_tables <- setNames(
+  lapply(race_vars, make_race_impact_table),
+  unname(race_labels)
+)
+
+# view one example
+race_impact_tables[["White"]]
+race_impact_tables[["Black"]]
+race_impact_tables[["Hispanic"]]
+race_impact_tables[["Other Race"]]
+
+
+
+latex_tables <- imap(race_impact_tables, ~ knitr::kable(
+  .x,
+  format = "latex",
+  booktabs = TRUE,
+  escape = FALSE,
+  caption = paste("Carceral contact among", .y, "respondents")
+))
+
+cat(latex_tables[["White"]])
+cat(latex_tables[["Black"]])
+cat(latex_tables[["Hispanic"]])
+cat(latex_tables[["Other Race"]])
 
 ```
 

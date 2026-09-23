@@ -39,9 +39,16 @@ library(knitr)
 ```{r}
 
 here::here()
+
+sample <- read_csv("data/cleaned_control_data.csv")
+
+not_full <- read_csv("data/cleaned_sans_control_data.csv")
+
+
 #sample <- readr::read_csv("data/cleaned/...")
 #sample <- readr::read_csv("data/cleaned/sept_14.csv") 
-sample <- readr::read_csv("data/cleaned_control_data.csv")
+#sample <- readr::read_csv("data/cleaned_control_data.csv")
+
 
 source("variable_labels.R")
 
@@ -418,10 +425,8 @@ cat(
 ### 2.1A Police Policy
 
 ```{r}
-#summary(sample$q15_1_1_to_5)
-#summary(sample[police_items_1_to_5])
-#sapply(sample[police_items_1_to_5], function(x) table(x, useNA = "ifany"))
 
+source("variable_labels.R")
 cor_matrix <- cor(
   sample[police_items_1_to_5],
   use = "pairwise.complete.obs"
@@ -467,10 +472,10 @@ sample <- sample %>%
 # police index 2: index of the items that hang together best
 
 police_reform_core <- c(
-  "q15_2_1_to_5",
-  "q15_3_1_to_5",
-  "q15_4_1_to_5",
-  "q15_5_1_to_5"
+  "no_strangle",
+  "police_tracker",
+  "police_training",
+  "charge_police"
 )
 
 sample <- sample %>%
@@ -1367,7 +1372,7 @@ results_table_tex <- make_restricted_panel_latex_table(
                    "Native_Am", "OtherRace", "gender"),
   control_labels = c(
     Black = "Black",
-    Hispanic = "Hispanic/Latino",
+    Hisp_Latino = "Hispanic/Latino",
     Asian_Am    = "Asian American",
     Native_Am   = "Native American",
     OtherRace = "Other Race",
@@ -1382,7 +1387,7 @@ writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.
 ##model for just desor
 
 dep_variable <-(sample$knowincarc)
-desor_model <- lm(desor_core ~ dep_variable + Black+Hispanic+OtherRace+fiscal_ideology+social_ideology, data = sample)
+desor_model <- lm(desor_core ~ dep_variable + Black+Hisp_Latino+OtherRace+fiscal_ideology+social_ideology, data = sample)
 summary(desor_model)
 
 ```
@@ -1406,7 +1411,7 @@ results_table_tex <- make_restricted_panel_latex_table(
                    "Native_Am", "OtherRace", "gender"),
   control_labels = c(
     Black = "Black",
-    Hispanic = "Hispanic/Latino",
+    Hisp_Latino = "Hispanic/Latino",
     Asian_Am    = "Asian American",
     Native_Am   = "Native American",
     OtherRace = "Other race",
@@ -1536,14 +1541,14 @@ names(sample)
 
 
 #impact - help 
-test_impact_full <- lm(prisonhelp ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+test_impact_full <- lm(prisonhelp ~ impact + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
 
-test_incarc_full <- lm(prisonhelp ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+test_incarc_full <- lm(prisonhelp ~ incarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
 
 #knowincarc 
-test_knowincarc_full <- lm(prisonhelp ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+test_knowincarc_full <- lm(prisonhelp ~ knowincarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
 
-test_vict_full <- lm(prisonhelp ~ vict + Black + Hispanic + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+test_vict_full <- lm(prisonhelp ~ vict + Black + Hisp_Latino + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
 
 test_impact_full
 test_knowincarc_full
@@ -1551,14 +1556,14 @@ test_incarc_full
 test_vict_full
 
 #impact - pun 
-test_impact_full_pen <- lm(prisonpen ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+test_impact_full_pen <- lm(prisonpen ~ impact + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
 
-test_incarc_full_pen <- lm(prisonpen ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+test_incarc_full_pen <- lm(prisonpen ~ incarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
 
 #knowincarc 
-test_knowincarc_full_pen <- lm(prisonpen ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+test_knowincarc_full_pen <- lm(prisonpen ~ knowincarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
 
-test_vict_full_pen <- lm(prisonpen ~ vict + Black + Hispanic + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+test_vict_full_pen <- lm(prisonpen ~ vict + Black + Hisp_Latino + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
 
 test_impact_full_pen
 test_knowincarc_full_pen
@@ -2507,33 +2512,33 @@ kable(
 
 ```{r}
 
-m_des_inc_impact <- lm(d_incppl_pris_abc ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+m_des_inc_impact <- lm(d_incppl_pris_abc ~ impact + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
 
-m_des_inc_incarc <- lm(d_incppl_pris_abc ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+m_des_inc_incarc <- lm(d_incppl_pris_abc ~ incarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
 
-m_des_inc_knowincarc <- lm(d_incppl_pris_abc ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+m_des_inc_knowincarc <- lm(d_incppl_pris_abc ~ knowincarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
 
-m_des_inc_vict <- lm(d_incppl_pris_abc ~ vict + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
-
-##
-
-m_des_crim_impact <- lm(d_crim_abc ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
-
-m_des_crim_incarc <- lm(d_crim_abc ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
-
-m_des_crim_knowincarc <- lm(d_crim_abc ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
-
-m_des_crim_vict <- lm(d_crim_abc ~ vict + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+m_des_inc_vict <- lm(d_incppl_pris_abc ~ vict + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
 
 ##
 
-m_des_incwomen_imp <- lm(d_incwomen_abc ~ impact + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+m_des_crim_impact <- lm(d_crim_abc ~ impact + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
 
-m_des_incwomen_incarc <- lm(d_incwomen_abc ~ incarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+m_des_crim_incarc <- lm(d_crim_abc ~ incarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
 
-m_des_incwomen_knowinc <- lm(d_incwomen_abc ~ knowincarc + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+m_des_crim_knowincarc <- lm(d_crim_abc ~ knowincarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
 
-m_des_incwomen_vict <- lm(d_incwomen_abc ~ vict + Black + Hispanic + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+m_des_crim_vict <- lm(d_crim_abc ~ vict + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+
+##
+
+m_des_incwomen_imp <- lm(d_incwomen_abc ~ impact + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+
+m_des_incwomen_incarc <- lm(d_incwomen_abc ~ incarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+
+m_des_incwomen_knowinc <- lm(d_incwomen_abc ~ knowincarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
+
+m_des_incwomen_vict <- lm(d_incwomen_abc ~ vict + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology + desor_core, data = sample)
 
 
 ##
@@ -3050,7 +3055,7 @@ m1c <- lm(d_incppl_pris_abc ~ impact +
     fiscal_ideology + social_ideology +
     penalpoint + desor_core +
     fire_rare + fire_privilege + fire_angry + fire_fear +
-    gender + Black + Hispanic + OtherRace,
+    gender + Black + Hisp_Latino + OtherRace,
   data = sample
 )
 
@@ -3059,7 +3064,7 @@ m1c_incarc <- lm(d_incppl_pris_abc ~ incarc +
     fiscal_ideology + social_ideology +
     penalpoint + desor_core +
     fire_rare + fire_privilege + fire_angry + fire_fear +
-    gender + Black + Hispanic + OtherRace,
+    gender + Black + Hisp_Latino + OtherRace,
   data = sample
 )
 
@@ -3068,7 +3073,7 @@ m1c_vict <- lm(d_incppl_pris_abc ~ vict +
     fiscal_ideology + social_ideology +
     penalpoint + desor_core +
     fire_rare + fire_privilege + fire_angry + fire_fear +
-    gender + Black + Hispanic + OtherRace,
+    gender + Black + Hisp_Latino + OtherRace,
   data = sample
 )
 
@@ -3077,7 +3082,7 @@ m1c_knowincarc <- lm(d_incppl_pris_abc ~ knowincarc +
     fiscal_ideology + social_ideology +
     penalpoint + desor_core +
     fire_rare + fire_privilege + fire_angry + fire_fear +
-    gender + Black + Hispanic + OtherRace,
+    gender + Black + Hisp_Latino + OtherRace,
   data = sample
 )
 
@@ -3190,7 +3195,7 @@ coeftest(m1c_knowincarc, vcov = vcovHC(m1c_knowincarc, type = "HC1"))
 
 m1cs <- lm(d_incppl_pris_abc ~ impact + Republican + Democrat + fiscal_ideology +
          social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
-         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,
          data = sample)
 
 # 1. Standardized coefficients
@@ -3486,7 +3491,7 @@ minc <- lm(d_incppl_pris_abc ~ incarc +
     fiscal_ideology + social_ideology +
     penalpoint + desor_core +
     fire_rare + fire_privilege + fire_angry + fire_fear +
-    gender + Black + Hispanic + OtherRace,
+    gender + Black + Hisp_Latino + OtherRace,
   data = sample
 )
 
@@ -3506,7 +3511,7 @@ coef_table_incarc <- coeftest(minc, vcov = vcovHC(minc, type = "HC1", cluster = 
 
 minc_s <- lm(d_incppl_pris_abc ~ incarc + Republican + Democrat + fiscal_ideology +
          social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
-         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,
          data = sample)
 
 # 1. Standardized coefficients
@@ -3615,7 +3620,7 @@ mv <- lm(d_incppl_pris_abc ~ vict +
     fiscal_ideology + social_ideology +
     penalpoint + desor_core +
     fire_rare + fire_privilege + fire_angry + fire_fear +
-    gender + Black + Hispanic + OtherRace,
+    gender + Black + Hisp_Latino + OtherRace,
   data = sample
 )
 summary(mv)
@@ -3633,7 +3638,7 @@ coef_table_vict <- coeftest(mv, vcov = vcovHC(mv, type = "HC1"))%>% broom::tidy(
 
 mvs <- lm(d_incppl_pris_abc ~ vict + Republican + Democrat + fiscal_ideology +
          social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
-         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,
          data = sample)
 
 # 1. Standardized coefficients
@@ -3721,7 +3726,7 @@ mki <- lm(d_incppl_pris_abc ~ knowincarc +
     fiscal_ideology + social_ideology +
     penalpoint + desor_core +
     fire_rare + fire_privilege + fire_angry + fire_fear +
-    gender + Black + Hispanic + OtherRace,
+    gender + Black + Hisp_Latino + OtherRace,
   data = sample
 )
 summary(mki)
@@ -3738,7 +3743,7 @@ coef_table_prox <- coeftest(mki, vcov = vcovHC(mki, type = "HC1"))%>% broom::tid
 ```{r}
 mkis <- lm(d_incppl_pris_abc ~ knowincarc + Republican + Democrat + fiscal_ideology +
          social_ideology + penalpoint + desor_core + fire_rare + fire_privilege +
-         fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+         fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,
          data = sample)
 
 # 1. Standardized coefficients
@@ -4191,7 +4196,7 @@ car::avPlots(m4_basic, terms = ~ desor_core + d_incppl_pris_abc + penalpoint + s
 Pairwise interpretation:
 
 | Relationship | Interpretation |   |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | desor_core & inc ppl | strong shared variance, likely suppression |  |
 | desorcore & ideo -0.37 | expected liberal/conservative |  |
 | desorcore & penalpoint: -0.19 | mild relationship |  |
@@ -4253,7 +4258,7 @@ hist(sample$prisonpen)
 ```{r, m3}
 
 m3 <- lm(prisonhelp ~ impact + d_incppl_pris_abc +
-    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,
 
     data = sample
 )
@@ -4278,7 +4283,7 @@ In each model, $delta_1$ captures the association between carceral contact and p
 ```{r, m4}
 
 m4 <- lm(prisonpen ~ impact + d_incppl_pris_abc +
-    Republican + Democrat + fiscal_ideology + social_ideology + penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+    Republican + Democrat + fiscal_ideology + social_ideology + penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,
 
     data = sample
 )
@@ -4331,13 +4336,13 @@ cor(sample$fire_angry, sample$prisonpen, use="pairwise.complete.obs")
 
 ```{r}
 m3_inc <- lm(prisonhelp ~ incarc + d_incppl_pris_abc +
-    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,
 
     data = sample
 )
 
 m4_inc <- lm(prisonpen ~ incarc + d_incppl_pris_abc +
-    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,data = sample)
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,data = sample)
 
 summary(m3_inc)
 summary(m4_inc)
@@ -4347,11 +4352,11 @@ summary(m4_inc)
 
 ```{r}
 m3_vict <- lm(prisonhelp ~ vict + d_incppl_pris_abc +
-    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,data = sample
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,data = sample
 )
 
 m4_vict <- lm(prisonpen ~ vict + d_incppl_pris_abc +
-    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,data = sample
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,data = sample
 )
 
 summary(m3_vict)
@@ -4363,12 +4368,12 @@ summary(m4_vict)
 ```{r}
 
 m3_prox <- lm(prisonhelp ~ knowincarc + d_incppl_pris_abc +
-    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,
     data = sample
 )
 
 m4_prox <- lm(prisonpen ~ knowincarc + d_incppl_pris_abc +
-    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace,
+    Republican + Democrat + fiscal_ideology + social_ideology +penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace,
     data = sample
 )
 
@@ -4396,7 +4401,7 @@ summary(m5a)
 m5b <- lm(prisonhelp ~ d_incppl_pris_abc * impact,
             data = sample)
 
-m5 <- lm(prisonhelp ~ d_incppl_pris_abc * impact + Republican + Democrat + fiscal_ideology + social_ideology + penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace, 
+m5 <- lm(prisonhelp ~ d_incppl_pris_abc * impact + Republican + Democrat + fiscal_ideology + social_ideology + penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace, 
             data = sample)
 
 summary(m5)
@@ -4430,7 +4435,7 @@ Rerunning M5 with Mean-Centered Deservingness
 m5_c<-lm(prisonhelp ~ d_inc_c*impact + Republican + 
     Democrat + fiscal_ideology + social_ideology + penalpoint + 
     desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
-    gender + Black + Hispanic + OtherRace, data = x_data)
+    gender + Black + Hisp_Latino + OtherRace, data = x_data)
 
 summary(m5_c)
 
@@ -4503,7 +4508,7 @@ summary(m6a)
 m6b <- lm(prisonpen ~ d_incppl_pris_abc * impact,
             data = sample)
 
-m6 <- lm(prisonpen ~ d_incppl_pris_abc * impact + Republican + Democrat + fiscal_ideology + social_ideology + penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hispanic + OtherRace, 
+m6 <- lm(prisonpen ~ d_incppl_pris_abc * impact + Republican + Democrat + fiscal_ideology + social_ideology + penalpoint + desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + gender + Black + Hisp_Latino + OtherRace, 
             data = sample)
 
 summary(m6)
@@ -4520,7 +4525,7 @@ Rerunning M5 with Mean-Centered Deservingness
 m6c <- lm(prisonpen ~ d_inc_c*impact + Republican +
     Democrat + fiscal_ideology + social_ideology + penalpoint + 
     desor_core + fire_rare + fire_privilege + fire_angry + fire_fear + 
-    gender + Black + Hispanic + OtherRace, data = x_data)
+    gender + Black + Hisp_Latino + OtherRace, data = x_data)
     
 summary(m6c)
 
