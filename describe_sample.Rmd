@@ -476,6 +476,24 @@ table(data_full$impact, useNA = "ifany")
 table(not_full$impact, useNA = "ifany")
 ```
 
+```{r}
+data_full %>%
+  group_by(impact)%>%
+  summarise(
+    n=n(),
+    total = 1600,
+    incarc = sum(incarc, na.rm = TRUE),
+    incarc_pct = ((incarc / total) *100),
+    knowincarc = sum(knowincarc, na.rm = TRUE),
+    knowincarc_pct = ((knowincarc / total) *100),
+    vict = sum(vict, na.rm = TRUE),
+    vict_pct = ((vict / total) *100),
+    any_impact = sum(impact, na.rm = TRUE),
+    any_impact_pct = ((any_impact / total) *100)
+  )
+```
+
+
 
 ```{r}
 
@@ -483,9 +501,9 @@ data_full %>%
   group_by(impact)%>%
   summarise(
     n=n(),
-    incarc = sum(incarc, na.rm = TRUE),
-    knowincarc = sum(knowincarc, na.rm = TRUE),
-    vict = sum(vict)
+    incarc = sum(incarc_bin, na.rm = TRUE),
+    knowincarc = sum(knowincarc_bin, na.rm = TRUE),
+    vict = sum(vict_bin, na.rm = TRUE)
   )
 
 ```
@@ -497,12 +515,19 @@ data_full %>%
   group_by(incarc) %>%
   summarise(
     n = n(),
+    incarc_total = sum(incarc, na.rm = TRUE),
     White = sum(White, na.rm = TRUE), 
+    pct_white = ((White / incarc_total) *100),
     Black = sum(Black, na.rm = TRUE),
+    pct_black = ((Black / incarc_total) *100),
     Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    pct_hi = ((Hisp_Latino / incarc_total) *100),
     Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    pct_aa = ((Asian_Am / incarc_total) *100),
     Native_am = sum(Native_Am, na.rm = TRUE),
-    OtherRace = sum(OtherRace, na.rm = TRUE)
+    pct_nat = ((Native_am / incarc_total) *100),
+    OtherRace = sum(OtherRace, na.rm = TRUE),
+    pct_other = ((OtherRace / incarc_total) *100)
   )
 
 ```

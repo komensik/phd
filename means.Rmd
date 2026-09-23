@@ -1,0 +1,43 @@
+---
+title: "Means"
+output: html_notebook
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,       # Hide code by default
+  warning = FALSE,
+  message = FALSE
+)
+install.packages("rlang")
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(gt)
+library(marginaleffects)
+library(mediation)
+library(naniar)
+library(rsq)
+library(patchwork)
+library(modelsummary)
+library(rlang)
+library(forcats)
+library(ggplot2)
+library(broom)
+library(knitr)
+
+source("variable_labels.R")
+```
+
+```{r}
+sample <- read_csv("data/cleaned_control_data.csv")
+
+not_full <- read_csv("data/cleaned_sans_control_data.csv")
+```
+
