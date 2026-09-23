@@ -484,28 +484,76 @@ race_vars <- c(
 ### H. Party + Ideology controls
 
 ```{r}
-
 #raw_data_cleaned %>% count(q47)
 
 #clean dem 101
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(dem101 = na_if(as.numeric(dem101), -99))
 
-#party ID dummies
+#single PID variable
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    Republican = case_when(
-      dem101 == 1 ~ 1,
-      dem101 %in% c(2, 3, 4) ~ 0,
-      TRUE ~ NA_real_
+    pid = case_when(
+      dem101 == 1 ~ "Republican",
+      dem101 == 2 ~ "Democrat",
+      dem101 == 3 ~ "Independent",
+      dem101 == 4 ~ "Other",
+      TRUE ~ NA_character_
     ),
-    Democrat = case_when(
-      dem101 == 2 ~ 1,
-      dem101 %in% c(1, 3, 4) ~ 0,
-      TRUE ~ NA_real_
+    
+    pid = factor(
+      pid,
+      levels = c(
+        "Independent",
+        "Democrat",
+        "Republican",
+        "Other"
+      )
     )
   )
 
+#other? 76
+# raw_data_cleaned %>%
+#   count(pid, .drop = FALSE)
+# 
+# raw_data_cleaned %>%
+#   count(pid, .drop = FALSE) %>%
+#   mutate(
+#     percent = round(100 * n / sum(n), 2)
+#   )
+
+# drop other when doing analyses? 
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    
+    # Numeric/ordinal version
+    pid_3 = case_when(
+      dem101 == 1 ~ 1,   # Republican
+      dem101 == 3 ~ 2,   # Independent
+      dem101 == 2 ~ 3,   # Democrat
+      dem101 == 4 ~ NA_real_,
+      TRUE ~ NA_real_
+    ),
+    
+    # Categorical version
+    pid_3_factor = factor(
+      pid_3,
+      levels = c(1, 2, 3),
+      labels = c("Republican", "Independent", "Democrat")
+    ),
+    
+    # Preserve reason for exclusion
+    pid_other = case_when(
+      dem101 == 4 ~ 1,
+      dem101 %in% c(1, 2, 3) ~ 0,
+      TRUE ~ NA_real_
+    )
+  )
+```
+
+
+
+```{r}
 #clean ideology
 #summary(raw_data_cleaned$q46)
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -555,15 +603,14 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 
 #trans indicator 
-raw_data_cleaned <- raw_data_cleaned %>% mutate(trans_id = case_when( trans == 1 ~ 1, trans %in% c(2, 3) ~ 0, # Conservative approach: counts only self-identified trans as 1 TRUE ~ NA_real_ ))
+raw_data_cleaned <- raw_data_cleaned %>% mutate(trans_id = case_when( trans == 1 ~ 1, trans %in% c(2, 3) ~ 0, #Conservative approach: counts only self-identified trans as 1 TRUE ~ NA_real_ ))
 
 #gender clean
 gender_vars <- c("woman", "man", "gqueer", "g_other")
 
-table(raw_data_cleaned$trans)
 
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(across(all_of(gender_vars), ~ na_if(as.numeric(.x), -99)))
+
+raw_data_cleaned <- raw_data_cleaned %>% mutate(across(all_of(gender_vars), ~ na_if(as.numeric(.x), -99)))
 
 
 #constructing the gender binary

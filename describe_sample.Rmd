@@ -26,6 +26,7 @@ library(psych)
 library(ggplot2)
 library(kableExtra)
 library(usmap)
+library(scales)
 
 source("variable_labels.R")
 ```
@@ -117,8 +118,6 @@ view(data_full %>%
 ## state, county
 
 ```{r}
-
-
 state_percent_2020 <- read_csv("state_percent_2020.csv")
 
 state_percent_2020 <- state_percent_2020 %>%
@@ -149,6 +148,108 @@ where <- data_full %>%
 
 View(where)
 
+where_appendix <- where %>%
+  select(state, n, percent, percent_2020, delta) %>%
+  mutate(
+    percent = round(percent, 2),
+    percent_2020 = round(percent_2020, 2),
+    delta = round(delta, 2)
+)
+    
+
+View(where_appendix)   
+
+state_table <- where_appendix %>%
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    longtable = TRUE,
+    caption = "Geographic Distribution of Survey Respondents Compared with the 2020 U.S. Population",
+    label = "tab:state_distribution",
+    col.names = c(
+      "State",
+      "N",
+      "Sample (\\%)",
+      "2020 U.S. Population (\\%)",
+      "$\\Delta$ (p.p.)"
+    ),
+    align = c("l", "r", "r", "r", "r"),
+    escape = FALSE
+  ) %>%
+  kable_styling(
+    latex_options = c("repeat_header"),
+    font_size = 9
+  )
+
+state_table
+
+writeLines(
+  as.character(state_table),
+  "state_distribution_table.tex"
+)
+```
+
+Map?
+
+```{r}
+state_map_data <- where %>%
+  select(state, percent)
+
+sample_map<-plot_usmap(data = state_map_data, values = "percent", color = "white", linewidth = 0.2) +
+  scale_fill_continuous(
+    name = "Sample (%)",
+    labels = label_number(accuracy = 0.01, suffix = "%")
+  ) +
+  labs(
+    title = "Geographic Distribution of Respondents",
+    subtitle = "Share of the full sample residing in each state"
+  ) +
+  theme(
+    legend.position = "right"
+  )
+sample_map
+
+```
+
+```{r}
+ggsave("sample_state_map.pdf", sample_map, width = 9, height = 6)
+```
+
+
+
+
+```{r}
+
+delta_map_data <- where %>%
+  select(state, delta)
+
+delta_map <- plot_usmap(data = delta_map_data, values = "delta", color = "white", linewidth = 0.2) +
+  scale_fill_gradient2(
+    name = expression(Delta ~ "(p.p.)"),
+    low = "steelblue",
+    mid = "white",
+    high = "firebrick",
+    midpoint = 0,
+    labels = label_number(accuracy = 0.01)
+  ) +
+  labs(
+    title = "State-Level Over- and Underrepresentation in the Sample",
+    subtitle = "Positive values indicate a larger sample share than the state's 2020 share of the U.S. population"
+  ) +
+  theme(
+    legend.position = "right"
+  )
+delta_map
+```
+
+```{r}
+ggsave("delta_map.pdf", delta_map, width = 9, height = 6)
+```
+
+
+
+
+```{r}
 view(data_full %>%
   group_by(state) %>%
   summarise(

@@ -45,7 +45,7 @@ used <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc",
           "impact", "incarc", "knowincarc", "vict",
           "local_police", "no_strangle", "police_tracker", "police_training", "charge_police","dpen", "min_wage", "free_calls", "ed_funds", "alt_sentencing", "lwop",
 "gov_attn", "vote2020", "willvote", "auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access_rev", "White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am",  "Pac_Island", "MENA", "race_notlisted",
-  "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology", "Democrat", "Republican")
+  "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology")
 
 used_missing <- data_full %>% 
   summarise(
@@ -81,7 +81,7 @@ demos <- c(
   "Pac_Island",
   "MENA",
   "race_notlisted",
-   "self_ideo", "Democrat", "Republican", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology"
+   "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology"
 )
 
 
