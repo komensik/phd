@@ -566,28 +566,121 @@ Probability of or proportion of being incarcerated, knowincarc, vict, impact by 
 
 ```{r}
 
-rid_totals <- data_full %>%
+#-----------------------------------
+# Incarceration by race
+#-----------------------------------
+
+race_incarc <- data_full %>%
   summarise(
-    n = n(),
-      aa_total = sum(Asian_Am, na.rm = TRUE),
-      black_total = sum(Black, na.rm = TRUE),
-      hisp_total = sum(Hisp_Latino, na.rm = TRUE),
-      mena_total = sum(MENA, na.rm = TRUE),
-    na_total = sum(Native_Am, na.rm = TRUE),
-      pi_total = sum(Pac_Island, na.rm = TRUE),
-      white_total = sum(White, na.rm = TRUE)
-  ), %>%
-  summarise(
-    n=n(),
-    pinc_aa = 
+    # Total respondents in each race category
+    aa_total    = sum(Asian_Am == 1, na.rm = TRUE),
+    black_total = sum(Black == 1, na.rm = TRUE),
+    hisp_total  = sum(Hisp_Latino == 1, na.rm = TRUE),
+    mena_total  = sum(MENA == 1, na.rm = TRUE),
+    na_total    = sum(Native_Am == 1, na.rm = TRUE),
+    pi_total    = sum(Pac_Island == 1, na.rm = TRUE),
+    white_total = sum(White == 1, na.rm = TRUE),
+    ro_total    = sum(OtherRace == 1, na.rm = TRUE),
+
+    # Number within each race category who have been incarcerated
+    n_inc_aa    = sum(Asian_Am == 1 & incarc == 1, na.rm = TRUE),
+    n_inc_black = sum(Black == 1 & incarc == 1, na.rm = TRUE),
+    n_inc_hisp  = sum(Hisp_Latino == 1 & incarc == 1, na.rm = TRUE),
+    n_inc_mena  = sum(MENA == 1 & incarc == 1, na.rm = TRUE),
+    n_inc_na    = sum(Native_Am == 1 & incarc == 1, na.rm = TRUE),
+    n_inc_pi    = sum(Pac_Island == 1 & incarc == 1, na.rm = TRUE),
+    n_inc_white = sum(White == 1 & incarc == 1, na.rm = TRUE),
+    n_inc_ro    = sum(OtherRace == 1 & incarc == 1, na.rm = TRUE)
+  ) %>%
+  mutate(
+    pct_inc_aa    = 100 * n_inc_aa / aa_total,
+    pct_inc_black = 100 * n_inc_black / black_total,
+    pct_inc_hisp  = 100 * n_inc_hisp / hisp_total,
+    pct_inc_mena  = 100 * n_inc_mena / mena_total,
+    pct_inc_na    = 100 * n_inc_na / na_total,
+    pct_inc_pi    = 100 * n_inc_pi / pi_total,
+    pct_inc_white = 100 * n_inc_white / white_total,
+    pct_inc_ro    = 100 * n_inc_ro / ro_total
   )
-#percent of race that is impacted
 
+View(race_incarc)
 
-View(rid_totals)
+incarc_race_table <- tibble(
+  Race = c(
+    "Asian American",
+    "Black",
+    "Hispanic/Latino",
+    "Middle Eastern/North African",
+    "Native American",
+    "Pacific Islander",
+    "White",
+    "Other Race"
+  ),
+  
+  Total_N = c(
+    race_incarc$aa_total,
+    race_incarc$black_total,
+    race_incarc$hisp_total,
+    race_incarc$mena_total,
+    race_incarc$na_total,
+    race_incarc$pi_total,
+    race_incarc$white_total,
+    race_incarc$ro_total
+  ),
+  
+  Incarcerated_N = c(
+    race_incarc$n_inc_aa,
+    race_incarc$n_inc_black,
+    race_incarc$n_inc_hisp,
+    race_incarc$n_inc_mena,
+    race_incarc$n_inc_na,
+    race_incarc$n_inc_pi,
+    race_incarc$n_inc_white,
+    race_incarc$n_inc_ro
+  ),
+  
+  Percent_Incarcerated = c(
+    race_incarc$pct_inc_aa,
+    race_incarc$pct_inc_black,
+    race_incarc$pct_inc_hisp,
+    race_incarc$pct_inc_mena,
+    race_incarc$pct_inc_na,
+    race_incarc$pct_inc_pi,
+    race_incarc$pct_inc_white,
+    race_incarc$pct_inc_ro
+  )
+) %>%
+  mutate(
+    Percent_Incarcerated = round(Percent_Incarcerated, 2)
+  )
+
+incarc_race_table
 
 ```
+for overleaf
+```{r}
 
+inc_race_pcts_table <- incarc_race_table %>%
+  knitr::kable(
+    format = "latex",
+    booktabs = TRUE,
+    align = c("l", "r", "r", "r"),
+    col.names = c(
+      "Race",
+      "Total $N$",
+      "Incarcerated $N$",
+      "\\% Incarcerated"
+    ),
+    caption = "Incarceration Experience by Race"
+  )
+
+
+writeLines(
+  as.character(inc_race_pcts_table),
+  "inc_race_pcts_table.tex"
+)
+
+```
 
 
 

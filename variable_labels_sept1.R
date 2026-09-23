@@ -172,14 +172,16 @@ all_race_labels <- c(
 ##
 
 demo_controls <- c(
-  "Black", "Hispanic", "OtherRace", "gender"
+  "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "OtherRace", "gender"
 )
 
 demo_controls_labels <- c(
   Black = "Black",
   Hisp_Latino    = "Hispanic/Latino", 
+  Asian_Am = "Asian American",
+  Native_Am = "Native American",
   OtherRace = "Other Race", 
-  gender = "Male"
+  gender = "Men"
 )
 
 party_ideo_controls <- c(
