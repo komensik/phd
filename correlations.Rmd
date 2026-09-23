@@ -49,48 +49,196 @@ summary(desors)
 ```
 
 
+I would like to run the following correlation analysis for the sample, then for those in the sample for whom incarc is 1, "" knowincarc is 1, "" vict is 1, ""impact is 1, and "" impact is 0. How do I do that? 
 
-
-```{r, desor1}
-
-
+```{r, desor0}
 # ------------------------------------------------------------
 # Deservingness / "sympathy" orientation: CORE items
 # ------------------------------------------------------------
 
-desor_core_vars <- c(
+desor_cont_vars <- c(
    "d_welfare_tanf_abc","d_fstamps_snap_abc","d_medicaid_abc","d_medicare_abc",
    "d_unemployed_abc","d_poorfam_abc","d_homeless_abc","d_immigrants_abc","d_unauth_undoc_abc")
 
-
 # ------------------------------------------------------------
-# 1. Item-only data and missingness
-# ------------------------------------------------------------
-
-# Item-only data
-core_mat <- sample %>%
-  select(all_of(desor_core_vars))
-
-# Number of observed items per respondent
-core_n <- rowSums(!is.na(core_mat))
-
-capture.output(table(core_n, useNA = "ifany"))
-
-# ------------------------------------------------------------
-# 2. Should they be index? Correlations among component items
+# 1. Define analysis groups
 # ------------------------------------------------------------
 
-desor_corrs <- psych::corr.test(
-  core_mat,
-  use = "pairwise",
-  method = "pearson",
-  adjust = "none"
+desor_groups <- list(
+  
+  full_sample = sample,
+  
+  incarc_1 = sample %>%
+    filter(incarc == 1),
+  
+  knowincarc_1 = sample %>%
+    filter(knowincarc == 1),
+  
+  vict_1 = sample %>%
+    filter(vict == 1),
+  
+  impact_1 = sample %>%
+    filter(impact == 1),
+  
+  impact_0 = sample %>%
+    filter(impact == 0)
 )
 
-# Pairwise correlations
-#view(round(desor_corr$r, 2))
 
-# N used for each pairwise correlation
-desor_corrs$n
+# Check N in each group
+sapply(desor_groups, nrow)
+
+# ------------------------------------------------------------
+# 2. Correlations within each group
+# ------------------------------------------------------------
+
+desor_cont_corrs <- purrr::map(
+  desor_groups,
+  ~ psych::corr.test(
+      .x %>% select(all_of(desor_cont_vars)),
+      use = "pairwise",
+      method = "pearson",
+      adjust = "none"
+    )
+)
+```
+
+# ------------------------------------------------------------
+# Inspect
+# ------------------------------------------------------------
+
+```{r, desor1}
+# Full sample correlations
+round(desor_cont_corrs$full_sample$r, 2)
+
+# Incarcerated respondents
+round(desor_cont_corrs$incarc_1$r, 2)
+
+# Know someone incarcerated
+round(desor_cont_corrs$knowincarc_1$r, 2)
+
+# Victimized respondents
+round(desor_cont_corrs$vict_1$r, 2)
+
+# Any impact
+round(desor_cont_corrs$impact_1$r, 2)
+
+# Not impacted
+round(desor_cont_corrs$impact_0$r, 2)
+
+desor_cont_corrs$full_sample$n
+
+desor_cont_corrs$incarc_1$n
+
+desor_cont_corrs$knowincarc_1$n
+
+desor_cont_corrs$vict_1$n
+
+desor_cont_corrs$impact_1$n
+
+desor_cont_corrs$impact_0$n
 
 ```
+
+
+
+```{r, desor2}
+# ------------------------------------------------------------
+# 3. Number of observed deservingness items, by group
+# ------------------------------------------------------------
+
+desor_item_counts <- purrr::map(
+  desor_groups,
+  ~ {
+    cont_mat <- .x %>%
+      select(all_of(desor_cont_vars))
+    
+    cont_n <- rowSums(!is.na(cont_mat))
+    
+    table(cont_n, useNA = "ifany")
+  }
+)
+
+desor_item_counts
+
+
+# ------------------------------------------------------------
+# 4. Reliability / internal consistency by group
+# ------------------------------------------------------------
+
+desor_cont_alpha <- purrr::map(
+  desor_groups,
+  ~ {
+    
+    cont_mat <- .x %>%
+      select(all_of(desor_cont_vars))
+    
+    cont_n <- rowSums(!is.na(cont_mat))
+    
+    cont_keep <- cont_n >= 5
+    
+    psych::alpha(
+      cont_mat[cont_keep, ],
+      check.keys = TRUE
+    )
+  }
+)
+
+# Full sample
+desor_cont_alpha$full_sample$total$raw_alpha
+desor_cont_alpha$full_sample$total$std.alpha
+desor_cont_alpha$full_sample$total$average_r
+desor_cont_alpha$full_sample$n.obs
+
+# Incarcerated
+desor_cont_alpha$incarc_1$total$raw_alpha
+desor_cont_alpha$incarc_1$total$std.alpha
+desor_cont_alpha$incarc_1$total$average_r
+desor_cont_alpha$incarc_1$n.obs
+
+# vict
+desor_cont_alpha$vict_1$total$raw_alpha
+
+# Know Incarcerated
+desor_cont_alpha$knowincarc_1$total$raw_alpha
+
+# Impacted
+desor_cont_alpha$impact_1$total$raw_alpha
+
+
+# Not impacted
+desor_cont_alpha$impact_0$total$raw_alpha
+```
+
+
+```{r}
+# Item Stats
+desor_cont_alpha$full_sample$item.stats
+```
+
+
+```{r}
+desor_cont_alpha$incarc_1$item.stats
+```
+
+
+```{r}
+desor_cont_alpha$vict_1$item.stats
+```
+
+
+```{r}
+desor_cont_alpha$knowincarc_1$item.stats
+```
+
+
+```{r}
+desor_cont_alpha$impact_1$item.stats
+```
+
+
+```{r}
+desor_cont_alpha$impact_0$item.stats
+
+```
+

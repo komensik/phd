@@ -52,6 +52,7 @@ desor_core_vars <- c(
   "d_welfare_tanf_abc","d_fstamps_snap_abc","d_medicaid_abc","d_medicare_abc",
   "d_unemployed_abc","d_poorfam_abc","d_homeless_abc","d_immigrants_abc","d_unauth_undoc_abc"
 )
+
 #no -99s, are all numeric
 
 # ------------------------------------------------------------
@@ -62,6 +63,7 @@ desor_core_vars <- c(
 core_mat <- raw_data_cleaned %>%
   select(all_of(desor_core_vars))
 
+#names(raw_data_cleaned)
 # Number of observed items per respondent
 core_n <- rowSums(!is.na(core_mat))
 
