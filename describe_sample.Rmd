@@ -146,7 +146,7 @@ where <- data_full %>%
   ) %>%
   arrange(desc(n))
 
-View(where)
+#View(where)
 
 where_appendix <- where %>%
   select(state, n, percent, percent_2020, delta) %>%
@@ -157,7 +157,7 @@ where_appendix <- where %>%
 )
     
 
-View(where_appendix)   
+#View(where_appendix)   
 
 state_table <- where_appendix %>%
   kable(
@@ -181,7 +181,7 @@ state_table <- where_appendix %>%
     font_size = 9
   )
 
-state_table
+#state_table
 
 writeLines(
   as.character(state_table),
@@ -216,7 +216,7 @@ ggsave("sample_state_map.pdf", sample_map, width = 9, height = 6)
 ```
 
 
-
+Map of difs
 
 ```{r}
 
@@ -246,8 +246,65 @@ delta_map
 ggsave("delta_map.pdf", delta_map, width = 9, height = 6)
 ```
 
+## party ID, pol ideology
+
+```{r}
+
+table(data_full$pid)
+
+parties <- data_full %>%
+  filter(!is.na(pid)) %>%
+  group_by(pid) %>%
+  summarise(
+    n = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    percent = 100 * n / nrow(data_full)
+  )%>%
+  arrange(desc(n))
+
+parties
+
+```
+
+```{r}
+pid_table <- parties %>%
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    longtable = TRUE,
+    caption = "Party Identification Across Sample",
+    label = "tab:pid_distribution",
+    col.names = c(
+      "Party",
+      "N",
+      "Sample (\\%)"
+    ),
+    align = c("l", "r", "r"),
+    escape = FALSE
+  ) %>%
+  kable_styling(
+    latex_options = c("repeat_header"),
+    font_size = 9
+  )
+
+View(pid_table)
+
+writeLines(
+  as.character(pid_table),
+  "pid_table_1.tex"
+)
+
+```
 
 
+
+```{r}
+
+table(data_full$pid_3)
+
+```
 
 ```{r}
 view(data_full %>%
