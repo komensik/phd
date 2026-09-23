@@ -31,7 +31,11 @@ library(ggplot2)
 
 ```{r}
 
-raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__09_18_26.csv") 
+# raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__09_18_26.csv") 
+
+ raw_data_cleaned <- read_csv("data/cleaned_control_data.csv")
+
+# raw_data_cleaned <- read_csv("data/cleaned_sans_control_data.csv")
 
 ```
 
@@ -75,7 +79,7 @@ desor_corr <- psych::corr.test(
 )
 
 # Pairwise correlations
-#view(round(desor_corr$r, 2))
+view(round(desor_corr$r, 2))
 
 # N used for each pairwise correlation
 desor_corr$n

@@ -41,3 +41,552 @@ sample <- read_csv("data/cleaned_control_data.csv")
 not_full <- read_csv("data/cleaned_sans_control_data.csv")
 ```
 
+
+# 1. Policy
+
+## 2.1 Policy Means x Impact
+
+```{r}
+
+sample %>%
+  dplyr::select(all_of(policy_vars)) %>%
+  psych::describe()
+
+sample %>%
+  dplyr::group_by(impact) %>%
+  dplyr::summarise(
+    dpen_rev = mean(dpen_rev, na.rm = TRUE),
+    lwop_rev = mean(lwop_rev, na.rm = TRUE),
+    prisonpen   = mean(prisonpen, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+help_means_impact <- (sample %>%
+  dplyr::group_by(impact) %>%
+  dplyr::summarise(
+    post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
+    min_wage = mean(min_wage, na.rm=TRUE),
+    free_calls = mean(free_calls, na.rm=TRUE),
+    ed_funds = mean(ed_funds, na.rm=TRUE),
+    alt_sentencing = mean(alt_sentencing, na.rm=TRUE),
+    q25_help_vars   = mean(q25_help_vars, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_impact)
+
+help_means_incarc <- (sample %>%
+  dplyr::group_by(incarc) %>%
+  dplyr::summarise(
+     post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
+    min_wage = mean(min_wage, na.rm=TRUE),
+    free_calls = mean(free_calls, na.rm=TRUE),
+    ed_funds = mean(ed_funds, na.rm=TRUE),
+    alt_sentencing = mean(alt_sentencing, na.rm=TRUE),
+    q25_help_vars   = mean(q25_help_vars, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_incarc)
+
+help_means_knowincarc <- (sample %>%
+  dplyr::group_by(knowincarc) %>%
+  dplyr::summarise(
+     post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
+    min_wage = mean(min_wage, na.rm=TRUE),
+    free_calls = mean(free_calls, na.rm=TRUE),
+    ed_funds = mean(ed_funds, na.rm=TRUE),
+    alt_sentencing = mean(alt_sentencing, na.rm=TRUE),
+    q25_help_vars   = mean(q25_help_vars, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_knowincarc)
+
+help_means_vict <- (sample %>%
+  dplyr::group_by(vict) %>%
+  dplyr::summarise(
+     post_felony_vote_rev = mean(post_felony_vote_rev, na.rm = TRUE),
+    jail_access_rev = mean(jail_access_rev, na.rm = TRUE),
+    min_wage = mean(min_wage, na.rm=TRUE),
+    free_calls = mean(free_calls, na.rm=TRUE),
+    ed_funds = mean(ed_funds, na.rm=TRUE),
+    alt_sentencing = mean(alt_sentencing, na.rm=TRUE),
+    q25_help_vars   = mean(q25_help_vars, na.rm = TRUE),
+    .groups = "drop"
+  )
+)
+View(help_means_vict)
+
+# overleaf table of all
+
+get_means <- function(var) {
+  sample %>%
+    dplyr::filter(.data[[var]] %in% c(0, 1)) %>%
+    dplyr::group_by(.data[[var]]) %>%
+    dplyr::summarise(
+      dplyr::across(
+        all_of(policy_vars),
+        ~ mean(.x, na.rm = TRUE)
+      ),
+      .groups = "drop"
+    ) %>%
+    dplyr::mutate(group = var) %>%
+    dplyr::rename(value = all_of(var)) %>%
+    dplyr::mutate(row = paste0(group, " = ", value)) %>%
+    dplyr::select(row, all_of(policy_vars))
+}
+
+pol_means_app_table <- bind_rows(lapply(impact_vars, get_means)) %>%
+  dplyr::mutate(dplyr::across(-row, ~ round(.x, 3))) %>%
+  dplyr::rename_with(
+    ~ policy_map$label[match(.x, policy_map$var)],
+    -row
+  )
+
+View(pol_means_app_table)
+
+
+```
+
+Means Tables
+
+```{r}
+#defining the non impact means and percent differences from impact vars
+pct_diff <- function(x, ref) {
+  ((x - ref) / ref) * 100
+}
+
+policy_summary <- function(df, var) {
+
+  no_impact_mean <- mean(
+    df[[var]][df$impact == 0],
+    na.rm = TRUE
+  )
+
+  impact_mean <- mean(
+    df[[var]][df$impact == 1],
+    na.rm = TRUE
+  )
+
+  direct_mean <- mean(
+    df[[var]][df$incarc == 1],
+    na.rm = TRUE
+  )
+
+  proximal_mean <- mean(
+    df[[var]][df$knowincarc == 1],
+    na.rm = TRUE
+  )
+
+  victim_mean <- mean(
+    df[[var]][df$vict == 1],
+    na.rm = TRUE
+  )
+
+  tibble::tibble(
+    var = var,
+    no_impact_mean = no_impact_mean,
+    impact_diff = mean_diff(impact_mean, no_impact_mean),
+    direct_diff = mean_diff(direct_mean, no_impact_mean),
+    proximal_diff = mean_diff(proximal_mean, no_impact_mean),
+    victim_diff = mean_diff(victim_mean, no_impact_mean)
+  )
+}
+
+
+## old p val 
+
+pval_ttest <- function(df, var, group_var) {
+  sub <- df %>%
+    dplyr::filter(!is.na(.data[[var]]), !is.na(.data[[group_var]])) %>%
+    dplyr::filter(.data[[group_var]] %in% c(0, 1))
+
+  if (length(unique(sub[[group_var]])) < 2) return(NA_real_)
+
+  stats::t.test(sub[[var]] ~ sub[[group_var]])$p.value
+}
+
+add_star <- function(x, p) {
+  ifelse(!is.na(p) & p < .05, paste0(sprintf("%.1f", x), "*"), sprintf("%.1f", x))
+}
+
+policy_stars <- policy_map %>%
+  dplyr::mutate(
+    p_direct = purrr::map_dbl(
+      var,
+      ~ pval_ttest(sample, .x, "incarc")
+    ),
+    
+    p_proximal = purrr::map_dbl(
+      var,
+      ~ pval_ttest(sample, .x, "knowincarc")
+    ),
+    
+    p_victim = purrr::map_dbl(
+      var,
+      ~ pval_ttest(sample, .x, "vict")
+    )
+  )
+
+# policy_stars <- policy_map %>%
+#   dplyr::mutate(
+#     p_direct   = purrr::map_dbl(var, ~ pval_ttest(sample %>% dplyr::filter(impact == 0 | incarc == 1), .x, "incarc")),
+#     p_proximal = purrr::map_dbl(var, ~ pval_ttest(sample %>% dplyr::filter(impact == 0 | knowincarc == 1), .x, "knowincarc")),
+#     p_victim   = purrr::map_dbl(var, ~ pval_ttest(sample %>% dplyr::filter(impact == 0 | vict == 1), .x, "vict"))
+#   )
+
+#merging the objects and formatting the display columns
+policy_table_final <- policy_table %>%
+  dplyr::left_join(
+    policy_stars %>% dplyr::select(var, p_direct, p_proximal, p_victim),
+    by = "var"
+  ) %>%
+  dplyr::mutate(
+    no_impact_mean = sprintf("%.2f", no_impact_mean),
+    direct_display   = add_star(direct_pct, p_direct),
+    proximal_display = add_star(proximal_pct, p_proximal),
+    victim_display   = add_star(victim_pct, p_victim)
+  ) %>%
+  dplyr::select(
+    section, label,
+    no_impact_mean,
+    direct_display,
+    proximal_display,
+    victim_display
+  )
+
+View(policy_table_final)
+
+# for overleaf
+latex_rows <- policy_table_final %>%
+  dplyr::mutate(
+    latex_row = paste0(
+      label, " & ",
+      no_impact_mean, " & ",
+      direct_display, " & ",
+      proximal_display, " & ",
+      victim_display, " \\\\"
+    )
+  )
+
+help_rows <- latex_rows %>%
+  dplyr::filter(section == "Help") %>%
+  dplyr::pull(latex_row)
+
+punish_rows <- latex_rows %>%
+  dplyr::filter(section == "Punish") %>%
+  dplyr::pull(latex_row)
+
+cat(
+  paste(help_rows, collapse = "\n"),
+  "\n\\addlinespace\n",
+  paste(punish_rows, collapse = "\n"),
+  sep = ""
+)
+
+# Mean differences relative to respondents reporting
+# none of the three focal experiences
+mean_diff <- function(x, ref) {
+  x - ref
+}
+
+policy_summary <- function(df, var) {
+  no_impact_mean <- mean(df[[var]][df$impact == 0], na.rm = TRUE)
+  impact_mean <- mean(df[[var]][df$impact == 1], na.rm = TRUE)
+  direct_mean    <- mean(df[[var]][df$incarc == 1], na.rm = TRUE)
+  proximal_mean  <- mean(df[[var]][df$knowincarc == 1], na.rm = TRUE)
+  victim_mean    <- mean(df[[var]][df$vict == 1], na.rm = TRUE)
+  
+  tibble::tibble(
+    var = var,
+    no_impact_mean = no_impact_mean,
+    impact_mean = pct_diff(impact_mean, no_impact_mean),
+    direct_pct = pct_diff(direct_mean, no_impact_mean),
+    proximal_pct = pct_diff(proximal_mean, no_impact_mean),
+    victim_pct = pct_diff(victim_mean, no_impact_mean)
+  )
+}
+
+policy_table <- purrr::map_dfr(
+  policy_map$var,
+  ~ policy_summary(sample, .x)
+) %>%
+  dplyr::left_join(policy_map, by = "var") %>%
+  dplyr::select(
+    var, section, label,
+    no_impact_mean,
+    impact_mean,
+    direct_diff,
+    proximal_diff,
+    victim_diff
+  )
+
+pval_ttest <- function(df, var, group_var) {
+  sub <- df %>%
+    dplyr::filter(
+      !is.na(.data[[var]]),
+      !is.na(.data[[group_var]])
+    ) %>%
+    dplyr::filter(.data[[group_var]] %in% c(0, 1))
+  
+  if (length(unique(sub[[group_var]])) < 2) {
+    return(NA_real_)
+  }
+  
+  stats::t.test(
+    sub[[var]] ~ sub[[group_var]]
+  )$p.value
+}
+
+add_star <- function(x, p) {
+  formatted <- sprintf("%+.2f", x)
+  
+  ifelse(
+    !is.na(p) & p < .05,
+    paste0(formatted, "*"),
+    formatted
+  )
+}
+
+policy_stars <- policy_map %>%
+  dplyr::mutate(
+    p_direct = purrr::map_dbl(
+      var,
+      ~ pval_ttest(
+        sample %>%
+          dplyr::filter(impact == 0 | incarc == 1),
+        .x,
+        "incarc"
+      )
+    ),
+    
+    p_proximal = purrr::map_dbl(
+      var,
+      ~ pval_ttest(
+        sample %>%
+          dplyr::filter(impact == 0 | knowincarc == 1),
+        .x,
+        "knowincarc"
+      )
+    ),
+    
+    p_victim = purrr::map_dbl(
+      var,
+      ~ pval_ttest(
+        sample %>%
+          dplyr::filter(impact == 0 | vict == 1),
+        .x,
+        "vict"
+      )
+    )
+  )
+
+policy_table_final <- policy_table %>%
+  dplyr::left_join(
+    policy_stars %>%
+      dplyr::select(var, p_direct, p_proximal, p_victim),
+    by = "var"
+  ) %>%
+  dplyr::mutate(
+    no_impact_mean   = sprintf("%.2f", no_impact_mean),
+    direct_display   = add_star(direct_diff, p_direct),
+    proximal_display = add_star(proximal_diff, p_proximal),
+    victim_display   = add_star(victim_diff, p_victim)
+  ) %>%
+  dplyr::select(
+    section,
+    label,
+    no_impact_mean,
+    direct_display,
+    proximal_display,
+    victim_display
+  )
+
+View(policy_table_final)
+
+# Generate rows for Overleaf
+latex_rows <- policy_table_final %>%
+  dplyr::mutate(
+    latex_row = paste0(
+      label, " & ",
+      no_impact_mean, " & ",
+      direct_display, " & ",
+      proximal_display, " & ",
+      victim_display, " \\\\"
+    )
+  )
+
+help_rows <- latex_rows %>%
+  dplyr::filter(section == "Help") %>%
+  dplyr::pull(latex_row)
+
+punish_rows <- latex_rows %>%
+  dplyr::filter(section == "Punish") %>%
+  dplyr::pull(latex_row)
+
+cat(
+  paste(help_rows, collapse = "\n"),
+  "\n\\addlinespace\n",
+  paste(punish_rows, collapse = "\n"),
+  sep = ""
+)
+
+
+```
+
+### 2.1A Police Policy
+
+```{r}
+
+source("variable_labels.R")
+cor_matrix <- cor(
+  sample[police_items_1_to_5],
+  use = "pairwise.complete.obs"
+)
+
+round(cor_matrix, 2)
+
+library(psych)
+
+
+alpha_result <- psych::alpha(sample[police_items_1_to_5])
+
+print(alpha_result)
+
+names(alpha_result)
+
+alpha_result$alpha.drop
+
+alpha_result
+
+as.data.frame(alpha_result$alpha.drop)
+
+View(alpha_result$alpha.drop)
+
+print(sample %>%
+  pivot_longer(cols = all_of(police_items_1_to_5)) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~ name))
+
+#avg check
+sample <- sample %>%
+  mutate(police_index = rowMeans(across(all_of(police_items_1_to_5)), na.rm = TRUE))
+
+summary(sample$police_index)
+
+# police index 1: index of all the police items
+sample <- sample %>%
+  mutate(
+    police_reform_index = rowMeans(across(all_of(police_items_1_to_5)), na.rm = TRUE)
+  )
+
+# police index 2: index of the items that hang together best
+
+police_reform_core <- c(
+  "no_strangle",
+  "police_tracker",
+  "police_training",
+  "charge_police"
+)
+
+sample <- sample %>%
+  mutate(
+    police_reform_core_index = rowMeans(across(all_of(police_reform_core)), na.rm = TRUE)
+  )
+
+# last - 3 groups 
+sample <- sample %>%
+  mutate(
+    police_violence_prevention = rowMeans(across(c("q15_2_1_to_5", "q15_4_1_to_5")), na.rm = TRUE),
+    police_accountability = rowMeans(across(c("q15_3_1_to_5", "q15_5_1_to_5")), na.rm = TRUE),
+    police_local_residency = q15_1_1_to_5
+  )
+
+## POLICE MEANS ANALYSIS 
+
+# index 1: police_reform_index
+
+## baseline: no impact
+all_baseline_mean <- mean(
+  sample$police_reform_index[sample$impact == 0],
+  na.rm = TRUE
+)
+
+## compute means for each impact group
+all_police_means <- tibble(
+  var = impact_vars
+) %>%
+  mutate(
+    label = impact_labels[var],
+    mean = sapply(var, function(v) {
+      mean(
+        sample$police_reform_index[
+          sample[[v]] == 1
+        ],
+        na.rm = TRUE
+      )
+    })
+  ) %>%
+  bind_rows(
+    tibble(
+      var = "no_impact",
+      label = "No impact",
+      mean = all_baseline_mean
+    ),
+    .
+  ) %>%
+  mutate(
+    diff_from_no_impact = mean - all_baseline_mean
+  )
+
+all_police_means
+
+##
+# index 2: 
+##
+
+# baseline: no impact
+baseline_mean <- mean(
+  sample$police_reform_core_index[sample$impact == 0],
+  na.rm = TRUE
+)
+
+# compute means for each impact group
+police_means <- tibble(
+  var = impact_vars
+) %>%
+  mutate(
+    label = impact_labels[var],
+    mean = sapply(var, function(v) {
+      mean(
+        sample$police_reform_core_index[
+          sample[[v]] == 1
+        ],
+        na.rm = TRUE
+      )
+    })
+  ) %>%
+  bind_rows(
+    tibble(
+      var = "no_impact",
+      label = "No impact",
+      mean = baseline_mean
+    ),
+    .
+  ) %>%
+  mutate(
+    diff_from_no_impact = mean - baseline_mean
+  )
+
+print(police_means) # index 2
+print(all_police_means)
+## index 3?
+##
+
+```
+

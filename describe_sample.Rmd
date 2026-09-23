@@ -396,6 +396,8 @@ writeLines(
 
 
 
+
+
 ```{r}
 # combinations
 combo_counts <- data_full %>%
@@ -559,6 +561,35 @@ data_full %>%
     OtherRace = sum(OtherRace, na.rm = TRUE)
   )
 ```
+
+Probability of or proportion of being incarcerated, knowincarc, vict, impact by RID
+
+```{r}
+
+rid_totals <- data_full %>%
+  summarise(
+    n = n(),
+      aa_total = sum(Asian_Am, na.rm = TRUE),
+      black_total = sum(Black, na.rm = TRUE),
+      hisp_total = sum(Hisp_Latino, na.rm = TRUE),
+      mena_total = sum(MENA, na.rm = TRUE),
+    na_total = sum(Native_Am, na.rm = TRUE),
+      pi_total = sum(Pac_Island, na.rm = TRUE),
+      white_total = sum(White, na.rm = TRUE)
+  ), %>%
+  summarise(
+    n=n(),
+    pinc_aa = 
+  )
+#percent of race that is impacted
+
+
+View(rid_totals)
+
+```
+
+
+
 
 ### (e) Table of Impact x Race
 

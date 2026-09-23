@@ -224,6 +224,7 @@ fire_controls_labels <- c(
   fire_fear = "Fear other races"
 )
 
+
 all_attitudinal_controls <- c(
   party_ideo_controls,
   desor_core,

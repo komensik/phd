@@ -1,0 +1,97 @@
+---
+title: "Correlations"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(tibble)
+library(gt)
+library(psych)
+library(ggplot2)
+
+
+source("variable_labels.R")
+```
+
+
+```{r}
+sample <- read_csv("data/cleaned_control_data.csv")
+
+not_full <- read_csv("data/cleaned_sans_control_data.csv")
+```
+
+```{r, desor}
+#desor_core is respondent level composite
+
+summary(sample$desor_core)
+
+hist(sample$desor_core)
+
+desors <- lm(desor_core ~ impact, sample)
+  
+summary(desors)
+
+```
+
+
+
+
+```{r, desor1}
+
+summary(not_full$desor_core)
+
+# ------------------------------------------------------------
+# Deservingness / "sympathy" orientation: CORE items
+# ------------------------------------------------------------
+
+desor_core_vars <- c(
+   "d_welfare_tanf_abc","d_fstamps_snap_abc","d_medicaid_abc","d_medicare_abc",
+   "d_unemployed_abc","d_poorfam_abc","d_homeless_abc","d_immigrants_abc","d_unauth_undoc_abc")
+
+
+# ------------------------------------------------------------
+# 1. Item-only data and missingness
+# ------------------------------------------------------------
+
+# Item-only data
+core_mat <- sample %>%
+  select(all_of(desor_core_vars))
+
+# Number of observed items per respondent
+core_n <- rowSums(!is.na(core_mat))
+
+capture.output(table(core_n, useNA = "ifany"))
+
+# ------------------------------------------------------------
+# 2. Should they be index? Correlations among component items
+# ------------------------------------------------------------
+
+desor_corrs <- psych::corr.test(
+  core_mat,
+  use = "pairwise",
+  method = "pearson",
+  adjust = "none"
+)
+
+# Pairwise correlations
+#view(round(desor_corr$r, 2))
+
+# N used for each pairwise correlation
+desor_corrs$n
+
+```
