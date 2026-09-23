@@ -708,6 +708,8 @@ Run each through: Model 1: no controls Model 2: demographics Model 3: demographi
 control_waves \| \|-- nocontrol \|-- demo \|-- party_ideo \|-- full_attitudes
 
 ```{r}
+
+names(sample)
 # ============================================================
 # 3. TO START - big picture here is defining the model "waves." The first is bivariate o no controls ("nocontrol"), then demo is models with just demographic controls (8-26 this is just race I think, then demographic controls and part ID and fiscal ideology and social ideology (party_ideo) then with all controls, so aforementioned plus FIRE and *eventually, need to fix* deservingness orientation. 
 # The following controls are grouped in vriable_labels, but prepped in variable_prep_script:
@@ -717,12 +719,17 @@ control_waves \| \|-- nocontrol \|-- demo \|-- party_ideo \|-- full_attitudes
 #   fire_controls
 # ============================================================
 
+demo_controls <- c(
+  "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "OtherRace", "gender"
+)
+
+
 control_waves <- list(
   nocontrol = character(0),
   demo = demo_controls,
   party_ideo = c(demo_controls, party_ideo_controls),
   full_attitudes = c(demo_controls, party_ideo_controls,
-                     fire_controls, desor_core) # 8-26 once desorcore fixed, add #desor_core to this list in full_attitudes
+                     fire_controls, desor_core)
 )
 ```
 
@@ -782,6 +789,7 @@ for (wave_name in names(control_waves)) {#calls list of waves in control waves
 
   policy_dummies_waves[[wave_name]] <- model_list
 }
+
 ##after the two inner loops finish organization for storing them. 
 ## object is roughly: policy_dummies_waves : A no control -> A1 no control m_prisonhelp_impact, A2 no control m_prisonhelp_incarc. . ..etc; B1 demographic controls m_prisonhelp_impact....(see below)
 #policy_dummies_waves

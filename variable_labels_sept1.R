@@ -205,11 +205,11 @@ pol_tude_vars <- c("fiscal_ideology", "social_ideology", "self_ideo")
 
 #below is missing policy disposition index bc problems so deprioritized
 
-desor_core <- c("desor_core")
-
-desor_core_label <- c(
-  desor_core = "Deservingness orientation"
-)
+# desor_core <- c("desor_core")
+# 
+# desor_core_label <- c(
+#   desor_core = "Deservingness orientation"
+# )
 
 #FIRE controls 
 fire_controls <- c(
