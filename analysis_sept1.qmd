@@ -10,7 +10,6 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
-install.packages("rlang")
 
 # Load packages
 library(dplyr)
@@ -33,7 +32,7 @@ library(ggplot2)
 library(broom)
 library(knitr)
 
-
+source("variable_labels.R")
 ```
 
 ```{r}
@@ -49,8 +48,6 @@ not_full <- read_csv("data/cleaned_sans_control_data.csv")
 #sample <- readr::read_csv("data/cleaned/sept_14.csv") 
 #sample <- readr::read_csv("data/cleaned_control_data.csv")
 
-
-source("variable_labels.R")
 
 #excluded no control responders: 
 
@@ -773,6 +770,33 @@ demo_controls <- c(
   "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "OtherRace", "gender"
 )
 
+party_ideo_controls <- c(
+  "pid",
+  "fiscal_ideology",
+  "social_ideology"
+)
+
+party_ideo_controls_labels <- c(
+  pid = "Party ID",
+  # Republican = "Republican",
+  # Democrat = "Democrat",
+  fiscal_ideology = "Fiscal ideology",
+  social_ideology = "Social ideology"
+)
+
+fire_controls <- c(
+  "fire_rare",
+  "fire_privilege",
+  "fire_angry",
+  "fire_fear"
+)
+
+fire_controls_labels <- c(
+  fire_rare = "Racism rare",
+  fire_privilege = "White privilege",
+  fire_angry = "Angry about racism",
+  fire_fear = "Fear other races"
+)
 
 control_waves <- list(
   nocontrol = character(0),
@@ -1449,6 +1473,7 @@ dep_variable <-(sample$knowincarc)
 desor_model <- lm(desor_core ~ dep_variable + Black+Hisp_Latino+OtherRace+fiscal_ideology+social_ideology, data = sample)
 summary(desor_model)
 
+writeLines(results_table_tex, "desor_controls_table.tex")
 ```
 
 ```{r}

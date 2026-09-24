@@ -1,5 +1,4 @@
-raw_data <- raw_data %>%
-  rename(
+
     # Experiences
     incarc           = q4_1_1,
     knowincarc       = q4_1_2,
@@ -7,6 +6,9 @@ raw_data <- raw_data %>%
     vict             = q4_2_1,
     knowvict         = q4_2_2,
     novict           = q4_2_3,
+    
+    _bin variables
+    
     on_medicaid      = q4_3_1,
     knowmedicaid     = q4_3_2,
     no_medicaid      = q4_3_3,
@@ -47,6 +49,9 @@ raw_data <- raw_data %>%
     police_training  = q15_4,
     charge_police    = q15_5,
 
+^were originally 6 to 10, recoded so 1 (strongly oppose) to 5 (strongly support) 
+( 3 = neither support nor oppose)
+
     # Prison attitudes
     prison_purpose   = q62_1,
 
@@ -57,6 +62,9 @@ raw_data <- raw_data %>%
     ed_funds         = q25_4,
     lwop             = q25_5,
     alt_sentencing   = q25_6,
+
+All recoded 1 to 5. Used versions...
+
 
     # Social programs
     medicare         = q18,
@@ -80,6 +88,8 @@ raw_data <- raw_data %>%
     voter_id         = q23_5,
     noncit_local     = q23_6,
     jail_access      = q23_7,
+
+effectively support, oppose, unsure 
 
     # Guns
     gun_sales        = q24,
