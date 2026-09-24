@@ -422,6 +422,7 @@ q25_help_vars <- c("min_wage", "free_calls", "ed_funds", "alt_sentencing")
 psych::describe(raw_data_cleaned[q25_help_vars])
 
 
+
 #I get min 1 1st qu 2.5 median 2.875 mean 2.88 3q 3.250 max 4 nas = 186
 
 #histograms
@@ -559,7 +560,7 @@ q25_barplot <- ggplot(
   )
 
 ggsave(
-  filename = "figures/q25_help_items_barplot.pdf",
+  filename = "figures/q25_help_items_barplot_09_26.pdf",
   plot = q25_barplot,
   width = 6.5,
   height = 5,

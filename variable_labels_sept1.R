@@ -48,7 +48,7 @@ policy_map <- tibble::tribble(
 ##
 
 police_items_1_to_5 <- c(
-  "local_police,",
+  "local_police",
   "no_strangle",
   "police_tracker",
   "police_training",
