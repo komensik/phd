@@ -191,8 +191,9 @@ party_ideo_controls <- c(
 )
 
 party_ideo_controls_labels <- c(
-  Republican = "Republican",
-  Democrat = "Democrat",
+  pid = "Party ID",
+  # Republican = "Republican",
+  # Democrat = "Democrat",
   fiscal_ideology = "Fiscal ideology",
   social_ideology = "Social ideology"
 )
