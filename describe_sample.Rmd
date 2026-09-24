@@ -309,6 +309,18 @@ table(data_full$pid_3)
 ## race
 
 ```{r}
+all_race_vars <- c(
+  "White",
+  "Black",
+  "Hisp_Latino",
+  "Asian_Am",
+  "Native_Am",
+  "Pac_Island",
+  "MENA",
+  "race_notlisted",
+  "multiracial"
+)
+
 data_full %>%
   select(all_of(all_race_vars)) %>%
   pivot_longer(everything(), names_to = "var", values_to = "val") %>%
