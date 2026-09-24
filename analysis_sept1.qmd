@@ -915,7 +915,8 @@ chunk_vector <- function(x, chunk_size = 2) {
 # model3_list: optional, NULL for now
 # row_vars: rows to display under carceral contact
 # include_placeholder_control_rows: include blank future rows
-# ------------------------------------------------------------
+# -----------------------------------------------------------
+
 make_restricted_panel_latex_table <- function(
     dv_vec,
     model2_list,

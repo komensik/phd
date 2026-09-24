@@ -8,7 +8,6 @@
 
 impact_vars<- c("impact", "incarc", "knowincarc", "vict")
 
-
 impact_labels <- c(
   impact = "Any Impact",
   incarc = "Direct",
@@ -71,7 +70,6 @@ police_map <- tibble::tribble(
   "police_training",   "Police Training",                       "Police Violence",
   "charge_police",   "Charge Police",                           "Police Police",
 )
-
 
 ##
 ## Outcome B: Deservingness
@@ -215,8 +213,6 @@ party_ideo_controls_labels <- c(
 )
 
 pol_tude_vars <- c("fiscal_ideology", "social_ideology", "self_ideo")
-
-
 
 
 #below is missing policy disposition index bc problems so deprioritized
