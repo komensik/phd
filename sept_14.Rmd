@@ -34,7 +34,7 @@ library(kableExtra)
 
 ```{r}
 
-data_full <- readr::read_csv("data/cleaned/all_vars_over_8.csv")
+raw_data_cleaned <- readr::read_csv("data/cleaned/all_vars_over_8.csv")
 
 ```
 sept 15 N is 2327
