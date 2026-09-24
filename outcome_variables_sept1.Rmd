@@ -1002,6 +1002,14 @@ raw_data_cleaned <- raw_data_cleaned %>%
     vote2020 = na_if(as.numeric(vote2020), -99)
   )
 
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    voteD2020 = case_when(
+      as.numeric(vote2020) == 1 ~ 0, 
+      as.numeric(vote2020) == 3 ~ 1,
+      na_if(as.numeric(vote2020), -99)
+    ) 
+  )
 
 ## plans to vote
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -1009,6 +1017,14 @@ raw_data_cleaned <- raw_data_cleaned %>%
     willvote = na_if(as.numeric(willvote), -99)
   )
 
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    case_when(
+      as.numeric(willvote) == 2 ~ 0, 
+      as.numeric(willvote) == 3 ~ 1,
+      na_if(as.numeric(willvote), -99)
+    ) 
+  )
 
 ## "gets issues"
 summary(raw_data_cleaned$gets_issues)

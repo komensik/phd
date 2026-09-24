@@ -126,6 +126,21 @@ political_behavior_labels <- c(
 ## CONTROLS
 
 # Condensed race variables
+
+problematic_race_vars <- c(
+  "White",
+  "Black",
+  "Hisp_Latino",
+  "AllOthers"
+)
+
+problematic_race_labels <- c(
+  White = "White",
+  Black = "Black",
+  Hisp_Latino = "Hisp_Latino",
+  OtherRaces = "AllOthers"
+)
+
 race_vars <- c(
   "White",
   "Black",

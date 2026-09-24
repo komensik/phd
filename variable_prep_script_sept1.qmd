@@ -482,6 +482,29 @@ race_vars <- c(
 
 ```
 
+#### more condensed race var
+
+```{r}
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    AllOthers = case_when(
+      OtherRace == 1 | Asian_Am == 1 | Native_Am == 1, ~ 1,
+      OtherRace == 0 & Asian_Am == 0 & Native_Am == 0, ~ 0,
+      TRUE ~ NA_real_
+    )
+  )
+
+
+problematic_race_vars <- c(
+  "White",
+  "Black",
+  "Hisp_Latino",
+  "AllOthers"
+)
+```
+
+
 ### H. Party + Ideology controls
 
 ```{r}

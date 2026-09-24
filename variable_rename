@@ -150,6 +150,9 @@ effectively support, oppose, unsure
     willvote = q110,
     livew_guns = q48,
     
+    gov attention 1 = gov pays not much attn, 2 = gov pays some attn, 3 = gov pays a lot of attenion 
+    vote2020: 1 = no, not eligible; 2 = no, eligible; 3 = yes
+    
     # FIRE
     fire_rare        = q32,
     fire_privilege   = q33,
