@@ -443,35 +443,14 @@ cat(
 ```{r}
 
 source("variable_labels.R")
-cor_matrix <- cor(
-  sample[police_items_1_to_5],
-  use = "pairwise.complete.obs"
+
+police_items_1_to_5 <- c(
+  "local_police",
+  "no_strangle",
+  "police_tracker",
+  "police_training",
+  "charge_police"
 )
-
-round(cor_matrix, 2)
-
-library(psych)
-
-
-alpha_result <- psych::alpha(sample[police_items_1_to_5])
-
-print(alpha_result)
-
-names(alpha_result)
-
-alpha_result$alpha.drop
-
-alpha_result
-
-as.data.frame(alpha_result$alpha.drop)
-
-View(alpha_result$alpha.drop)
-
-print(sample %>%
-  pivot_longer(cols = all_of(police_items_1_to_5)) %>%
-  ggplot(aes(x = value)) +
-  geom_histogram(binwidth = 1) +
-  facet_wrap(~ name))
 
 #avg check
 sample <- sample %>%
@@ -502,9 +481,8 @@ sample <- sample %>%
 # last - 3 groups 
 sample <- sample %>%
   mutate(
-    police_violence_prevention = rowMeans(across(c("q15_2_1_to_5", "q15_4_1_to_5")), na.rm = TRUE),
-    police_accountability = rowMeans(across(c("q15_3_1_to_5", "q15_5_1_to_5")), na.rm = TRUE),
-    police_local_residency = q15_1_1_to_5
+    police_violence_prevention = rowMeans(across(c("no_strangle", "police_training")), na.rm = TRUE),
+    police_accountability = rowMeans(across(c("police_tracker", "charge_police")), na.rm = TRUE)
   )
 
 ## POLICE MEANS ANALYSIS 

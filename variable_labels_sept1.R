@@ -185,8 +185,7 @@ demo_controls_labels <- c(
 )
 
 party_ideo_controls <- c(
-  "Republican",
-  "Democrat",
+  "pid",
   "fiscal_ideology",
   "social_ideology"
 )

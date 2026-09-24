@@ -676,6 +676,56 @@ Police Means Tables
 
 ```
 
+# 2. Good Controls?
+
+## Y ~ X, Z ~ X, y ~ z
+
+```{r}
+
+m_a <- lm(min_wage ~ pid, data = sample) # given someone's PID, how much min wage support would we predict
+
+
+
+m_b <- lm(impact ~ pid, data = sample)  # given unit's pid, how much carceral impact would we predict? 
+
+y_resid <- resid(m_a)
+x_resid <- resid(m_b)
+
+m_c <- lm(y_resid ~ x_resid) # among the variation in impact that is unrelated to PID, is that variation associated with the variation in minimum-wage support that is also unrelated to PID?
+
+summary(m_c)
+```
+```{r}
+
+m_a1 <- lm(min_wage ~ self_ideo, data = sample) # given someone's PID, how much min wage support would we predict
+
+
+
+m_b1 <- lm(impact ~ self_ideo, data = sample)  # given unit's pid, how much carceral impact would we predict? 
+
+y_resid_a1 <- resid(m_a1)
+x_resid_a2 <- resid(m_b1)
+
+m_c_a1 <- lm(y_resid_a1 ~ x_resid_a2) # among the variation in impact that is unrelated to PID, is that variation associated with the variation in minimum-wage support that is also unrelated to PID?
+
+summary(m_c_a1)
+```
+
+
+all 
+```{r}
+
+covs_min_wage <- lm(min_wage ~ White + Black + Hisp_Latino + Asian_Am + Native_Am + OtherRace, data = sample)
+
+summary(covs_min_wage)
+
+covs_min_wage_1 <- lm(min_wage ~pid + self_ideo + desor_core + White + Black + Hisp_Latino + Asian_Am + Native_Am + OtherRace + gov_attn, data = sample)
+
+summary(covs_min_wage_1)
+
+```
+
+
 # 3. Policy Regressions
 
 This section continues to use variable_labels.R. The goal of this section was to avoid and clean up extensive seperated regressions, and instead incorporate use loop that iteratively work through outcome variables and incorporate controls.
@@ -732,6 +782,7 @@ control_waves <- list(
                      fire_controls, desor_core)
 )
 ```
+
 
 ### 3.2 Define lm function that will waves will operate thru
 
