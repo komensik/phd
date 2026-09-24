@@ -489,8 +489,8 @@ race_vars <- c(
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     AllOthers = case_when(
-      OtherRace == 1 | Asian_Am == 1 | Native_Am == 1, ~ 1,
-      OtherRace == 0 & Asian_Am == 0 & Native_Am == 0, ~ 0,
+      OtherRace == 1 | Asian_Am == 1 | Native_Am == 1 ~ 1,
+      OtherRace == 0 & Asian_Am == 0 & Native_Am == 0 ~ 0,
       TRUE ~ NA_real_
     )
   )
