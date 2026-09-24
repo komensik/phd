@@ -115,12 +115,13 @@ all_deserving_vars <- c(
 ##
 
 #Gov pays attention to preferences? 1 not much, 2 some, 3 a lot
-political_behavior_vars <- c("gov_attn", "vote2020", "willvote")
+political_behavior_vars <- c("gov_attn", "vote2020", "willvote", "vote_plan")
 
 political_behavior_labels <- c(
   gov_attn = "Government pays attention",
   vote2020 = "Voted in 2020",
-  willvote = "Plans to vote"
+  willvote = "Plans to vote",
+  vote_plan = "Eligible, plans to vote"
 )
 
 ## CONTROLS
