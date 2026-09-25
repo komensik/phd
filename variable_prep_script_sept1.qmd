@@ -127,7 +127,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     incarc = case_when(
       incarc_raw == 1 ~ 1, 
-      impact_raw == 0 ~ 0, 
+      impact == 0 ~ 0, 
       TRUE ~ NA_real_ #"otherwise, assign NA"
     )
   )
@@ -136,7 +136,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     knowincarc = case_when(
       knowincarc_raw == 1 ~ 1, 
-      impact_raw == 0 ~ 0, 
+      impact == 0 ~ 0, 
       TRUE ~ NA_real_ #"otherwise, assign NA"
     )
   )
@@ -145,7 +145,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     vict = case_when(
       vict_raw == 1 ~ 1, 
-      impact_raw == 0 ~ 0, 
+      impact == 0 ~ 0, 
       TRUE ~ NA_real_ #"otherwise, assign NA"
     )
   )
