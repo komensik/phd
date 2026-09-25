@@ -34,7 +34,7 @@ library(kableExtra)
 
 ```{r}
 
-raw_data_cleaned <- readr::read_csv("data/cleaned/all_vars_over_8.csv")
+raw_data_cleaned <-readr::read_csv("data/cleaned/all_vars_over_8.csv")
 
 ```
 sept 15 N is 2327
@@ -128,19 +128,19 @@ df_no_control <- raw_data_cleaned %>%
   filter(missing_controls)
 
 #remove ppl without controls from missing controls
-raw_data_cleaned <- raw_data_cleaned %>%
+data_full <- raw_data_cleaned %>%
     filter(!missing_controls)
 
-nrow(raw_data_cleaned)
+nrow(data_full)
 
 ```
 
 ## impact x two dfs
 ```{r}
-table(raw_data_cleaned$incarc)
-table(raw_data_cleaned$knowincarc)
-table(raw_data_cleaned$vict)
-table(raw_data_cleaned$impact)
+table(data_full$incarc)
+table(data_full$knowincarc)
+table(data_full$vict)
+table(data_full$impact)
 
 table(df_no_control$impact)
 ```
@@ -148,10 +148,10 @@ table(df_no_control$impact)
 ## ration x two dfs
 ```{r}
 
-table(raw_data_cleaned$ration_scripts)
+table(data_full$ration_scripts)
 table(df_no_control$ration_scripts)
 
-table(raw_data_cleaned$ration_food)
+table(data_full$ration_food)
 table(df_no_control$ration_food)
 
 ```
@@ -161,8 +161,6 @@ table(df_no_control$ration_food)
 save the csv of df of only non missing ("full")
 ```{r}
 
-data_full <- 
-  
 write_csv(data_full, "data/cleaned_control_data.csv")
 
 nrow(data_full)
