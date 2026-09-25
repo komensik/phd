@@ -597,7 +597,11 @@ raw_data_cleaned <- raw_data_cleaned %>%
 # drop other when doing analyses? 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    
+    # Preserve others
+    pid_other = case_when(
+      dem101 == 4 ~ 1,
+      dem101 %in% c(1, 2, 3) ~ 0,
+      TRUE ~ NA_real_),
     # Numeric/ordinal version
     pid_3 = case_when(
       dem101 == 1 ~ 1,   # Republican
@@ -612,14 +616,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
       pid_3,
       levels = c(1, 2, 3),
       labels = c("Republican", "Independent", "Democrat")
-    ),
-    
-    # Preserve reason for exclusion
-    pid_other = case_when(
-      dem101 == 4 ~ 1,
-      dem101 %in% c(1, 2, 3) ~ 0,
-      TRUE ~ NA_real_
     )
+    
   )
 ```
 

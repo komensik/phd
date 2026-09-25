@@ -253,10 +253,10 @@ ggsave("delta_map.pdf", delta_map, width = 9, height = 6)
 
 ```{r}
 
-table(data_full$pid)
+table(data_full$pid_3)
 
 parties <- data_full %>%
-  filter(!is.na(pid)) %>%
+  filter(!is.na(pid_3)) %>%
   group_by(pid) %>%
   summarise(
     n = n(),
@@ -270,6 +270,30 @@ parties <- data_full %>%
 parties
 
 ```
+Are difs from 'actual' or other estimates of actual meaningful? 
+```{r}
+party_counts <- c(
+  Democrat = 620,
+  Independent = 510,
+  Republican = 395
+)
+
+gallup_2024 <- c(
+  Democrat = .28,
+  Independent = .43,
+  Republican = .28
+)
+
+# Because the published rounded percentages sum to .99
+gallup_2024 <- gallup_2024 / sum(gallup_2024)
+
+chisq.test(
+  x = party_counts,
+  p = gallup_2024
+)
+```
+
+
 
 ```{r}
 pid_table <- parties %>%
@@ -308,6 +332,28 @@ writeLines(
 table(data_full$pid_3)
 
 ```
+
+```{r}
+
+
+table(data_full$self_ideo)
+
+self_ideoS <- data_full %>%
+  filter(!is.na(self_ideo)) %>%
+  group_by(self_ideo) %>%
+  summarise(
+    n = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    percent = 100 * n / nrow(data_full)
+  )%>%
+  arrange(desc(n))
+
+self_ideoS
+
+```
+
 
 ## race
 
