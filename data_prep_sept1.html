@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -68,10 +71,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="data_prep_sept1_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="data_prep_sept1_files/libs/quarto-html/anchor.min.js"></script>
 <link href="data_prep_sept1_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="data_prep_sept1_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="data_prep_sept1_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="data_prep_sept1_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="data_prep_sept1_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="data_prep_sept1_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="data_prep_sept1_files/libs/bootstrap/bootstrap-917079515d91bccb85b543faf8aa8bb6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -146,6 +149,9 @@ Attaching package: 'janitor'</code></pre>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'kableExtra' was built under R version 4.6.1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>
 Attaching package: 'kableExtra'</code></pre>
 </div>
@@ -154,6 +160,7 @@ Attaching package: 'kableExtra'</code></pre>
 
     group_rows</code></pre>
 </div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>OVERALL: I start by constructing the relevant info first (with the exception of excluding respondents who don’t consent), then describing what that info says, then I make exclusion (potentially additional flag) decisions last.</p>
 <section id="basic-prep" class="level1">
@@ -172,8 +179,13 @@ Attaching package: 'kableExtra'</code></pre>
 </ul>
 <p>Here, I am creating a block variable to keep track of what block each participant was sorted into, so that when I merge the disparate variables, it is still easy to know which group each participant was assigned to (thus, what groups they would have been prompted to evaluated and also important because it appears that the deserving questions for participants in block A were forced choice and snapped to increments of 10: not the case for B and C).</p>
 </section>
-<section id="b.-cleaned-data-frame-deleting-un-needed-vars" class="level4">
-<h4 class="anchored" data-anchor-id="b.-cleaned-data-frame-deleting-un-needed-vars">b. Cleaned data frame, deleting un-needed vars</h4>
+<section id="b1.-re-name-variables-here-that-you-can-at-this-point" class="level4">
+<h4 class="anchored" data-anchor-id="b1.-re-name-variables-here-that-you-can-at-this-point">b1. Re-name variables here that you can at this point</h4>
+<p>Here, I’m renaming the ones that don’t involve cleaning or recoding – just where I can do a straightforward rename.</p>
+<p>-Not doing deservingness and power here</p>
+</section>
+<section id="b2.-cleaned-data-frame-deleting-un-needed-vars" class="level4">
+<h4 class="anchored" data-anchor-id="b2.-cleaned-data-frame-deleting-un-needed-vars">b2. Cleaned data frame, deleting un-needed vars</h4>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>  [1] "deserving_group_a_do_1"            "deserving_group_a_do_2"           
@@ -412,16 +424,34 @@ Attaching package: 'kableExtra'</code></pre>
 </ul>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
+<pre><code>   Mode   FALSE    TRUE 
+logical     599    2095 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
 <pre><code>
 FALSE  TRUE 
   628  2066 </code></pre>
 </div>
 </div>
 <p>attn_q9_pass, attn_check_q17, attn_q114_pass</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+   0    1    2    3 
+ 599   29  462 1604 </code></pre>
+</div>
+</div>
 <p>1,604 respondents passed all 3 attn checks 599 did not supply correct answers none of them 32 passed 1 459 passed 2</p>
 </section>
 <section id="b.-survey-duration" class="level3">
 <h3 class="anchored" data-anchor-id="b.-survey-duration">b. survey duration</h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+    0.05    14.70    25.35   138.16    44.14 13975.55 </code></pre>
+</div>
+</div>
+<p>median: 25.35</p>
 <p>Grouping ppl into speed categories</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -461,466 +491,11 @@ FALSE  TRUE
  [91] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 [106] TRUE TRUE TRUE</code></pre>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code> d_black_afam_abc d_native_ind_abc d_asianam_abc    d_latino_his_abc
- Min.   :  0.0    Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 50.0    1st Qu.: 60.00   1st Qu.: 50.00   1st Qu.: 50.00  
- Median : 75.0    Median : 80.00   Median : 70.00   Median : 71.00  
- Mean   : 71.8    Mean   : 75.91   Mean   : 69.66   Mean   : 70.09  
- 3rd Qu.: 95.0    3rd Qu.:100.00   3rd Qu.: 90.00   3rd Qu.: 90.00  
- Max.   :100.0    Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :325      NA's   :323      NA's   :331      NA's   :333     
- d_whiteam_abc d_mideastam_abc  d_incwomen_abc   d_collegewom_abc
- Min.   :  0   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 50   1st Qu.: 50.00   1st Qu.: 33.00   1st Qu.: 50.00  
- Median : 70   Median : 65.00   Median : 50.00   Median : 76.00  
- Mean   : 67   Mean   : 65.19   Mean   : 52.62   Mean   : 72.99  
- 3rd Qu.: 87   3rd Qu.: 86.00   3rd Qu.: 71.00   3rd Qu.: 93.00  
- Max.   :100   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :328   NA's   :333      NA's   :329      NA's   :328     
-  d_enviro_abc    d_feminists_abc  d_proabort_choice_abc d_abortprov_abc 
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00        Min.   :  0.00  
- 1st Qu.: 50.00   1st Qu.: 40.00   1st Qu.: 42.00        1st Qu.: 33.00  
- Median : 70.00   Median : 54.00   Median : 60.00        Median : 59.00  
- Mean   : 66.89   Mean   : 57.43   Mean   : 59.67        Mean   : 56.55  
- 3rd Qu.: 90.00   3rd Qu.: 80.00   3rd Qu.: 87.00        3rd Qu.: 83.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00        Max.   :100.00  
- NA's   :322      NA's   :332      NA's   :326           NA's   :314     
- d_welfare_tanf_abc d_fstamps_snap_abc  d_unions_abc    d_medicaid_abc  
- Min.   :  0.00     Min.   :  0.00     Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 50.00     1st Qu.: 50.00     1st Qu.: 50.00   1st Qu.: 51.00  
- Median : 64.00     Median : 70.50     Median : 67.00   Median : 75.00  
- Mean   : 64.38     Mean   : 69.63     Mean   : 64.79   Mean   : 72.24  
- 3rd Qu.: 85.00     3rd Qu.: 90.00     3rd Qu.: 85.00   3rd Qu.: 91.00  
- Max.   :100.00     Max.   :100.00     Max.   :100.00   Max.   :100.00  
- NA's   :326        NA's   :320        NA's   :324      NA's   :321     
- d_medicare_abc   d_unemployed_abc  d_police_abc    d_poorfam_abc   
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 60.00   1st Qu.: 50.00   1st Qu.: 50.00   1st Qu.: 60.00  
- Median : 80.00   Median : 67.00   Median : 70.00   Median : 80.00  
- Mean   : 75.99   Mean   : 65.26   Mean   : 63.78   Mean   : 76.23  
- 3rd Qu.:100.00   3rd Qu.: 85.00   3rd Qu.: 88.00   3rd Qu.:100.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :321      NA's   :325      NA's   :315      NA's   :317     
- d_wealthy_abc    d_teachers_abc   d_sci_experts_abc  d_child_abc    
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00    Min.   :  0.00  
- 1st Qu.: 20.00   1st Qu.: 65.00   1st Qu.: 50.00    1st Qu.: 70.00  
- Median : 50.00   Median : 84.00   Median : 75.00    Median : 91.00  
- Mean   : 44.53   Mean   : 78.92   Mean   : 70.94    Mean   : 82.88  
- 3rd Qu.: 64.00   3rd Qu.:100.00   3rd Qu.: 90.00    3rd Qu.:100.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00    Max.   :100.00  
- NA's   :319      NA's   :315      NA's   :323       NA's   :318     
-   d_crim_abc     d_incppl_pris_abc d_homeless_abc  d_immigrants_abc
- Min.   :  0.00   Min.   :  0.00    Min.   :  0.0   Min.   :  0.00  
- 1st Qu.:  8.00   1st Qu.: 25.00    1st Qu.: 50.0   1st Qu.: 50.00  
- Median : 28.00   Median : 50.00    Median : 71.0   Median : 61.00  
- Mean   : 31.64   Mean   : 46.34    Mean   : 69.7   Mean   : 61.31  
- 3rd Qu.: 50.00   3rd Qu.: 66.00    3rd Qu.: 90.0   3rd Qu.: 82.00  
- Max.   :100.00   Max.   :100.00    Max.   :100.0   Max.   :100.00  
- NA's   :322      NA's   :334       NA's   :314     NA's   :325     
- d_unauth_undoc_abc d_gunowners_abc   d_voters_abc      d_lgbt_abc    
- Min.   :  0.00     Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 12.00     1st Qu.: 40.00   1st Qu.: 50.00   1st Qu.: 46.00  
- Median : 50.00     Median : 50.00   Median : 77.00   Median : 60.00  
- Mean   : 43.92     Mean   : 55.93   Mean   : 73.35   Mean   : 60.62  
- 3rd Qu.: 70.00     3rd Qu.: 76.00   3rd Qu.: 95.00   3rd Qu.: 89.00  
- Max.   :100.00     Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :314        NA's   :317      NA's   :316      NA's   :317     
-  d_trans_abc     d_transkids_abc  d_gunmans_abc      d_ice_abc     
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 34.00   1st Qu.: 40.00   1st Qu.: 20.00   1st Qu.: 40.00  
- Median : 55.00   Median : 60.00   Median : 50.00   Median : 59.00  
- Mean   : 56.36   Mean   : 58.43   Mean   : 44.33   Mean   : 57.62  
- 3rd Qu.: 83.00   3rd Qu.: 89.00   3rd Qu.: 66.00   3rd Qu.: 80.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :319      NA's   :321      NA's   :335      NA's   :332     
-  d_socmed_abc      d_nra_abc      d_bigbank_abc    d_bigcorp_abc   
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 21.00   1st Qu.: 14.00   1st Qu.: 19.50   1st Qu.: 12.00  
- Median : 50.00   Median : 50.00   Median : 40.00   Median : 38.00  
- Mean   : 44.21   Mean   : 44.58   Mean   : 40.92   Mean   : 38.23  
- 3rd Qu.: 62.00   3rd Qu.: 70.00   3rd Qu.: 60.00   3rd Qu.: 57.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :323      NA's   :328      NA's   :327      NA's   :323     
-   d_uni_abc      d_comcoll_abc    d_noncit_parent_a d_incparents_a  
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.0     Min.   :  0.00  
- 1st Qu.: 50.00   1st Qu.: 51.00   1st Qu.: 40.0     1st Qu.: 30.00  
- Median : 65.00   Median : 74.00   Median : 60.0     Median : 50.00  
- Mean   : 63.19   Mean   : 71.84   Mean   : 59.9     Mean   : 51.81  
- 3rd Qu.: 84.00   3rd Qu.: 90.00   3rd Qu.: 80.0     3rd Qu.: 70.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.0     Max.   :100.00  
- NA's   :327      NA's   :328      NA's   :1876      NA's   :1873    
-   d_hsteen_a      d_athiest_a       d_cath_a         d_evan_a     
- Min.   :  0.00   Min.   :  0.0   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 50.00   1st Qu.: 40.0   1st Qu.: 50.00   1st Qu.: 30.00  
- Median : 70.00   Median : 50.0   Median : 55.00   Median : 50.00  
- Mean   : 67.17   Mean   : 54.9   Mean   : 59.81   Mean   : 53.35  
- 3rd Qu.: 90.00   3rd Qu.: 80.0   3rd Qu.: 80.00   3rd Qu.: 80.00  
- Max.   :100.00   Max.   :100.0   Max.   :100.00   Max.   :100.00  
- NA's   :1875     NA's   :1880    NA's   :1886     NA's   :1882    
-    d_jews_a         d_pal_a         d_muslim_a      d_blackwom_a   
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 50.00   1st Qu.: 30.00   1st Qu.: 50.00   1st Qu.: 50.00  
- Median : 70.00   Median : 50.00   Median : 60.00   Median : 80.00  
- Mean   : 68.09   Mean   : 55.07   Mean   : 60.16   Mean   : 71.85  
- 3rd Qu.: 90.00   3rd Qu.: 80.00   3rd Qu.: 80.00   3rd Qu.: 90.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :1877     NA's   :1875     NA's   :1880     NA's   :1882    
-  d_blackmen_a       d_lds_a        d_longcov_a        d_exon_a     
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 50.00   1st Qu.: 30.00   1st Qu.: 60.00   1st Qu.: 60.00  
- Median : 70.00   Median : 50.00   Median : 80.00   Median : 80.00  
- Mean   : 69.72   Mean   : 52.75   Mean   : 73.48   Mean   : 76.49  
- 3rd Qu.: 90.00   3rd Qu.: 70.00   3rd Qu.: 90.00   3rd Qu.:100.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :1882     NA's   :1877     NA's   :1874     NA's   :1870    
-    d_weed_a        d_opioid_a      d_whitecol_a       d_tech_a     
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 40.00   1st Qu.: 20.00   1st Qu.: 50.00   1st Qu.: 50.00  
- Median : 50.00   Median : 50.00   Median : 70.00   Median : 70.00  
- Mean   : 55.33   Mean   : 44.97   Mean   : 65.25   Mean   : 67.67  
- 3rd Qu.: 80.00   3rd Qu.: 70.00   3rd Qu.: 80.00   3rd Qu.: 90.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :1880     NA's   :1875     NA's   :1883     NA's   :1874    
-  d_smokers_a        d_genx_a        d_boomer_a        d_mill_a     
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 30.00   1st Qu.: 50.00   1st Qu.: 50.00   1st Qu.: 50.00  
- Median : 50.00   Median : 70.00   Median : 70.00   Median : 70.00  
- Mean   : 48.03   Mean   : 68.87   Mean   : 69.37   Mean   : 67.15  
- 3rd Qu.: 70.00   3rd Qu.: 90.00   3rd Qu.: 90.00   3rd Qu.: 90.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :1878     NA's   :1879     NA's   :1874     NA's   :1881    
-    d_genz_a        d_metoo_b      d_christnat_b     d_ruralam_b    
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 50.00   1st Qu.: 40.50   1st Qu.: 18.00   1st Qu.: 50.00  
- Median : 60.00   Median : 57.00   Median : 50.00   Median : 71.00  
- Mean   : 65.39   Mean   : 57.35   Mean   : 46.23   Mean   : 70.35  
- 3rd Qu.: 80.00   3rd Qu.: 82.00   3rd Qu.: 69.25   3rd Qu.: 90.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :1880     NA's   :1883     NA's   :1886     NA's   :1883    
-  d_urbanam_b      d_suburbam_b    d_billion_b        d_blm_b      
- Min.   :  0.00   Min.   :  0.0   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 50.00   1st Qu.: 50.0   1st Qu.:  6.00   1st Qu.: 30.00  
- Median : 68.00   Median : 68.0   Median : 32.00   Median : 56.00  
- Mean   : 67.42   Mean   : 66.9   Mean   : 36.17   Mean   : 55.39  
- 3rd Qu.: 85.00   3rd Qu.: 83.0   3rd Qu.: 55.50   3rd Qu.: 83.00  
- Max.   :100.00   Max.   :100.0   Max.   :100.00   Max.   :100.00  
- NA's   :1883     NA's   :1884    NA's   :1875     NA's   :1880    
-    d_maga_b        d_progs_b        d_soc_b       d_proudboys_b   
- Min.   :  0.00   Min.   :  0.0   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.:  8.50   1st Qu.: 36.0   1st Qu.: 26.00   1st Qu.:  0.00  
- Median : 48.00   Median : 51.0   Median : 50.00   Median : 30.00  
- Mean   : 42.54   Mean   : 54.9   Mean   : 47.66   Mean   : 32.07  
- 3rd Qu.: 68.00   3rd Qu.: 78.0   3rd Qu.: 70.00   3rd Qu.: 50.00  
- Max.   :100.00   Max.   :100.0   Max.   :100.00   Max.   :100.00  
- NA's   :1875     NA's   :1883    NA's   :1885     NA's   :1885    
-   d_attnys_b     d_military_b       d_vets_b        d_solds_b     
- Min.   :  0.0   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 36.0   1st Qu.: 58.50   1st Qu.: 70.00   1st Qu.: 67.00  
- Median : 50.0   Median : 82.00   Median : 89.00   Median : 90.00  
- Mean   : 53.1   Mean   : 75.26   Mean   : 81.96   Mean   : 80.85  
- 3rd Qu.: 71.0   3rd Qu.:100.00   3rd Qu.:100.00   3rd Qu.:100.00  
- Max.   :100.0   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :1878    NA's   :1871     NA's   :1872     NA's   :1876    
- d_essentials_b     d_nurses_b        d_drs_b          d_dems_b    
- Min.   :  0.00   Min.   :  6.00   Min.   :  0.00   Min.   :  0.0  
- 1st Qu.: 65.00   1st Qu.: 67.00   1st Qu.: 56.00   1st Qu.: 44.0  
- Median : 84.00   Median : 85.00   Median : 75.00   Median : 54.0  
- Mean   : 79.25   Mean   : 79.84   Mean   : 72.78   Mean   : 57.3  
- 3rd Qu.:100.00   3rd Qu.:100.00   3rd Qu.: 92.00   3rd Qu.: 81.0  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.0  
- NA's   :1875     NA's   :1875     NA's   :1874     NA's   :1882   
-    d_reps_b        d_media_b       d_bluecol_c      d_working_c    
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 27.00   1st Qu.: 29.00   1st Qu.: 65.00   1st Qu.: 70.00  
- Median : 50.00   Median : 50.00   Median : 81.00   Median : 86.00  
- Mean   : 50.21   Mean   : 47.58   Mean   : 78.01   Mean   : 81.16  
- 3rd Qu.: 74.00   3rd Qu.: 67.00   3rd Qu.: 97.00   3rd Qu.:100.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :1879     NA's   :1881     NA's   :1955     NA's   :1955    
-  d_midclass_c    d_migrantwork_c   d_smallbiz_c    d_taxpayers_c   
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 60.00   1st Qu.: 50.00   1st Qu.: 64.50   1st Qu.: 64.50  
- Median : 77.00   Median : 65.00   Median : 80.00   Median : 83.00  
- Mean   : 74.79   Mean   : 62.95   Mean   : 76.78   Mean   : 78.03  
- 3rd Qu.: 95.00   3rd Qu.: 83.00   3rd Qu.: 95.00   3rd Qu.:100.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :1955     NA's   :1955     NA's   :1955     NA's   :1955    
-  d_elderly_c        d_moms_c       d_retires_c     d_sexoffenders_c
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 70.00   1st Qu.: 70.00   1st Qu.: 65.50   1st Qu.:  0.00  
- Median : 89.00   Median : 89.00   Median : 84.00   Median :  2.00  
- Mean   : 81.94   Mean   : 81.95   Mean   : 78.74   Mean   : 14.86  
- 3rd Qu.:100.00   3rd Qu.:100.00   3rd Qu.:100.00   3rd Qu.: 20.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :1955     NA's   :1955     NA's   :1955     NA's   :1955    
- d_sexhar_vict_c  d_sexharrasser_c d_formerlyinc_c   d_homeown_c   
- Min.   :  0.00   Min.   :  0      Min.   :  0.00   Min.   :  0.0  
- 1st Qu.: 66.00   1st Qu.:  0      1st Qu.: 40.00   1st Qu.: 51.0  
- Median : 85.00   Median :  1      Median : 50.00   Median : 75.0  
- Mean   : 78.77   Mean   : 15      Mean   : 55.79   Mean   : 71.9  
- 3rd Qu.:100.00   3rd Qu.: 20      3rd Qu.: 74.00   3rd Qu.: 90.0  
- Max.   :100.00   Max.   :100      Max.   :100.00   Max.   :100.0  
- NA's   :1955     NA's   :1955     NA's   :1955     NA's   :1955   
-  d_regufee_c     d_gunvi_vict_c   d_polbrut_vict_c   d_unins_c     
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 47.00   1st Qu.: 65.00   1st Qu.: 60.00   1st Qu.: 50.00  
- Median : 62.00   Median : 84.00   Median : 80.00   Median : 68.00  
- Mean   : 60.62   Mean   : 78.14   Mean   : 75.22   Mean   : 66.38  
- 3rd Qu.: 85.00   3rd Qu.:100.00   3rd Qu.: 99.50   3rd Qu.: 89.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :1955     NA's   :1955     NA's   :1955     NA's   :1955    
-  d_mentill_c        d_aids_c         d_gay_c        d_lesbians_c   
- Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
- 1st Qu.: 55.00   1st Qu.: 50.00   1st Qu.: 50.00   1st Qu.: 49.00  
- Median : 79.00   Median : 70.00   Median : 60.00   Median : 62.00  
- Mean   : 73.08   Mean   : 67.07   Mean   : 60.88   Mean   : 61.27  
- 3rd Qu.: 95.00   3rd Qu.: 90.00   3rd Qu.: 87.00   3rd Qu.: 89.00  
- Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
- NA's   :1955     NA's   :1955     NA's   :1955     NA's   :1955    </code></pre>
-</div>
 </div>
 <p>LIMITED Deserving/power for 1 group only: recode groups directly</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "All group-specific variables created successfully."</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  [1] "progress"              "duration_in_seconds"   "finished"             
-  [4] "response_id"           "deserving_group_a_1"   "deserving_group_a_2"  
-  [7] "deserving_group_a_3"   "deserving_group_a_4"   "deserving_group_a_5"  
- [10] "deserving_group_a_6"   "deserving_group_a_7"   "deserving_group_a_8"  
- [13] "deserving_group_a_9"   "deserving_group_a_10"  "deserving_group_a_11" 
- [16] "deserving_group_a_12"  "deserving_group_a_13"  "deserving_group_a_14" 
- [19] "deserving_group_a_15"  "deserving_group_a_16"  "deserving_group_a_17" 
- [22] "deserving_group_a_18"  "deserving_group_a_19"  "deserving_group_a_20" 
- [25] "deserving_group_a_21"  "deserving_group_a_22"  "deserving_group_a_23" 
- [28] "deserving_group_a_24"  "deserving_group_a_25"  "deserving_group_a_26" 
- [31] "deserving_group_a_27"  "deserving_group_a_28"  "deserving_group_a_29" 
- [34] "deserving_group_a_30"  "deserving_group_a_31"  "deserving_group_a_32" 
- [37] "deserving_group_a_33"  "deserving_group_a_34"  "deserving_group_a_35" 
- [40] "deserving_group_a_36"  "deserving_group_a_37"  "deserving_group_a_38" 
- [43] "deserving_group_a_39"  "deserving_group_a_40"  "deserving_group_a_41" 
- [46] "deserving_group_a_42"  "deserving_group_a_43"  "deserving_group_a_44" 
- [49] "deserving_group_a_45"  "deserving_group_a_46"  "deserving_group_a_47" 
- [52] "deserving_group_a_48"  "deserving_group_a_49"  "deserving_group_a_50" 
- [55] "deserving_group_a_51"  "deserving_group_a_52"  "deserving_group_a_53" 
- [58] "deserving_group_a_54"  "deserving_group_a_55"  "deserving_group_a_56" 
- [61] "deserving_group_a_57"  "deserving_group_a_58"  "deserving_group_a_59" 
- [64] "deserving_group_a_60"  "deserving_group_a_61"  "deserving_group_a_62" 
- [67] "deserving_group_a_63"  "deserving_group_a_64"  "deserving_group_a_65" 
- [70] "deserving_group_a_66"  "power_group_a_1"       "power_group_a_2"      
- [73] "power_group_a_3"       "power_group_a_4"       "power_group_a_5"      
- [76] "power_group_a_6"       "power_group_a_7"       "power_group_a_8"      
- [79] "power_group_a_9"       "power_group_a_10"      "power_group_a_11"     
- [82] "power_group_a_12"      "power_group_a_13"      "power_group_a_14"     
- [85] "power_group_a_15"      "power_group_a_16"      "power_group_a_17"     
- [88] "power_group_a_18"      "power_group_a_19"      "power_group_a_20"     
- [91] "power_group_a_21"      "power_group_a_22"      "power_group_a_23"     
- [94] "power_group_a_24"      "power_group_a_25"      "power_group_a_26"     
- [97] "power_group_a_27"      "power_group_a_28"      "power_group_a_29"     
-[100] "power_group_a_30"      "power_group_a_31"      "power_group_a_32"     
-[103] "power_group_a_33"      "power_group_a_34"      "power_group_a_35"     
-[106] "power_group_a_36"      "power_group_a_37"      "power_group_a_38"     
-[109] "power_group_a_39"      "power_group_a_40"      "power_group_a_41"     
-[112] "power_group_a_42"      "power_group_a_43"      "power_group_a_44"     
-[115] "power_group_a_45"      "power_group_a_46"      "power_group_a_47"     
-[118] "power_group_a_48"      "power_group_a_49"      "power_group_a_66"     
-[121] "power_group_a_50"      "power_group_a_51"      "power_group_a_52"     
-[124] "power_group_a_53"      "power_group_a_54"      "power_group_a_55"     
-[127] "power_group_a_56"      "power_group_a_57"      "power_group_a_58"     
-[130] "power_group_a_59"      "power_group_a_60"      "power_group_a_61"     
-[133] "power_group_a_62"      "power_group_a_63"      "power_group_a_64"     
-[136] "deserving_group_b_1"   "deserving_group_b_2"   "deserving_group_b_3"  
-[139] "deserving_group_b_4"   "deserving_group_b_5"   "deserving_group_b_6"  
-[142] "deserving_group_b_7"   "deserving_group_b_8"   "deserving_group_b_9"  
-[145] "deserving_group_b_10"  "deserving_group_b_11"  "deserving_group_b_12" 
-[148] "deserving_group_b_13"  "deserving_group_b_14"  "deserving_group_b_15" 
-[151] "deserving_group_b_16"  "deserving_group_b_17"  "deserving_group_b_18" 
-[154] "deserving_group_b_19"  "deserving_group_b_20"  "deserving_group_b_21" 
-[157] "deserving_group_b_22"  "deserving_group_b_23"  "deserving_group_b_24" 
-[160] "deserving_group_b_25"  "deserving_group_b_26"  "deserving_group_b_27" 
-[163] "deserving_group_b_28"  "deserving_group_b_29"  "deserving_group_b_30" 
-[166] "deserving_group_b_31"  "deserving_group_b_32"  "deserving_group_b_33" 
-[169] "deserving_group_b_34"  "deserving_group_b_35"  "deserving_group_b_36" 
-[172] "deserving_group_b_37"  "deserving_group_b_38"  "deserving_group_b_39" 
-[175] "deserving_group_b_40"  "deserving_group_b_41"  "deserving_group_b_42" 
-[178] "deserving_group_b_43"  "deserving_group_b_44"  "deserving_group_b_45" 
-[181] "deserving_group_b_46"  "deserving_group_b_47"  "deserving_group_b_48" 
-[184] "deserving_group_b_49"  "deserving_group_b_50"  "deserving_group_b_51" 
-[187] "deserving_group_b_52"  "deserving_group_b_53"  "deserving_group_b_54" 
-[190] "deserving_group_b_55"  "deserving_group_b_56"  "deserving_group_b_57" 
-[193] "deserving_group_b_58"  "deserving_group_b_59"  "deserving_group_b_60" 
-[196] "deserving_group_b_61"  "deserving_group_b_62"  "deserving_group_b_63" 
-[199] "power_group_b_1"       "power_group_b_2"       "power_group_b_3"      
-[202] "power_group_b_4"       "power_group_b_5"       "power_group_b_6"      
-[205] "power_group_b_7"       "power_group_b_8"       "power_group_b_9"      
-[208] "power_group_b_10"      "power_group_b_11"      "power_group_b_12"     
-[211] "power_group_b_13"      "power_group_b_14"      "power_group_b_15"     
-[214] "power_group_b_16"      "power_group_b_17"      "power_group_b_18"     
-[217] "power_group_b_19"      "power_group_b_20"      "power_group_b_21"     
-[220] "power_group_b_22"      "power_group_b_23"      "power_group_b_24"     
-[223] "power_group_b_25"      "power_group_b_26"      "power_group_b_27"     
-[226] "power_group_b_28"      "power_group_b_29"      "power_group_b_30"     
-[229] "power_group_b_31"      "power_group_b_32"      "power_group_b_33"     
-[232] "power_group_b_34"      "power_group_b_35"      "power_group_b_36"     
-[235] "power_group_b_37"      "power_group_b_38"      "power_group_b_39"     
-[238] "power_group_b_40"      "power_group_b_41"      "power_group_b_42"     
-[241] "power_group_b_43"      "power_group_b_44"      "power_group_b_45"     
-[244] "power_group_b_46"      "power_group_b_47"      "power_group_b_48"     
-[247] "power_group_b_49"      "power_group_b_50"      "power_group_b_51"     
-[250] "power_group_b_52"      "power_group_b_53"      "power_group_b_54"     
-[253] "power_group_b_55"      "power_group_b_56"      "power_group_b_57"     
-[256] "power_group_b_58"      "power_group_b_59"      "power_group_b_60"     
-[259] "power_group_b_61"      "power_group_b_62"      "power_group_b_63"     
-[262] "deserving_group_c_1"   "deserving_group_c_2"   "deserving_group_c_3"  
-[265] "deserving_group_c_4"   "deserving_group_c_5"   "deserving_group_c_6"  
-[268] "deserving_group_c_7"   "deserving_group_c_8"   "deserving_group_c_9"  
-[271] "deserving_group_c_10"  "deserving_group_c_11"  "deserving_group_c_12" 
-[274] "deserving_group_c_13"  "deserving_group_c_14"  "deserving_group_c_15" 
-[277] "deserving_group_c_16"  "deserving_group_c_17"  "deserving_group_c_18" 
-[280] "deserving_group_c_19"  "deserving_group_c_20"  "deserving_group_c_21" 
-[283] "deserving_group_c_22"  "deserving_group_c_23"  "deserving_group_c_24" 
-[286] "deserving_group_c_25"  "deserving_group_c_26"  "deserving_group_c_27" 
-[289] "deserving_group_c_28"  "deserving_group_c_29"  "deserving_group_c_30" 
-[292] "deserving_group_c_31"  "deserving_group_c_32"  "deserving_group_c_33" 
-[295] "deserving_group_c_34"  "deserving_group_c_35"  "deserving_group_c_36" 
-[298] "deserving_group_c_37"  "deserving_group_c_38"  "deserving_group_c_39" 
-[301] "deserving_group_c_40"  "deserving_group_c_41"  "deserving_group_c_42" 
-[304] "deserving_group_c_43"  "deserving_group_c_44"  "deserving_group_c_45" 
-[307] "deserving_group_c_46"  "deserving_group_c_47"  "deserving_group_c_48" 
-[310] "deserving_group_c_49"  "deserving_group_c_50"  "deserving_group_c_51" 
-[313] "deserving_group_c_52"  "deserving_group_c_53"  "deserving_group_c_54" 
-[316] "deserving_group_c_55"  "deserving_group_c_56"  "deserving_group_c_57" 
-[319] "deserving_group_c_58"  "deserving_group_c_59"  "deserving_group_c_60" 
-[322] "deserving_group_c_61"  "deserving_group_c_62"  "deserving_group_c_63" 
-[325] "deserving_group_c_64"  "power_group_c_1"       "power_group_c_2"      
-[328] "power_group_c_3"       "power_group_c_4"       "power_group_c_5"      
-[331] "power_group_c_6"       "power_group_c_7"       "power_group_c_8"      
-[334] "power_group_c_9"       "power_group_c_10"      "power_group_c_11"     
-[337] "power_group_c_12"      "power_group_c_13"      "power_group_c_14"     
-[340] "power_group_c_15"      "power_group_c_16"      "power_group_c_17"     
-[343] "power_group_c_18"      "power_group_c_19"      "power_group_c_20"     
-[346] "power_group_c_21"      "power_group_c_22"      "power_group_c_23"     
-[349] "power_group_c_24"      "power_group_c_25"      "power_group_c_26"     
-[352] "power_group_c_27"      "power_group_c_28"      "power_group_c_29"     
-[355] "power_group_c_30"      "power_group_c_31"      "power_group_c_32"     
-[358] "power_group_c_33"      "power_group_c_34"      "power_group_c_35"     
-[361] "power_group_c_36"      "power_group_c_37"      "power_group_c_38"     
-[364] "power_group_c_39"      "power_group_c_40"      "power_group_c_41"     
-[367] "power_group_c_42"      "power_group_c_43"      "power_group_c_44"     
-[370] "power_group_c_45"      "power_group_c_46"      "power_group_c_47"     
-[373] "power_group_c_48"      "power_group_c_49"      "power_group_c_50"     
-[376] "power_group_c_51"      "power_group_c_52"      "power_group_c_53"     
-[379] "power_group_c_54"      "power_group_c_55"      "power_group_c_56"     
-[382] "power_group_c_57"      "power_group_c_58"      "power_group_c_59"     
-[385] "power_group_c_60"      "power_group_c_61"      "power_group_c_62"     
-[388] "power_group_c_63"      "power_group_c_64"      "q4_1_1"               
-[391] "q4_1_2"                "q4_1_3"                "q4_2_1"               
-[394] "q4_2_2"                "q4_2_3"                "q4_3_1"               
-[397] "q4_3_2"                "q4_3_3"                "q4_4_1"               
-[400] "q4_4_2"                "q4_4_3"                "q4_5_1"               
-[403] "q4_5_2"                "q4_5_3"                "q4_6_1"               
-[406] "q4_6_2"                "q4_6_3"                "q4_7_1"               
-[409] "q4_7_2"                "q4_7_3"                "q4_8_1"               
-[412] "q4_8_2"                "q4_8_3"                "q4_9_1"               
-[415] "q4_9_2"                "q4_9_3"                "q4_10_1"              
-[418] "q4_10_2"               "q4_10_3"               "q4_11_1"              
-[421] "q4_11_2"               "q4_11_3"               "q6"                   
-[424] "q7"                    "q8"                    "q9"                   
-[427] "q102_1"                "q102_2"                "q102_3"               
-[430] "q102_4"                "q102_5"                "q15_1"                
-[433] "q15_2"                 "q15_3"                 "q15_4"                
-[436] "q15_5"                 "q62_1"                 "q25_1"                
-[439] "q25_2"                 "q25_3"                 "q25_4"                
-[442] "q25_5"                 "q25_6"                 "q17"                  
-[445] "q18"                   "q20"                   "q19"                  
-[448] "q22_1"                 "q22_2"                 "q22_3"                
-[451] "q22_4"                 "q22_5"                 "q22_6"                
-[454] "q22_7"                 "q23_1"                 "q23_2"                
-[457] "q23_3"                 "q23_4"                 "q23_5"                
-[460] "q23_6"                 "q23_7"                 "q24"                  
-[463] "q26_1"                 "q26_2"                 "q26_3"                
-[466] "q26_4"                 "q26_5"                 "q26_6"                
-[469] "q27"                   "q28_1"                 "q28_2"                
-[472] "q28_3"                 "q28_4"                 "q28_5"                
-[475] "q28_6"                 "q28_7"                 "q28_8"                
-[478] "q28_9"                 "q28_10"                "q28_11"               
-[481] "q63_1"                 "q63_2"                 "q63_3"                
-[484] "q104_1"                "q104_2"                "q104_3"               
-[487] "q104_4"                "q68_2"                 "q69_1"                
-[490] "q69_2"                 "q69_3"                 "q69_4"                
-[493] "q69_5"                 "q69_6"                 "q69_7"                
-[496] "q69_8"                 "q70"                   "q71"                  
-[499] "q72"                   "q73"                   "q74_1"                
-[502] "q74_2"                 "q74_3"                 "q74_4"                
-[505] "q74_5"                 "q74_6"                 "q29"                  
-[508] "q30"                   "q31"                   "q110"                 
-[511] "q32"                   "q33"                   "q34"                  
-[514] "q111"                  "q112"                  "q35"                  
-[517] "q36"                   "q37"                   "q38"                  
-[520] "q40"                   "q41"                   "q42"                  
-[523] "q43"                   "q46"                   "q47"                  
-[526] "q114_1"                "q114_2"                "q114_3"               
-[529] "q114_4"                "q114_5"                "q114_6"               
-[532] "q114_7"                "q114_8"                "q114_9"               
-[535] "q48"                   "q49_1"                 "q49_2"                
-[538] "q49_3"                 "q50_1"                 "q50_2"                
-[541] "q50_3"                 "dem101"                "dem"                  
-[544] "q109"                  "politcs"               "q51_1"                
-[547] "q51_2"                 "q51_3"                 "q51_4"                
-[550] "q51_5"                 "q51_6"                 "q51_7"                
-[553] "q51_8"                 "q51_8_text"            "q52"                  
-[556] "q52_5_text"            "q53"                   "q54"                  
-[559] "q113_first_click"      "q113_last_click"       "q113_page_submit"     
-[562] "q113_click_count"      "q55"                   "q56_1"                
-[565] "q56_2"                 "q56_3"                 "q56_4"                
-[568] "q56_4_text"            "q78_1"                 "q78_7"                
-[571] "q78_2"                 "q78_3"                 "q78_4"                
-[574] "q78_6"                 "q78_6_text"            "q58_1"                
-[577] "q58_2"                 "respondent_id"         "block"                
-[580] "attn_q9_pass"          "attn_q9_typo"          "attn_check_q17"       
-[583] "attn_q114_pass"        "attn_q9_answered"      "attn_q17_answered"    
-[586] "attn_q114_answered"    "attn_pass_count"       "attn_fail_count"      
-[589] "attn_answered_count"   "duration_minutes"      "sub_8"                
-[592] "sub_12"                "sub_20"                "sub_30"               
-[595] "over_52"               "over_180"              "nonfinisher"          
-[598] "d_black_afam_abc"      "d_native_ind_abc"      "d_asianam_abc"        
-[601] "d_latino_his_abc"      "d_whiteam_abc"         "d_mideastam_abc"      
-[604] "d_incwomen_abc"        "d_collegewom_abc"      "d_enviro_abc"         
-[607] "d_feminists_abc"       "d_proabort_choice_abc" "d_abortprov_abc"      
-[610] "d_welfare_tanf_abc"    "d_fstamps_snap_abc"    "d_unions_abc"         
-[613] "d_medicaid_abc"        "d_medicare_abc"        "d_unemployed_abc"     
-[616] "d_police_abc"          "d_poorfam_abc"         "d_wealthy_abc"        
-[619] "d_teachers_abc"        "d_sci_experts_abc"     "d_child_abc"          
-[622] "d_crim_abc"            "d_incppl_pris_abc"     "d_homeless_abc"       
-[625] "d_immigrants_abc"      "d_unauth_undoc_abc"    "d_gunowners_abc"      
-[628] "d_voters_abc"          "d_lgbt_abc"            "d_trans_abc"          
-[631] "d_transkids_abc"       "d_gunmans_abc"         "d_ice_abc"            
-[634] "d_socmed_abc"          "d_nra_abc"             "d_bigbank_abc"        
-[637] "d_bigcorp_abc"         "d_uni_abc"             "d_comcoll_abc"        
-[640] "d_noncit_parent_a"     "d_incparents_a"        "d_hsteen_a"           
-[643] "d_athiest_a"           "d_cath_a"              "d_evan_a"             
-[646] "d_jews_a"              "d_pal_a"               "d_muslim_a"           
-[649] "d_blackwom_a"          "d_blackmen_a"          "d_lds_a"              
-[652] "d_longcov_a"           "d_exon_a"              "d_weed_a"             
-[655] "d_opioid_a"            "d_whitecol_a"          "d_tech_a"             
-[658] "d_smokers_a"           "d_genx_a"              "d_boomer_a"           
-[661] "d_mill_a"              "d_genz_a"              "d_metoo_b"            
-[664] "d_christnat_b"         "d_ruralam_b"           "d_urbanam_b"          
-[667] "d_suburbam_b"          "d_billion_b"           "d_blm_b"              
-[670] "d_maga_b"              "d_progs_b"             "d_soc_b"              
-[673] "d_proudboys_b"         "d_attnys_b"            "d_military_b"         
-[676] "d_vets_b"              "d_solds_b"             "d_essentials_b"       
-[679] "d_nurses_b"            "d_drs_b"               "d_dems_b"             
-[682] "d_reps_b"              "d_media_b"             "d_bluecol_c"          
-[685] "d_working_c"           "d_midclass_c"          "d_migrantwork_c"      
-[688] "d_smallbiz_c"          "d_taxpayers_c"         "d_elderly_c"          
-[691] "d_moms_c"              "d_retires_c"           "d_sexoffenders_c"     
-[694] "d_sexhar_vict_c"       "d_sexharrasser_c"      "d_formerlyinc_c"      
-[697] "d_homeown_c"           "d_regufee_c"           "d_gunvi_vict_c"       
-[700] "d_polbrut_vict_c"      "d_unins_c"             "d_mentill_c"          
-[703] "d_aids_c"              "d_gay_c"               "d_lesbians_c"         </code></pre>
 </div>
 </div>
 <p>Checking this worked before removing the old variables</p>
@@ -1052,7 +627,7 @@ FALSE  TRUE
 </div>
 </div>
 <p>Save pre-dropped version</p>
-<p>Save for analysis dataset without block-spec/deserv vars (uncleaned_data_light, later to be cleaned_data_light)</p>
+<p>Save for analysis dataset without block-spec/deserv vars</p>
 </section>
 <section id="d.-nas-completion-of-vars" class="level3">
 <h3 class="anchored" data-anchor-id="d.-nas-completion-of-vars">2d. NAs &amp; completion of vars</h3>
@@ -1061,7 +636,7 @@ FALSE  TRUE
 <p>If for the deservingness questions, respondent has set all to same number or many in a row same number</p>
 <p>if all block a, block b, or block c vars are same number</p>
 <p>items under a question – all are ‘strongly support’ or ‘no/unsure’ etc</p>
-<p>“q15_1”, “q15_2”, “q15_3”, “q15_4”, “q15_5”,</p>
+<p>“q15_1”, “local_police”, “q15_3”, “q15_4”, “charge_police”,</p>
 <p>“q25_1”, “q25_2”, “q25_3”, “q25_4”,</p>
 <p>“q23_2”, “q23_2”,“q23_7”,</p>
 <p>“q32”, “q33”, “q34”, “q35”, “q36”, “q37”, “q38”,</p>
@@ -1072,7 +647,7 @@ FALSE  TRUE
 <h1>5. Description of Consented, pre-screening sample</h1>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 323</code></pre>
+<pre><code>[1] 320</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2694</code></pre>
@@ -1085,120 +660,9 @@ FALSE  TRUE
 2 B       898
 3 C       898</code></pre>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  [1] "progress"              "duration_in_seconds"   "finished"             
-  [4] "response_id"           "q4_1_1"                "q4_1_2"               
-  [7] "q4_1_3"                "q4_2_1"                "q4_2_2"               
- [10] "q4_2_3"                "q4_3_1"                "q4_3_2"               
- [13] "q4_3_3"                "q4_4_1"                "q4_4_2"               
- [16] "q4_4_3"                "q4_5_1"                "q4_5_2"               
- [19] "q4_5_3"                "q4_6_1"                "q4_6_2"               
- [22] "q4_6_3"                "q4_7_1"                "q4_7_2"               
- [25] "q4_7_3"                "q4_8_1"                "q4_8_2"               
- [28] "q4_8_3"                "q4_9_1"                "q4_9_2"               
- [31] "q4_9_3"                "q4_10_1"               "q4_10_2"              
- [34] "q4_10_3"               "q4_11_1"               "q4_11_2"              
- [37] "q4_11_3"               "q6"                    "q7"                   
- [40] "q8"                    "q9"                    "q102_1"               
- [43] "q102_2"                "q102_3"                "q102_4"               
- [46] "q102_5"                "q15_1"                 "q15_2"                
- [49] "q15_3"                 "q15_4"                 "q15_5"                
- [52] "q62_1"                 "q25_1"                 "q25_2"                
- [55] "q25_3"                 "q25_4"                 "q25_5"                
- [58] "q25_6"                 "q17"                   "q18"                  
- [61] "q20"                   "q19"                   "q22_1"                
- [64] "q22_2"                 "q22_3"                 "q22_4"                
- [67] "q22_5"                 "q22_6"                 "q22_7"                
- [70] "q23_1"                 "q23_2"                 "q23_3"                
- [73] "q23_4"                 "q23_5"                 "q23_6"                
- [76] "q23_7"                 "q24"                   "q26_1"                
- [79] "q26_2"                 "q26_3"                 "q26_4"                
- [82] "q26_5"                 "q26_6"                 "q27"                  
- [85] "q28_1"                 "q28_2"                 "q28_3"                
- [88] "q28_4"                 "q28_5"                 "q28_6"                
- [91] "q28_7"                 "q28_8"                 "q28_9"                
- [94] "q28_10"                "q28_11"                "q63_1"                
- [97] "q63_2"                 "q63_3"                 "q104_1"               
-[100] "q104_2"                "q104_3"                "q104_4"               
-[103] "q68_2"                 "q69_1"                 "q69_2"                
-[106] "q69_3"                 "q69_4"                 "q69_5"                
-[109] "q69_6"                 "q69_7"                 "q69_8"                
-[112] "q70"                   "q71"                   "q72"                  
-[115] "q73"                   "q74_1"                 "q74_2"                
-[118] "q74_3"                 "q74_4"                 "q74_5"                
-[121] "q74_6"                 "q29"                   "q30"                  
-[124] "q31"                   "q110"                  "q32"                  
-[127] "q33"                   "q34"                   "q111"                 
-[130] "q112"                  "q35"                   "q36"                  
-[133] "q37"                   "q38"                   "q40"                  
-[136] "q41"                   "q42"                   "q43"                  
-[139] "q46"                   "q47"                   "q114_1"               
-[142] "q114_2"                "q114_3"                "q114_4"               
-[145] "q114_5"                "q114_6"                "q114_7"               
-[148] "q114_8"                "q114_9"                "q48"                  
-[151] "q49_1"                 "q49_2"                 "q49_3"                
-[154] "q50_1"                 "q50_2"                 "q50_3"                
-[157] "dem101"                "dem"                   "q109"                 
-[160] "politcs"               "q51_1"                 "q51_2"                
-[163] "q51_3"                 "q51_4"                 "q51_5"                
-[166] "q51_6"                 "q51_7"                 "q51_8"                
-[169] "q51_8_text"            "q52"                   "q52_5_text"           
-[172] "q53"                   "q54"                   "q113_first_click"     
-[175] "q113_last_click"       "q113_page_submit"      "q113_click_count"     
-[178] "q55"                   "q56_1"                 "q56_2"                
-[181] "q56_3"                 "q56_4"                 "q56_4_text"           
-[184] "q78_1"                 "q78_7"                 "q78_2"                
-[187] "q78_3"                 "q78_4"                 "q78_6"                
-[190] "q78_6_text"            "q58_1"                 "q58_2"                
-[193] "respondent_id"         "block"                 "attn_q9_pass"         
-[196] "attn_q9_typo"          "attn_check_q17"        "attn_q114_pass"       
-[199] "attn_q9_answered"      "attn_q17_answered"     "attn_q114_answered"   
-[202] "attn_pass_count"       "attn_fail_count"       "attn_answered_count"  
-[205] "duration_minutes"      "sub_8"                 "sub_12"               
-[208] "sub_20"                "sub_30"                "over_52"              
-[211] "over_180"              "nonfinisher"           "d_black_afam_abc"     
-[214] "d_native_ind_abc"      "d_asianam_abc"         "d_latino_his_abc"     
-[217] "d_whiteam_abc"         "d_mideastam_abc"       "d_incwomen_abc"       
-[220] "d_collegewom_abc"      "d_enviro_abc"          "d_feminists_abc"      
-[223] "d_proabort_choice_abc" "d_abortprov_abc"       "d_welfare_tanf_abc"   
-[226] "d_fstamps_snap_abc"    "d_unions_abc"          "d_medicaid_abc"       
-[229] "d_medicare_abc"        "d_unemployed_abc"      "d_police_abc"         
-[232] "d_poorfam_abc"         "d_wealthy_abc"         "d_teachers_abc"       
-[235] "d_sci_experts_abc"     "d_child_abc"           "d_crim_abc"           
-[238] "d_incppl_pris_abc"     "d_homeless_abc"        "d_immigrants_abc"     
-[241] "d_unauth_undoc_abc"    "d_gunowners_abc"       "d_voters_abc"         
-[244] "d_lgbt_abc"            "d_trans_abc"           "d_transkids_abc"      
-[247] "d_gunmans_abc"         "d_ice_abc"             "d_socmed_abc"         
-[250] "d_nra_abc"             "d_bigbank_abc"         "d_bigcorp_abc"        
-[253] "d_uni_abc"             "d_comcoll_abc"         "d_noncit_parent_a"    
-[256] "d_incparents_a"        "d_hsteen_a"            "d_athiest_a"          
-[259] "d_cath_a"              "d_evan_a"              "d_jews_a"             
-[262] "d_pal_a"               "d_muslim_a"            "d_blackwom_a"         
-[265] "d_blackmen_a"          "d_lds_a"               "d_longcov_a"          
-[268] "d_exon_a"              "d_weed_a"              "d_opioid_a"           
-[271] "d_whitecol_a"          "d_tech_a"              "d_smokers_a"          
-[274] "d_genx_a"              "d_boomer_a"            "d_mill_a"             
-[277] "d_genz_a"              "d_metoo_b"             "d_christnat_b"        
-[280] "d_ruralam_b"           "d_urbanam_b"           "d_suburbam_b"         
-[283] "d_billion_b"           "d_blm_b"               "d_maga_b"             
-[286] "d_progs_b"             "d_soc_b"               "d_proudboys_b"        
-[289] "d_attnys_b"            "d_military_b"          "d_vets_b"             
-[292] "d_solds_b"             "d_essentials_b"        "d_nurses_b"           
-[295] "d_drs_b"               "d_dems_b"              "d_reps_b"             
-[298] "d_media_b"             "d_bluecol_c"           "d_working_c"          
-[301] "d_midclass_c"          "d_migrantwork_c"       "d_smallbiz_c"         
-[304] "d_taxpayers_c"         "d_elderly_c"           "d_moms_c"             
-[307] "d_retires_c"           "d_sexoffenders_c"      "d_sexhar_vict_c"      
-[310] "d_sexharrasser_c"      "d_formerlyinc_c"       "d_homeown_c"          
-[313] "d_regufee_c"           "d_gunvi_vict_c"        "d_polbrut_vict_c"     
-[316] "d_unins_c"             "d_mentill_c"           "d_aids_c"             
-[319] "d_gay_c"               "d_lesbians_c"          "common_na_count"      
-[322] "block_na_count"        "na_count"             </code></pre>
-</div>
 </div>
 <section id="attention-checks" class="level2">
 <h2 class="anchored" data-anchor-id="attention-checks">attention checks</h2>
-<p>How’d they do on attention checks?</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 2
@@ -1219,7 +683,7 @@ FALSE  TRUE
 4                   3  1663</code></pre>
 </div>
 </div>
-<p>Overall, 1,604 respondents passed all 3 checks. 462 passed 2, 29 passed 1, and 599 respondents “failed” all 3 checks – or they did not supply correct answers.</p>
+<p>Overall, 1,604 respondents passed all 3 checks. 462 passed 2, 29 passed 1, and 599 respondents “failed” all 3 checks – or they did not supply correct answers.This can include NAs.</p>
 <p>table:</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -1287,7 +751,7 @@ FALSE  TRUE
 <pre><code># A tibble: 1 × 13
       n sub_8_n sub_8_pct sub_12_n sub_12_pct sub_20_n sub_20_pct sub_30_n
   &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
-1  2694     352      13.1      539       20.0     1021       37.9     1595
+1  2694     368      13.7      570       21.2     1021       37.9     1595
 # ℹ 5 more variables: sub_30_pct &lt;dbl&gt;, over_52_n &lt;dbl&gt;, over_52_pct &lt;dbl&gt;,
 #   over_180_n &lt;dbl&gt;, over_180_pct &lt;dbl&gt;</code></pre>
 </div>
@@ -1317,11 +781,11 @@ FALSE  TRUE
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-   2.00    2.00    3.00   69.67  133.00  253.00 </code></pre>
+   2.00    2.00    3.00   67.39  127.00  247.00 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-   2.00    2.00    3.00   67.02  133.00  230.00 </code></pre>
+   2.00    2.00    3.00   64.74  127.00  224.00 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
@@ -1342,8 +806,8 @@ FALSE  TRUE
 <pre><code># A tibble: 2 × 8
   finished     n min_na q1_na median_na mean_na q3_na max_na
   &lt;chr&gt;    &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
-1 0          463     36   188       251   218.    252    253
-2 1         2231      2     2         3    38.8   133    214</code></pre>
+1 0          463     35   182       245   212.    246    247
+2 1         2231      2     2         3    37.3   127    208</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1351,9 +815,9 @@ FALSE  TRUE
 <pre><code># A tibble: 3 × 7
   block     n median_na mean_na q75_na q90_na max_na
   &lt;chr&gt; &lt;int&gt;     &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-1 A       898         3    66.7    134    188    253
-2 B       898         3    66.5    133    188    251
-3 C       898         3    75.9    133    252    252</code></pre>
+1 A       898         3    64.4    128    182    247
+2 B       898         3    64.2    127    182    245
+3 C       898         3    73.5    127    246    246</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1361,11 +825,11 @@ FALSE  TRUE
 <pre><code># A tibble: 5 × 6
   progress_group     n median_na mean_na min_na max_na
   &lt;chr&gt;          &lt;int&gt;     &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-1 100%            2231         3    38.8      2    214
-2 25–&lt;50%           42       106   108.      71    176
-3 50–&lt;75%            1        55    55       55     55
-4 75–&lt;100%           1        36    36       36     36
-5 &lt;25%             419       252   230.     133    253</code></pre>
+1 100%            2231         3    37.3      2    208
+2 25–&lt;50%           42       100   103.      70    170
+3 50–&lt;75%            1        54    54       54     54
+4 75–&lt;100%           1        35    35       35     35
+5 &lt;25%             419       246   224.     127    247</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1373,10 +837,10 @@ FALSE  TRUE
 <pre><code># A tibble: 4 × 6
   attn_answered_count     n median_na mean_na median_progress pct_finished
                 &lt;int&gt; &lt;int&gt;     &lt;dbl&gt;   &lt;dbl&gt;           &lt;dbl&gt;        &lt;dbl&gt;
-1                   0   396       252  235.                 7        0.505
-2                   1   223       151  153.               100       90.6  
-3                   2   412       133  128.               100       88.6  
-4                   3  1663         3    4.52             100       99.9  </code></pre>
+1                   0   396       246  229.                 7        0.505
+2                   1   223       145  147.               100       90.6  
+3                   2   412       127  123.               100       88.6  
+4                   3  1663         3    4.48             100       99.9  </code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1384,7 +848,7 @@ FALSE  TRUE
 <pre><code># A tibble: 2 × 8
   finished     n median_progress median_na median_common_na median_block_na
   &lt;chr&gt;    &lt;int&gt;           &lt;dbl&gt;     &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt;
-1 0          463               7       251              230              21
+1 0          463               7       245              224              21
 2 1         2231             100         3                3               0
 # ℹ 2 more variables: median_attn_answered &lt;int&gt;, median_attn_passed &lt;dbl&gt;</code></pre>
 </div>
@@ -1409,34 +873,365 @@ FALSE  TRUE
 <h3 class="anchored" data-anchor-id="enough-usable-measurements">enough usable measurements?</h3>
 <p>Ie, did respondents supply enough of the questionnaire to furnish usable measurements?</p>
 <p>Among people who broke off—or among finishers with substantial missingness—what analytically important information is actually present?</p>
-<p>q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3</p>
-<p>q15_1 q15_2 q15_3 q15_4 q15_5 q15 q25_1 q25_2 q25_3 q25_4 q25_1 q4_1_1 q4_1_2 q4_1_3 q4_2_1 q4_2_2 q4_2_3, q62_1,q51_1, q51_2, q51_3, q51_4, q51_5, q51_6, q51_7, q51_8, dem101,</p>
-<p>q32, q33, q34, q35, q36, q37, q38, q111,</p>
 <p>used variables</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>used_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"d_crim_abc"</span>, <span class="st">"d_incppl_pris_abc"</span>,<span class="st">"d_incwomen_abc"</span>,<span class="st">"local_police"</span>, <span class="st">"local_police"</span>, <span class="st">"police_tracker"</span>, <span class="st">"police_training"</span>, <span class="st">"charge_police"</span>,</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="st">"dpen"</span>, <span class="st">"min_wage"</span>, <span class="st">"free_calls"</span>, <span class="st">"ed_funds"</span>, <span class="st">"incarc_raw"</span>, <span class="st">"knowincarc_raw"</span>, <span class="st">"noincarc_raw"</span>, <span class="st">"vict_raw"</span>, <span class="st">"knowvict_raw"</span>, <span class="st">"novict_raw"</span>, <span class="st">"lwop"</span>, <span class="st">"alt_sentencing"</span>, <span class="st">"post_felony_vote"</span>,<span class="st">"jail_access"</span>, <span class="st">"prison_purpose"</span>,<span class="st">"White"</span>, <span class="st">"Black"</span>, <span class="st">"Hisp_Latino"</span>, <span class="st">"Asian_Am"</span>, <span class="st">"Native_Am"</span>, <span class="st">"Pac_Island"</span>, <span class="st">"MENA"</span>, <span class="st">"race_notlisted"</span>,<span class="st">"dem101"</span>,<span class="st">"fire_rare"</span>, <span class="st">"fire_privilege"</span>, <span class="st">"fire_angry"</span>, <span class="st">"fire_fear"</span>, <span class="st">"aa_special_favors"</span>, <span class="st">"aa_been_cheated"</span>, <span class="st">"aa_try_harder"</span>, <span class="st">"legacy_slavery"</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>used_var_missing <span class="ot">&lt;-</span> raw_data <span class="sc">%&gt;%</span> </span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">all_of</span>(used_vars),</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span><span class="fu">sum</span>(<span class="fu">is.na</span>(.))</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">everything</span>(),</span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"variable"</span>,</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"n_missing"</span></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_answered =</span> <span class="fu">nrow</span>(raw_data)<span class="sc">-</span> n_missing,</span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_missing =</span> n_missing<span class="sc">/</span><span class="fu">nrow</span>(raw_data) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_answered =</span> n_answered<span class="sc">/</span><span class="fu">nrow</span>(raw_data) <span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(pct_missing))</span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(used_var_missing)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <p>for overleaf</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 236 × 3
-   variable n_missing pct_missing
-   &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;
- 1 q112          2694       100  
- 2 q109          2297        85.3
- 3 dem           2071        76.9
- 4 q53           1412        52.4
- 5 politcs       1082        40.2
- 6 q51_1         1082        40.2
- 7 q51_2         1082        40.2
- 8 q51_3         1082        40.2
- 9 q51_4         1082        40.2
-10 q51_5         1082        40.2
-# ℹ 226 more rows</code></pre>
+<pre><code># A tibble: 232 × 3
+   variable   n_missing pct_missing
+   &lt;chr&gt;          &lt;int&gt;       &lt;dbl&gt;
+ 1 q112            2694       100  
+ 2 q109            2297        85.3
+ 3 dem             2071        76.9
+ 4 born_again      1412        52.4
+ 5 self_ideo       1082        40.2
+ 6 White           1082        40.2
+ 7 Black           1082        40.2
+ 8 Native_Am       1082        40.2
+ 9 Asian_Am        1082        40.2
+10 Pac_Island      1082        40.2
+# ℹ 222 more rows</code></pre>
 </div>
 </div>
+<p>Branch questions: 109 112 dem q53</p>
+<p>Demographics q51_n (racial dem) q56 (gender) (_1 is women, _2 man, _3 queer, _4 other)</p>
+<p>Info I will need about respondents who answer DVs - race - gender - political identity</p>
+<p>Race vars uncleaned are 0, 1, NA, -99</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "character"</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ -99    0    1 &lt;NA&gt; 
+   3  425 1184 1082 </code></pre>
+</div>
+</div>
+<p>425 not-white respondents who made it to this question 1184 white respondents who made it to this question 1082 started but didn’t make it to this question</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "1"   "0"   NA    "-99"</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ -99    0    1 &lt;NA&gt; 
+   3 1341  268 1082 </code></pre>
+</div>
+</div>
+<p>268 black respondents 1341 not black respondents 1082 NA</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ -99    0    1 &lt;NA&gt; 
+   3 1372  237 1082 </code></pre>
+</div>
+</div>
+<p>237 Hispanic respondents 1372 not hispanic respondents 1082 NA</p>
 </section>
+</section>
+</section>
+<section id="flag-and-or-drop" class="level1">
+<h1>6. Flag and or drop</h1>
+<section id="attn-checks" class="level3">
+<h3 class="anchored" data-anchor-id="attn-checks">attn checks</h3>
+</section>
+<section id="duration-1" class="level3">
+<h3 class="anchored" data-anchor-id="duration-1">duration</h3>
+<p>-already did sub 8 through 30, over 52 over 180 Hillygus: standard is to drop 1/3 median, flag 1/2 median</p>
+<p>median: 25.35 1/3 is 8.43</p>
+</section>
+<section id="progressfinished" class="level3">
+<h3 class="anchored" data-anchor-id="progressfinished">progress/finished</h3>
+<p>DROP – faster than 1/3 the median, so sub 8.43 min responders</p>
+<p>I looked at the 8.43 people. Among them, 277 did not answer any of the 3 attentioon checks. These folks (faster than a third the median and didn not answer attention checks) can go.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+FALSE  TRUE 
+ 2417   277 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 277 × 5
+   respondent_id      duration_minutes attn_answered_count attn_pass_count
+   &lt;chr&gt;                         &lt;dbl&gt;               &lt;int&gt;           &lt;dbl&gt;
+ 1 iP4a7f33c2ba24c0ef            0.1                     0               0
+ 2 iPbed21bf0d15adf39            1.68                    0               0
+ 3 iPcc9072b73bc2d0e0            1                       0               0
+ 4 iP2ca8f1159704a395            4.17                    0               0
+ 5 iPea07e47873b4cea0            0.867                   0               0
+ 6 iP6ebe05656b32ef23            0.95                    0               0
+ 7 iPfd843fd266982a94            3.35                    0               0
+ 8 iP109d083129f37429            0.467                   0               0
+ 9 iP4d89bded1964c00e            4.2                     0               0
+10 iP822a81e573606fd8            0.117                   0               0
+# ℹ 267 more rows
+# ℹ 1 more variable: attn_wrong_count &lt;dbl&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+      n
+  &lt;int&gt;
+1  2417</code></pre>
+</div>
+</div>
+<p>This brings the N to 2417.</p>
+<p>What about those who were faster than 1/3 the median but failed all three?</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+FALSE  TRUE 
+ 2416     1 </code></pre>
+</div>
+</div>
+<p>There’s just one. We can remove that person.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+      n
+  &lt;int&gt;
+1  2416</code></pre>
+</div>
+</div>
+<p>Now the N is 2416.</p>
+<p>Remaining respondents who were under a third of the median?</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 232 × 3
+   variable       n_missing pct_missing
+   &lt;chr&gt;              &lt;int&gt;       &lt;dbl&gt;
+ 1 q112                  89        3.68
+ 2 q109                  89        3.68
+ 3 dem                   86        3.56
+ 4 born_again            83        3.44
+ 5 livew_guns            82        3.39
+ 6 no_known_gay          82        3.39
+ 7 gay_friend            82        3.39
+ 8 gay_fam               82        3.39
+ 9 no_known_trans        82        3.39
+10 trans_friend          82        3.39
+# ℹ 222 more rows</code></pre>
+</div>
+</div>
+<p>If you went sub 1/3 the median, have progress less than 100 and answered fewer than all 3 attention checks (or failed), probably should go.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+</div>
+<p>only 4 people</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2412</code></pre>
+</div>
+</div>
+<p>down to 2412 respondents</p>
+<p>NOTE TO SELF: Have still not excluded all sub 1/3 the median.</p>
+<p>85 ??? Sept 14 – you can come back to this later, for now focus on what’s up without these 85, apply the rule, talk about differences between remaining all answer and remaining only answer controls</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2327</code></pre>
+</div>
+</div>
+<p>n is 2,327</p>
+<p>(dropped th 85)</p>
 </section>
 </section>
 <section id="save-cleaned_light.csv" class="level1">
 <h1>4. SAVE: cleaned_light.csv</h1>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] "progress"                   "duration_in_seconds"       
+  [3] "finished"                   "response_id"               
+  [5] "incarc_raw"                 "knowincarc_raw"            
+  [7] "noincarc_raw"               "vict_raw"                  
+  [9] "knowvict_raw"               "novict_raw"                
+ [11] "on_medicaid"                "knowmedicaid"              
+ [13] "no_medicaid"                "tanf"                      
+ [15] "knowtanf"                   "notanf"                    
+ [17] "snap"                       "knowsnap"                  
+ [19] "nosnap"                     "immigrated"                
+ [21] "knowimmigrated"             "noimmigrated"              
+ [23] "unionmember"                "knowunion"                 
+ [25] "nounion"                    "aborted"                   
+ [27] "knowaborted"                "noaborted"                 
+ [29] "unemployed"                 "knowunemployed"            
+ [31] "nounemployed"               "uninsured"                 
+ [33] "knowuninsured"              "nouninsured"               
+ [35] "unable_vote"                "know_unable_vote"          
+ [37] "no_unable_vote"             "ration_scripts"            
+ [39] "ration_period"              "ration_food"               
+ [41] "q9"                         "q102_1"                    
+ [43] "q102_2"                     "q102_3"                    
+ [45] "q102_4"                     "q102_5"                    
+ [47] "local_police"               "no_strangle"               
+ [49] "police_tracker"             "police_training"           
+ [51] "charge_police"              "prison_purpose"            
+ [53] "dpen"                       "min_wage"                  
+ [55] "free_calls"                 "ed_funds"                  
+ [57] "lwop"                       "alt_sentencing"            
+ [59] "q17"                        "medicare"                  
+ [61] "unemployment_ins"           "medicaid"                  
+ [63] "reduce_ineq_minwage"        "reduce_ineq_studdebt"      
+ [65] "reduce_ineq_taxrich"        "reduce_ineq_moremedcare"   
+ [67] "reduce_ineq_lessmig"        "reduce_ineq_poorben"       
+ [69] "reduce_ineq_morecoll"       "auto_reg"                  
+ [71] "post_felony_vote"           "early_vote"                
+ [73] "election_holiday"           "voter_id"                  
+ [75] "noncit_local"               "jail_access"               
+ [77] "gun_sales"                  "guns_1"                    
+ [79] "guns_2"                     "guns_3"                    
+ [81] "guns_4"                     "guns_5"                    
+ [83] "guns_6"                     "abortion_op"               
+ [85] "abortion_death"             "abortion_health"           
+ [87] "abortion_rape"              "abortion_defect"           
+ [89] "abortion_miscar"            "abortion_debt"             
+ [91] "abortion_violence"          "abortion_incarc"           
+ [93] "abortion_teen"              "abortion_want"             
+ [95] "abortion_ability"           "lgbt_employers"            
+ [97] "lgbt_medical"               "lgbt_business"             
+ [99] "college_econ_wellbeing"     "college_indoctrination"    
+[101] "more_attend_college"        "college_diverse_students"  
+[103] "public_college_funding"     "college_no_race_admissions"
+[105] "college_ben_beat_costs"     "colleges_out_touch"        
+[107] "reg_banks"                  "reg_socmedia"              
+[109] "reg_six_fig"                "reg_biz"                   
+[111] "increase_deportations"      "increase_border_security"  
+[113] "accept_refugees"            "easier_family_sponsorship" 
+[115] "allow_daca_stay"            "legal_status_undocumented" 
+[117] "gets_issues"                "gov_attn"                  
+[119] "vote2020"                   "willvote"                  
+[121] "fire_rare"                  "fire_privilege"            
+[123] "fire_angry"                 "fire_fear"                 
+[125] "q112"                       "aa_special_favors"         
+[127] "aa_been_cheated"            "aa_try_harder"             
+[129] "legacy_slavery"             "women_power"               
+[131] "women_xagg"                 "women_leash"               
+[133] "feminist"                   "fiscal_ideology"           
+[135] "social_ideology"            "facebook"                  
+[137] "twitter"                    "youtube"                   
+[139] "q114_4"                     "truthsocial"               
+[141] "parlor1"                    "reddit"                    
+[143] "tiktok"                     "parlor2"                   
+[145] "livew_guns"                 "no_known_gay"              
+[147] "gay_friend"                 "gay_fam"                   
+[149] "no_known_trans"             "trans_friend"              
+[151] "trans_fam"                  "dem101"                    
+[153] "dem"                        "q109"                      
+[155] "self_ideo"                  "White"                     
+[157] "Black"                      "Native_Am"                 
+[159] "Asian_Am"                   "Pac_Island"                
+[161] "MENA"                       "Hisp_Latino"               
+[163] "race_notlisted"             "q51_8_text"                
+[165] "relig"                      "relig_text"                
+[167] "born_again"                 "relig_import"              
+[169] "q113_first_click"           "q113_last_click"           
+[171] "q113_page_submit"           "q113_click_count"          
+[173] "trans"                      "woman"                     
+[175] "man"                        "gqueer"                    
+[177] "g_other"                    "q56_4_text"                
+[179] "hetero"                     "lesbian"                   
+[181] "bi"                         "gay"                       
+[183] "queer"                      "other_sexuality"           
+[185] "q78_6_text"                 "q58_1"                     
+[187] "q58_2"                      "respondent_id"             
+[189] "state"                      "county"                    
+[191] "block"                      "attn_q9_pass"              
+[193] "attn_q9_typo"               "attn_check_q17"            
+[195] "attn_q114_pass"             "attn_q9_answered"          
+[197] "attn_q17_answered"          "attn_q114_answered"        
+[199] "attn_pass_count"            "attn_fail_count"           
+[201] "attn_answered_count"        "duration_minutes"          
+[203] "sub_8.45"                   "sub_12.6"                  
+[205] "sub_20"                     "sub_30"                    
+[207] "over_52"                    "over_180"                  
+[209] "nonfinisher"                "d_black_afam_abc"          
+[211] "d_native_ind_abc"           "d_asianam_abc"             
+[213] "d_latino_his_abc"           "d_whiteam_abc"             
+[215] "d_mideastam_abc"            "d_incwomen_abc"            
+[217] "d_collegewom_abc"           "d_enviro_abc"              
+[219] "d_feminists_abc"            "d_proabort_choice_abc"     
+[221] "d_abortprov_abc"            "d_welfare_tanf_abc"        
+[223] "d_fstamps_snap_abc"         "d_unions_abc"              
+[225] "d_medicaid_abc"             "d_medicare_abc"            
+[227] "d_unemployed_abc"           "d_police_abc"              
+[229] "d_poorfam_abc"              "d_wealthy_abc"             
+[231] "d_teachers_abc"             "d_sci_experts_abc"         
+[233] "d_child_abc"                "d_crim_abc"                
+[235] "d_incppl_pris_abc"          "d_homeless_abc"            
+[237] "d_immigrants_abc"           "d_unauth_undoc_abc"        
+[239] "d_gunowners_abc"            "d_voters_abc"              
+[241] "d_lgbt_abc"                 "d_trans_abc"               
+[243] "d_transkids_abc"            "d_gunmans_abc"             
+[245] "d_ice_abc"                  "d_socmed_abc"              
+[247] "d_nra_abc"                  "d_bigbank_abc"             
+[249] "d_bigcorp_abc"              "d_uni_abc"                 
+[251] "d_comcoll_abc"              "d_noncit_parent_a"         
+[253] "d_incparents_a"             "d_hsteen_a"                
+[255] "d_athiest_a"                "d_cath_a"                  
+[257] "d_evan_a"                   "d_jews_a"                  
+[259] "d_pal_a"                    "d_muslim_a"                
+[261] "d_blackwom_a"               "d_blackmen_a"              
+[263] "d_lds_a"                    "d_longcov_a"               
+[265] "d_exon_a"                   "d_weed_a"                  
+[267] "d_opioid_a"                 "d_whitecol_a"              
+[269] "d_tech_a"                   "d_smokers_a"               
+[271] "d_genx_a"                   "d_boomer_a"                
+[273] "d_mill_a"                   "d_genz_a"                  
+[275] "d_metoo_b"                  "d_christnat_b"             
+[277] "d_ruralam_b"                "d_urbanam_b"               
+[279] "d_suburbam_b"               "d_billion_b"               
+[281] "d_blm_b"                    "d_maga_b"                  
+[283] "d_progs_b"                  "d_soc_b"                   
+[285] "d_proudboys_b"              "d_attnys_b"                
+[287] "d_military_b"               "d_vets_b"                  
+[289] "d_solds_b"                  "d_essentials_b"            
+[291] "d_nurses_b"                 "d_drs_b"                   
+[293] "d_dems_b"                   "d_reps_b"                  
+[295] "d_media_b"                  "d_bluecol_c"               
+[297] "d_working_c"                "d_midclass_c"              
+[299] "d_migrantwork_c"            "d_smallbiz_c"              
+[301] "d_taxpayers_c"              "d_elderly_c"               
+[303] "d_moms_c"                   "d_retires_c"               
+[305] "d_sexoffenders_c"           "d_sexhar_vict_c"           
+[307] "d_sexharrasser_c"           "d_formerlyinc_c"           
+[309] "d_homeown_c"                "d_regufee_c"               
+[311] "d_gunvi_vict_c"             "d_polbrut_vict_c"          
+[313] "d_unins_c"                  "d_mentill_c"               
+[315] "d_aids_c"                   "d_gay_c"                   
+[317] "d_lesbians_c"               "common_na_count"           
+[319] "block_na_count"             "na_count"                  
+[321] "attn_wrong_count"           "breakoff"                  
+[323] "early_breakoff"             "sub_mean_breakoff"         
+[325] "exclude_fast_no_attn"       "exclude_fast_bad_attn"     
+[327] "exclude_fast_incomplete"   </code></pre>
+</div>
+</div>
 </section>
 
 </main>

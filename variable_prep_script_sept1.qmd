@@ -599,7 +599,7 @@ cor(pol_tude,
 print(psych::corr.test(pol_tude))
 ```
 
-### I. Gender 
+### I. Gender
 
 ```{r, gender}
 #raw_data_cleaned %>% count(q55)

@@ -1752,14 +1752,232 @@ display: none;
 
 
 <!-- rnb-text-begin -->
+<ol style="list-style-type: upper-alpha">
+<li></li>
+</ol>
 <p>run data_prep_sept1.qmd</p>
 <p>make sure github saves this</p>
 <p>write_csv(raw_data_cleaned , “data/cleaned/over_8_cleaned.csv”)</p>
 <p>so that when the next file pulls “data/cleaned/over_8_cleaned.csv” it
 is the most recent</p>
+<ol start="2" style="list-style-type: upper-alpha">
+<li></li>
+</ol>
+<p>then run variable_prep_script_sept1.qmd</p>
+<p>make sure github saves this</p>
+<p>write_csv(raw_data_cleaned,
+“data/cleaned/coded_data__09_18_26.csv”)</p>
+<p>so that when the next file pulls
+“data/cleaned/coded_data__09_18_26.csv” it is the most recent</p>
+<ol start="3" style="list-style-type: upper-alpha">
+<li></li>
+</ol>
+<p>then run outcome_variables_sept1.rmd</p>
+<p>make sure github saves</p>
+<p>write_csv(raw_data_cleaned, “data/cleaned/all_vars_over_8.csv”)</p>
+<p>so that when the next file pulls
+“datadata/cleaned/all_vars_over_8.csv” it is the most recent</p>
+<ol start="4" style="list-style-type: upper-alpha">
+<li></li>
+</ol>
+<p>then run Data_Junction.Rmd</p>
+<p>make sure github saves</p>
+<p>write_csv(data_full, “data/cleaned_control_data.csv”) and
+write_csv(df_no_control, “data/cleaned_sans_control_data.csv”)</p>
+<p>so that when the next file pulls “data/cleaned_control_data.csv” and
+“data/cleaned_sans_control_data.csv” they are the most recent</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVYRzRqSUQwOVBUMDlQVDA5UFQwOVBUMDlQVDA5UFQwOVBUMDlQVDA5UFQwOVBUMDlQVDA5UFQwOVBUMDlQVDA5UFQwOVBUMDlQVDA5UFQwOVBUMDlQVnh1SXlCRFNFRlFWRVZTSURFZ1JFRlVRU0JRU1ZCRlRFbE9SVnh1SXlBOVBUMDlQVDA5UFQwOVBUMDlQVDA5UFQwOVBUMDlQVDA5UFQwOVBUMDlQVDA5UFQwOVBUMDlQVDA5UFQwOVBUMDlQVDA5UFQwOVBUMDlQVDFjYmx4dUl5QXhMaUJKYm1sMGFXRnNJR1JoZEdFZ1kyeGxZVzVwYm1kY2JuTjVjM1JsYlRJb1hHNGdJRndpY1hWaGNuUnZYQ0lzWEc0Z0lHTW9YQ0p5Wlc1a1pYSmNJaXdnWENKa1lYUmhYM0J5WlhCZmMyVndkREV1Y1cxa1hDSXBYRzRwWEc1Y2JpTWdNaTRnVm1GeWFXRmliR1VnY0hKbGNHRnlZWFJwYjI1Y2JuTjVjM1JsYlRJb1hHNGdJRndpY1hWaGNuUnZYQ0lzWEc0Z0lHTW9YQ0p5Wlc1a1pYSmNJaXdnWENKMllYSnBZV0pzWlY5d2NtVndYM05qY21sd2RGOXpaWEIwTVM1eGJXUmNJaWxjYmlsY2JseHVJeUF6TGlCUGRYUmpiMjFsSUhaaGNtbGhZbXhsSUdOdmJuTjBjblZqZEdsdmJseHVjbTFoY210a2IzZHVPanB5Wlc1a1pYSW9YRzRnSUZ3aWIzVjBZMjl0WlY5MllYSnBZV0pzWlhOZmMyVndkREV1VW0xa1hDSmNiaWxjYm1CZ1lDSjkgLS0+XG5cbmBgYHJcblxuIyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cbiMgQ0hBUFRFUiAxIERBVEEgUElQRUxJTkVcbiMgPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09XG5cbiMgMS4gSW5pdGlhbCBkYXRhIGNsZWFuaW5nXG5zeXN0ZW0yKFxuICBcInF1YXJ0b1wiLFxuICBjKFwicmVuZGVyXCIsIFwiZGF0YV9wcmVwX3NlcHQxLnFtZFwiKVxuKVxuXG4jIDIuIFZhcmlhYmxlIHByZXBhcmF0aW9uXG5zeXN0ZW0yKFxuICBcInF1YXJ0b1wiLFxuICBjKFwicmVuZGVyXCIsIFwidmFyaWFibGVfcHJlcF9zY3JpcHRfc2VwdDEucW1kXCIpXG4pXG5cbiMgMy4gT3V0Y29tZSB2YXJpYWJsZSBjb25zdHJ1Y3Rpb25cbnJtYXJrZG93bjo6cmVuZGVyKFxuICBcIm91dGNvbWVfdmFyaWFibGVzX3NlcHQxLlJtZFwiXG4pXG5gYGBcblxuPCEtLSBybmItc291cmNlLWVuZCAtLT5cbiJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG4jID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuIyBDSEFQVEVSIDEgREFUQSBQSVBFTElORVxuIyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cblxuIyAxLiBJbml0aWFsIGRhdGEgY2xlYW5pbmdcbnN5c3RlbTIoXG4gIFwicXVhcnRvXCIsXG4gIGMoXCJyZW5kZXJcIiwgXCJkYXRhX3ByZXBfc2VwdDEucW1kXCIpXG4pXG5cbiMgMi4gVmFyaWFibGUgcHJlcGFyYXRpb25cbnN5c3RlbTIoXG4gIFwicXVhcnRvXCIsXG4gIGMoXCJyZW5kZXJcIiwgXCJ2YXJpYWJsZV9wcmVwX3NjcmlwdF9zZXB0MS5xbWRcIilcbilcblxuIyAzLiBPdXRjb21lIHZhcmlhYmxlIGNvbnN0cnVjdGlvblxucm1hcmtkb3duOjpyZW5kZXIoXG4gIFwib3V0Y29tZV92YXJpYWJsZXNfc2VwdDEuUm1kXCJcbilcbmBgYCJ9 -->
+<pre class="r"><code>
+# ============================================================
+# CHAPTER 1 DATA PIPELINE
+# ============================================================
+
+# 1. Initial data cleaning
+system2(
+  &quot;quarto&quot;,
+  c(&quot;render&quot;, &quot;data_prep_sept1.qmd&quot;)
+)
+
+# 2. Variable preparation
+system2(
+  &quot;quarto&quot;,
+  c(&quot;render&quot;, &quot;variable_prep_script_sept1.qmd&quot;)
+)
+
+# 3. Outcome variable construction
+rmarkdown::render(
+  &quot;outcome_variables_sept1.Rmd&quot;
+)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG4gIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgMCVcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAyJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA1JSBbc2V0dXBdICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA3JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA5JSBbdW5uYW1lZC1jaHVuay0yXSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEyJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDE0JSBbZGVzb3IxXSAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDE2JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDE5JSBbZGVzb3IyXSAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIxJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIzJSBbZGVzb3IzXSAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDI2JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDI4JSBbcHVuaXNob3JyZWhhYl0gICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDMwJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDMzJSBbcHJpc29ucGVuXSAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDM1JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDM3JSBbdW5uYW1lZC1jaHVuay0zXSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQwJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQyJSBbdW5uYW1lZC1jaHVuay00XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQ0JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQ3JSBbcHJpc29uaGVscF0gICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQ5JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDUxJSBbdW5uYW1lZC1jaHVuay01XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDUzJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgIHwgIDU2JSBbdW5uYW1lZC1jaHVuay02XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgIHwgIDU4JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgIHwgIDYwJSBbZWxlY3Rpb25oZWxwcXNdICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgIHwgIDYzJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgIHwgIDY1JSBbdW5uYW1lZC1jaHVuay03XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgIHwgIDY3JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgIHwgIDcwJSBbdW5uYW1lZC1jaHVuay04XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgIHwgIDcyJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgIHwgIDc0JSBbZWxlY3Rpb25oZWxwcXNfMl1cbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgIHwgIDc3JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgIHwgIDc5JSBbdW5uYW1lZC1jaHVuay05XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgIHwgIDgxJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgIHwgIDg0JSBbdW5uYW1lZC1jaHVuay0xMF1cbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgIHwgIDg2JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgIHwgIDg4JSBbdW5uYW1lZC1jaHVuay0xMV1cbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgIHwgIDkxJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgIHwgIDkzJSBbdW5uYW1lZC1jaHVuay0xMl1cbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gIHwgIDk1JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIHwgIDk4JSBbdW5uYW1lZC1jaHVuay0xM11cbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLnwgMTAwJSAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuL0FwcGxpY2F0aW9ucy9SU3R1ZGlvLmFwcC9Db250ZW50cy9SZXNvdXJjZXMvYXBwL3F1YXJ0by9iaW4vdG9vbHMvYWFyY2g2NC9wYW5kb2MgK1JUUyAtSzUxMm0gLVJUUyBvdXRjb21lX3ZhcmlhYmxlc19zZXB0MS5rbml0Lm1kIC0tdG8gaHRtbDQgLS1mcm9tIG1hcmtkb3duK2F1dG9saW5rX2JhcmVfdXJpcyt0ZXhfbWF0aF9zaW5nbGVfYmFja3NsYXNoIC0tb3V0cHV0IG91dGNvbWVfdmFyaWFibGVzX3NlcHQxLmh0bWwgLS1sdWEtZmlsdGVyIC9MaWJyYXJ5L0ZyYW1ld29ya3MvUi5mcmFtZXdvcmsvVmVyc2lvbnMvNC42L1Jlc291cmNlcy9saWJyYXJ5L3JtYXJrZG93bi9ybWFya2Rvd24vbHVhL3BhZ2VicmVhay5sdWEgLS1sdWEtZmlsdGVyIC9MaWJyYXJ5L0ZyYW1ld29ya3MvUi5mcmFtZXdvcmsvVmVyc2lvbnMvNC42L1Jlc291cmNlcy9saWJyYXJ5L3JtYXJrZG93bi9ybWFya2Rvd24vbHVhL2xhdGV4LWRpdi5sdWEgLS1sdWEtZmlsdGVyIC9MaWJyYXJ5L0ZyYW1ld29ya3MvUi5mcmFtZXdvcmsvVmVyc2lvbnMvNC42L1Jlc291cmNlcy9saWJyYXJ5L3JtYXJrZG93bi9ybWFya2Rvd24vbHVhL3RhYmxlLWNsYXNzZXMubHVhIC0tZW1iZWQtcmVzb3VyY2VzIC0tc3RhbmRhbG9uZSAtLXZhcmlhYmxlIGJzMz1UUlVFIC0tc2VjdGlvbi1kaXZzIC0tdGVtcGxhdGUgL0xpYnJhcnkvRnJhbWV3b3Jrcy9SLmZyYW1ld29yay9WZXJzaW9ucy80LjYvUmVzb3VyY2VzL2xpYnJhcnkvcm1hcmtkb3duL3JtZC9oL2RlZmF1bHQuaHRtbCAtLXN5bnRheC1oaWdobGlnaHRpbmcgbm9uZSAtLXZhcmlhYmxlIGhpZ2hsaWdodGpzPTEgLS12YXJpYWJsZSB0aGVtZT1ib290c3RyYXAgLS1tYXRoamF4IC0tdmFyaWFibGUgJ21hdGhqYXgtdXJsPWh0dHBzOi8vbWF0aGpheC5yc3R1ZGlvLmNvbS9sYXRlc3QvTWF0aEpheC5qcz9jb25maWc9VGVYLUFNUy1NTUxfSFRNTG9yTU1MJyAtLWluY2x1ZGUtaW4taGVhZGVyIC92YXIvZm9sZGVycy96Xy9mY3RkcnRiOTU3emRrcTJiX3RoNHFicncwMDAwZ3EvVC8vUnRtcGh3N1NOZi9ybWFya2Rvd24tc3RyMTBhMGY1MmQ4MTY3NC5odG1sIC0tdmFyaWFibGUgY29kZV9mb2xkaW5nPXNob3cgLS12YXJpYWJsZSBzb3VyY2VfZW1iZWQ9b3V0Y29tZV92YXJpYWJsZXNfc2VwdDEuUm1kIC0taW5jbHVkZS1hZnRlci1ib2R5IC92YXIvZm9sZGVycy96Xy9mY3RkcnRiOTU3emRrcTJiX3RoNHFicncwMDAwZ3EvVC8vUnRtcGh3N1NOZi9maWxlMTBhMGY2OGFhNDQyOS5odG1sIC0tdmFyaWFibGUgY29kZV9tZW51PTEgLS12YXJpYWJsZSBrYWJsZS1zY3JvbGw9MSBcbiJ9 -->
+<pre><code>
+  |                                                           
+  |                                                     |   0%
+  |                                                           
+  |.                                                    |   2%                   
+  |                                                           
+  |..                                                   |   5% [setup]           
+  |                                                           
+  |....                                                 |   7%                   
+  |                                                           
+  |.....                                                |   9% [unnamed-chunk-2] 
+  |                                                           
+  |......                                               |  12%                   
+  |                                                           
+  |.......                                              |  14% [desor1]          
+  |                                                           
+  |.........                                            |  16%                   
+  |                                                           
+  |..........                                           |  19% [desor2]          
+  |                                                           
+  |...........                                          |  21%                   
+  |                                                           
+  |............                                         |  23% [desor3]          
+  |                                                           
+  |..............                                       |  26%                   
+  |                                                           
+  |...............                                      |  28% [punishorrehab]   
+  |                                                           
+  |................                                     |  30%                   
+  |                                                           
+  |.................                                    |  33% [prisonpen]       
+  |                                                           
+  |..................                                   |  35%                   
+  |                                                           
+  |....................                                 |  37% [unnamed-chunk-3] 
+  |                                                           
+  |.....................                                |  40%                   
+  |                                                           
+  |......................                               |  42% [unnamed-chunk-4] 
+  |                                                           
+  |.......................                              |  44%                   
+  |                                                           
+  |.........................                            |  47% [prisonhelp]      
+  |                                                           
+  |..........................                           |  49%                   
+  |                                                           
+  |...........................                          |  51% [unnamed-chunk-5] 
+  |                                                           
+  |............................                         |  53%                   
+  |                                                           
+  |..............................                       |  56% [unnamed-chunk-6] 
+  |                                                           
+  |...............................                      |  58%                   
+  |                                                           
+  |................................                     |  60% [electionhelpqs]  
+  |                                                           
+  |.................................                    |  63%                   
+  |                                                           
+  |...................................                  |  65% [unnamed-chunk-7] 
+  |                                                           
+  |....................................                 |  67%                   
+  |                                                           
+  |.....................................                |  70% [unnamed-chunk-8] 
+  |                                                           
+  |......................................               |  72%                   
+  |                                                           
+  |.......................................              |  74% [electionhelpqs_2]
+  |                                                           
+  |.........................................            |  77%                   
+  |                                                           
+  |..........................................           |  79% [unnamed-chunk-9] 
+  |                                                           
+  |...........................................          |  81%                   
+  |                                                           
+  |............................................         |  84% [unnamed-chunk-10]
+  |                                                           
+  |..............................................       |  86%                   
+  |                                                           
+  |...............................................      |  88% [unnamed-chunk-11]
+  |                                                           
+  |................................................     |  91%                   
+  |                                                           
+  |.................................................    |  93% [unnamed-chunk-12]
+  |                                                           
+  |...................................................  |  95%                   
+  |                                                           
+  |.................................................... |  98% [unnamed-chunk-13]
+  |                                                           
+  |.....................................................| 100%                   
+                                                                                                               
+/Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools/aarch64/pandoc +RTS -K512m -RTS outcome_variables_sept1.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output outcome_variables_sept1.html --lua-filter /Library/Frameworks/R.framework/Versions/4.6/Resources/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /Library/Frameworks/R.framework/Versions/4.6/Resources/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /Library/Frameworks/R.framework/Versions/4.6/Resources/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --template /Library/Frameworks/R.framework/Versions/4.6/Resources/library/rmarkdown/rmd/h/default.html --syntax-highlighting none --variable highlightjs=1 --variable theme=bootstrap --mathjax --variable &#39;mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39; --include-in-header /var/folders/z_/fctdrtb957zdkq2b_th4qbrw0000gq/T//Rtmphw7SNf/rmarkdown-str10a0f52d81674.html --variable code_folding=show --variable source_embed=outcome_variables_sept1.Rmd --include-after-body /var/folders/z_/fctdrtb957zdkq2b_th4qbrw0000gq/T//Rtmphw7SNf/file10a0f68aa4429.html --variable code_menu=1 --variable kable-scroll=1 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVJeUEwTGlCR2FXNWhiQ0JrWVhSaElHcDFibU4wYVc5dUlDOGdZVzVoYkhsMGFXTWdjMkZ0Y0d4bGMxeHVjbTFoY210a2IzZHVPanB5Wlc1a1pYSW9YRzRnSUZ3aVJHRjBZVjlLZFc1amRHbHZiaTVTYldSY0lseHVLVnh1WUdCZ0luMD0gLS0+XG5cbmBgYHJcbiMgNC4gRmluYWwgZGF0YSBqdW5jdGlvbiAvIGFuYWx5dGljIHNhbXBsZXNcbnJtYXJrZG93bjo6cmVuZGVyKFxuICBcIkRhdGFfSnVuY3Rpb24uUm1kXCJcbilcbmBgYFxuXG48IS0tIHJuYi1zb3VyY2UtZW5kIC0tPlxuIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyA0LiBGaW5hbCBkYXRhIGp1bmN0aW9uIC8gYW5hbHl0aWMgc2FtcGxlc1xucm1hcmtkb3duOjpyZW5kZXIoXG4gIFwiRGF0YV9KdW5jdGlvbi5SbWRcIlxuKVxuYGBgIn0= -->
+<pre class="r"><code># 4. Final data junction / analytic samples
+rmarkdown::render(
+  &quot;Data_Junction.Rmd&quot;
+)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG4gIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgMCVcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA0JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA4JSBbc2V0dXBdICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEyJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDE1JSBbdW5uYW1lZC1jaHVuay0xXSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDE5JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIzJSBbdW5uYW1lZC1jaHVuay0yXSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDI3JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDMxJSBbdW5uYW1lZC1jaHVuay0zXSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDM1JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDM4JSBbdW5uYW1lZC1jaHVuay00XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQyJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQ2JSBbdW5uYW1lZC1jaHVuay01XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDUwJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgIHwgIDU0JSBbdW5uYW1lZC1jaHVuay02XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgICAgICAgIHwgIDU4JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgICAgICAgIHwgIDYyJSBbdW5uYW1lZC1jaHVuay03XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgIHwgIDY1JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgICAgICAgIHwgIDY5JSBbdW5uYW1lZC1jaHVuay04XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgIHwgIDczJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgIHwgIDc3JSBbdW5uYW1lZC1jaHVuay05XSBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgICAgICAgIHwgIDgxJSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgIHwgIDg1JSBbdW5uYW1lZC1jaHVuay0xMF1cbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgIHwgIDg4JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uICAgIHwgIDkyJSBbdW5uYW1lZC1jaHVuay0xMV1cbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gIHwgIDk2JSAgICAgICAgICAgICAgICAgICBcbiAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIHwuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLnwgMTAwJSBbdW5uYW1lZC1jaHVuay0xMl1cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuL0FwcGxpY2F0aW9ucy9SU3R1ZGlvLmFwcC9Db250ZW50cy9SZXNvdXJjZXMvYXBwL3F1YXJ0by9iaW4vdG9vbHMvYWFyY2g2NC9wYW5kb2MgK1JUUyAtSzUxMm0gLVJUUyBEYXRhX0p1bmN0aW9uLmtuaXQubWQgLS10byBodG1sNCAtLWZyb20gbWFya2Rvd24rYXV0b2xpbmtfYmFyZV91cmlzK3RleF9tYXRoX3NpbmdsZV9iYWNrc2xhc2ggLS1vdXRwdXQgRGF0YV9KdW5jdGlvbi5odG1sIC0tbHVhLWZpbHRlciAvTGlicmFyeS9GcmFtZXdvcmtzL1IuZnJhbWV3b3JrL1ZlcnNpb25zLzQuNi9SZXNvdXJjZXMvbGlicmFyeS9ybWFya2Rvd24vcm1hcmtkb3duL2x1YS9wYWdlYnJlYWsubHVhIC0tbHVhLWZpbHRlciAvTGlicmFyeS9GcmFtZXdvcmtzL1IuZnJhbWV3b3JrL1ZlcnNpb25zLzQuNi9SZXNvdXJjZXMvbGlicmFyeS9ybWFya2Rvd24vcm1hcmtkb3duL2x1YS9sYXRleC1kaXYubHVhIC0tbHVhLWZpbHRlciAvTGlicmFyeS9GcmFtZXdvcmtzL1IuZnJhbWV3b3JrL1ZlcnNpb25zLzQuNi9SZXNvdXJjZXMvbGlicmFyeS9ybWFya2Rvd24vcm1hcmtkb3duL2x1YS90YWJsZS1jbGFzc2VzLmx1YSAtLWVtYmVkLXJlc291cmNlcyAtLXN0YW5kYWxvbmUgLS12YXJpYWJsZSBiczM9VFJVRSAtLXNlY3Rpb24tZGl2cyAtLXRlbXBsYXRlIC9MaWJyYXJ5L0ZyYW1ld29ya3MvUi5mcmFtZXdvcmsvVmVyc2lvbnMvNC42L1Jlc291cmNlcy9saWJyYXJ5L3JtYXJrZG93bi9ybWQvaC9kZWZhdWx0Lmh0bWwgLS1zeW50YXgtaGlnaGxpZ2h0aW5nIG5vbmUgLS12YXJpYWJsZSBoaWdobGlnaHRqcz0xIC0tdmFyaWFibGUgdGhlbWU9Ym9vdHN0cmFwIC0tbWF0aGpheCAtLXZhcmlhYmxlICdtYXRoamF4LXVybD1odHRwczovL21hdGhqYXgucnN0dWRpby5jb20vbGF0ZXN0L01hdGhKYXguanM/Y29uZmlnPVRlWC1BTVMtTU1MX0hUTUxvck1NTCcgLS1pbmNsdWRlLWluLWhlYWRlciAvdmFyL2ZvbGRlcnMvel8vZmN0ZHJ0Yjk1N3pka3EyYl90aDRxYnJ3MDAwMGdxL1QvL1J0bXBodzdTTmYvcm1hcmtkb3duLXN0cjEwYTBmNGJiMDQ3ZGUuaHRtbCAtLXZhcmlhYmxlIGNvZGVfZm9sZGluZz1zaG93IC0tdmFyaWFibGUgc291cmNlX2VtYmVkPURhdGFfSnVuY3Rpb24uUm1kIC0taW5jbHVkZS1hZnRlci1ib2R5IC92YXIvZm9sZGVycy96Xy9mY3RkcnRiOTU3emRrcTJiX3RoNHFicncwMDAwZ3EvVC8vUnRtcGh3N1NOZi9maWxlMTBhMGYyMjNlNjZhNC5odG1sIC0tdmFyaWFibGUgY29kZV9tZW51PTEgLS12YXJpYWJsZSBrYWJsZS1zY3JvbGw9MSBcbiJ9 -->
+<pre><code>
+  |                                                           
+  |                                                     |   0%
+  |                                                           
+  |..                                                   |   4%                   
+  |                                                           
+  |....                                                 |   8% [setup]           
+  |                                                           
+  |......                                               |  12%                   
+  |                                                           
+  |........                                             |  15% [unnamed-chunk-1] 
+  |                                                           
+  |..........                                           |  19%                   
+  |                                                           
+  |............                                         |  23% [unnamed-chunk-2] 
+  |                                                           
+  |..............                                       |  27%                   
+  |                                                           
+  |................                                     |  31% [unnamed-chunk-3] 
+  |                                                           
+  |..................                                   |  35%                   
+  |                                                           
+  |....................                                 |  38% [unnamed-chunk-4] 
+  |                                                           
+  |......................                               |  42%                   
+  |                                                           
+  |........................                             |  46% [unnamed-chunk-5] 
+  |                                                           
+  |..........................                           |  50%                   
+  |                                                           
+  |.............................                        |  54% [unnamed-chunk-6] 
+  |                                                           
+  |...............................                      |  58%                   
+  |                                                           
+  |.................................                    |  62% [unnamed-chunk-7] 
+  |                                                           
+  |...................................                  |  65%                   
+  |                                                           
+  |.....................................                |  69% [unnamed-chunk-8] 
+  |                                                           
+  |.......................................              |  73%                   
+  |                                                           
+  |.........................................            |  77% [unnamed-chunk-9] 
+  |                                                           
+  |...........................................          |  81%                   
+  |                                                           
+  |.............................................        |  85% [unnamed-chunk-10]
+  |                                                           
+  |...............................................      |  88%                   
+  |                                                           
+  |.................................................    |  92% [unnamed-chunk-11]
+  |                                                           
+  |...................................................  |  96%                   
+  |                                                           
+  |.....................................................| 100% [unnamed-chunk-12]
+                                                                                                               
+/Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools/aarch64/pandoc +RTS -K512m -RTS Data_Junction.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output Data_Junction.html --lua-filter /Library/Frameworks/R.framework/Versions/4.6/Resources/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /Library/Frameworks/R.framework/Versions/4.6/Resources/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /Library/Frameworks/R.framework/Versions/4.6/Resources/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --template /Library/Frameworks/R.framework/Versions/4.6/Resources/library/rmarkdown/rmd/h/default.html --syntax-highlighting none --variable highlightjs=1 --variable theme=bootstrap --mathjax --variable &#39;mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39; --include-in-header /var/folders/z_/fctdrtb957zdkq2b_th4qbrw0000gq/T//Rtmphw7SNf/rmarkdown-str10a0f4bb047de.html --variable code_folding=show --variable source_embed=Data_Junction.Rmd --include-after-body /var/folders/z_/fctdrtb957zdkq2b_th4qbrw0000gq/T//Rtmphw7SNf/file10a0f223e66a4.html --variable code_menu=1 --variable kable-scroll=1 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2hhcHRlciAxIFBpcGVsaW5lIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpydW4gZGF0YV9wcmVwX3NlcHQxLnFtZAoKbWFrZSBzdXJlIGdpdGh1YiBzYXZlcyB0aGlzCgp3cml0ZV9jc3YocmF3X2RhdGFfY2xlYW5lZCAsICJkYXRhL2NsZWFuZWQvb3Zlcl84X2NsZWFuZWQuY3N2IikgCgpzbyB0aGF0IHdoZW4gdGhlIG5leHQgZmlsZSBwdWxscyAiZGF0YS9jbGVhbmVkL292ZXJfOF9jbGVhbmVkLmNzdiIgaXQgaXMgdGhlIG1vc3QgcmVjZW50Cgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2hhcHRlciAxIFBpcGVsaW5lIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpBLgoKcnVuIGRhdGFfcHJlcF9zZXB0MS5xbWQKCm1ha2Ugc3VyZSBnaXRodWIgc2F2ZXMgdGhpcwoKd3JpdGVfY3N2KHJhd19kYXRhX2NsZWFuZWQgLCAiZGF0YS9jbGVhbmVkL292ZXJfOF9jbGVhbmVkLmNzdiIpIAoKc28gdGhhdCB3aGVuIHRoZSBuZXh0IGZpbGUgcHVsbHMgImRhdGEvY2xlYW5lZC9vdmVyXzhfY2xlYW5lZC5jc3YiIGl0IGlzIHRoZSBtb3N0IHJlY2VudAoKQi4gCgp0aGVuIHJ1biB2YXJpYWJsZV9wcmVwX3NjcmlwdF9zZXB0MS5xbWQKCm1ha2Ugc3VyZSBnaXRodWIgc2F2ZXMgdGhpcwoKd3JpdGVfY3N2KHJhd19kYXRhX2NsZWFuZWQsICJkYXRhL2NsZWFuZWQvY29kZWRfZGF0YV9fMDlfMThfMjYuY3N2IikKCnNvIHRoYXQgd2hlbiB0aGUgbmV4dCBmaWxlIHB1bGxzICJkYXRhL2NsZWFuZWQvY29kZWRfZGF0YV9fMDlfMThfMjYuY3N2IiBpdCBpcyB0aGUgbW9zdCByZWNlbnQKCkMuCgp0aGVuIHJ1biBvdXRjb21lX3ZhcmlhYmxlc19zZXB0MS5ybWQKCm1ha2Ugc3VyZSBnaXRodWIgc2F2ZXMgCgp3cml0ZV9jc3YocmF3X2RhdGFfY2xlYW5lZCwgImRhdGEvY2xlYW5lZC9hbGxfdmFyc19vdmVyXzguY3N2IikKCnNvIHRoYXQgd2hlbiB0aGUgbmV4dCBmaWxlIHB1bGxzICJkYXRhZGF0YS9jbGVhbmVkL2FsbF92YXJzX292ZXJfOC5jc3YiIGl0IGlzIHRoZSBtb3N0IHJlY2VudAoKCkQuIAoKdGhlbiBydW4gRGF0YV9KdW5jdGlvbi5SbWQKCm1ha2Ugc3VyZSBnaXRodWIgc2F2ZXMgCgoKd3JpdGVfY3N2KGRhdGFfZnVsbCwgImRhdGEvY2xlYW5lZF9jb250cm9sX2RhdGEuY3N2IikgYW5kIAp3cml0ZV9jc3YoZGZfbm9fY29udHJvbCwgImRhdGEvY2xlYW5lZF9zYW5zX2NvbnRyb2xfZGF0YS5jc3YiKQoKc28gdGhhdCB3aGVuIHRoZSBuZXh0IGZpbGUgcHVsbHMgImRhdGEvY2xlYW5lZF9jb250cm9sX2RhdGEuY3N2IiBhbmQgImRhdGEvY2xlYW5lZF9zYW5zX2NvbnRyb2xfZGF0YS5jc3YiIHRoZXkgYXJlIHRoZSBtb3N0IHJlY2VudAoKYGBge3J9CgojID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQojIENIQVBURVIgMSBEQVRBIFBJUEVMSU5FCiMgPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgojIDEuIEluaXRpYWwgZGF0YSBjbGVhbmluZwpzeXN0ZW0yKAogICJxdWFydG8iLAogIGMoInJlbmRlciIsICJkYXRhX3ByZXBfc2VwdDEucW1kIikKKQoKIyAyLiBWYXJpYWJsZSBwcmVwYXJhdGlvbgpzeXN0ZW0yKAogICJxdWFydG8iLAogIGMoInJlbmRlciIsICJ2YXJpYWJsZV9wcmVwX3NjcmlwdF9zZXB0MS5xbWQiKQopCgojIDMuIE91dGNvbWUgdmFyaWFibGUgY29uc3RydWN0aW9uCnJtYXJrZG93bjo6cmVuZGVyKAogICJvdXRjb21lX3ZhcmlhYmxlc19zZXB0MS5SbWQiCikKCiMgNC4gRmluYWwgZGF0YSBqdW5jdGlvbiAvIGFuYWx5dGljIHNhbXBsZXMKcm1hcmtkb3duOjpyZW5kZXIoCiAgIkRhdGFfSnVuY3Rpb24uUm1kIgopCgoKYGBgCgo=</div>
 
 
 
