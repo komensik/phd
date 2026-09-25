@@ -3,6 +3,8 @@ title: "Chapter 1 Pipeline"
 output: html_notebook
 ---
 
+A.
+
 run data_prep_sept1.qmd
 
 make sure github saves this
@@ -10,4 +12,68 @@ make sure github saves this
 write_csv(raw_data_cleaned , "data/cleaned/over_8_cleaned.csv") 
 
 so that when the next file pulls "data/cleaned/over_8_cleaned.csv" it is the most recent
+
+B. 
+
+then run variable_prep_script_sept1.qmd
+
+make sure github saves this
+
+write_csv(raw_data_cleaned, "data/cleaned/coded_data__09_18_26.csv")
+
+so that when the next file pulls "data/cleaned/coded_data__09_18_26.csv" it is the most recent
+
+C.
+
+then run outcome_variables_sept1.rmd
+
+make sure github saves 
+
+write_csv(raw_data_cleaned, "data/cleaned/all_vars_over_8.csv")
+
+so that when the next file pulls "datadata/cleaned/all_vars_over_8.csv" it is the most recent
+
+
+D. 
+
+then run Data_Junction.Rmd
+
+make sure github saves 
+
+
+write_csv(data_full, "data/cleaned_control_data.csv") and 
+write_csv(df_no_control, "data/cleaned_sans_control_data.csv")
+
+so that when the next file pulls "data/cleaned_control_data.csv" and "data/cleaned_sans_control_data.csv" they are the most recent
+
+```{r}
+
+# ============================================================
+# CHAPTER 1 DATA PIPELINE
+# ============================================================
+
+# 1. Initial data cleaning
+system2(
+  "quarto",
+  c("render", "data_prep_sept1.qmd")
+)
+
+# 2. Variable preparation
+system2(
+  "quarto",
+  c("render", "variable_prep_script_sept1.qmd")
+)
+
+# 3. Outcome variable construction
+rmarkdown::render(
+  "outcome_variables_sept1.Rmd"
+)
+
+# 4. Final data junction / analytic samples
+rmarkdown::render(
+  "Data_Junction.Rmd"
+)
+
+
+```
 
