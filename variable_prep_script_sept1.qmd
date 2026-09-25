@@ -376,26 +376,26 @@ raw_data_cleaned <- raw_data_cleaned %>%
 Index?
 
 ```{r}
-fire_vars <- c("fire_rare", "fire_privilege", "fire_angry", "fire_fear")
-
-fire_matrix <- cor(
-  sample[fire_vars],
-  use = "pairwise.complete.obs"
-)
-
-round(fire_matrix, 2)
-
-library(psych)
-
-alpha_result <- psych::alpha(sample[fire_vars])
-
-print(alpha_result)
-
-names(alpha_result)
-
-alpha_result$alpha.drop
-
-alpha_result
+# fire_vars <- c("fire_rare", "fire_privilege", "fire_angry", "fire_fear")
+# 
+# fire_matrix <- cor(
+#   sample[fire_vars],
+#   use = "pairwise.complete.obs"
+# )
+# 
+# round(fire_matrix, 2)
+# 
+# library(psych)
+# 
+# alpha_result <- psych::alpha(sample[fire_vars])
+# 
+# print(alpha_result)
+# 
+# names(alpha_result)
+# 
+# alpha_result$alpha.drop
+# 
+# alpha_result
 
 ```
 
@@ -731,28 +731,28 @@ raw_data_cleaned <- raw_data_cleaned %>%
       TRUE ~ NA_real_
     )
   ))
-
-sm_use <- c("facebook", "twitter", "youtube", "truthsocial", "reddit", "parlor1", "parlor2", "tiktok")
-
-sm_matrix <- cor(
-  sample[sm_use],
-  use = "pairwise.complete.obs"
-)
-
-round(sm_matrix, 2)
-
-library(psych)
-
-alpha_result <- psych::alpha(sample[sm_use])
-
-print(alpha_result)
-
-names(alpha_result)
-
-alpha_result$alpha.drop
-
-alpha_result
-
+# 
+# sm_use <- c("facebook", "twitter", "youtube", "truthsocial", "reddit", "parlor1", "parlor2", "tiktok")
+# 
+# sm_matrix <- cor(
+#   sample[sm_use],
+#   use = "pairwise.complete.obs"
+# )
+# 
+# round(sm_matrix, 2)
+# 
+# library(psych)
+# 
+# alpha_result <- psych::alpha(sample[sm_use])
+# 
+# print(alpha_result)
+# 
+# names(alpha_result)
+# 
+# alpha_result$alpha.drop
+# 
+# alpha_result
+# 
 
 ```
 
