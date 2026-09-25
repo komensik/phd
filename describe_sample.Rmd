@@ -128,7 +128,7 @@ state_percent_2020 <- state_percent_2020 %>%
     percent_2020 = readr::parse_number(oct)
   )
 
-view(state_percent_2020)
+#view(state_percent_2020)
 
 where <- data_full %>%
   filter(!is.na(state)) %>%
@@ -255,9 +255,11 @@ ggsave("delta_map.pdf", delta_map, width = 9, height = 6)
 
 table(data_full$pid_3)
 
+table(data_full$pid_other)
+
 parties <- data_full %>%
   filter(!is.na(pid_3)) %>%
-  group_by(pid) %>%
+  group_by(pid_3) %>%
   summarise(
     n = n(),
     .groups = "drop"
@@ -265,6 +267,39 @@ parties <- data_full %>%
   mutate(
     percent = 100 * n / nrow(data_full)
   )%>%
+  arrange(desc(n))
+
+parties
+
+
+parties <- data_full %>%
+  mutate(
+    pid_table = case_when(
+      pid_other == 1 ~ "Other",
+      !is.na(pid_3) ~ as.character(pid_3),
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(pid_table)) %>%
+  count(pid_table, name = "n") %>%
+  mutate(
+    percent = 100 * n / sum(n)
+  ) %>%
+  arrange(desc(n))
+
+
+parties <- data_full %>%
+  mutate(
+    pid_3 = case_when(
+      pid_other == 1 ~ "Other",
+      TRUE ~ as.character(pid_3)
+    )
+  ) %>%
+  filter(!is.na(pid_3)) %>%
+  count(pid_3, name = "n") %>%
+  mutate(
+    percent = 100 * n / sum(n)
+  ) %>%
   arrange(desc(n))
 
 parties
