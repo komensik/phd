@@ -319,7 +319,7 @@ Police Means Tables
 
 # 2. Good Controls?
 
-## Y ~ X, Z ~ X, y ~ z
+## Y \~ X, Z \~ X, y \~ z
 
 ```{r}
 
@@ -336,6 +336,7 @@ m_c <- lm(y_resid ~ x_resid) # among the variation in impact that is unrelated t
 
 summary(m_c)
 ```
+
 ```{r}
 
 m_a1 <- lm(min_wage ~ self_ideo, data = sample) # given someone's PID, how much min wage support would we predict
@@ -352,8 +353,8 @@ m_c_a1 <- lm(y_resid_a1 ~ x_resid_a2) # among the variation in impact that is un
 summary(m_c_a1)
 ```
 
+all
 
-all 
 ```{r}
 
 covs_min_wage <- lm(min_wage ~ White + Black + Hisp_Latino + Asian_Am + Native_Am + OtherRace, data = sample)
@@ -365,7 +366,6 @@ covs_min_wage_1 <- lm(min_wage ~ pid_3 + self_ideo + desor_core + White + Black 
 summary(covs_min_wage_1)
 
 ```
-
 
 # 3. Policy Regressions
 
@@ -463,7 +463,6 @@ control_waves <- list(
 )
 ```
 
-
 ### 3.2 Define lm function that will waves will operate thru
 
 ```{r}
@@ -556,8 +555,6 @@ policy_dummies_partyideo_models <- policy_dummies_waves[["party_ideo"]]
 policy_dummies_full_models <- policy_dummies_waves[["full_attitudes"]]
 
 ```
-
-
 
 ## 3.3 -- PRE 08-26 RECODING "restricted" model for when incarc, knowincarc, vict were coded such that 0 meant not incarc, not vict, etc.. (08-2026 no longer necessary for main reported relationships having recoded incarc, knowincarc, and vict)
 
@@ -2490,5 +2487,3 @@ So the bottom line is that this table now does what you need it to do. The basel
 8.  
 
 9.  
-
-

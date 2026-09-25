@@ -1,0 +1,403 @@
+---
+title: "Data_Junction"
+output: html_notebook
+---
+
+In this script, I just break into those who finished the survey (ie demographic questions) and those who did not.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(tibble)
+library(gt)
+library(psych)
+library(ggplot2)
+library(kableExtra)
+
+
+```
+
+# Setup
+
+```{r}
+
+raw_data_cleaned <-readr::read_csv("data/cleaned/all_vars_over_8.csv")
+
+```
+
+sept 15 N is 2327
+
+```{r}
+
+used <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc",
+          "impact", "incarc", "knowincarc", "vict",
+          "local_police", "no_strangle", "police_tracker", "police_training", "charge_police","dpen", "min_wage", "free_calls", "ed_funds", "alt_sentencing", "lwop",
+"gov_attn", "vote2020", "willvote", "auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access_rev", "White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am",  "Pac_Island", "MENA", "race_notlisted",
+  "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology")
+
+used_missing <- raw_data_cleaned %>% 
+  summarise(
+    across(
+      all_of(used),
+      ~sum(is.na(.))
+    )
+  ) %>%
+  pivot_longer(
+    everything(),
+    names_to = "variable",
+    values_to = "n_missing"
+  ) %>%
+  mutate(
+    n_answered = nrow(raw_data_cleaned)- n_missing,
+    pct_missing = n_missing/nrow(raw_data_cleaned) * 100,
+    pct_answered = n_answered/nrow(raw_data_cleaned) *100
+  ) %>%
+  arrange(desc(pct_missing))
+
+View(used_missing)
+
+```
+
+```{r}
+
+demos <- c(
+  "White",
+  "Black",
+  "Hisp_Latino",
+  "Asian_Am",
+  "Native_Am",
+  "Pac_Island",
+  "MENA",
+  "race_notlisted",
+   "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology"
+)
+
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    no_controls = if_all(
+      all_of(demos),
+      is.na
+    )
+  )
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    missing_controls = if_any(
+      all_of(demos),
+      is.na
+    )
+  )
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    no_controls = if_all(
+      all_of(demos),
+      is.na
+    ),
+    missing_controls = if_any(
+      all_of(demos),
+      is.na
+    ),
+    
+    control_status = case_when(
+      no_controls ~ "No controls",
+      missing_controls ~ "Some controls missing",
+      TRUE ~ "All controls present"
+    )
+  )
+
+#how many
+raw_data_cleaned %>%
+  count(control_status)
+
+#version of just ppl w no controls for comparison
+df_no_control <- raw_data_cleaned %>%
+  filter(missing_controls)
+
+#remove ppl without controls from missing controls
+data_full <- raw_data_cleaned %>%
+    filter(!missing_controls)
+
+nrow(data_full)
+
+```
+
+## impact x two dfs
+
+```{r}
+table(data_full$incarc)
+table(data_full$knowincarc)
+table(data_full$vict)
+table(data_full$impact)
+
+table(df_no_control$impact)
+```
+
+## ration x two dfs
+
+```{r}
+
+table(data_full$ration_scripts)
+table(df_no_control$ration_scripts)
+
+table(data_full$ration_food)
+table(df_no_control$ration_food)
+
+```
+
+## Drop NON USED variables now
+
+This could change, but these are variables that you are really probably not using
+
+```{r}
+deserving_block_drop <- c(
+  # Block A
+  "d_hsteen_a",
+  "d_athiest_a",
+  "d_cath_a",
+  "d_evan_a",
+  "d_jews_a",
+  "d_pal_a",
+  "d_muslim_a",
+  "d_blackwom_a",
+  "d_blackmen_a",
+  "d_lds_a",
+  "d_longcov_a",
+  "d_whitecol_a",
+  "d_tech_a",
+  "d_smokers_a",
+  "d_genx_a",
+  "d_boomer_a",
+  "d_mill_a",
+  "d_genz_a",
+  
+  # Block B
+  "d_metoo_b",
+  "d_christnat_b",
+  "d_ruralam_b",
+  "d_urbanam_b",
+  "d_suburbam_b",
+  "d_billion_b",
+  "d_blm_b",
+  "d_maga_b",
+  "d_progs_b",
+  "d_soc_b",
+  "d_proudboys_b",
+  "d_attnys_b",
+  "d_military_b",
+  "d_vets_b",
+  "d_solds_b",
+  "d_essentials_b",
+  "d_nurses_b",
+  "d_drs_b",
+  "d_dems_b",
+  "d_reps_b",
+  "d_media_b",
+  
+  # Block C
+  "d_bluecol_c",
+  "d_working_c",
+  "d_midclass_c",
+  "d_migrantwork_c",
+  "d_smallbiz_c",
+  "d_taxpayers_c",
+  "d_elderly_c",
+  "d_moms_c",
+  "d_retires_c",
+  "d_homeown_c",
+  "d_regufee_c",
+  "d_unins_c",
+  "d_mentill_c",
+  "d_aids_c",
+  "d_gay_c",
+  "d_lesbians_c"
+)
+```
+
+```{r}
+# ------------------------------------------------------------
+# 3. Abortion
+# ------------------------------------------------------------
+
+abortion_drop <- c(
+  "abortion_op",
+  "abortion_death",
+  "abortion_health",
+  "abortion_rape",
+  "abortion_defect",
+  "abortion_miscar",
+  "abortion_debt",
+  "abortion_violence",
+  "abortion_incarc",
+  "abortion_teen",
+  "abortion_want",
+  "abortion_ability"
+)
+
+
+# ------------------------------------------------------------
+# 4. Inequality policy items
+# ------------------------------------------------------------
+
+inequality_drop <- c(
+  "reduce_ineq_minwage",
+  "reduce_ineq_studdebt",
+  "reduce_ineq_taxrich",
+  "reduce_ineq_moremedcare",
+  "reduce_ineq_lessmig",
+  "reduce_ineq_poorben",
+  "reduce_ineq_morecoll"
+)
+
+
+# ------------------------------------------------------------
+# 5. Guns
+# ------------------------------------------------------------
+
+guns_drop <- c(
+  "gun_sales",
+  "guns_1",
+  "guns_2",
+  "guns_3",
+  "guns_4",
+  "guns_5",
+  "guns_6"
+)
+
+
+# ------------------------------------------------------------
+# 6. LGBT policy
+# ------------------------------------------------------------
+
+lgbt_policy_drop <- c(
+  "lgbt_employers",
+  "lgbt_medical",
+  "lgbt_business"
+)
+
+
+# ------------------------------------------------------------
+# 7. Immigration policy
+# ------------------------------------------------------------
+
+immigration_drop <- c(
+  "increase_deportations",
+  "increase_border_security",
+  "accept_refugees",
+  "easier_family_sponsorship",
+  "allow_daca_stay",
+  "legal_status_undocumented"
+)
+
+
+# ------------------------------------------------------------
+# 8. Regulation items
+# ------------------------------------------------------------
+
+regulation_drop <- c(
+  "reg_banks",
+  "reg_socmedia",
+  "reg_six_fig",
+  "reg_biz"
+)
+
+
+# ------------------------------------------------------------
+# 9. Who respondent knows
+# ------------------------------------------------------------
+
+known_people_drop <- unique(c(
+  "no_known_gay",
+  "gay_friend",
+  "gay_fam",
+  "no_known_trans",
+  "trans_friend",
+  "trans_fam"
+))
+```
+
+```{r}
+vars_to_drop <- c(
+  deserving_block_drop,
+  #deserving_other_drop,
+  abortion_drop,
+  inequality_drop,
+  guns_drop,
+  lgbt_policy_drop,
+  immigration_drop,
+  regulation_drop,
+  known_people_drop
+)
+
+
+```
+
+```{r}
+data_full <- data_full %>%
+  select(-any_of(vars_to_drop))
+
+df_no_control <- df_no_control %>%
+  select(-any_of(vars_to_drop))
+```
+
+
+## SAVE
+
+#### WID: cleaned_control_data.csv
+
+save the csv of df of only non missing ("full")
+
+AKA data_full
+
+```{r}
+
+write_csv(data_full, "data/cleaned_control_data.csv")
+
+nrow(data_full)
+```
+
+#### WIDOUT: cleaned_control_data.csv
+
+save the csv of those not in the above
+
+AKA df_no_control
+
+```{r}
+write_csv(df_no_control, "data/cleaned_sans_control_data.csv")
+```
+
+## states
+
+```{r}
+
+data_full %>%
+  group_by(state) %>%
+  summarise(
+    n = n(),
+    incarc = sum(incarc, na.rm = TRUE),
+    knowincarc = sum(knowincarc, na.rm = TRUE),
+    vict = sum(vict, na.rm = TRUE)
+  )
+
+data_full %>%
+  group_by(state) %>%
+  summarise(
+    n = n(),
+    impact = sum(incarc, na.rm = TRUE)
+  )
+
+```

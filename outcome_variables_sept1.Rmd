@@ -41,7 +41,15 @@ raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__09_18_26.csv")
 
 # Deservingness Scores
 
-## Sympathy "desor_core" control
+
+Standardize? No -- in my prelim, I write: To ensure that I do not control for a variable that is conceptually or empirically too close to the deservingness of incarcerated people when it is the dependent variable, I exclude any deservingness ratings for groups that are substantively overlapping or highly correlated. Including those could absorb variance in the outcome or introduce post-treatment bias by controlling for a related evaluative construct. I also avoid using global composite or average deservingness scores across all groups – for example, a respondent's mean deservingnesss rating across all 65 groups they evaluated – because that composite would include the rating of incarcerated people itself, introducing potential collinearity and making it difficult to isolate the unique effect of contact. This modeling strategy attempts to preserve interpretability and ensuring that the effect of policy contact is estimated with respect to unstandardized, target-specific deservingness scores. 12
+
+12 While constructing composite or control variables involving other deservingness targets, I assess whether their inclusion introduces collinearity or conceptual overlap with the dependent variable. In particular, I examine correlations between group-level deservingness ratings to ensure that any included groups are not too closely tied to perceptions of incarcerated people. If preliminary checks reveal that including a particular group (e.g., “criminals” or “formerly incarcerated individuals”) would obscure key variance or conflate target constructs, I exclude it from the model and treat it as conceptually non-distinct for the purposes of this analysis.
+
+## B. Means?
+
+
+## B. Sympathy "desor_core" control
 
 ```{r, desor1}
 # ------------------------------------------------------------
@@ -1046,6 +1054,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 Note:
 
 Approximately 561 respondents did not provide responses to the political behavior items (government attention, past vote, intended vote). Missingness is perfectly overlapping across these items, indicating that these questions were likely administered to a subset of respondents rather than reflecting item-level nonresponse.
+
 # Write and Save Data
 ```{r}
 #sept 14 -- saving to now look at completeness problem (+ representativeness)

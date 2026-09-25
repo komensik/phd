@@ -37,7 +37,10 @@ data_full <- read_csv("data/cleaned_control_data.csv")
 
 not_full <- read_csv("data/cleaned_sans_control_data.csv")
 
+
 ```
+
+
 
 # quality of samples
 

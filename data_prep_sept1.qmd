@@ -1686,4 +1686,5 @@ write_csv(raw_data_cleaned , "data/cleaned/over_8_cleaned.csv") # main file to u
 
 #testing <- readr::read_csv("data/cleaned/cleaned_light.csv")
 
+print(names(raw_data_cleaned))
 ```

@@ -2,3 +2,12 @@
 title: "Chapter 1 Pipeline"
 output: html_notebook
 ---
+
+run data_prep_sept1.qmd
+
+make sure github saves this
+
+write_csv(raw_data_cleaned , "data/cleaned/over_8_cleaned.csv") 
+
+so that when the next file pulls "data/cleaned/over_8_cleaned.csv" it is the most recent
+

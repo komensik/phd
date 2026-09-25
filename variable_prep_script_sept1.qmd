@@ -47,19 +47,7 @@ nrow(raw_data_cleaned)
 
 ## 2. Variables
 
-### A. Deservingness and Power consolidation
-
-```{r, prisonerdeserves}
-
-# pretty much done, maybe standardize later?
-
-```
-
-Standardize? No -- in my prelim, I write: To ensure that I do not control for a variable that is conceptually or empirically too close to the deservingness of incarcerated people when it is the dependent variable, I exclude any deservingness ratings for groups that are substantively overlapping or highly correlated. Including those could absorb variance in the outcome or introduce post-treatment bias by controlling for a related evaluative construct. I also avoid using global composite or average deservingness scores across all groups – for example, a respondent's mean deservingnesss rating across all 65 groups they evaluated – because that composite would include the rating of incarcerated people itself, introducing potential collinearity and making it difficult to isolate the unique effect of contact. This modeling strategy attempts to preserve interpretability and ensuring that the effect of policy contact is estimated with respect to unstandardized, target-specific deservingness scores. 12
-
-12 While constructing composite or control variables involving other deservingness targets, I assess whether their inclusion introduces collinearity or conceptual overlap with the dependent variable. In particular, I examine correlations between group-level deservingness ratings to ensure that any included groups are not too closely tied to perceptions of incarcerated people. If preliminary checks reveal that including a particular group (e.g., “criminals” or “formerly incarcerated individuals”) would obscure key variance or conflate target constructs, I exclude it from the model and treat it as conceptually non-distinct for the purposes of this analysis.
-
-### B. CJ Experiences - Basic Coding
+### A. CJ Experiences - Basic Coding
 
 #### Extra binaries (incarc, KI, vict)
 
@@ -152,7 +140,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-### C. Other Experiences
+### B. Other Experiences
 
 #### Impact Plus (Constructing For-Analysis)
 
@@ -306,7 +294,7 @@ for (experience in names(experience_sets)) {
 
 ```
 
-### D. Q6, 7, 8 - Ration Block
+### C. Ration, Hardship Block
 
 ### 
 
@@ -326,7 +314,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-### F. FIRE controls
+### D. FIRE controls
 
 ```{r}
 
@@ -349,7 +337,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-### G. Race
+### E. Race
 
 q51\_ ▢ White (1) ▢ Black or African American (2) ▢ Native American / Alaska Native (3) ▢ Asian / Asian American (4) ▢ Native Hawaiian / Other Pacific Islander (5) ▢ Middle Eastern/ North African (6) ▢ Hispanic/Latino/a/e (7) ▢ My preferred response not listed (8)
 
@@ -503,7 +491,7 @@ problematic_race_vars <- c(
 )
 ```
 
-### H. Party + Ideology controls
+### F. Party + Ideology controls
 
 ```{r}
 #raw_data_cleaned %>% count(q47)
@@ -611,7 +599,7 @@ cor(pol_tude,
 print(psych::corr.test(pol_tude))
 ```
 
-### I. Gender
+### I. Gender 
 
 ```{r, gender}
 #raw_data_cleaned %>% count(q55)
