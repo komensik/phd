@@ -31,7 +31,7 @@ library(ggplot2)
 
 ```{r}
 
- raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__09_18_26.csv") 
+raw_data_cleaned <- readr::read_csv("data/cleaned/coded_data__09_18_26.csv") 
 
 # raw_data_cleaned <- read_csv("data/cleaned_control_data.csv")
 
@@ -81,7 +81,7 @@ desor_corr <- psych::corr.test(
 )
 
 # Pairwise correlations
-view(round(desor_corr$r, 2))
+#view(round(desor_corr$r, 2))
 
 # N used for each pairwise correlation
 desor_corr$n
@@ -236,12 +236,12 @@ cor(pen_data,
     use = "pairwise.complete.obs")
 
 
-print(psych::corr.test(pen_data))
+#print(psych::corr.test(pen_data))
 
-print(psych::alpha(pen_data))
+#print(psych::alpha(pen_data))
 
 # Quick look
-psych::describe(pen_data)
+#psych::describe(pen_data)
 
 # Correlation (more interpretable than alpha for 2 items)
 cor(raw_data_cleaned[pen_vars], use = "pairwise.complete.obs")
@@ -426,10 +426,10 @@ psych::describe(raw_data_cleaned[q25_help_vars])
 #I get min 1 1st qu 2.5 median 2.875 mean 2.88 3q 3.250 max 4 nas = 186
 
 #histograms
-print(hist(raw_data_cleaned$min_wage))
-print(hist(raw_data_cleaned$free_calls))
-print(hist(raw_data_cleaned$ed_funds))
-print(hist(raw_data_cleaned$alt_sentencing))
+# print(hist(raw_data_cleaned$min_wage))
+# print(hist(raw_data_cleaned$free_calls))
+# print(hist(raw_data_cleaned$ed_funds))
+# print(hist(raw_data_cleaned$alt_sentencing))
 
 library(dplyr)
 library(tidyr)
@@ -832,10 +832,10 @@ all_help_data <- raw_data_cleaned %>%
   select(all_of(all_help_items))
 
 # now, pairwise corrs
-View(round(
-  cor(all_help_data, use = "pairwise.complete.obs"),
-  2
-))
+#View(round(
+#  cor(all_help_data, use = "pairwise.complete.obs"),
+#  2
+#))
 
 # Correlations + N + significance information
 all_help_corr <- psych::corr.test(
@@ -876,10 +876,10 @@ combined_data <- raw_data_cleaned %>%
   select(all_of(combined_items))
 
 # Pairwise correlations
-View(round(
-  cor(combined_data, use = "pairwise.complete.obs"),
-  2
-))
+# View(round(
+#   cor(combined_data, use = "pairwise.complete.obs"),
+#   2
+# ))
 
 combined_corr <- psych::corr.test(
   combined_data,
@@ -895,7 +895,7 @@ combined_alpha <- psych::alpha(
   check.keys = FALSE
 )
 
-print(combined_alpha)
+#print(combined_alpha)
 ```
 
 #### D5. Variance and Stand Dev
