@@ -1367,10 +1367,10 @@ Among people who broke off—or among finishers with substantial missingness—w
 
 used variables
 
-```{r}
+```{r, echo=TRUE, include=TRUE}
 
 used_vars <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc","local_police", "local_police", "police_tracker", "police_training", "charge_police",
-"dpen", "min_wage", "free_calls", "ed_funds", "incarc", "knowincarc", "noincarc", "vict", "knowvict", "novict", "lwop", "alt_sentencing", "post_felony_vote","jail_access", "prison_purpose","White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "Pac_Island", "MENA", "race_notlisted","dem101","fire_rare", "fire_privilege", "fire_angry", "fire_fear", "aa_special_favors", "aa_been_cheated", "aa_try_harder", "legacy_slavery"
+"dpen", "min_wage", "free_calls", "ed_funds", "incarc_raw", "knowincarc_raw", "noincarc_raw", "vict_raw", "knowvict_raw", "novict_raw", "lwop", "alt_sentencing", "post_felony_vote","jail_access", "prison_purpose","White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "Pac_Island", "MENA", "race_notlisted","dem101","fire_rare", "fire_privilege", "fire_angry", "fire_fear", "aa_special_favors", "aa_been_cheated", "aa_try_harder", "legacy_slavery"
 )
 
 used_var_missing <- raw_data %>% 
@@ -1465,23 +1465,23 @@ Race vars uncleaned are 0, 1, NA, -99
 
 ```{r}
 #white respondents
-class(raw_data$q51_1)
-table(raw_data$q51_1, useNA = "ifany")
+class(raw_data$White)
+table(raw_data$White, useNA = "ifany")
 ```
 
 425 not-white respondents who made it to this question 1184 white respondents who made it to this question 1082 started but didn't make it to this question
 
 ```{r}
 #Black respondents
-unique(raw_data$q51_2)
-table(raw_data$q51_2, useNA = "ifany")
+unique(raw_data$Black)
+table(raw_data$Black, useNA = "ifany")
 ```
 
 268 black respondents 1341 not black respondents 1082 NA
 
 ```{r}
 #Hispanic respondents
-table(raw_data$q51_7, useNA = "ifany")
+table(raw_data$Hisp_Latino, useNA = "ifany")
 ```
 
 237 Hispanic respondents 1372 not hispanic respondents 1082 NA

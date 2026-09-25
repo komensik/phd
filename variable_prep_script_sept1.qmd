@@ -68,7 +68,7 @@ Standardize? No -- in my prelim, I write: To ensure that I do not control for a 
  raw_data_cleaned <- raw_data_cleaned %>%
    mutate(
      incarc_bin = if_else(
-       incarc == 1,
+       incarc_raw == 1,
        1,
        0,
        missing = NA_real_
@@ -77,7 +77,7 @@ Standardize? No -- in my prelim, I write: To ensure that I do not control for a 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     noincarc_bin = if_else(
-  (incarc == 0 & knowincarc == 0) | noincarc == 1,
+  (incarc_raw == 0 & knowincarc_raw == 0) | noincarc_raw == 1,
   1, 0,
   missing = NA_real_
 ))
@@ -86,7 +86,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
  raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     knowincarc_bin = if_else(
-      knowincarc == 1,
+      knowincarc_raw == 1,
       1,
       0,
       missing = NA_real_
@@ -96,7 +96,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
  raw_data_cleaned <- raw_data_cleaned %>%
    mutate(
      vict_bin = if_else(
-       vict == 1,
+       vict_raw == 1,
        1,
        0,
        missing = NA_real_
@@ -115,7 +115,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     impact = if_else(
-      incarc == 1 | knowincarc == 1 | vict == 1,
+      incarc_raw == 1 | knowincarc_raw == 1 | vict_raw == 1,
       1, 0,
       missing = NA_real_
     )
@@ -126,8 +126,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     incarc = case_when(
-      incarc == 1 ~ 1, 
-      impact == 0 ~ 0, 
+      incarc_raw == 1 ~ 1, 
+      impact_raw == 0 ~ 0, 
       TRUE ~ NA_real_ #"otherwise, assign NA"
     )
   )
@@ -135,8 +135,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     knowincarc = case_when(
-      knowincarc == 1 ~ 1, 
-      impact == 0 ~ 0, 
+      knowincarc_raw == 1 ~ 1, 
+      impact_raw == 0 ~ 0, 
       TRUE ~ NA_real_ #"otherwise, assign NA"
     )
   )
@@ -144,14 +144,13 @@ raw_data_cleaned <- raw_data_cleaned %>%
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     vict = case_when(
-      vict == 1 ~ 1, 
-      impact == 0 ~ 0, 
+      vict_raw == 1 ~ 1, 
+      impact_raw == 0 ~ 0, 
       TRUE ~ NA_real_ #"otherwise, assign NA"
     )
   )
 
 ```
-
 
 ### C. Other Experiences
 
@@ -504,7 +503,6 @@ problematic_race_vars <- c(
 )
 ```
 
-
 ### H. Party + Ideology controls
 
 ```{r}
@@ -574,8 +572,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
     )
   )
 ```
-
-
 
 ```{r}
 #clean ideology
