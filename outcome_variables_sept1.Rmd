@@ -46,7 +46,7 @@ Standardize? No -- in my prelim, I write: To ensure that I do not control for a 
 
 12 While constructing composite or control variables involving other deservingness targets, I assess whether their inclusion introduces collinearity or conceptual overlap with the dependent variable. In particular, I examine correlations between group-level deservingness ratings to ensure that any included groups are not too closely tied to perceptions of incarcerated people. If preliminary checks reveal that including a particular group (e.g., “criminals” or “formerly incarcerated individuals”) would obscure key variance or conflate target constructs, I exclude it from the model and treat it as conceptually non-distinct for the purposes of this analysis.
 
-## B. Means?
+## B. Tendencies
 
 
 ## B. Sympathy "desor_core" control
