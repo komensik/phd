@@ -47,7 +47,7 @@ used <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc",
 "gov_attn", "vote2020", "willvote", "auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access_rev", "White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am",  "Pac_Island", "MENA", "race_notlisted",
   "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology")
 
-used_missing <- data_full %>% 
+used_missing <- raw_data_cleaned %>% 
   summarise(
     across(
       all_of(used),
@@ -61,8 +61,8 @@ used_missing <- data_full %>%
   ) %>%
   mutate(
     n_answered = nrow(raw_data_cleaned)- n_missing,
-    pct_missing = n_missing/nrow(data_full) * 100,
-    pct_answered = n_answered/nrow(data_full) *100
+    pct_missing = n_missing/nrow(raw_data_cleaned) * 100,
+    pct_answered = n_answered/nrow(raw_data_cleaned) *100
   ) %>%
   arrange(desc(pct_missing))
 
@@ -85,7 +85,7 @@ demos <- c(
 )
 
 
-data_full <- data_full %>%
+raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     no_controls = if_all(
       all_of(demos),
@@ -93,7 +93,7 @@ data_full <- data_full %>%
     )
   )
 
-data_full <- data_full %>%
+raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     missing_controls = if_any(
       all_of(demos),
@@ -101,7 +101,7 @@ data_full <- data_full %>%
     )
   )
 
-data_full <- data_full %>%
+raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     no_controls = if_all(
       all_of(demos),
@@ -120,27 +120,27 @@ data_full <- data_full %>%
   )
 
 #how many
-data_full %>%
+raw_data_cleaned %>%
   count(control_status)
 
 #version of just ppl w no controls for comparison
-df_no_control <- data_full %>%
+df_no_control <- raw_data_cleaned %>%
   filter(missing_controls)
 
 #remove ppl without controls from missing controls
-data_full <- data_full %>%
+raw_data_cleaned <- raw_data_cleaned %>%
     filter(!missing_controls)
 
-nrow(data_full)
+nrow(raw_data_cleaned)
 
 ```
 
 ## impact x two dfs
 ```{r}
-table(data_full$incarc)
-table(data_full$knowincarc)
-table(data_full$vict)
-table(data_full$impact)
+table(raw_data_cleaned$incarc)
+table(raw_data_cleaned$knowincarc)
+table(raw_data_cleaned$vict)
+table(raw_data_cleaned$impact)
 
 table(df_no_control$impact)
 ```
@@ -148,10 +148,10 @@ table(df_no_control$impact)
 ## ration x two dfs
 ```{r}
 
-table(data_full$ration_scripts)
+table(raw_data_cleaned$ration_scripts)
 table(df_no_control$ration_scripts)
 
-table(data_full$ration_food)
+table(raw_data_cleaned$ration_food)
 table(df_no_control$ration_food)
 
 ```
@@ -161,6 +161,8 @@ table(df_no_control$ration_food)
 save the csv of df of only non missing ("full")
 ```{r}
 
+data_full <- 
+  
 write_csv(data_full, "data/cleaned_control_data.csv")
 
 nrow(data_full)
