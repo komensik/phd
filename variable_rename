@@ -1,11 +1,11 @@
 
     # Experiences
-    incarc           = q4_1_1,
-    knowincarc       = q4_1_2,
-    noincarc         = q4_1_3,
-    vict             = q4_2_1,
-    knowvict         = q4_2_2,
-    novict           = q4_2_3,
+    incarc_raw           = q4_1_1,
+    knowincarc_raw      = q4_1_2,
+    noincarc_raw        = q4_1_3,
+    vict_raw             = q4_2_1,
+    knowvict_raw        = q4_2_2,
+    novict_raw           = q4_2_3,
     
     _bin variables
     
