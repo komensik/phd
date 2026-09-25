@@ -567,3 +567,20 @@ print(all_police_means)
 
 ```
 
+**Basic Means Write-Up: Index 1**
+
+```{r}
+
+
+```
+
+```{r}
+
+```
+
+Police Means Tables
+
+```{r}
+
+
+```

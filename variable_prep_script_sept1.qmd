@@ -316,9 +316,23 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ### D. FIRE controls
 
+fire_rare: racial problems in the US are rare, isolated situations
+
+- 1 is strongly agree, 4 strongly disagree
+
+fire_privilege: white people have advantages
+
+- 1 is strongly agree, 4 is strongly disagree
+
+fire_angry: I am angry that racism exists
+
+- 1 is strongly agree, 4 is strongly disagree
+
+fire_fear: I am fearful of other races
+
+- 1 is strongly agree, 4 is strongly disagree
+
 ```{r}
-
-
 fire_vars <- c("fire_rare", "fire_privilege", "fire_angry", "fire_fear")
 
 
@@ -329,11 +343,58 @@ raw_data_cleaned <- raw_data_cleaned %>%
   ))
 
 
-# summary(raw_data_cleaned$fire_angry)
-# summary(raw_data_cleaned$fire_privilege)
-# summary(raw_data_cleaned$fire_fear)
-# summary(raw_data_cleaned$fire_rare)
+hist(raw_data_cleaned$fire_rare)
+hist(raw_data_cleaned$fire_fear)
 
+
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(fire_rare)
+    ~ case_when(
+      . == 1 ~ 4,          
+      . == 2 ~ 3,
+      . == 3 ~ 2,
+      . == 4 ~ 1,        
+      TRUE ~ NA_real_
+    )
+
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(fire_fear)
+~ case_when(
+  . == 1 ~ 4,          
+  . == 2 ~ 3,
+  . == 3 ~ 2,
+  . == 4 ~ 1,        
+  TRUE ~ NA_real_
+)
+
+
+```
+
+Index?
+
+```{r}
+fire_vars <- c("fire_rare", "fire_privilege", "fire_angry", "fire_fear")
+
+fire_matrix <- cor(
+  sample[fire_vars],
+  use = "pairwise.complete.obs"
+)
+
+round(fire_matrix, 2)
+
+library(psych)
+
+alpha_result <- psych::alpha(sample[fire_vars])
+
+print(alpha_result)
+
+names(alpha_result)
+
+alpha_result$alpha.drop
+
+alpha_result
 
 ```
 
@@ -639,14 +700,62 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
-### J. State/County
-
--numeric variables that are (I think) Qualtrics drill down internal answer codes
+### J. Online?
 
 ```{r}
-#unique(raw_data_cleaned$state)
+
+raw_data_cleaned <- raw_data_cleaned %>% 
+  mutate(
+    facebook = na_if(as.numeric(facebook), -99),
+    twitter = na_if(as.numeric(twitter), -99),
+    truthsocial = na_if(as.numeric(truthsocial), -99),
+    reddit = na_if(as.numeric(reddit), -99),
+    parlor1 = na_if(as.numeric(parlor1), -99),
+    parlor2 = na_if(as.numeric(parlor2), -99),
+    youtube = na_if(as.numeric(youtube), -99),
+    tiktok = na_if(as.numeric(tiktok), -99)
+  )
+
+sm_use <- c("facebook", "twitter", "youtube", "truthsocial", "reddit", "parlor1", "parlor2", "tiktok")
+
+table(raw_data_cleaned$youtube)
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(across(
+    all_of(sm_use),
+    ~ case_when(
+      . == 4 ~ 3,
+      . == 5 ~ 2,
+      . == 6 ~ 1,
+      TRUE ~ NA_real_
+    )
+  ))
+
+sm_use <- c("facebook", "twitter", "youtube", "truthsocial", "reddit", "parlor1", "parlor2", "tiktok")
+
+sm_matrix <- cor(
+  sample[sm_use],
+  use = "pairwise.complete.obs"
+)
+
+round(sm_matrix, 2)
+
+library(psych)
+
+alpha_result <- psych::alpha(sample[sm_use])
+
+print(alpha_result)
+
+names(alpha_result)
+
+alpha_result$alpha.drop
+
+alpha_result
+
 
 ```
+
+Social media average variable – come back to this later if useful for a control.
 
 ### K. LAST OF CLEANING - WRITE CSV
 

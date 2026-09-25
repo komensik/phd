@@ -637,4 +637,245 @@ View(police_alpha$impact_0$item.stats)
 ```
 
 
+# Duplicative police correlations?
 
+```{r}
+cor_matrix <- cor(
+  sample[police_items],
+  use = "pairwise.complete.obs"
+)
+
+round(cor_matrix, 2)
+
+library(psych)
+
+
+alpha_result <- psych::alpha(sample[police_items])
+
+print(alpha_result)
+
+names(alpha_result)
+
+alpha_result$alpha.drop
+
+alpha_result
+
+as.data.frame(alpha_result$alpha.drop)
+
+View(alpha_result$alpha.drop)
+
+print(sample %>%
+  pivot_longer(cols = all_of(police_items)) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~ name))
+
+#avg check
+sample <- sample %>%
+  mutate(police_index = rowMeans(across(all_of(police_items)), na.rm = TRUE))
+
+summary(sample$police_index)
+
+# police index 1: index of all the police items
+sample <- sample %>%
+  mutate(
+    police_reform_index = rowMeans(across(all_of(police_items)), na.rm = TRUE)
+  )
+
+# police index 2: index of the items that hang together best
+
+police_reform_core <- c(
+  "no_strangle",
+  "police_tracker",
+  "police_training",
+  "charge_police"
+)
+
+sample <- sample %>%
+  mutate(
+    police_reform_core_index = rowMeans(across(all_of(police_reform_core)), na.rm = TRUE)
+  )
+
+# last - 3 groups 
+# sample <- sample %>%
+#   mutate(
+#     police_violence_prevention = rowMeans(across(c("q15_2_1_to_5", "q15_4_1_to_5")), na.rm = TRUE),
+#     police_accountability = rowMeans(across(c("q15_3_1_to_5", "q15_5_1_to_5")), na.rm = TRUE),
+#     police_local_residency = q15_1_1_to_5
+#   )
+
+## POLICE MEANS ANALYSIS 
+
+# index 1: police_reform_index
+
+## baseline: no impact
+all_baseline_mean <- mean(
+  sample$police_reform_index[sample$impact == 0],
+  na.rm = TRUE
+)
+
+## compute means for each impact group
+all_police_means <- tibble(
+  var = impact_vars
+) %>%
+  mutate(
+    label = impact_labels[var],
+    mean = sapply(var, function(v) {
+      mean(
+        sample$police_reform_index[
+          sample[[v]] == 1
+        ],
+        na.rm = TRUE
+      )
+    })
+  ) %>%
+  bind_rows(
+    tibble(
+      var = "no_impact",
+      label = "No impact",
+      mean = all_baseline_mean
+    ),
+    .
+  ) %>%
+  mutate(
+    diff_from_no_impact = mean - all_baseline_mean
+  )
+
+all_police_means
+
+##
+# index 2: 
+##
+
+# baseline: no impact
+baseline_mean <- mean(
+  sample$police_reform_core_index[sample$impact == 0],
+  na.rm = TRUE
+)
+
+# compute means for each impact group
+police_means <- tibble(
+  var = impact_vars
+) %>%
+  mutate(
+    label = impact_labels[var],
+    mean = sapply(var, function(v) {
+      mean(
+        sample$police_reform_core_index[
+          sample[[v]] == 1
+        ],
+        na.rm = TRUE
+      )
+    })
+  ) %>%
+  bind_rows(
+    tibble(
+      var = "no_impact",
+      label = "No impact",
+      mean = baseline_mean
+    ),
+    .
+  ) %>%
+  mutate(
+    diff_from_no_impact = mean - baseline_mean
+  )
+
+print(police_means) # index 2
+print(all_police_means)
+## index 3?
+##
+```
+
+### 2.1A Police Policy
+
+```{r}
+
+source("variable_labels.R")
+
+
+
+```
+
+**Write up on coding police variables decision**
+
+all - participants' opposition/ support (coded 1-5, unsure = 3)
+
+\(1\) Require that police officers live in the cities or towns they police
+
+\(2\) Make it a crime for police to use chokeholds or strangleholds
+
+\(3\) Create a federal government database to track police officers who have been accused of misconduct
+
+\(4\) Require police to be trained in nonviolent alternatives to deadly force
+
+\(5\) Allow civilians to file lawsuits against police officers that use excessive force or misconduct
+
+My loose overall theory is that experiences with crime victimization may influence trust in government and policy learning. Ie, people who have been victimized may view the CJ system as differently legitimate and trustworthy, potentially extend that to the state; they will also learn things about policy. That's the context in which I'm thinking about how to use these survey items.
+
+My initial view is – theoretically – these mostly might fall into two categories. The first category is policing police, or police oversight – questions 3 and 5. The second is about police violence, or police violence prevention - so questions 2 and 4. My initial view is that question 1 is different, or might not as clearly fit into the buckets. but it could also fit into some idea of constraining police?
+
+I want to make this decision in an appropriate way from the research design perspective – not select on my (xyz - forgot what this is called).
+
+I'm not entirely clear if grouping these variables in a single index improves analyses – more power, especially given that my victimized sample is only 277? One option is use as a whole index, but then also break out separate analyses. Another is to do 3 (keep local as a standalone – this might look like:
+
+police_map \<- tibble::tribble( \~var, \~label, \~section, "q15_1_1_to_5", "Local Police", "Misc. Police", "q15_2_1_to_5", "No Strangle", "Police Violence", "q15_3_1_to_5", "Police Tracker", "Police Police", "q15_4_1_to_5", "Police Training", "Police Violence", "q15_5_1_to_5", "Charge Police", "Police Police", )
+
+) – odds are I would still want to run analyses with them as distinct variables. Last option is all 3?
+
+Relationships between police variables
+
+- Police should be local
+
+  - & no strangle = 0.41
+
+  - & track misconduct = 0.45
+
+  - & require alternatives training = 0.39
+
+  - & allow civilian lawsuits against = 0.39
+
+- Strangleholds & chokeholds illegal
+
+  - & police local = 0.41
+
+  - & track misconduct = 0.58
+
+  - & require alternatives training = 0.55
+
+  - & allow civilian lawsuits against = 0.58
+
+- Federal misconduct database
+
+  - & police local = 0.45
+
+  - & no strangle = 0.48
+
+  - & track misconduct = 0.67
+
+  - & require alternatives training = 0.70
+
+- Require police to be trained in nonviolent alternatives to deadly force
+
+  - & police local = 0.39
+
+  - & no strangle = 0.55
+
+  - & track misconduct = 0.67
+
+  - & allow civilian lawsuits against = 0.65
+
+- Allow civilians to file lawsuits against police officers that use excessive force or misconduct
+
+  - & police local = 0.39
+
+  - & no strangle = 0.58
+
+  - & track misconduct = 0.70
+
+  - & require alternatives training = 0.65
+
+Alpha for all = 0.85 – reason to use as one.
+
+ADD DECISION WRITE UP
+
+Decision: two layers. First (index), second (ones that hang together best), then last (3) created above.
