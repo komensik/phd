@@ -356,6 +356,42 @@ sm_use <- unique(c(
   "facebook", "twitter", "youtube", "truthsocial", "reddit", "parlor1", "parlor2", "tiktok"
 ))
 
+# ------------------------------------------------------------
+# 10. Classic Racial Resentment (using FIRE atm)
+# ------------------------------------------------------------
+classic_racism <- unique(c(
+  "aa_special_favors", "aa_been_cheated", "aa_try_harder", "legacy_slavery"
+))
+
+# ------------------------------------------------------------
+# 11. experience binaries
+# ------------------------------------------------------------
+
+experience_bins <- unique(c(
+  "on_medicaid_bin",
+  "no_medicaid_bin",
+  "tanf_bin",
+  "notanf_bin",
+  "knowtanf_bin",
+  "snap_bin",
+  "knowsnap_bin",
+  "immigrated_bin",
+  "knowimmigrated_bin",
+  "unionmember_bin",
+  "nounion_bin",
+  "knowunion_bin",
+  "aborted_bin",
+  "knowaborted_bin",
+  "noaborted_bin",
+  "unemployment_bin",
+  "knowunemployed_bin",
+  "noemployed_bin",
+  "uninsured_bin",
+  "knowuninsured_bin",
+  "unable_vote_bin",
+  "know_unable_vote_bin",
+  "no_unable_vote_bin"
+))
 ```
 
 ```{r}
@@ -368,7 +404,9 @@ vars_to_drop <- c(
   lgbt_policy_drop,
   immigration_drop,
   regulation_drop,
-  known_people_drop
+  known_people_drop,
+  raw_vars,
+  sm_use
 )
 
 

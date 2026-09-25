@@ -343,31 +343,32 @@ raw_data_cleaned <- raw_data_cleaned %>%
   ))
 
 
-hist(raw_data_cleaned$fire_rare)
-hist(raw_data_cleaned$fire_fear)
-
-
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(fire_rare)
-    ~ case_when(
-      . == 1 ~ 4,          
-      . == 2 ~ 3,
-      . == 3 ~ 2,
-      . == 4 ~ 1,        
-      TRUE ~ NA_real_
-    )
-
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(fire_fear)
-~ case_when(
-  . == 1 ~ 4,          
-  . == 2 ~ 3,
-  . == 3 ~ 2,
-  . == 4 ~ 1,        
-  TRUE ~ NA_real_
-)
+# hist(raw_data_cleaned$fire_rare)
+# 
+# table(raw_data_cleaned$fire_fear)
+# 
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(fire_rare)
+#     ~ case_when(
+#       . == 1 ~ 4,          
+#       . == 2 ~ 3,
+#       . == 3 ~ 2,
+#       . == 4 ~ 1,        
+#       TRUE ~ NA_real_
+#     )
+# 
+# 
+# raw_data_cleaned <- raw_data_cleaned %>%
+#   mutate(fire_fear)
+# ~ case_when(
+#   . == 1 ~ 4,          
+#   . == 2 ~ 3,
+#   . == 3 ~ 2,
+#   . == 4 ~ 1,        
+#   TRUE ~ NA_real_
+# )
+# 
+# hist(raw_data_cleaned$fire_fear)
 
 
 ```
