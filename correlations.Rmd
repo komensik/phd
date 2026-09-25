@@ -445,7 +445,7 @@ Correlations when full, incarc, knowincarc, vict, impacted, not impacted
 # Carceral state help policies
 # ------------------------------------------------------------
 
-police_items_1_to_5 <- c(
+police_items <- c(
   "local_police",
   "no_strangle",
   "police_tracker",
@@ -488,7 +488,7 @@ sapply(police_groups, nrow)
 police_corrs <- purrr::map(
   police_groups,
   ~ psych::corr.test(
-      .x %>% select(all_of(police_items_1_to_5)),
+      .x %>% select(all_of(police_items)),
       use = "pairwise",
       method = "pearson",
       adjust = "none"
@@ -545,7 +545,7 @@ police_item_counts <- purrr::map(
   police_groups,
   ~ {
     police_mat <- .x %>%
-      select(all_of(police_items_1_to_5))
+      select(all_of(police_items))
     
     police_n <- rowSums(!is.na(police_mat))
     
@@ -565,7 +565,7 @@ police_alpha <- purrr::map(
   ~ {
     
     police_mat <- .x %>%
-      select(all_of(police_items_1_to_5))
+      select(all_of(police_items))
     
     police_n <- rowSums(!is.na(police_mat))
     

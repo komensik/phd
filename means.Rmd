@@ -443,7 +443,7 @@ cat(
 
 source("variable_labels.R")
 
-police_items_1_to_5 <- c(
+police_items <- c(
   "local_police",
   "no_strangle",
   "police_tracker",
@@ -453,14 +453,14 @@ police_items_1_to_5 <- c(
 
 #avg check
 sample <- sample %>%
-  mutate(police_index = rowMeans(across(all_of(police_items_1_to_5)), na.rm = TRUE))
+  mutate(police_index = rowMeans(across(all_of(police_items)), na.rm = TRUE))
 
 summary(sample$police_index)
 
 # police index 1: index of all the police items
 sample <- sample %>%
   mutate(
-    police_reform_index = rowMeans(across(all_of(police_items_1_to_5)), na.rm = TRUE)
+    police_reform_index = rowMeans(across(all_of(police_items)), na.rm = TRUE)
   )
 
 # police index 2: index of the items that hang together best

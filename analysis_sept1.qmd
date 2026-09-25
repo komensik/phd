@@ -2248,7 +2248,7 @@ kable(
   cat()
 ```
 
-## deservingness straight up models with controls
+## police_1Models with controls
 
 ```{r}
 

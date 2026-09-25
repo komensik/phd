@@ -933,8 +933,12 @@ combined_alpha <- psych::alpha(
 
 # Originally 6 = strong oppose, 7= somewhat oppose, 8 = neutral, 9 = somewhat support, 10 = strong support
 
+table(raw_data_cleaned$local_police) #still coded 6-10
+
 # Define Q25 police items
 police_items <- c("local_police", "no_strangle", "police_tracker", "police_training", "charge_police")
+
+#print(police_items)
 
 # Step 1: Recode -99 to NA and ensure numeric
 raw_data_cleaned <- raw_data_cleaned %>%
@@ -956,11 +960,12 @@ raw_data_cleaned <- raw_data_cleaned %>%
     . == 9 ~ 4,
     . == 10 ~ 5,        
     TRUE ~ NA_real_
-  ),  
-    .names = "{.col}_1_to_5"
+  )
   ))
 
-police_items_1_to_5 <- c(
+table(raw_data_cleaned$local_police)
+
+police_items <- c(
   "local_police",
   "no_strangle",
   "police_tracker",
