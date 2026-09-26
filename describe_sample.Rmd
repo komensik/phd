@@ -372,7 +372,233 @@ self_ideoS <- data_full %>%
 
 self_ideoS
 
+
+
+self_ideoS <- data_full %>%
+  mutate(
+    self_ideo_table = case_when(
+      self_ideo == 1 ~ "Very Liberal",
+      self_ideo == 2 ~ "Somewhat Liberal",
+      self_ideo == 3 ~ "Moderate",
+      self_ideo == 4 ~ "Somewhat Conservative",
+      self_ideo == 5 ~ "Very Conservative",
+      TRUE ~ NA_character_
+    )
+  ) %>% filter(!is.na(self_ideo_table)) %>%
+  count(self_ideo_table, name = "n") %>% 
+  mutate(
+    percent = 100 * n / sum(n)
+    )
+                
+
+
+self_ideoS
 ```
+Compared to Gallup 2024
+```{r}
+sum(data_full$self_ideo == 1)
+
+Liberal = (sum(data_full$self_ideo == 1)) + (sum(data_full$self_ideo == 2))
+  
+Moderate = sum(data_full$self_ideo == 3)
+  
+Conservative = (sum(data_full$self_ideo == 4)) + (sum(data_full$self_ideo == 5))
+
+Liberal
+Conservative
+
+
+l_r_c <- data_full %>%
+  mutate(
+    l_r_c_table = case_when(
+      self_ideo == 1 | self_ideo == 2 ~ "Liberal",
+      self_ideo == 3 ~ "Moderate",
+      self_ideo == 4 | self_ideo == 5 ~ "Conservative",
+      TRUE ~ NA_character_
+    )
+  ) %>% filter(!is.na(l_r_c_table)) %>%
+  count(l_r_c_table, name = "n") %>% 
+  mutate(
+    percent = 100 * n / sum(n)
+    )
+
+l_r_c
+```
+
+
+```{r}
+ideo_counts <- c(
+  Very_Liberal = sum(data_full$self_ideo == 1),
+  Somewhat_Liberal = sum(data_full$self_ideo == 2),
+  Moderate = sum(data_full$self_ideo == 3),
+  Somewhat_Conservative = sum(data_full$self_ideo == 4),
+  Very_Conservative = sum(data_full$self_ideo == 5)
+)
+
+
+
+gallup_2024_ideo <- c(
+  Very_Liberal = .09,
+  Somewhat_Liberal = .17,
+  Moderate = .34,
+  Somewhat_Conservative = .27,
+  Very_Conservative = .01
+)
+
+# Because the published rounded percentages sum to .99
+gallup_2024_ideo <- gallup_2024_ideo / sum(gallup_2024_ideo)
+
+chisq.test(
+  x = ideo_counts,
+  p = gallup_2024_ideo
+)
+
+```
+
+
+```{r}
+pol_tude_vars <- c("fiscal_ideology", "social_ideology", "self_ideo")
+
+table(data_full$fiscal_ideology)
+
+pol_tude <- raw_data_cleaned %>%
+  select(all_of(pol_tude_vars))
+
+cor(pol_tude,
+    use = "pairwise.complete.obs")
+
+print(psych::corr.test(pol_tude))
+```
+
+Ideo Bandits
+
+How many respondents identify as conservative but then do not identify as fiscally conservative or socially conservative
+```{r}
+library(dplyr)
+library(tidyr)
+
+ideo_by_party <- data_full %>%
+  
+  # ------------------------------------------
+  # 1. Create four-category party ID
+  # ------------------------------------------
+  mutate(
+    party4 = case_when(
+      pid_other == 1 ~ "Other",
+      pid_3 == 1 ~ "Democrat",
+      pid_3 == 2 ~ "Independent",
+      pid_3 == 3 ~ "Republican",
+      TRUE ~ NA_character_
+    ),
+    
+    party4 = factor(
+      party4,
+      levels = c(
+        "Democrat",
+        "Independent",
+        "Republican",
+        "Other"
+      )
+    )
+  ) %>%
+  
+  # ------------------------------------------
+  # 2. Keep ideology variables
+  # ------------------------------------------
+  select(
+    party4,
+    self_ideo,
+    fiscal_ideology,
+    social_ideology
+  ) %>%
+  
+  # ------------------------------------------
+  # 3. Put ideology measures into long form
+  # ------------------------------------------
+  pivot_longer(
+    cols = c(
+      self_ideo,
+      fiscal_ideology,
+      social_ideology
+    ),
+    names_to = "ideology_type",
+    values_to = "ideology_value"
+  )
+```
+
+
+
+labels
+```{r}
+ideo_by_party <- ideo_by_party %>%
+  mutate(
+    
+    ideology_label = case_when(
+      
+      # General ideology: 1-5 scale
+      ideology_type == "self_ideo" & ideology_value == 1 ~ "Very Liberal",
+      ideology_type == "self_ideo" & ideology_value == 2 ~ "Somewhat Liberal",
+      ideology_type == "self_ideo" & ideology_value == 3 ~ "Moderate",
+      ideology_type == "self_ideo" & ideology_value == 4 ~ "Somewhat Conservative",
+      ideology_type == "self_ideo" & ideology_value == 5 ~ "Very Conservative",
+      
+      # Fiscal/social ideology: 0-5 scale
+      ideology_type %in% c("fiscal_ideology", "social_ideology") &
+        ideology_value == 0 ~ "Very Liberal",
+      
+      ideology_type %in% c("fiscal_ideology", "social_ideology") &
+        ideology_value == 1 ~ "Liberal",
+      
+      ideology_type %in% c("fiscal_ideology", "social_ideology") &
+        ideology_value == 2 ~ "Somewhat Liberal",
+      
+      ideology_type %in% c("fiscal_ideology", "social_ideology") &
+        ideology_value == 3 ~ "Somewhat Conservative",
+      
+      ideology_type %in% c("fiscal_ideology", "social_ideology") &
+        ideology_value == 4 ~ "Conservative",
+      
+      ideology_type %in% c("fiscal_ideology", "social_ideology") &
+        ideology_value == 5 ~ "Very Conservative",
+      
+      TRUE ~ NA_character_
+    ),
+    
+    ideology_type = recode(
+      ideology_type,
+      self_ideo = "General Ideology",
+      fiscal_ideology = "Fiscal Ideology",
+      social_ideology = "Social Ideology"
+    )
+  )
+```
+
+```{r}
+ideo_party_table <- ideo_by_party %>%
+  filter(
+    !is.na(party4),
+    !is.na(ideology_label)
+  ) %>%
+  count(
+    party4,
+    ideology_type,
+    ideology_label,
+    name = "n"
+  ) %>%
+  group_by(
+    party4,
+    ideology_type
+  ) %>%
+  mutate(
+    percent = 100 * n / sum(n)
+  ) %>%
+  ungroup()
+```
+
+```{r}
+View(ideo_party_table)
+```
+
 
 
 ## race

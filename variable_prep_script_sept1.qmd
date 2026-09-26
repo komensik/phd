@@ -490,9 +490,9 @@ combo_counts <- raw_data_cleaned %>%
   count(n_races, race_combo, name = "n") %>%
   arrange(desc(n))
 
-View(combo_counts)                                # everything
+#View(combo_counts)                                # everything
 
-filter(combo_counts, n_races >= 2)          # multiracial combos only
+#filter(combo_counts, n_races >= 2)          # multiracial combos only
 ```
 
 ```{r}
@@ -562,7 +562,8 @@ problematic_race_vars <- c(
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(dem101 = na_if(as.numeric(dem101), -99))
 
-#single PID variable
+table(raw_data_cleaned$dem101)
+#single PID variable, coding on survey:
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     pid = case_when(
@@ -572,7 +573,6 @@ raw_data_cleaned <- raw_data_cleaned %>%
       dem101 == 4 ~ "Other",
       TRUE ~ NA_character_
     ),
-    
     pid = factor(
       pid,
       levels = c(
@@ -584,29 +584,20 @@ raw_data_cleaned <- raw_data_cleaned %>%
     )
   )
 
-#other? 76
-# raw_data_cleaned %>%
-#   count(pid, .drop = FALSE)
-# 
-# raw_data_cleaned %>%
-#   count(pid, .drop = FALSE) %>%
-#   mutate(
-#     percent = round(100 * n / sum(n), 2)
-#   )
-
-# drop other when doing analyses? 
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
-    # Preserve others
+    # Preserve "Other" separately
     pid_other = case_when(
       dem101 == 4 ~ 1,
       dem101 %in% c(1, 2, 3) ~ 0,
-      TRUE ~ NA_real_),
-    # Numeric/ordinal version
+      TRUE ~ NA_real_
+    ),
+    
+    # Numeric version: lower = left, higher = right
     pid_3 = case_when(
-      dem101 == 1 ~ 1,   # Republican
+      dem101 == 2 ~ 1,   # Democrat
       dem101 == 3 ~ 2,   # Independent
-      dem101 == 2 ~ 3,   # Democrat
+      dem101 == 1 ~ 3,   # Republican
       dem101 == 4 ~ NA_real_,
       TRUE ~ NA_real_
     ),
@@ -615,9 +606,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
     pid_3_factor = factor(
       pid_3,
       levels = c(1, 2, 3),
-      labels = c("Republican", "Independent", "Democrat")
+      labels = c("Democrat", "Independent", "Republican")
     )
-    
   )
 ```
 
@@ -639,24 +629,12 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #summary(raw_data_cleaned$fiscal_ideology)
 
 #self-reported ideo ident
-table(raw_data_cleaned$politcs) # already coded so that left to right
+table(raw_data_cleaned$self_ideo) # already coded so that left to right
 # 
 # raw_data_cleaned <- raw_data_cleaned %>%
 #    rename(
 #      self_ideo = politcs
 #      )
-```
-
-```{r}
-pol_tude_vars <- c("fiscal_ideology", "social_ideology", "self_ideo")
-
-pol_tude <- raw_data_cleaned %>%
-  select(all_of(pol_tude_vars))
-
-cor(pol_tude,
-    use = "pairwise.complete.obs")
-
-print(psych::corr.test(pol_tude))
 ```
 
 ### I. Gender
