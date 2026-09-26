@@ -274,9 +274,9 @@ parties <- data_full %>%
   mutate(
     pid_table = case_when(
       pid_other == 1 ~ "Other",
-      pid_3 == 1 ~ "Republican",
+      pid_3 == 1 ~ "Democrat",
       pid_3 == 2 ~ "Independent",
-      pid_3 == 3 ~ "Democrat",
+      pid_3 == 3 ~ "Republican",
       TRUE ~ NA_character_
     )
   ) %>%
@@ -424,7 +424,11 @@ l_r_c <- data_full %>%
 
 l_r_c
 ```
+gallup liberal = 9% plus 17 % is 26 %
 
+gallup conservative = 10% plus 27% is 37%
+
+moderate 34%
 
 ```{r}
 ideo_counts <- c(
@@ -448,6 +452,8 @@ gallup_2024_ideo <- c(
 # Because the published rounded percentages sum to .99
 gallup_2024_ideo <- gallup_2024_ideo / sum(gallup_2024_ideo)
 
+
+
 chisq.test(
   x = ideo_counts,
   p = gallup_2024_ideo
@@ -461,7 +467,7 @@ pol_tude_vars <- c("fiscal_ideology", "social_ideology", "self_ideo")
 
 table(data_full$fiscal_ideology)
 
-pol_tude <- raw_data_cleaned %>%
+pol_tude <- data_full %>%
   select(all_of(pol_tude_vars))
 
 cor(pol_tude,
@@ -597,6 +603,8 @@ ideo_party_table <- ideo_by_party %>%
 
 ```{r}
 View(ideo_party_table)
+
+
 ```
 
 
