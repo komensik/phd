@@ -175,24 +175,6 @@ ul.task-list li input[type="checkbox"] {
 <h4 class="anchored" data-anchor-id="multiracial-var">multiracial var</h4>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 29 × 3
-   n_races race_combo                                                n
-     &lt;int&gt; &lt;chr&gt;                                                 &lt;int&gt;
- 1       3 White + Hisp_Latino + multiracial                       101
- 2       3 White + Native_Am + multiracial                          21
- 3       3 White + Black + multiracial                              19
- 4       3 Black + Hisp_Latino + multiracial                        15
- 5       3 White + Asian_Am + multiracial                           12
- 6       3 Black + Native_Am + multiracial                           7
- 7       3 Hisp_Latino + Native_Am + multiracial                     5
- 8       4 White + Hisp_Latino + Native_Am + multiracial             5
- 9       4 White + Black + Native_Am + multiracial                   3
-10       5 White + Black + Hisp_Latino + Native_Am + multiracial     3
-# ℹ 19 more rows</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
 <pre><code>               White Black Hisp_Latino Asian_Am Native_Am Pac_Island MENA
 White           1180    31         114       17        36          3    3
 Black             31   267          21        5        16          0    1
@@ -227,35 +209,16 @@ multiracial                 4         218</code></pre>
 <h3 class="anchored" data-anchor-id="f.-party-ideology-controls">F. Party + Ideology controls</h3>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt; table of extent 0 &gt;</code></pre>
+<pre><code>
+  1   2   3   4 
+396 620 511  76 </code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>                fiscal_ideology social_ideology self_ideo
-fiscal_ideology       1.0000000       0.8716908 0.8551536
-social_ideology       0.8716908       1.0000000 0.8442498
-self_ideo             0.8551536       0.8442498 1.0000000</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Call:psych::corr.test(x = pol_tude)
-Correlation matrix 
-                fiscal_ideology social_ideology self_ideo
-fiscal_ideology            1.00            0.87      0.86
-social_ideology            0.87            1.00      0.84
-self_ideo                  0.86            0.84      1.00
-Sample Size 
-                fiscal_ideology social_ideology self_ideo
-fiscal_ideology            1655            1655      1601
-social_ideology            1655            1655      1601
-self_ideo                  1601            1601      1604
-Probability values (Entries above the diagonal are adjusted for multiple tests.) 
-                fiscal_ideology social_ideology self_ideo
-fiscal_ideology               0               0         0
-social_ideology               0               0         0
-self_ideo                     0               0         0
-
- To see confidence intervals of the correlations, print with the short=FALSE option</code></pre>
+<pre><code>
+-99   1   2   3   4   5 
+  2 294 332 525 292 159 </code></pre>
 </div>
 </div>
 </section>
