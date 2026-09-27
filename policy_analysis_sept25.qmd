@@ -25,6 +25,46 @@ I care about these models for:
 
 This code also should make tables and figures. I'll come back to adjusting tables/figures later, for now I just want to make sure that I have fixed the code so it reflects a change: that the impact, incarc, knowincarc, and vict are all set so that when = 0, it means impact = 0. I want to report out, for example, how people who selected vict = 1 differ from those whose impact = 0, rather than just those whose vict = 0.
 
+```{r setup, include=FALSE, echo=FALSE}
+
+knitr::opts_chunk$set(
+  echo = FALSE,       # Hide code by default
+  warning = FALSE,
+  message = FALSE
+)
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(gt)
+library(marginaleffects)
+library(mediation)
+library(naniar)
+library(rsq)
+library(patchwork)
+library(modelsummary)
+library(rlang)
+library(forcats)
+library(ggplot2)
+library(broom)
+library(knitr)
+
+source("variable_labels_sept1.R")
+```
+
+
+```{r}
+
+sample <- read_csv("data/cleaned_control_data.csv")
+
+not_full <- read_csv("data/cleaned_sans_control_data.csv")
+```
+
 # ORIGINAL STARTS HERE
 
 This section continues to use variable_labels.R. The goal of this section was to avoid and clean up extensive seperated regressions, and instead incorporate use loop that iteratively work through outcome variables and incorporate controls.
@@ -129,8 +169,6 @@ control_waves <- list(
 ```
 
 ### 3.2 Define lm function that will waves will operate thru
-
-```{r}
 # ============================================================
 # This starts by defining my reusable function. That function says:
 
@@ -143,11 +181,15 @@ control_waves <- list(
 ## (e) run the regression
 # ============================================================
 
+```{r}
+
+
 make_policy_model <- function(df, dv, iv, controls = character(0)) { #character(0) just means empty character vector so this function works for uncontrolled model then for controlled model
   rhs <- c(iv, controls)
   fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
   lm(fml, data = df)
 }
+```
 
 # ============================================================
 # MAIN MODEL GENERATING LOOOP Now, I need to line up buckets to put the models 
@@ -161,6 +203,7 @@ make_policy_model <- function(df, dv, iv, controls = character(0)) { #character(
 ### victimized vs non impact
 # ============================================================
 
+```{r}
 policy_dummies_waves <- list() #this is actually now main model generating loop
 
 for (wave_name in names(control_waves)) {#calls list of waves in control waves
@@ -184,7 +227,7 @@ for (wave_name in names(control_waves)) {#calls list of waves in control waves
 
   policy_dummies_waves[[wave_name]] <- model_list
 }
-
+```
 ##after the two inner loops finish organization for storing them. 
 ## object is roughly: policy_dummies_waves : A no control -> A1 no control m_prisonhelp_impact, A2 no control m_prisonhelp_incarc. . ..etc; B1 demographic controls m_prisonhelp_impact....(see below)
 #policy_dummies_waves
@@ -204,44 +247,17 @@ for (wave_name in names(control_waves)) {#calls list of waves in control waves
 # |-- party_ideo
 # |
 # |-- full_attitudes
- 
+
 # ============================================================
-# NEXT -- making hopefully more convenient references so that  instead of typing out the full "policy_dummies_waves[["nocontrol"]][["m_prisonhelp_incarc"]] I can type "policy_dummies_models[{"m_prisonhelp_incarc"}] (really tho, the table making code came first and this lets me adopt above outputs to )
-## 
-#
-# T 
+# NEXT -- making hopefully more convenient shortcuts/references so that  instead of typing out the full "policy_dummies_waves[["nocontrol"]][["m_prisonhelp_incarc"]] I can type "policy_dummies_models[{"m_prisonhelp_incarc"}] (really tho, the table making code came first and this lets me adopt above outputs to )
 # ============================================================
 
-
-
+```{r}
 policy_dummies_models <- policy_dummies_waves[["nocontrol"]]
 policy_dummies_demo_models <- policy_dummies_waves[["demo"]]
 policy_dummies_partyideo_models <- policy_dummies_waves[["party_ideo"]]
 policy_dummies_full_models <- policy_dummies_waves[["full_attitudes"]]
 
-```
-
-## 3.3 -- PRE 08-26 RECODING "restricted" model for when incarc, knowincarc, vict were coded such that 0 meant not incarc, not vict, etc.. (08-2026 no longer necessary for main reported relationships having recoded incarc, knowincarc, and vict)
-
-```{r}
-# goal 1 wave loop above
-# 
-# make_restricted_model <- function(df, dv, subgroup_var, controls = character(0)) {
-# 
-#   if (subgroup_var == "impact") {
-#     rhs <- c("impact", controls)
-#     fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
-#     return(lm(fml, data = df))
-#   }
-# 
-#   df_sub <- df %>%
-#     dplyr::filter(impact == 0 | .data[[subgroup_var]] == 1) %>%
-#     dplyr::mutate(treat = ifelse(.data[[subgroup_var]] == 1, 1, 0))
-# 
-#   rhs <- c("treat", controls)
-#   fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
-#   lm(fml, data = df_sub)
-# }
 ```
 
 ### 3.3 Appendix Tables - Each IV Model Grouped around DV
