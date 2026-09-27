@@ -67,24 +67,29 @@ names(sample)
 #   desor_core***
 #   fire_controls
 # ============================================================
-
 demo_controls <- c(
-  "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "OtherRace", "gender"
+  "Black", "Hisp_Latino", "AllOthers", "gender"
 )
 
-problematic_demos <- c(
-  "White",
-  "Black",
-  "Hisp_Latino",
-  "AllOthers"
-)
-problematic_demos_labels <- c(
-  White = "White",
+demo_controls_labels <- c(
   Black = "Black",
-  Hisp_Latino = "Hisp_Latino",
-  OtherRaces = "AllOthers",
-  Gender = "Gender"
+  Hisp_Latino    = "Hispanic/Latino", 
+  AllOthers = "Other RID",
+  gender = "Men"
 )
+
+# problematic_race_vars <- c(
+#   "White",
+#   "Black",
+#   "Hisp_Latino",
+#   "AllOthers"
+# )
+# problematic_race_labels <- c(
+#   White = "White",
+#   Black = "Black",
+#   Hisp_Latino = "Hisp_Latino",
+#   OtherRaces = "AllOthers"
+# )
 
 party_ideo_controls <- c(
   "pid_3",
@@ -117,8 +122,8 @@ fire_controls_labels <- c(
 control_waves <- list(
   nocontrol = character(0),
   demo = demo_controls,
-  party_ideo = c(problematic_demos, party_ideo_controls),
-  full_attitudes = c(problematic_demos, party_ideo_controls,
+  party_ideo = c(demo_controls, party_ideo_controls),
+  full_attitudes = c(demo_controls, party_ideo_controls,
                      fire_controls, desor_core)
 )
 ```

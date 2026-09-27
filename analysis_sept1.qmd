@@ -75,21 +75,21 @@ summary(gender_model)
 ```
 
 ```{r}
-nrow(sample)
-
-view(sample$impact)
-
-m_a <- lm(prisonhelp ~ gender, data = sample) # given someone's desorcore, how much prisonhelp support would we predict
-
-
-m_b <- lm(impact ~ gender, data = sample)  # given unit's desorcore, how much carceral impact would we predict? 
-
-y_resid <- resid(m_a)
-x_resid <- resid(m_b)
-
-m_c <- lm(y_resid ~ x_resid) # among the variation in impact that is unrelated to gender, is that variation associated with the variation in help support that is also unrelated to gender?
-
-summary(m_c)
+# nrow(sample)
+# table(sample$incarc)
+# table(sample$impact)
+# 
+# m_a <- lm(prisonhelp ~ gender, data = sample) # given someone's desorcore, how much prisonhelp support would we predict
+# 
+# 
+# m_b <- lm(impact ~ gender, data = sample)  # given unit's desorcore, how much carceral impact would we predict? 
+# 
+# y_resid <- resid(m_a)
+# x_resid <- resid(m_b)
+# 
+# m_c <- lm(y_resid ~ x_resid) # among the variation in impact that is unrelated to gender, is that variation associated with the variation in help support that is also unrelated to gender?
+# 
+# summary(m_c)
 ```
 
 ## Y \~ X, Z \~ X, y \~ z
