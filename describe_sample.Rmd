@@ -604,7 +604,6 @@ ideo_party_table <- ideo_by_party %>%
 ```{r}
 View(ideo_party_table)
 
-
 ```
 
 

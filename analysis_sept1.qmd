@@ -32,7 +32,7 @@ library(ggplot2)
 library(broom)
 library(knitr)
 
-source("variable_labels.R")
+source("variable_labels_sept1.R")
 ```
 
 ```{r}
@@ -65,6 +65,29 @@ nrow(excluded)
 
 # 2. Good Controls?
 
+### Demographics
+
+```{r}
+
+gender_model <- lm(prisonhelp ~ impact + gender, data = sample)
+
+summary(gender_model)
+```
+
+```{r}
+m_a <- lm(prisonhelp ~ gender, data = sample) # given someone's desorcore, how much prisonhelp support would we predict
+
+
+m_b <- lm(impact ~ gender, data = sample)  # given unit's desorcore, how much carceral impact would we predict? 
+
+y_resid <- resid(m_a)
+x_resid <- resid(m_b)
+
+m_c <- lm(y_resid ~ x_resid) # among the variation in impact that is unrelated to gender, is that variation associated with the variation in help support that is also unrelated to gender?
+
+summary(m_c)
+```
+
 ## Y \~ X, Z \~ X, y \~ z
 
 ```{r}
@@ -82,8 +105,6 @@ m_c <- lm(y_resid ~ x_resid) # among the variation in impact that is unrelated t
 
 summary(m_c)
 ```
-
-
 
 ```{r}
 
@@ -174,20 +195,28 @@ names(sample)
 # ============================================================
 
 demo_controls <- c(
-  "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "OtherRace", "gender"
+  "Black", "Hisp_Latino", "AllOthers", "gender"
 )
-problematic_race_vars <- c(
-  "White",
-  "Black",
-  "Hisp_Latino",
-  "AllOthers"
-)
-problematic_race_labels <- c(
-  White = "White",
+
+demo_controls_labels <- c(
   Black = "Black",
-  Hisp_Latino = "Hisp_Latino",
-  OtherRaces = "AllOthers"
+  Hisp_Latino    = "Hispanic/Latino", 
+  AllOthers = "Other RID",
+  gender = "Men"
 )
+
+# problematic_race_vars <- c(
+#   "White",
+#   "Black",
+#   "Hisp_Latino",
+#   "AllOthers"
+# )
+# problematic_race_labels <- c(
+#   White = "White",
+#   Black = "Black",
+#   Hisp_Latino = "Hisp_Latino",
+#   OtherRaces = "AllOthers"
+# )
 
 party_ideo_controls <- c(
   "pid_3",
@@ -220,8 +249,8 @@ fire_controls_labels <- c(
 control_waves <- list(
   nocontrol = character(0),
   demo = demo_controls,
-  party_ideo = c(problematic_race_vars, party_ideo_controls),
-  full_attitudes = c(problematic_race_vars, party_ideo_controls,
+  party_ideo = c(demo_controls, party_ideo_controls),
+  full_attitudes = c(demo_controls, party_ideo_controls,
                      fire_controls, desor_core)
 )
 ```
@@ -1190,8 +1219,6 @@ appendix_table_wide <- comparison_table %>%
 
 View(appendix_table_wide)
 ```
-
-
 
 # 4. DV: Deservingness
 
