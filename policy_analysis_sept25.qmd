@@ -507,7 +507,6 @@ chunk_vector <- function(x, chunk_size = 2) {
 
 
 ```{r}
-
 make_policy_panel_latex_table <- function(
     dv_vec,
     model2_list,
@@ -700,14 +699,11 @@ results_table_tex <- make_policy_panel_latex_table(
   model2_title = "Model 2",
   model3_title = "Model 3",
   row_vars = c("impact", "incarc", "knowincarc", "vict"),
-  control_vars = c("Black", "Hispanic/Latino", "Asian_Am",
-                   "Native_Am", "OtherRace", "gender"),
+  control_vars = c("Black", "Hispanic/Latino", "AllOthers", "gender"),
   control_labels = c(
     Black = "Black",
     Hisp_Latino = "Hispanic/Latino",
-    Asian_Am    = "Asian American",
-    Native_Am   = "Native American",
-    OtherRace = "Other Race",
+    AllOthers = "Other Race",
     gender = "Male"
   ),
   robust = TRUE
@@ -740,14 +736,11 @@ results_table_tex <- make_policy_panel_latex_table(
   model2_title = "Model 2",
   model3_title = "Model 3",
   row_vars = c("impact", "incarc", "knowincarc", "vict"),
-  control_vars = c("Black", "Hispanic/Latino", "Asian_Am",
-                   "Native_Am", "OtherRace", "gender"),
+  control_vars = c("Black", "Hispanic/Latino", "AllOthers", "gender"),
   control_labels = c(
     Black = "Black",
     Hisp_Latino = "Hispanic/Latino",
-    Asian_Am    = "Asian American",
-    Native_Am   = "Native American",
-    OtherRace = "Other race",
+    AllOthers = "Other race",
     gender = "Male"
   ),
   robust = TRUE
