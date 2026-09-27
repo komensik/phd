@@ -75,6 +75,10 @@ summary(gender_model)
 ```
 
 ```{r}
+nrow(sample)
+
+view(sample$impact)
+
 m_a <- lm(prisonhelp ~ gender, data = sample) # given someone's desorcore, how much prisonhelp support would we predict
 
 
