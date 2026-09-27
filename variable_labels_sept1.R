@@ -126,19 +126,19 @@ political_behavior_labels <- c(
 
 # Condensed race variables
 
-problematic_race_vars <- c(
-  "White",
-  "Black",
-  "Hisp_Latino",
-  "AllOthers"
-)
+# problematic_race_vars <- c(
+#   "White",
+#   "Black",
+#   "Hisp_Latino",
+#   "AllOthers"
+# )
 
-problematic_race_labels <- c(
-  White = "White",
-  Black = "Black",
-  Hisp_Latino = "Hisp_Latino",
-  OtherRaces = "AllOthers"
-)
+# problematic_race_labels <- c(
+#   White = "White",
+#   Black = "Black",
+#   Hisp_Latino = "Hisp_Latino",
+#   OtherRaces = "AllOthers"
+# )
 
 race_vars <- c(
   "White",
@@ -186,15 +186,13 @@ all_race_labels <- c(
 ##
 
 demo_controls <- c(
-  "Black", "Hisp_Latino", "Asian_Am", "Native_Am", "OtherRace", "gender"
+  "Black", "Hisp_Latino", "AllOthers", "gender"
 )
 
 demo_controls_labels <- c(
   Black = "Black",
   Hisp_Latino    = "Hispanic/Latino", 
-  Asian_Am = "Asian American",
-  Native_Am = "Native American",
-  OtherRace = "Other Race", 
+  AllOthers = "Other RID",
   gender = "Men"
 )
 

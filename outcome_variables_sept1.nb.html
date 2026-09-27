@@ -1760,13 +1760,13 @@ display: none;
 <h1>Setup</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-message-begin eyJkYXRhIjoiUm93czogMjMyNyBDb2x1bW5zOiAzODBcbuKUgOKUgCBDb2x1bW4gc3BlY2lmaWNhdGlvbiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIBcbkRlbGltaXRlcjogXCIsXCJcbmNociAgKDE1KTogcmVzcG9uc2VfaWQsIHJhdGlvbl9zY3JpcHRzLCByYXRpb25fcGVyaW9kLCByYXRpb25fZm9vZCwgLi4uXG5kYmwgKDM1MCk6IHByb2dyZXNzLCBkdXJhdGlvbl9pbl9zZWNvbmRzLCBmaW5pc2hlZCwgaW5jYXJjX3Jhdywga25vdy4uLlxubGdsICAoMTUpOiBxMTEyLCBhdHRuX3E5X3Bhc3MsIGF0dG5fcTlfdHlwbywgYXR0bl9jaGVja19xMTcsIGF0dG5fcTEuLi5cblxu4oS5IFVzZSBgc3BlYygpYCB0byByZXRyaWV2ZSB0aGUgZnVsbCBjb2x1bW4gc3BlY2lmaWNhdGlvbiBmb3IgdGhpcyBkYXRhLlxu4oS5IFNwZWNpZnkgdGhlIGNvbHVtbiB0eXBlcyBvciBzZXQgYHNob3dfY29sX3R5cGVzID0gRkFMU0VgIHRvIHF1aWV0IHRoaXMgbWVzc2FnZS5cbiJ9 -->
+<!-- rnb-message-begin eyJkYXRhIjoiUm93czogMjMyNyBDb2x1bW5zOiAzODBcbuKUgOKUgCBDb2x1bW4gc3BlY2lmaWNhdGlvbiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIBcbkRlbGltaXRlcjogXCIsXCJcbmNociAgKDE1KTogcmVzcG9uc2VfaWQsIHJhdGlvbl9zY3JpcHRzLCByYXRpb25fcGVyaW9kLCByYXRpb25fZm9vZCwgcTE3LC4uLlxuZGJsICgzNTApOiBwcm9ncmVzcywgZHVyYXRpb25faW5fc2Vjb25kcywgZmluaXNoZWQsIGluY2FyY19yYXcsIGtub3dpbmNhLi4uXG5sZ2wgICgxNSk6IHExMTIsIGF0dG5fcTlfcGFzcywgYXR0bl9xOV90eXBvLCBhdHRuX2NoZWNrX3ExNywgYXR0bl9xMTE0X3AuLi5cblxu4oS5IFVzZSBgc3BlYygpYCB0byByZXRyaWV2ZSB0aGUgZnVsbCBjb2x1bW4gc3BlY2lmaWNhdGlvbiBmb3IgdGhpcyBkYXRhLlxu4oS5IFNwZWNpZnkgdGhlIGNvbHVtbiB0eXBlcyBvciBzZXQgYHNob3dfY29sX3R5cGVzID0gRkFMU0VgIHRvIHF1aWV0IHRoaXMgbWVzc2FnZS5cbiJ9 -->
 <pre><code>Rows: 2327 Columns: 380
-── Column specification ────────────────────────────────────────────────
+── Column specification ────────────────────────────────────────────────────
 Delimiter: &quot;,&quot;
-chr  (15): response_id, ration_scripts, ration_period, ration_food, ...
-dbl (350): progress, duration_in_seconds, finished, incarc_raw, know...
-lgl  (15): q112, attn_q9_pass, attn_q9_typo, attn_check_q17, attn_q1...
+chr  (15): response_id, ration_scripts, ration_period, ration_food, q17,...
+dbl (350): progress, duration_in_seconds, finished, incarc_raw, knowinca...
+lgl  (15): q112, attn_q9_pass, attn_q9_typo, attn_check_q17, attn_q114_p...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
@@ -1964,7 +1964,7 @@ lwop_rev 0.2377258 1.0000000</code></pre>
 dpen_rev 1.0000000 0.2377258
 lwop_rev 0.2377258 1.0000000</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5SZWxpYWJpbGl0eSBhbmFseXNpcyAgIFxuQ2FsbDogcHN5Y2g6OmFscGhhKHggPSBwZW5fZGF0YSwgY2hlY2sua2V5cyA9IEZBTFNFKVxuXG4gIHJhd19hbHBoYSBzdGQuYWxwaGEgRzYoc21jKSBhdmVyYWdlX3IgIFMvTiAgIGFzZSBtZWFuICAgc2QgbWVkaWFuX3JcbiAgICAgIDAuMzggICAgICAwLjM4ICAgIDAuMjQgICAgICAwLjI0IDAuNjIgMC4wMjUgIDIuOSAwLjcxICAgICAwLjI0XG5cbiAgICA5NSUgY29uZmlkZW5jZSBib3VuZGFyaWVzIFxuICAgICAgICAgbG93ZXIgYWxwaGEgdXBwZXJcbkZlbGR0ICAgICAwLjMzICAwLjM4ICAwLjQzXG5EdWhhY2hlayAgMC4zMyAgMC4zOCAgMC40M1xuXG4gUmVsaWFiaWxpdHkgaWYgYW4gaXRlbSBpcyBkcm9wcGVkOlxuICAgICAgICAgcmF3X2FscGhhIHN0ZC5hbHBoYSBHNihzbWMpIGF2ZXJhZ2VfciAgUy9OIGFscGhhIHNlIHZhci5yXG5kcGVuX3JldiAgICAgIDAuMjggICAgICAwLjI0ICAgMC4wNTcgICAgICAwLjI0IDAuMzEgICAgICAgTkEgICAgIDBcbmx3b3BfcmV2ICAgICAgMC4yMSAgICAgIDAuMjQgICAwLjA1NyAgICAgIDAuMjQgMC4zMSAgICAgICBOQSAgICAgMFxuICAgICAgICAgbWVkLnJcbmRwZW5fcmV2ICAwLjI0XG5sd29wX3JldiAgMC4yNFxuXG4gSXRlbSBzdGF0aXN0aWNzIFxuICAgICAgICAgICAgbiByYXcuciBzdGQuciByLmNvciByLmRyb3AgbWVhbiAgIHNkXG5kcGVuX3JldiAyMDMwICAwLjgyICAwLjc5ICAwLjM4ICAgMC4yNCAgMi44IDAuOTdcbmx3b3BfcmV2IDIwMzAgIDAuNzUgIDAuNzkgIDAuMzggICAwLjI0ICAyLjkgMC44M1xuXG5Ob24gbWlzc2luZyByZXNwb25zZSBmcmVxdWVuY3kgZm9yIGVhY2ggaXRlbVxuICAgICAgICAgICAgMSAgICAyICAyLjUgICAgMyAgICA0IG1pc3NcbmRwZW5fcmV2IDAuMTMgMC4xNyAwLjE1IDAuMzAgMC4yNiAwLjEzXG5sd29wX3JldiAwLjA2IDAuMTQgMC4xNyAwLjM2IDAuMjggMC4xM1xuIn0= -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5SZWxpYWJpbGl0eSBhbmFseXNpcyAgIFxuQ2FsbDogcHN5Y2g6OmFscGhhKHggPSBwZW5fZGF0YSwgY2hlY2sua2V5cyA9IEZBTFNFKVxuXG4gIHJhd19hbHBoYSBzdGQuYWxwaGEgRzYoc21jKSBhdmVyYWdlX3IgIFMvTiAgIGFzZSBtZWFuICAgc2QgbWVkaWFuX3JcbiAgICAgIDAuMzggICAgICAwLjM4ICAgIDAuMjQgICAgICAwLjI0IDAuNjIgMC4wMjUgIDIuOSAwLjcxICAgICAwLjI0XG5cbiAgICA5NSUgY29uZmlkZW5jZSBib3VuZGFyaWVzIFxuICAgICAgICAgbG93ZXIgYWxwaGEgdXBwZXJcbkZlbGR0ICAgICAwLjMzICAwLjM4ICAwLjQzXG5EdWhhY2hlayAgMC4zMyAgMC4zOCAgMC40M1xuXG4gUmVsaWFiaWxpdHkgaWYgYW4gaXRlbSBpcyBkcm9wcGVkOlxuICAgICAgICAgcmF3X2FscGhhIHN0ZC5hbHBoYSBHNihzbWMpIGF2ZXJhZ2VfciAgUy9OIGFscGhhIHNlIHZhci5yIG1lZC5yXG5kcGVuX3JldiAgICAgIDAuMjggICAgICAwLjI0ICAgMC4wNTcgICAgICAwLjI0IDAuMzEgICAgICAgTkEgICAgIDAgIDAuMjRcbmx3b3BfcmV2ICAgICAgMC4yMSAgICAgIDAuMjQgICAwLjA1NyAgICAgIDAuMjQgMC4zMSAgICAgICBOQSAgICAgMCAgMC4yNFxuXG4gSXRlbSBzdGF0aXN0aWNzIFxuICAgICAgICAgICAgbiByYXcuciBzdGQuciByLmNvciByLmRyb3AgbWVhbiAgIHNkXG5kcGVuX3JldiAyMDMwICAwLjgyICAwLjc5ICAwLjM4ICAgMC4yNCAgMi44IDAuOTdcbmx3b3BfcmV2IDIwMzAgIDAuNzUgIDAuNzkgIDAuMzggICAwLjI0ICAyLjkgMC44M1xuXG5Ob24gbWlzc2luZyByZXNwb25zZSBmcmVxdWVuY3kgZm9yIGVhY2ggaXRlbVxuICAgICAgICAgICAgMSAgICAyICAyLjUgICAgMyAgICA0IG1pc3NcbmRwZW5fcmV2IDAuMTMgMC4xNyAwLjE1IDAuMzAgMC4yNiAwLjEzXG5sd29wX3JldiAwLjA2IDAuMTQgMC4xNyAwLjM2IDAuMjggMC4xM1xuIn0= -->
 <pre><code>
 Reliability analysis   
 Call: psych::alpha(x = pen_data, check.keys = FALSE)
@@ -1978,12 +1978,9 @@ Feldt     0.33  0.38  0.43
 Duhachek  0.33  0.38  0.43
 
  Reliability if an item is dropped:
-         raw_alpha std.alpha G6(smc) average_r  S/N alpha se var.r
-dpen_rev      0.28      0.24   0.057      0.24 0.31       NA     0
-lwop_rev      0.21      0.24   0.057      0.24 0.31       NA     0
-         med.r
-dpen_rev  0.24
-lwop_rev  0.24
+         raw_alpha std.alpha G6(smc) average_r  S/N alpha se var.r med.r
+dpen_rev      0.28      0.24   0.057      0.24 0.31       NA     0  0.24
+lwop_rev      0.21      0.24   0.057      0.24 0.31       NA     0  0.24
 
  Item statistics 
             n raw.r std.r r.cor r.drop mean   sd
@@ -2110,7 +2107,7 @@ alt_sentencing        0          0        0              0
 
  To see confidence intervals of the correlations, print with the short=FALSE option</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5SZWxpYWJpbGl0eSBhbmFseXNpcyAgIFxuQ2FsbDogcHN5Y2g6OmFscGhhKHggPSBxMjVfaGVscF9kYXRhKVxuXG4gIHJhd19hbHBoYSBzdGQuYWxwaGEgRzYoc21jKSBhdmVyYWdlX3IgUy9OICAgIGFzZSBtZWFuICAgc2QgbWVkaWFuX3JcbiAgICAgIDAuNzUgICAgICAwLjc1ICAgICAwLjcgICAgICAwLjQzIDMuMSAwLjAwODMgIDIuOSAwLjY3ICAgICAwLjQ0XG5cbiAgICA5NSUgY29uZmlkZW5jZSBib3VuZGFyaWVzIFxuICAgICAgICAgbG93ZXIgYWxwaGEgdXBwZXJcbkZlbGR0ICAgICAwLjc0ICAwLjc1ICAwLjc3XG5EdWhhY2hlayAgMC43NCAgMC43NSAgMC43N1xuXG4gUmVsaWFiaWxpdHkgaWYgYW4gaXRlbSBpcyBkcm9wcGVkOlxuICAgICAgICAgICAgICAgcmF3X2FscGhhIHN0ZC5hbHBoYSBHNihzbWMpIGF2ZXJhZ2VfciBTL04gYWxwaGEgc2Vcbm1pbl93YWdlICAgICAgICAgICAgMC42OSAgICAgIDAuNjkgICAgMC42MCAgICAgIDAuNDMgMi4yICAgMC4wMTExXG5mcmVlX2NhbGxzICAgICAgICAgIDAuNjggICAgICAwLjY4ICAgIDAuNTkgICAgICAwLjQyIDIuMiAgIDAuMDExNFxuZWRfZnVuZHMgICAgICAgICAgICAwLjY4ICAgICAgMC42OCAgICAwLjU5ICAgICAgMC40MSAyLjEgICAwLjAxMTNcbmFsdF9zZW50ZW5jaW5nICAgICAgMC43MyAgICAgIDAuNzMgICAgMC42NCAgICAgIDAuNDcgMi43ICAgMC4wMDk3XG4gICAgICAgICAgICAgICAgIHZhci5yIG1lZC5yXG5taW5fd2FnZSAgICAgICAwLjAwMzM1ICAwLjQyXG5mcmVlX2NhbGxzICAgICAwLjAwMTAwICAwLjQyXG5lZF9mdW5kcyAgICAgICAwLjAwMzY5ICAwLjM5XG5hbHRfc2VudGVuY2luZyAwLjAwMDQ4ICAwLjQ4XG5cbiBJdGVtIHN0YXRpc3RpY3MgXG4gICAgICAgICAgICAgICAgICBuIHJhdy5yIHN0ZC5yIHIuY29yIHIuZHJvcCBtZWFuICAgc2Rcbm1pbl93YWdlICAgICAgIDIwMzAgIDAuNzggIDAuNzYgIDAuNjQgICAwLjU2ICAyLjcgMC45NVxuZnJlZV9jYWxscyAgICAgMjAzMCAgMC43OCAgMC43NyAgMC42NiAgIDAuNTcgIDIuOSAwLjkzXG5lZF9mdW5kcyAgICAgICAyMDI5ICAwLjc3ICAwLjc4ICAwLjY3ICAgMC41OCAgMy4xIDAuODNcbmFsdF9zZW50ZW5jaW5nIDIwMjkgIDAuNzAgIDAuNzIgIDAuNTYgICAwLjQ5ICAyLjggMC44MFxuXG5Ob24gbWlzc2luZyByZXNwb25zZSBmcmVxdWVuY3kgZm9yIGVhY2ggaXRlbVxuICAgICAgICAgICAgICAgICAgMSAgICAyICAyLjUgICAgMyAgICA0IG1pc3Ncbm1pbl93YWdlICAgICAgIDAuMTMgMC4yMSAwLjEyIDAuMzIgMC4yMiAwLjEzXG5mcmVlX2NhbGxzICAgICAwLjEwIDAuMTcgMC4xMSAwLjMzIDAuMjkgMC4xM1xuZWRfZnVuZHMgICAgICAgMC4wNSAwLjA5IDAuMDggMC4zOSAwLjM4IDAuMTNcbmFsdF9zZW50ZW5jaW5nIDAuMDcgMC4xNCAwLjE5IDAuNDAgMC4yMCAwLjEzXG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5SZWxpYWJpbGl0eSBhbmFseXNpcyAgIFxuQ2FsbDogcHN5Y2g6OmFscGhhKHggPSBxMjVfaGVscF9kYXRhKVxuXG4gIHJhd19hbHBoYSBzdGQuYWxwaGEgRzYoc21jKSBhdmVyYWdlX3IgUy9OICAgIGFzZSBtZWFuICAgc2QgbWVkaWFuX3JcbiAgICAgIDAuNzUgICAgICAwLjc1ICAgICAwLjcgICAgICAwLjQzIDMuMSAwLjAwODMgIDIuOSAwLjY3ICAgICAwLjQ0XG5cbiAgICA5NSUgY29uZmlkZW5jZSBib3VuZGFyaWVzIFxuICAgICAgICAgbG93ZXIgYWxwaGEgdXBwZXJcbkZlbGR0ICAgICAwLjc0ICAwLjc1ICAwLjc3XG5EdWhhY2hlayAgMC43NCAgMC43NSAgMC43N1xuXG4gUmVsaWFiaWxpdHkgaWYgYW4gaXRlbSBpcyBkcm9wcGVkOlxuICAgICAgICAgICAgICAgcmF3X2FscGhhIHN0ZC5hbHBoYSBHNihzbWMpIGF2ZXJhZ2VfciBTL04gYWxwaGEgc2UgICB2YXIuclxubWluX3dhZ2UgICAgICAgICAgICAwLjY5ICAgICAgMC42OSAgICAwLjYwICAgICAgMC40MyAyLjIgICAwLjAxMTEgMC4wMDMzNVxuZnJlZV9jYWxscyAgICAgICAgICAwLjY4ICAgICAgMC42OCAgICAwLjU5ICAgICAgMC40MiAyLjIgICAwLjAxMTQgMC4wMDEwMFxuZWRfZnVuZHMgICAgICAgICAgICAwLjY4ICAgICAgMC42OCAgICAwLjU5ICAgICAgMC40MSAyLjEgICAwLjAxMTMgMC4wMDM2OVxuYWx0X3NlbnRlbmNpbmcgICAgICAwLjczICAgICAgMC43MyAgICAwLjY0ICAgICAgMC40NyAyLjcgICAwLjAwOTcgMC4wMDA0OFxuICAgICAgICAgICAgICAgbWVkLnJcbm1pbl93YWdlICAgICAgICAwLjQyXG5mcmVlX2NhbGxzICAgICAgMC40MlxuZWRfZnVuZHMgICAgICAgIDAuMzlcbmFsdF9zZW50ZW5jaW5nICAwLjQ4XG5cbiBJdGVtIHN0YXRpc3RpY3MgXG4gICAgICAgICAgICAgICAgICBuIHJhdy5yIHN0ZC5yIHIuY29yIHIuZHJvcCBtZWFuICAgc2Rcbm1pbl93YWdlICAgICAgIDIwMzAgIDAuNzggIDAuNzYgIDAuNjQgICAwLjU2ICAyLjcgMC45NVxuZnJlZV9jYWxscyAgICAgMjAzMCAgMC43OCAgMC43NyAgMC42NiAgIDAuNTcgIDIuOSAwLjkzXG5lZF9mdW5kcyAgICAgICAyMDI5ICAwLjc3ICAwLjc4ICAwLjY3ICAgMC41OCAgMy4xIDAuODNcbmFsdF9zZW50ZW5jaW5nIDIwMjkgIDAuNzAgIDAuNzIgIDAuNTYgICAwLjQ5ICAyLjggMC44MFxuXG5Ob24gbWlzc2luZyByZXNwb25zZSBmcmVxdWVuY3kgZm9yIGVhY2ggaXRlbVxuICAgICAgICAgICAgICAgICAgMSAgICAyICAyLjUgICAgMyAgICA0IG1pc3Ncbm1pbl93YWdlICAgICAgIDAuMTMgMC4yMSAwLjEyIDAuMzIgMC4yMiAwLjEzXG5mcmVlX2NhbGxzICAgICAwLjEwIDAuMTcgMC4xMSAwLjMzIDAuMjkgMC4xM1xuZWRfZnVuZHMgICAgICAgMC4wNSAwLjA5IDAuMDggMC4zOSAwLjM4IDAuMTNcbmFsdF9zZW50ZW5jaW5nIDAuMDcgMC4xNCAwLjE5IDAuNDAgMC4yMCAwLjEzXG4ifQ== -->
 <pre><code>
 Reliability analysis   
 Call: psych::alpha(x = q25_help_data)
@@ -2124,16 +2121,16 @@ Feldt     0.74  0.75  0.77
 Duhachek  0.74  0.75  0.77
 
  Reliability if an item is dropped:
-               raw_alpha std.alpha G6(smc) average_r S/N alpha se
-min_wage            0.69      0.69    0.60      0.43 2.2   0.0111
-free_calls          0.68      0.68    0.59      0.42 2.2   0.0114
-ed_funds            0.68      0.68    0.59      0.41 2.1   0.0113
-alt_sentencing      0.73      0.73    0.64      0.47 2.7   0.0097
-                 var.r med.r
-min_wage       0.00335  0.42
-free_calls     0.00100  0.42
-ed_funds       0.00369  0.39
-alt_sentencing 0.00048  0.48
+               raw_alpha std.alpha G6(smc) average_r S/N alpha se   var.r
+min_wage            0.69      0.69    0.60      0.43 2.2   0.0111 0.00335
+free_calls          0.68      0.68    0.59      0.42 2.2   0.0114 0.00100
+ed_funds            0.68      0.68    0.59      0.41 2.1   0.0113 0.00369
+alt_sentencing      0.73      0.73    0.64      0.47 2.7   0.0097 0.00048
+               med.r
+min_wage        0.42
+free_calls      0.42
+ed_funds        0.39
+alt_sentencing  0.48
 
  Item statistics 
                   n raw.r std.r r.cor r.drop mean   sd
@@ -2156,7 +2153,7 @@ free_calls     0.4831019  1.0000000 0.4873705      0.3718568
 ed_funds       0.4476314  0.4873705 1.0000000      0.4238443
 alt_sentencing 0.3850568  0.3718568 0.4238443      1.0000000</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5SZWxpYWJpbGl0eSBhbmFseXNpcyAgIFxuQ2FsbDogcHN5Y2g6OmFscGhhKHggPSBxMjVfaGVscF9kYXRhLCBjaGVjay5rZXlzID0gRkFMU0UpXG5cbiAgcmF3X2FscGhhIHN0ZC5hbHBoYSBHNihzbWMpIGF2ZXJhZ2VfciBTL04gICAgYXNlIG1lYW4gICBzZCBtZWRpYW5fclxuICAgICAgMC43NSAgICAgIDAuNzUgICAgIDAuNyAgICAgIDAuNDMgMy4xIDAuMDA4MyAgMi45IDAuNjcgICAgIDAuNDRcblxuICAgIDk1JSBjb25maWRlbmNlIGJvdW5kYXJpZXMgXG4gICAgICAgICBsb3dlciBhbHBoYSB1cHBlclxuRmVsZHQgICAgIDAuNzQgIDAuNzUgIDAuNzdcbkR1aGFjaGVrICAwLjc0ICAwLjc1ICAwLjc3XG5cbiBSZWxpYWJpbGl0eSBpZiBhbiBpdGVtIGlzIGRyb3BwZWQ6XG4gICAgICAgICAgICAgICByYXdfYWxwaGEgc3RkLmFscGhhIEc2KHNtYykgYXZlcmFnZV9yIFMvTiBhbHBoYSBzZVxubWluX3dhZ2UgICAgICAgICAgICAwLjY5ICAgICAgMC42OSAgICAwLjYwICAgICAgMC40MyAyLjIgICAwLjAxMTFcbmZyZWVfY2FsbHMgICAgICAgICAgMC42OCAgICAgIDAuNjggICAgMC41OSAgICAgIDAuNDIgMi4yICAgMC4wMTE0XG5lZF9mdW5kcyAgICAgICAgICAgIDAuNjggICAgICAwLjY4ICAgIDAuNTkgICAgICAwLjQxIDIuMSAgIDAuMDExM1xuYWx0X3NlbnRlbmNpbmcgICAgICAwLjczICAgICAgMC43MyAgICAwLjY0ICAgICAgMC40NyAyLjcgICAwLjAwOTdcbiAgICAgICAgICAgICAgICAgdmFyLnIgbWVkLnJcbm1pbl93YWdlICAgICAgIDAuMDAzMzUgIDAuNDJcbmZyZWVfY2FsbHMgICAgIDAuMDAxMDAgIDAuNDJcbmVkX2Z1bmRzICAgICAgIDAuMDAzNjkgIDAuMzlcbmFsdF9zZW50ZW5jaW5nIDAuMDAwNDggIDAuNDhcblxuIEl0ZW0gc3RhdGlzdGljcyBcbiAgICAgICAgICAgICAgICAgIG4gcmF3LnIgc3RkLnIgci5jb3Igci5kcm9wIG1lYW4gICBzZFxubWluX3dhZ2UgICAgICAgMjAzMCAgMC43OCAgMC43NiAgMC42NCAgIDAuNTYgIDIuNyAwLjk1XG5mcmVlX2NhbGxzICAgICAyMDMwICAwLjc4ICAwLjc3ICAwLjY2ICAgMC41NyAgMi45IDAuOTNcbmVkX2Z1bmRzICAgICAgIDIwMjkgIDAuNzcgIDAuNzggIDAuNjcgICAwLjU4ICAzLjEgMC44M1xuYWx0X3NlbnRlbmNpbmcgMjAyOSAgMC43MCAgMC43MiAgMC41NiAgIDAuNDkgIDIuOCAwLjgwXG5cbk5vbiBtaXNzaW5nIHJlc3BvbnNlIGZyZXF1ZW5jeSBmb3IgZWFjaCBpdGVtXG4gICAgICAgICAgICAgICAgICAxICAgIDIgIDIuNSAgICAzICAgIDQgbWlzc1xubWluX3dhZ2UgICAgICAgMC4xMyAwLjIxIDAuMTIgMC4zMiAwLjIyIDAuMTNcbmZyZWVfY2FsbHMgICAgIDAuMTAgMC4xNyAwLjExIDAuMzMgMC4yOSAwLjEzXG5lZF9mdW5kcyAgICAgICAwLjA1IDAuMDkgMC4wOCAwLjM5IDAuMzggMC4xM1xuYWx0X3NlbnRlbmNpbmcgMC4wNyAwLjE0IDAuMTkgMC40MCAwLjIwIDAuMTNcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5SZWxpYWJpbGl0eSBhbmFseXNpcyAgIFxuQ2FsbDogcHN5Y2g6OmFscGhhKHggPSBxMjVfaGVscF9kYXRhLCBjaGVjay5rZXlzID0gRkFMU0UpXG5cbiAgcmF3X2FscGhhIHN0ZC5hbHBoYSBHNihzbWMpIGF2ZXJhZ2VfciBTL04gICAgYXNlIG1lYW4gICBzZCBtZWRpYW5fclxuICAgICAgMC43NSAgICAgIDAuNzUgICAgIDAuNyAgICAgIDAuNDMgMy4xIDAuMDA4MyAgMi45IDAuNjcgICAgIDAuNDRcblxuICAgIDk1JSBjb25maWRlbmNlIGJvdW5kYXJpZXMgXG4gICAgICAgICBsb3dlciBhbHBoYSB1cHBlclxuRmVsZHQgICAgIDAuNzQgIDAuNzUgIDAuNzdcbkR1aGFjaGVrICAwLjc0ICAwLjc1ICAwLjc3XG5cbiBSZWxpYWJpbGl0eSBpZiBhbiBpdGVtIGlzIGRyb3BwZWQ6XG4gICAgICAgICAgICAgICByYXdfYWxwaGEgc3RkLmFscGhhIEc2KHNtYykgYXZlcmFnZV9yIFMvTiBhbHBoYSBzZSAgIHZhci5yXG5taW5fd2FnZSAgICAgICAgICAgIDAuNjkgICAgICAwLjY5ICAgIDAuNjAgICAgICAwLjQzIDIuMiAgIDAuMDExMSAwLjAwMzM1XG5mcmVlX2NhbGxzICAgICAgICAgIDAuNjggICAgICAwLjY4ICAgIDAuNTkgICAgICAwLjQyIDIuMiAgIDAuMDExNCAwLjAwMTAwXG5lZF9mdW5kcyAgICAgICAgICAgIDAuNjggICAgICAwLjY4ICAgIDAuNTkgICAgICAwLjQxIDIuMSAgIDAuMDExMyAwLjAwMzY5XG5hbHRfc2VudGVuY2luZyAgICAgIDAuNzMgICAgICAwLjczICAgIDAuNjQgICAgICAwLjQ3IDIuNyAgIDAuMDA5NyAwLjAwMDQ4XG4gICAgICAgICAgICAgICBtZWQuclxubWluX3dhZ2UgICAgICAgIDAuNDJcbmZyZWVfY2FsbHMgICAgICAwLjQyXG5lZF9mdW5kcyAgICAgICAgMC4zOVxuYWx0X3NlbnRlbmNpbmcgIDAuNDhcblxuIEl0ZW0gc3RhdGlzdGljcyBcbiAgICAgICAgICAgICAgICAgIG4gcmF3LnIgc3RkLnIgci5jb3Igci5kcm9wIG1lYW4gICBzZFxubWluX3dhZ2UgICAgICAgMjAzMCAgMC43OCAgMC43NiAgMC42NCAgIDAuNTYgIDIuNyAwLjk1XG5mcmVlX2NhbGxzICAgICAyMDMwICAwLjc4ICAwLjc3ICAwLjY2ICAgMC41NyAgMi45IDAuOTNcbmVkX2Z1bmRzICAgICAgIDIwMjkgIDAuNzcgIDAuNzggIDAuNjcgICAwLjU4ICAzLjEgMC44M1xuYWx0X3NlbnRlbmNpbmcgMjAyOSAgMC43MCAgMC43MiAgMC41NiAgIDAuNDkgIDIuOCAwLjgwXG5cbk5vbiBtaXNzaW5nIHJlc3BvbnNlIGZyZXF1ZW5jeSBmb3IgZWFjaCBpdGVtXG4gICAgICAgICAgICAgICAgICAxICAgIDIgIDIuNSAgICAzICAgIDQgbWlzc1xubWluX3dhZ2UgICAgICAgMC4xMyAwLjIxIDAuMTIgMC4zMiAwLjIyIDAuMTNcbmZyZWVfY2FsbHMgICAgIDAuMTAgMC4xNyAwLjExIDAuMzMgMC4yOSAwLjEzXG5lZF9mdW5kcyAgICAgICAwLjA1IDAuMDkgMC4wOCAwLjM5IDAuMzggMC4xM1xuYWx0X3NlbnRlbmNpbmcgMC4wNyAwLjE0IDAuMTkgMC40MCAwLjIwIDAuMTNcbiJ9 -->
 <pre><code>
 Reliability analysis   
 Call: psych::alpha(x = q25_help_data, check.keys = FALSE)
@@ -2170,16 +2167,16 @@ Feldt     0.74  0.75  0.77
 Duhachek  0.74  0.75  0.77
 
  Reliability if an item is dropped:
-               raw_alpha std.alpha G6(smc) average_r S/N alpha se
-min_wage            0.69      0.69    0.60      0.43 2.2   0.0111
-free_calls          0.68      0.68    0.59      0.42 2.2   0.0114
-ed_funds            0.68      0.68    0.59      0.41 2.1   0.0113
-alt_sentencing      0.73      0.73    0.64      0.47 2.7   0.0097
-                 var.r med.r
-min_wage       0.00335  0.42
-free_calls     0.00100  0.42
-ed_funds       0.00369  0.39
-alt_sentencing 0.00048  0.48
+               raw_alpha std.alpha G6(smc) average_r S/N alpha se   var.r
+min_wage            0.69      0.69    0.60      0.43 2.2   0.0111 0.00335
+free_calls          0.68      0.68    0.59      0.42 2.2   0.0114 0.00100
+ed_funds            0.68      0.68    0.59      0.41 2.1   0.0113 0.00369
+alt_sentencing      0.73      0.73    0.64      0.47 2.7   0.0097 0.00048
+               med.r
+min_wage        0.42
+free_calls      0.42
+ed_funds        0.39
+alt_sentencing  0.48
 
  Item statistics 
                   n raw.r std.r r.cor r.drop mean   sd
@@ -2268,7 +2265,7 @@ jail_access_rev                         0               0
 
  To see confidence intervals of the correlations, print with the short=FALSE option</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5SZWxpYWJpbGl0eSBhbmFseXNpcyAgIFxuQ2FsbDogcHN5Y2g6OmFscGhhKHggPSBpbmNhcmNfZWxlY3RvcmFsX2RhdGEpXG5cbiAgcmF3X2FscGhhIHN0ZC5hbHBoYSBHNihzbWMpIGF2ZXJhZ2VfciBTL04gICBhc2UgbWVhbiAgIHNkIG1lZGlhbl9yXG4gICAgICAgMC42ICAgICAgIDAuNiAgICAwLjQzICAgICAgMC40MyAxLjUgMC4wMTcgIDIuNSAwLjY2ICAgICAwLjQzXG5cbiAgICA5NSUgY29uZmlkZW5jZSBib3VuZGFyaWVzIFxuICAgICAgICAgbG93ZXIgYWxwaGEgdXBwZXJcbkZlbGR0ICAgICAwLjU3ICAgMC42ICAwLjYzXG5EdWhhY2hlayAgMC41NyAgIDAuNiAgMC42M1xuXG4gUmVsaWFiaWxpdHkgaWYgYW4gaXRlbSBpcyBkcm9wcGVkOlxuICAgICAgICAgICAgICAgICAgICAgcmF3X2FscGhhIHN0ZC5hbHBoYSBHNihzbWMpIGF2ZXJhZ2VfciAgUy9OXG5wb3N0X2ZlbG9ueV92b3RlX3JldiAgICAgIDAuNDMgICAgICAwLjQzICAgIDAuMTggICAgICAwLjQzIDAuNzVcbmphaWxfYWNjZXNzX3JldiAgICAgICAgICAgMC40MyAgICAgIDAuNDMgICAgMC4xOCAgICAgIDAuNDMgMC43NVxuICAgICAgICAgICAgICAgICAgICAgYWxwaGEgc2UgdmFyLnIgbWVkLnJcbnBvc3RfZmVsb255X3ZvdGVfcmV2ICAgICAgIE5BICAgICAwICAwLjQzXG5qYWlsX2FjY2Vzc19yZXYgICAgICAgICAgICBOQSAgICAgMCAgMC40M1xuXG4gSXRlbSBzdGF0aXN0aWNzIFxuICAgICAgICAgICAgICAgICAgICAgICAgbiByYXcuciBzdGQuciByLmNvciByLmRyb3AgbWVhbiAgIHNkXG5wb3N0X2ZlbG9ueV92b3RlX3JldiAxNjg4ICAwLjg1ICAwLjg1ICAwLjU1ICAgMC40MyAgMi41IDAuNzlcbmphaWxfYWNjZXNzX3JldiAgICAgIDE2ODggIDAuODQgIDAuODUgIDAuNTUgICAwLjQzICAyLjUgMC43OFxuXG5Ob24gbWlzc2luZyByZXNwb25zZSBmcmVxdWVuY3kgZm9yIGVhY2ggaXRlbVxuICAgICAgICAgICAgICAgICAgICAgICAgMSAgICAyICAgIDMgbWlzc1xucG9zdF9mZWxvbnlfdm90ZV9yZXYgMC4xOCAwLjE0IDAuNjggMC4yN1xuamFpbF9hY2Nlc3NfcmV2ICAgICAgMC4xOCAwLjE1IDAuNjcgMC4yN1xuIn0= -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5SZWxpYWJpbGl0eSBhbmFseXNpcyAgIFxuQ2FsbDogcHN5Y2g6OmFscGhhKHggPSBpbmNhcmNfZWxlY3RvcmFsX2RhdGEpXG5cbiAgcmF3X2FscGhhIHN0ZC5hbHBoYSBHNihzbWMpIGF2ZXJhZ2VfciBTL04gICBhc2UgbWVhbiAgIHNkIG1lZGlhbl9yXG4gICAgICAgMC42ICAgICAgIDAuNiAgICAwLjQzICAgICAgMC40MyAxLjUgMC4wMTcgIDIuNSAwLjY2ICAgICAwLjQzXG5cbiAgICA5NSUgY29uZmlkZW5jZSBib3VuZGFyaWVzIFxuICAgICAgICAgbG93ZXIgYWxwaGEgdXBwZXJcbkZlbGR0ICAgICAwLjU3ICAgMC42ICAwLjYzXG5EdWhhY2hlayAgMC41NyAgIDAuNiAgMC42M1xuXG4gUmVsaWFiaWxpdHkgaWYgYW4gaXRlbSBpcyBkcm9wcGVkOlxuICAgICAgICAgICAgICAgICAgICAgcmF3X2FscGhhIHN0ZC5hbHBoYSBHNihzbWMpIGF2ZXJhZ2VfciAgUy9OIGFscGhhIHNlXG5wb3N0X2ZlbG9ueV92b3RlX3JldiAgICAgIDAuNDMgICAgICAwLjQzICAgIDAuMTggICAgICAwLjQzIDAuNzUgICAgICAgTkFcbmphaWxfYWNjZXNzX3JldiAgICAgICAgICAgMC40MyAgICAgIDAuNDMgICAgMC4xOCAgICAgIDAuNDMgMC43NSAgICAgICBOQVxuICAgICAgICAgICAgICAgICAgICAgdmFyLnIgbWVkLnJcbnBvc3RfZmVsb255X3ZvdGVfcmV2ICAgICAwICAwLjQzXG5qYWlsX2FjY2Vzc19yZXYgICAgICAgICAgMCAgMC40M1xuXG4gSXRlbSBzdGF0aXN0aWNzIFxuICAgICAgICAgICAgICAgICAgICAgICAgbiByYXcuciBzdGQuciByLmNvciByLmRyb3AgbWVhbiAgIHNkXG5wb3N0X2ZlbG9ueV92b3RlX3JldiAxNjg4ICAwLjg1ICAwLjg1ICAwLjU1ICAgMC40MyAgMi41IDAuNzlcbmphaWxfYWNjZXNzX3JldiAgICAgIDE2ODggIDAuODQgIDAuODUgIDAuNTUgICAwLjQzICAyLjUgMC43OFxuXG5Ob24gbWlzc2luZyByZXNwb25zZSBmcmVxdWVuY3kgZm9yIGVhY2ggaXRlbVxuICAgICAgICAgICAgICAgICAgICAgICAgMSAgICAyICAgIDMgbWlzc1xucG9zdF9mZWxvbnlfdm90ZV9yZXYgMC4xOCAwLjE0IDAuNjggMC4yN1xuamFpbF9hY2Nlc3NfcmV2ICAgICAgMC4xOCAwLjE1IDAuNjcgMC4yN1xuIn0= -->
 <pre><code>
 Reliability analysis   
 Call: psych::alpha(x = incarc_electoral_data)
@@ -2282,12 +2279,12 @@ Feldt     0.57   0.6  0.63
 Duhachek  0.57   0.6  0.63
 
  Reliability if an item is dropped:
-                     raw_alpha std.alpha G6(smc) average_r  S/N
-post_felony_vote_rev      0.43      0.43    0.18      0.43 0.75
-jail_access_rev           0.43      0.43    0.18      0.43 0.75
-                     alpha se var.r med.r
-post_felony_vote_rev       NA     0  0.43
-jail_access_rev            NA     0  0.43
+                     raw_alpha std.alpha G6(smc) average_r  S/N alpha se
+post_felony_vote_rev      0.43      0.43    0.18      0.43 0.75       NA
+jail_access_rev           0.43      0.43    0.18      0.43 0.75       NA
+                     var.r med.r
+post_felony_vote_rev     0  0.43
+jail_access_rev          0  0.43
 
  Item statistics 
                         n raw.r std.r r.cor r.drop mean   sd
