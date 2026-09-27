@@ -53,6 +53,10 @@ library(forcats)
 library(ggplot2)
 library(broom)
 library(knitr)
+library(dplyr)
+library(purrr)
+library(lmtest)
+library(sandwich)
 
 source("variable_labels_sept1.R")
 ```
@@ -80,6 +84,28 @@ As of now, it (policy_vs_nonimp_waves) compares those groups (ie incarc == 1 and
 Then this chunk builds tables.
 
 \*\*\*08-26 I HAVE NOW RECODED incarc, knowincarc, and vict so that 1 = impacted in that particular way and 0 = NOT IMPACTED at all (ie, impact == 0).
+
+To confirm:
+
+```{r}
+table(sample$impact)
+
+sample %>%
+  group_by(impact) %>%
+  summarise(
+    n = n(),
+    incarc = sum(incarc, na.rm = TRUE),
+    knowincarc = sum(knowincarc, na.rm = TRUE),
+    vict = sum(vict, na.rm = TRUE),
+  )
+
+# Confirm the comparison-group coding
+table(sample$impact, sample$incarc, useNA = "ifany")
+table(sample$impact, sample$knowincarc, useNA = "ifany")
+table(sample$impact, sample$vict, useNA = "ifany")
+```
+
+
 
 This means that I don't need the same 2 goal situation. I am now cleaning this up so that the main models will say:
 
@@ -182,13 +208,12 @@ control_waves <- list(
 # ============================================================
 
 ```{r}
-
-
 make_policy_model <- function(df, dv, iv, controls = character(0)) { #character(0) just means empty character vector so this function works for uncontrolled model then for controlled model
   rhs <- c(iv, controls)
   fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
   lm(fml, data = df)
 }
+
 ```
 
 # ============================================================
@@ -253,6 +278,7 @@ for (wave_name in names(control_waves)) {#calls list of waves in control waves
 # ============================================================
 
 ```{r}
+
 policy_dummies_models <- policy_dummies_waves[["nocontrol"]]
 policy_dummies_demo_models <- policy_dummies_waves[["demo"]]
 policy_dummies_partyideo_models <- policy_dummies_waves[["party_ideo"]]
@@ -409,6 +435,8 @@ for (dv_name in policy_vars) {
 }
 ```
 
+
+
 ### 3.4 Compare Each Impacted Subgroup to Non-Impacted
 
 Restricted sample comparison logic (not impacted vs incarcerated) ultimate goal: no-controls to controls main results table built from the restricted-sample non-impacted-versus-subgroup models. then extend the restricted-sample models rather than rebuilding everything from scratch when adding controls.
@@ -417,83 +445,25 @@ Why doing this instead of a factor variable for all impact: -restricted-sample r
 
 A single categorical variable like 0 = not impacted, 1 = direct only, 2 = proximal only, 3 = victim only, 4 = multiple forms would answer a different question. It would force you to partition the sample into mutually exclusive bins, which is useful for some appendix descriptives and maybe later robustness checks, but it would also collapse substantively important overlap into a catch-all “multiple forms” group and make it harder to estimate the specific contrast you currently care about: whether each exposure type, as experienced in the real world, is associated with different outcomes relative to the fully non-impacted. For your main table, the restricted-sample approach is cleaner and more faithful to the theory.
 
-```{r}
-
-# ============================================================
-# Goal #2: compare each impacted subgroup to the fully
-# non-impacted group
-# ============================================================
-
-policy_vs_nonimp_waves <- list()
-
-for (wave_name in names(control_waves)) {
-
-  model_list <- list()
-
-  for (dv in policy_vars) {
-    for (iv in impact_vars) {
-
-      model_name <- paste0("comp_", dv, "_", iv)
-
-      model_list[[model_name]] <- make_restricted_model(
-        df = sample,
-        dv = dv,
-        subgroup_var = iv,
-        controls = control_waves[[wave_name]]
-      )
-    }
-  }
-
-  policy_vs_nonimp_waves[[wave_name]] <- model_list
-}
-
-policy_vs_nonimp_nocontrol_models <- policy_vs_nonimp_waves[["nocontrol"]]
-policy_vs_nonimp_demo_models <- policy_vs_nonimp_waves[["demo"]]
-policy_vs_nonimp_partyideo_models <- policy_vs_nonimp_waves[["party_ideo"]]
-policy_vs_nonimp_full_models <- policy_vs_nonimp_waves[["full_attitudes"]]
-
-
-summary(policy_vs_nonimp_nocontrol_models$comp_prisonhelp_impact)
-summary(policy_vs_nonimp_demo_models$comp_prisonhelp_impact)
-
-```
-
-reusable system for:
-
-a results-section table for prisonhelp and prisonpen,
-
-appendix tables for the remaining DVs in the same architecture,
-
-a blank second model block for later controlled models,
-
-placeholder control rows so the table skeleton already matches where you are headed.
-
 ### 3.5 Tables Loop
-
-```{r}
 # ============================================================
-# Advisor-style restricted-sample tables
+# Tables
 # Goal: compare each impacted subgroup to non-impacted only
-# Model 2 = no-controls restricted-sample models
+# Model 2 = no-controls models
 # Model 3 = placeholder for later controlled models
 #
 # Packages used:
 # dplyr, stringr, purrr, lmtest, sandwich
 # ============================================================
 
-library(dplyr)
-library(stringr)
-library(purrr)
-library(lmtest)
-library(sandwich)
-
+```{r}
 # ------------------------------------------------------------
-# Labels from your variable script
+# Labels from variable script
 # ------------------------------------------------------------
 policy_labels <- setNames(policy_map$label, policy_map$var)
 
 # ------------------------------------------------------------
-# Formatting helpers
+# Formatting helpers (regression output to latex)
 # ------------------------------------------------------------
 p_to_stars <- function(p) {
   dplyr::case_when(
@@ -518,75 +488,15 @@ latex_escape <- function(x) {
 }
 
 # ------------------------------------------------------------
-# Extract one non-intercept coefficient from a model
-# robust = HC1 by default
-# ------------------------------------------------------------
-get_single_term_stats <- function(mod, robust = TRUE) {
-  if (robust) {
-    ct <- lmtest::coeftest(mod, vcov. = sandwich::vcovHC(mod, type = "HC1"))
-    out <- data.frame(
-      term      = rownames(ct),
-      estimate  = ct[, 1],
-      std.error = ct[, 2],
-      p.value   = ct[, 4],
-      stringsAsFactors = FALSE
-    )
-  } else {
-    sm <- summary(mod)$coefficients
-    out <- data.frame(
-      term      = rownames(sm),
-      estimate  = sm[, 1],
-      std.error = sm[, 2],
-      p.value   = sm[, 4],
-      stringsAsFactors = FALSE
-    )
-  }
-
-  out %>%
-    filter(term != "(Intercept)") %>%
-    slice(1) %>%
-    mutate(
-      n  = stats::nobs(mod),
-      r2 = summary(mod)$r.squared
-    )
-}
-
-# ------------------------------------------------------------
-# Build one cell for one DV x subgroup x model-list
-# Returns something like:
-# \makecell[c]{0.210*** \\ (0.030)}
-#
-# If model_list is NULL, returns blank cell
-# ------------------------------------------------------------
-make_comp_cell <- function(model_list, dv, iv, robust = TRUE) {
-
-  if (is.null(model_list)) return("")
-
-  model_name <- paste0("comp_", dv, "_", iv)
-
-  if (!model_name %in% names(model_list)) return("")
-
-  stats_row <- get_single_term_stats(model_list[[model_name]], robust = robust)
-
-  coef_txt <- paste0(
-    fmt_num(stats_row$estimate, 3),
-    p_to_stars(stats_row$p.value)
-  )
-
-  se_txt <- paste0("(", fmt_num(stats_row$std.error, 3), ")")
-
-  paste0("\\makecell[c]{", coef_txt, " \\\\ ", se_txt, "}")
-}
-
-# ------------------------------------------------------------
 # Split a vector into chunks for appendix tables
 # ------------------------------------------------------------
 chunk_vector <- function(x, chunk_size = 2) {
   split(x, ceiling(seq_along(x) / chunk_size))
 }
+```
 
 # ------------------------------------------------------------
-# Main table builder
+# MAIN TABLE BUILDER HERE
 #
 # dv_vec: which DVs go in the columns for each model block
 # model2_list: required (your no-controls restricted-sample list)
@@ -595,7 +505,10 @@ chunk_vector <- function(x, chunk_size = 2) {
 # include_placeholder_control_rows: include blank future rows
 # -----------------------------------------------------------
 
-make_restricted_panel_latex_table <- function(
+
+```{r}
+
+make_policy_panel_latex_table <- function(
     dv_vec,
     model2_list,
     model3_list = NULL,
@@ -604,13 +517,11 @@ make_restricted_panel_latex_table <- function(
     model2_title = "Model 2",
     model3_title = "Model 3",
     row_vars = c("impact", "incarc", "knowincarc", "vict"),
-    control_vars = c("Black", "Hisp_Latino", "Asian_Am", "Native_Am", "OtherRace", "gender"),
+    control_vars = c("Black", "Hisp_Latino", "AllOthers", "gender"),
     control_labels = c(
       Black = "Black",
       Hisp_Latino = "Hispanic/Latino",
-      Asian_Am    = "Asian American",
-      Native_Am   = "Native American",
-      OtherRace = "Other Race",
+      AllOthers = "Other Race",
       gender = "Male"
     ),
     robust = TRUE
@@ -703,7 +614,7 @@ make_restricted_panel_latex_table <- function(
   for (iv in row_vars) {
 
     row_label <- impact_labels[[iv]]
-    main_term <- ifelse(iv == "impact", "impact", "treat")
+    main_term <- iv
 
     # main subgroup row
     model2_cells <- sapply(dv_vec, function(dv) {
@@ -776,10 +687,11 @@ make_restricted_panel_latex_table <- function(
 }
 ```
 
+TEll the function which DVs and model waves to display 
 ```{r}
 results_dvs <- c("prisonhelp", "prisonpen")
 
-results_table_tex <- make_restricted_panel_latex_table(
+results_table_tex <- make_policy_panel_latex_table(
   dv_vec = results_dvs,
   model2_list = policy_vs_nonimp_nocontrol_models,
   model3_list = policy_vs_nonimp_demo_models,
@@ -819,7 +731,7 @@ writeLines(results_table_tex, "desor_controls_table.tex")
 # ------------------------------------------------------------
 results_dvs <- c("prisonhelp", "prisonpen")
 
-results_table_tex <- make_restricted_panel_latex_table(
+results_table_tex <- make_policy_panel_latex_table(
   dv_vec = results_dvs,
   model2_list = policy_vs_nonimp_nocontrol_models,
   model3_list = policy_vs_nonimp_demo_models,
@@ -866,7 +778,7 @@ appendix_tables <- list()
 for (i in seq_along(appendix_help_chunks)) {
   dv_chunk <- appendix_help_chunks[[i]]
 
-  tex <- make_restricted_panel_latex_table(
+  tex <- make_policy_panel_latex_table(
     dv_vec = dv_chunk,
     model2_list = policy_vs_nonimp_nocontrol_models,
     model3_list = NULL,
@@ -887,7 +799,7 @@ for (i in seq_along(appendix_help_chunks)) {
 for (i in seq_along(appendix_punish_chunks)) {
   dv_chunk <- appendix_punish_chunks[[i]]
 
-  tex <- make_restricted_panel_latex_table(
+  tex <- make_policy_panel_latex_table(
     dv_vec = dv_chunk,
     model2_list = policy_vs_nonimp_nocontrol_models,
     model3_list = NULL,
@@ -932,7 +844,7 @@ comp_prisonpen_vict
 
 results_dvs <- c("prisonhelp", "prisonpen")
 
-results_table_tex <- make_restricted_panel_latex_table(
+results_table_tex <- make_policy_panel_latex_table(
   dv_vec = results_dvs,
   model2_list = policy_vs_nonimp_nocontrol_models,
   model3_list = policy_vs_nonimp_demo_models,
@@ -948,10 +860,9 @@ results_table_tex <- make_restricted_panel_latex_table(
 writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
 ```
 
-##. ##. \## 4-8 Policy MV Regressions (non-restricted)
+## Sept 26 now duplicative ## 4-8 Policy MV Regressions (non-restricted)
 
 ```{r}
-names(sample)
 #checkin that reported restricted table matches
 #restricted_incarc <- sample %>%
 #  filter(impact == 0 | incarc == 1)
@@ -959,41 +870,41 @@ names(sample)
 #m_check <- lm(prisonhelp ~ incarc + Black + Hispanic + OtherRace + #gender + Republican + Democrat + fiscal_ideology + social_ideology #+desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data #= restricted_incarc)
 
 #summary(m_check)
-
-
-#impact - help 
-test_impact_full <- lm(prisonhelp ~ impact + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-
-test_incarc_full <- lm(prisonhelp ~ incarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-
-#knowincarc 
-test_knowincarc_full <- lm(prisonhelp ~ knowincarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-
-test_vict_full <- lm(prisonhelp ~ vict + Black + Hisp_Latino + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-
-test_impact_full
-test_knowincarc_full
-test_incarc_full
-test_vict_full
-
-#impact - pun 
-test_impact_full_pen <- lm(prisonpen ~ impact + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-
-test_incarc_full_pen <- lm(prisonpen ~ incarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-
-#knowincarc 
-test_knowincarc_full_pen <- lm(prisonpen ~ knowincarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-
-test_vict_full_pen <- lm(prisonpen ~ vict + Black + Hisp_Latino + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-
-test_impact_full_pen
-test_knowincarc_full_pen
-test_incarc_full_pen
-test_vict_full_pen
+# 
+# 
+# #impact - help 
+# test_impact_full <- lm(prisonhelp ~ impact + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+# 
+# test_incarc_full <- lm(prisonhelp ~ incarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+# 
+# #knowincarc 
+# test_knowincarc_full <- lm(prisonhelp ~ knowincarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+# 
+# test_vict_full <- lm(prisonhelp ~ vict + Black + Hisp_Latino + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+# 
+# test_impact_full
+# test_knowincarc_full
+# test_incarc_full
+# test_vict_full
+# 
+# #impact - pun 
+# test_impact_full_pen <- lm(prisonpen ~ impact + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+# 
+# test_incarc_full_pen <- lm(prisonpen ~ incarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+# 
+# #knowincarc 
+# test_knowincarc_full_pen <- lm(prisonpen ~ knowincarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+# 
+# test_vict_full_pen <- lm(prisonpen ~ vict + Black + Hisp_Latino + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
+# 
+# test_impact_full_pen
+# test_knowincarc_full_pen
+# test_incarc_full_pen
+# test_vict_full_pen
 
 ```
 
-Same as above but for policies
+also duplicative 
 
 ```{r}
 policy_dvs <- policy_map %>%
