@@ -693,10 +693,404 @@ print(prisonhelp_wave_table, width = Inf)
 ```
 
 
+
 # ------------------------------------------------------------
 # END TEMPORARY SEPT 27 -- CREATING LATEX FOR ALL TABLES FOR INSPECTION
 # ------------------------------------------------------------
 
+```{r}
+# ============================================================
+# STEP 5: ONE FOUR-WAVE LATEX TABLE PER DV
+#
+# Assumes Steps 1-4 have already run, including:
+#   make_wave_results_long()
+#   fmt_num()
+#   p_to_stars()
+#   wave_order
+#   wave_labels
+#
+# Outcome and comparison labels are already attached by
+# make_wave_results_long(), using policy_labels and impact_labels.
+# ============================================================
+
+# ------------------------------------------------------------
+# 5A. Escape plain-text labels for LaTeX
+# This leaves your older latex_escape() function untouched.
+# ------------------------------------------------------------
+
+wave_tex_escape <- function(x) {
+
+  replacements <- c(
+    "\\" = "\\textbackslash{}",
+    "&" = "\\&",
+    "%" = "\\%",
+    "$" = "\\$",
+    "#" = "\\#",
+    "_" = "\\_",
+    "{" = "\\{",
+    "}" = "\\}",
+    "~" = "\\textasciitilde{}",
+    "^" = "\\textasciicircum{}"
+  )
+
+  vapply(as.character(x), function(txt) {
+
+    if (is.na(txt)) {
+      stop("A table label is missing.", call. = FALSE)
+    }
+
+    chars <- strsplit(txt, "", fixed = TRUE)[[1]]
+    positions <- match(chars, names(replacements))
+    replace <- !is.na(positions)
+
+    chars[replace] <- unname(
+      replacements[positions[replace]]
+    )
+
+    paste0(chars, collapse = "")
+
+  }, character(1), USE.NAMES = FALSE)
+}
+
+
+# ------------------------------------------------------------
+# 5B. Build one four-wave LaTeX table for one DV
+#
+# For each comparison, print:
+#   coefficient with SE underneath
+#   N
+#   R-squared
+# ------------------------------------------------------------
+
+make_wave_latex_table <- function(
+    dv_name,
+    model_waves = policy_dummies_waves,
+    row_vars = impact_vars,
+    waves = wave_order,
+    robust = TRUE,
+    digits = 3
+) {
+
+  if (length(waves) != 4L || anyDuplicated(waves)) {
+    stop(
+      "Supply four distinct model waves.",
+      call. = FALSE
+    )
+  }
+
+  # Use the checked extraction function from Step 3.
+  # This retains unrounded statistics, N, R2, and existing labels.
+  results <- make_wave_results_long(
+    dv_name = dv_name,
+    model_waves = model_waves,
+    row_vars = row_vars,
+    waves = waves,
+    robust = robust
+  )
+
+  results$iv <- as.character(results$iv)
+  results$wave <- as.character(results$wave)
+
+  # Do not silently export missing or duplicated results.
+  if (
+    nrow(results) != length(row_vars) * length(waves) ||
+    anyDuplicated(results[c("iv", "wave")])
+  ) {
+    stop(
+      "Missing or duplicated model results for: ",
+      dv_name,
+      call. = FALSE
+    )
+  }
+
+  numeric_cols <- c(
+    "estimate", "std.error", "p.value", "n", "r2"
+  )
+
+  if (any(!is.finite(as.matrix(results[numeric_cols])))) {
+    stop(
+      "Non-finite model statistics for: ",
+      dv_name,
+      call. = FALSE
+    )
+  }
+
+  # Use the outcome label already obtained from policy_map.
+  dv_label <- unique(as.character(results$dv_label))
+
+  if (
+    length(dv_label) != 1L ||
+    anyNA(dv_label) ||
+    !nzchar(dv_label)
+  ) {
+    stop(
+      "Check the policy_map label for: ",
+      dv_name,
+      call. = FALSE
+    )
+  }
+
+  # Join cells and add the LaTeX end-of-row marker.
+  tex_row <- function(cells) {
+    paste0(paste(cells, collapse = " & "), " \\\\")
+  }
+
+  body_lines <- character(0)
+
+  # Build one comparison block at a time.
+  for (iv_name in row_vars) {
+
+    block <- results[results$iv == iv_name, ]
+
+    # Put the four results in the specified wave order.
+    block <- block[match(waves, block$wave), ]
+
+    if (anyNA(block$wave)) {
+      stop(
+        "A wave is missing for ",
+        dv_name, " / ", iv_name,
+        call. = FALSE
+      )
+    }
+
+    # Use the comparison label supplied through impact_labels.
+    iv_label <- as.character(block$iv_label[1])
+
+    # Round only for display.
+    # Significance stars use the unrounded p-values.
+    cells <- paste0(
+      "\\makecell[c]{",
+      fmt_num(block$estimate, digits),
+      p_to_stars(block$p.value),
+      " \\\\ (",
+      fmt_num(block$std.error, digits),
+      ")}"
+    )
+
+    body_lines <- c(
+      body_lines,
+
+      # Coefficient and SE row
+      tex_row(c(
+        wave_tex_escape(iv_label),
+        cells
+      )),
+
+      # Sample size for each model in this comparison
+      tex_row(c(
+        "\\quad N",
+        formatC(
+          as.integer(block$n),
+          format = "d",
+          big.mark = ","
+        )
+      )),
+
+      # R-squared for each model in this comparison
+      tex_row(c(
+        "\\quad $R^2$",
+        fmt_num(block$r2, digits)
+      )),
+
+      "\\addlinespace"
+    )
+  }
+
+  # Keep the note consistent with the requested SE method.
+  se_note <- if (robust) {
+    "Entries are OLS coefficients with HC1 robust standard errors in parentheses."
+  } else {
+    "Entries are OLS coefficients with conventional OLS standard errors in parentheses."
+  }
+
+  # Reference keys are identifiers, not printed labels:
+  # do not escape underscores here.
+  label_key <- paste0("tab:policy-waves-", dv_name)
+
+  # Assemble the complete table.
+  c(
+    "\\begin{table}[!htbp]",
+    "\\centering",
+    "\\begin{threeparttable}",
+
+    paste0(
+      "\\caption{",
+      wave_tex_escape(paste0("OLS models of ", dv_label)),
+      "}"
+    ),
+
+    paste0("\\label{", label_key, "}"),
+
+    "\\small",
+    "\\setlength{\\tabcolsep}{4pt}",
+    "\\renewcommand{\\arraystretch}{1.12}",
+
+    "\\begin{tabularx}{\\textwidth}{@{}>{\\raggedright\\arraybackslash}p{0.22\\textwidth}*{4}{>{\\centering\\arraybackslash}X}@{}}",
+
+    "\\toprule",
+
+    tex_row(c(
+      "Carceral contact",
+      wave_tex_escape(unname(wave_labels[waves]))
+    )),
+
+    "\\midrule",
+    body_lines,
+    "\\bottomrule",
+    "\\end{tabularx}",
+
+    "\\begin{tablenotes}[flushleft]",
+    "\\footnotesize",
+
+    paste0("\\item ", se_note),
+
+    "\\item Each focal coefficient comes from a separate regression. The reference group reports none of the three focal experiences: personal incarceration, knowing someone incarcerated, or personal victimization. Exposure groups may overlap.",
+
+    "\\item Controls accumulate from left to right: none; demographics; demographics plus party/ideology; then additionally FIRE and core deservingness controls. Control coefficients are not displayed.",
+
+    "\\item N and $R^2$ refer to the model immediately above them. Each model retains its own estimation sample; sample sizes may differ across comparisons and waves.",
+
+    "\\item * $p<0.05$, ** $p<0.01$, *** $p<0.001$.",
+
+    "\\end{tablenotes}",
+    "\\end{threeparttable}",
+    "\\end{table}"
+  )
+}
+```
+
+```{r}
+# ============================================================
+# STEP 6: EXPORT ALL FOUR-WAVE DV TABLES
+# ============================================================
+
+# ------------------------------------------------------------
+# 6A. Generate one table for every DV in policy_vars
+# Uses policy_vars, NOT the narrower results_dvs.
+# ------------------------------------------------------------
+
+# Keep filenames and LaTeX reference keys safe and unique.
+if (
+  length(policy_vars) == 0L ||
+  anyNA(policy_vars) ||
+  anyDuplicated(policy_vars) ||
+  any(!grepl("^[A-Za-z0-9_][A-Za-z0-9_.-]*$", policy_vars))
+) {
+  stop(
+    "policy_vars must contain unique, nonmissing, filename-safe variable names."
+  )
+}
+
+wave_latex_tables <- setNames(
+  lapply(policy_vars, function(dv_name) {
+
+    make_wave_latex_table(
+      dv_name = dv_name,
+      model_waves = policy_dummies_waves,
+      row_vars = impact_vars,
+      waves = wave_order,
+      robust = TRUE
+    )
+
+  }),
+  policy_vars
+)
+
+
+# ------------------------------------------------------------
+# 6B. Write one .tex file per DV
+# ------------------------------------------------------------
+
+wave_table_dir <- file.path("tables", "policy_waves")
+
+dir.create(
+  wave_table_dir,
+  recursive = TRUE,
+  showWarnings = FALSE
+)
+
+if (!dir.exists(wave_table_dir)) {
+  stop("Could not create output folder: ", wave_table_dir)
+}
+
+# Named vector linking each DV to its output filename.
+wave_table_files <- setNames(
+  paste0(policy_vars, "_wave_table.tex"),
+  policy_vars
+)
+
+for (dv_name in policy_vars) {
+
+  writeLines(
+    wave_latex_tables[[dv_name]],
+    con = file.path(
+      wave_table_dir,
+      wave_table_files[[dv_name]]
+    )
+  )
+
+}
+
+
+# ------------------------------------------------------------
+# 6C. Create an Overleaf main document
+#
+# The main file and individual table files belong together
+# in the same folder.
+#
+# Each DV starts on a fresh page, in policy_vars order.
+# ------------------------------------------------------------
+
+input_lines <- unlist(
+  lapply(unname(wave_table_files), function(filename) {
+
+    c(
+      paste0("\\input{", filename, "}"),
+      "\\clearpage"
+    )
+
+  }),
+  use.names = FALSE
+)
+
+master_tex <- c(
+  "\\documentclass[11pt,letterpaper]{article}",
+  "\\usepackage[margin=0.75in]{geometry}",
+  "\\usepackage[T1]{fontenc}",
+  "\\usepackage[utf8]{inputenc}",
+  "\\usepackage{booktabs,tabularx,array,threeparttable,makecell}",
+  "\\begin{document}",
+  input_lines,
+  "\\end{document}"
+)
+
+writeLines(
+  master_tex,
+  con = file.path(
+    wave_table_dir,
+    "all_policy_wave_tables.tex"
+  )
+)
+
+
+# ------------------------------------------------------------
+# 6D. Print the completion status and exact output location
+# ------------------------------------------------------------
+
+cat(
+  "Exported ",
+  length(wave_latex_tables),
+  " four-wave DV tables.\n",
+
+  "Folder: ",
+  normalizePath(wave_table_dir, winslash = "/"),
+  "\n",
+
+  "Overleaf main file: all_policy_wave_tables.tex\n",
+
+  sep = ""
+)
+```
 
 
 ### 3.3 Appendix Tables - Each IV Model Grouped around DV
@@ -1121,8 +1515,10 @@ writeLines(results_table_tex, "desor_controls_table.tex")
 ```
 
 # ------------------------------------------------------------
-# Sept 27 -- Tables to Take Stock, Decide Main Presentation
+# following has not yet been updated
 # ------------------------------------------------------------
+
+
 
 
 
@@ -1216,4 +1612,7 @@ for (i in seq_along(appendix_punish_chunks)) {
   writeLines(tex, paste0("appendix_punish_restricted_table_", i, ".tex"))
 }
 ```
+
+
+
 
