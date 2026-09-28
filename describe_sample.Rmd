@@ -748,7 +748,7 @@ all_race_vars <- c(
 )
 
 data_full %>%
-  select(all_of(all_race_vars)) %>%
+  dplyr::select(all_of(all_race_vars)) %>%
   pivot_longer(everything(), names_to = "var", values_to = "val") %>%
   count(var, val) %>%
   pivot_wider(names_from = val, values_from = n, values_fill = 0)
@@ -760,8 +760,8 @@ rid_2020 <- read_csv("race_vs_2020.csv")
 view(rid_2020)
 
 rid_2020_table <- rid_2020 %>%
-  mutate(
-    race_ethnicity = recode(
+  dplyr::mutate(
+    race_ethnicity = dplyr::recode(
       rid,
       "Asian_Am"    = "Asian",
       "Black"       = "Black or African American",
@@ -781,7 +781,7 @@ rid_2020_table <- rid_2020 %>%
     # Format Census population in millions
     census_n = sprintf("%.1f", `2020_n_million`)
   ) %>%
-  select(
+  dplyr::select(
     race_ethnicity,
     n,
     sample_pct,
@@ -839,8 +839,8 @@ writeLines(
 ```{r}
 # combinations
 combo_counts <- data_full %>%
-  mutate(.id = row_number()) %>%
-  select(.id, all_of(all_race_vars)) %>%
+  dplyr::mutate(.id = row_number()) %>%
+  dplyr::select(.id, all_of(all_race_vars)) %>%
   pivot_longer(-.id, names_to = "race", values_to = "selected") %>%
   filter(selected == 1) %>%                      # drops both 0s and NAs
   mutate(race = factor(race, levels = all_race_vars)) %>%
@@ -854,9 +854,9 @@ combo_counts <- data_full %>%
   count(n_races, race_combo, name = "n") %>%
   arrange(desc(n))
 
-#View(combo_counts)                                # everything
+View(combo_counts)                                # everything
 
-#filter(combo_counts, n_races >= 2)          # multiracial combos only
+filter(combo_counts, n_races >= 2)          # multiracial combos only
 
 
 ```
@@ -876,6 +876,21 @@ view(data_full %>%
   ))
 
 ```
+
+Multi-Racial Whites? 
+```{r}
+table(data_full$AllOthers)
+
+view(data_full) %>%
+  group_by(White) %>% 
+  summarise (
+    n = n(), 
+    Black = sum(Black, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    AllOthers = sum(AllOthers, na.rm = TRUE)
+  )
+```
+
 
 # Experiences
 
