@@ -877,7 +877,7 @@ view(data_full %>%
 
 ```
 
-Multi-Racial Whites? 
+### Multi-Racial Whites? 
 ```{r}
 table(data_full$AllOthers)
 
@@ -890,6 +890,41 @@ view(data_full) %>%
     AllOthers = sum(AllOthers, na.rm = TRUE)
   )
 ```
+```{r}
+
+view(data_full) %>%
+  group_by(Black) %>% 
+  summarise (
+    n = n(), 
+    White = sum(White, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    AllOthers = sum(AllOthers, na.rm = TRUE)
+  )
+```
+```{r}
+
+view(data_full) %>%
+  group_by(Hisp_Latino) %>% 
+  summarise (
+    n = n(), 
+    White = sum(White, na.rm = TRUE),
+    Black       = sum(Black, na.rm = TRUE),
+    AllOthers = sum(AllOthers, na.rm = TRUE)
+  )
+
+```
+
+```{r}
+view(data_full) %>%
+  group_by(AllOthers) %>% 
+  summarise (
+    n = n(), 
+    White = sum(White, na.rm = TRUE),
+    Black       = sum(Black, na.rm = TRUE),
+    Hisp_Latino = sum(Hisp_Latino, na.rm = TRUE)
+  )
+```
+
 
 
 # Experiences
@@ -986,6 +1021,8 @@ data_full %>%
   )
 
 ```
+
+
 ```{r}
 data_full %>%
   group_by(impact) %>%
@@ -1365,5 +1402,102 @@ cat(latex_tables[["Black"]])
 cat(latex_tables[["Hispanic"]])
 cat(latex_tables[["Other Race"]])
 
+```
+
+
+
+
+# FIRE
+
+```{r}
+data_full %>%
+  group_by(fire_rare) %>% 
+  summarise (
+    n = n(), 
+    White = sum(White, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Black = sum(Black, na.rm = TRUE),
+    AllOthers = sum(AllOthers, na.rm = TRUE)
+  )
+
+# data_full %>%
+#   group_by(fire_rare) %>% 
+#   summarise (
+#     n = n(), 
+#     White = sum(White, na.rm = TRUE),
+#     White_pct = ((White / total) *100),
+#     Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+#     HL_pct = ((Hisp_Latino / total) *100),
+#     Black = sum(Black, na.rm = TRUE),
+#     Black_pct = ((Black / total) *100),
+#     AllOthers = sum(AllOthers, na.rm = TRUE)
+#   )
+
+```
+
+
+
+# ------------------------------------------------------------
+# desor core vars -- confirm correlation
+# -----------------------------------------------------------
+
+```{r}
+
+desor_core_vars <- c(
+  "d_welfare_tanf_abc","d_fstamps_snap_abc","d_medicaid_abc","d_medicare_abc",
+  "d_unemployed_abc","d_poorfam_abc","d_homeless_abc","d_immigrants_abc","d_unauth_undoc_abc"
+)
+
+
+desor_corr <- psych::corr.test(
+  core_mat,
+  use = "pairwise",
+  method = "pearson",
+  adjust = "none"
+)
+
+# Pairwise correlations
+view(round(desor_corr$r, 2))
+
+
+dcore_data <- sample %>%
+  select(all_of(desor_core_vars))
+
+
+cor(dcore_data,
+    use = "pairwise.complete.obs")
+
+
+print(psych::corr.test(dcore_data))
+
+print(psych::alpha(dcore_data))
+
+```
+
+```{r}
+# Eligibility rule for composite
+# at least 5 of 9 items observed
+core_keep <- core_n >= 5
+
+table(core_keep, useNA = "ifany")
+
+
+core_alpha <- psych::alpha(
+  core_mat[core_keep, ],
+  check.keys = TRUE
+)
+
+# Key reliability outputs
+core_alpha$total$raw_alpha
+core_alpha$total$std.alpha
+core_alpha$total$average_r
+core_alpha$n.obs
+
+# Item diagnostics
+core_alpha$alpha.drop
+core_alpha$item.stats
+
+# Check whether psych automatically reversed any items
+core_alpha$keys
 ```
 

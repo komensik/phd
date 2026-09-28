@@ -197,17 +197,17 @@ control_waves <- list(
 
 ### 3.2 Define lm function that will waves will operate thru
 # ============================================================
-# This starts by defining my reusable function. That function says:
-
-#"whenever (later) I give this function a dataset (df), a dependent variable (dv), an independent variable (iv), and some controls (controls), R should:
-
-##(a) start with a default of assuming there are no controls, if no controls are given (character (0)); 
-## (b) in the right-hand side (rhs) or the equation, use the supplied iv and supplied controls to make a vector with all vraibles that should appear to the right of ~
-## (c) (fml) construct an ordinary regression syntax with the supplied dv on the left of ~, then supplied rhs info and turn it into a signle string (collapse = "+"), and 
-## (d) treat this as a statistical formula rather than a string (as.formula())
-## (e) run the regression
+# Define Resusable function
 # ============================================================
+This starts by defining my reusable function. That function says:
 
+"whenever (later) I give this function a dataset (df), a dependent variable (dv), an independent variable (iv), and some controls (controls), R should:
+
+(a) start with a default of assuming there are no controls, if no controls are given (character (0)); 
+(b) in the right-hand side (rhs) or the equation, use the supplied iv and supplied controls to make a vector with all vraibles that should appear to the right of ~
+(c) (fml) construct an ordinary regression syntax with the supplied dv on the left of ~, then supplied rhs info and turn it into a signle string (collapse = "+"), and 
+ (d) treat this as a statistical formula rather than a string (as.formula())
+(e) run the regression
 ```{r}
 make_policy_model <- function(df, dv, iv, controls = character(0)) { #character(0) just means empty character vector so this function works for uncontrolled model then for controlled model
   rhs <- c(iv, controls)
@@ -218,17 +218,16 @@ make_policy_model <- function(df, dv, iv, controls = character(0)) { #character(
 ```
 
 # ============================================================
-# MAIN MODEL GENERATING LOOOP Now, I need to line up buckets to put the models 
-## that place is "policy_dummies_waves"
-#
-# Then, I need to say how I will fill it. I will fill it with waves of models that loop through dvs and iteratively add controls 
-#for each dv, generates 4 substantive comparisons:
-### impact versus non impact
-### incarc versus non impact
-### knowincarc versus non impact
-### victimized vs non impact
+# MAIN MODEL GENERATING LOOOP 
 # ============================================================
+Now, I need to line up buckets to put the models 
+ that place is "policy_dummies_waves"
 
+ Then, I need to say how I will fill it. I will fill it with waves of models that loop through dvs and iteratively add controls 
+for each dv, generates 4 substantive comparisons:
+ impact versus non impact incarc versus non impact
+ knowincarc versus non impact
+victimized vs non impact
 ```{r}
 policy_dummies_waves <- list() #this is actually now main model generating loop
 
@@ -512,6 +511,7 @@ make_wave_results_long <- function(
 }
 ```
 
+
 ```{r}
 # ------------------------------------------------------------
 # 4. Build one wide inspection table for one DV
@@ -688,15 +688,11 @@ make_wave_results_table <- function(
 # 4. Display the four-wave table
 # ------------------------------------------------------------
 
-print(prisonhelp_wave_table, width = Inf)
+# print(prisonhelp_wave_table, width = Inf)
 
 ```
 
 
-
-# ------------------------------------------------------------
-# END TEMPORARY SEPT 27 -- CREATING LATEX FOR ALL TABLES FOR INSPECTION
-# ------------------------------------------------------------
 
 ```{r}
 # ============================================================
@@ -1091,6 +1087,119 @@ cat(
   sep = ""
 )
 ```
+
+# ============================================================
+# JUST WANT TO LOOK AT MODELS? 
+# ============================================================
+
+NAMES
+```{r}
+# Show the four wave names
+names(policy_dummies_waves)
+
+# Show every model stored in a given wave name (for ex, full-attitudes wave)
+names(policy_dummies_full_models)
+```
+
+Remember standard errors though: summary () reports conventional OLS standard errors, my tables in Latex report HC1 Robust
+
+```{r}
+
+# No controls
+summary(policy_dummies_models[["m_prisonhelp_incarc"]])
+
+# Demographic controls
+summary(policy_dummies_demo_models[["m_prisonhelp_incarc"]])
+
+# Demographics + party/ideology
+summary(policy_dummies_partyideo_models[["m_prisonhelp_incarc"]])
+
+# Demographics + party/ideology + FIRE + core deservingness
+summary(policy_dummies_full_models[["m_prisonhelp_incarc"]])
+
+```
+
+To look at w/HC1 Robust SEs:
+
+```{r}
+model_to_check <- policy_dummies_full_models[["m_prisonhelp_incarc"]]
+
+lmtest::coeftest(
+  model_to_check,
+  vcov. = sandwich::vcovHC(model_to_check, type = "HC1")
+)
+```
+
+
+```{r}
+model_to_check <- policy_dummies_full_models[["m_prisonhelp_impact"]]
+
+lmtest::coeftest(
+  model_to_check,
+  vcov. = sandwich::vcovHC(model_to_check, type = "HC1")
+)
+```
+
+Variables have 0 value?
+fiscal and social at 0 are most liberal
+```{r}
+table(sample$fiscal_ideology)
+
+table(sample$social_ideology)
+```
+
+pid_3 doesn't have coded 0 value, gender at 0 is women, fire vars don't have a 0, desorcore has a respondent who gave 0 
+
+desorcore
+```{r}
+table(sample$pid_3)
+table(sample$gender)
+table(sample$fire_angry)
+```
+
+
+
+
+```{r}
+m_prisonhelp_impact_verify <- lm(prisonhelp ~ impact + Black + Hisp_Latino + AllOthers + gender + pid_3 + fiscal_ideology + social_ideology + fire_rare + fire_privilege + fire_angry + fire_fear + desor_core, data = sample)
+
+lmtest::coeftest(
+  m_prisonhelp_impact_verify,
+  vcov. = sandwich::vcovHC(m_prisonhelp_impact_verify, type = "HC1")
+)
+
+
+```
+
+
+# ------------------------------------------------------------
+# END TEMPORARY SEPT 27 -- CREATING LATEX FOR ALL TABLES FOR INSPECTION
+# ------------------------------------------------------------
+
+
+
+# ------------------------------------------------------------
+# What about when we make controls our outcome variables
+# ------------------------------------------------------------
+
+```{r}
+# 
+# hist(sample$fire_rare)
+# 
+# m_fire_fear <- lm(fire_rare ~ incarc + Black + Hisp_Latino + pid_3 + AllOthers, data = sample)
+# 
+# summary(m_fire_fear)
+# 
+# sample %>%
+#   group_by(fire_rare) %>%
+#   summarise(
+#     n = n(),
+#     White = sum(White)
+#   )
+
+```
+
+
 
 
 ### 3.3 Appendix Tables - Each IV Model Grouped around DV

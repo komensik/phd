@@ -563,6 +563,16 @@ raw_data_cleaned <- raw_data_cleaned %>%
   mutate(dem101 = na_if(as.numeric(dem101), -99))
 
 table(raw_data_cleaned$dem101)
+
+#party ID dummies
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    Republican = ifelse(dem101 == 1, 1, 0),
+    Democrat = ifelse(dem101 == 2, 1, 0)
+  )
+
+
+
 #single PID variable, coding on survey:
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
@@ -609,6 +619,31 @@ raw_data_cleaned <- raw_data_cleaned %>%
       labels = c("Democrat", "Independent", "Republican")
     )
   )
+
+
+
+
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    pid = case_when(
+      dem101 == 1 ~ "Republican",
+      dem101 == 2 ~ "Democrat",
+      dem101 == 3 ~ "Independent",
+      dem101 == 4 ~ "Other",
+      TRUE ~ NA_character_
+    ),
+    pid = factor(
+      pid,
+      levels = c(
+        "Independent",
+        "Democrat",
+        "Republican",
+        "Other"
+      )
+    )
+  )
+
 ```
 
 ```{r}

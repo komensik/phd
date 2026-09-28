@@ -89,10 +89,10 @@ desor_corr <- psych::corr.test(
 )
 
 # Pairwise correlations
-#view(round(desor_corr$r, 2))
+view(round(desor_corr$r, 2))
 
 # N used for each pairwise correlation
-desor_corr$n
+#desor_corr$n
 
 ```
 
