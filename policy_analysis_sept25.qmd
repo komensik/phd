@@ -159,15 +159,16 @@ demo_controls_labels <- c(
 # )
 
 party_ideo_controls <- c(
-  "pid_3",
+  "Republican",
+  "Democrat",
   "fiscal_ideology",
   "social_ideology"
 )
 
 party_ideo_controls_labels <- c(
-  pid_3 = "Party ID",
-  # Republican = "Republican",
-  # Democrat = "Democrat",
+  # pid_3 = "Party ID",
+  Republican = "Republican",
+  Democrat = "Democrat",
   fiscal_ideology = "Fiscal ideology",
   social_ideology = "Social ideology"
 )
@@ -1161,7 +1162,7 @@ table(sample$fire_angry)
 
 
 ```{r}
-m_prisonhelp_impact_verify <- lm(prisonhelp ~ impact + Black + Hisp_Latino + AllOthers + gender + pid_3 + fiscal_ideology + social_ideology + fire_rare + fire_privilege + fire_angry + fire_fear + desor_core, data = sample)
+m_prisonhelp_impact_verify <- lm(prisonhelp ~ impact + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology + fire_rare + fire_privilege + fire_angry + fire_fear + desor_core, data = sample)
 
 lmtest::coeftest(
   m_prisonhelp_impact_verify,
