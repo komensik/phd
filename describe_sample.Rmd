@@ -289,6 +289,8 @@ parties <- data_full %>%
 
 parties
 
+
+
 ```
 Are difs from 'actual' or other estimates of actual meaningful? 
 ```{r}
@@ -354,8 +356,6 @@ table(data_full$pid_3)
 ```
 
 ```{r}
-
-
 table(data_full$self_ideo)
 
 self_ideoS <- data_full %>%
@@ -393,6 +393,34 @@ self_ideoS <- data_full %>%
 
 
 self_ideoS
+
+
+ideo_table <- self_ideoS %>%
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    longtable = TRUE,
+    caption = "Self-Identified Pol. Ideology",
+    label = "tab:self_ideo_distribution",
+    col.names = c(
+      "Ideo.",
+      "N",
+      "Sample (\\%)"
+    ),
+    align = c("l", "r", "r"),
+    escape = FALSE
+  ) %>%
+  kable_styling(
+    latex_options = c("repeat_header"),
+    font_size = 9
+  )
+
+View(pid_table)
+
+writeLines(
+  as.character(ideo_table),
+  "self_ideo_table.tex"
+)
 ```
 Compared to Gallup 2024
 ```{r}
@@ -463,15 +491,21 @@ chisq.test(
 
 
 ```{r}
-pol_tude_vars <- c("fiscal_ideology", "social_ideology", "self_ideo")
 
-table(data_full$fiscal_ideology)
+pol_tude_vars <- c(
+  "fiscal_ideology",
+  "social_ideology",
+  "self_ideo"
+)
 
 pol_tude <- data_full %>%
-  select(all_of(pol_tude_vars))
+  dplyr::select(dplyr::all_of(pol_tude_vars))
 
-cor(pol_tude,
-    use = "pairwise.complete.obs")
+cor(
+  pol_tude,
+  use = "pairwise.complete.obs"
+)
+
 
 print(psych::corr.test(pol_tude))
 ```
@@ -511,7 +545,7 @@ ideo_by_party <- data_full %>%
   # ------------------------------------------
   # 2. Keep ideology variables
   # ------------------------------------------
-  select(
+  dplyr::select(
     party4,
     self_ideo,
     fiscal_ideology,
@@ -606,6 +640,96 @@ View(ideo_party_table)
 
 ```
 
+Turning above into 4 separate tables (more legible for appendix)
+
+```{r}
+ideo_party_table <- ideo_party_table %>%
+  mutate(
+    ideology_label = factor(
+      ideology_label,
+      levels = c(
+        "Very Liberal",
+        "Liberal",
+        "Somewhat Liberal",
+        "Moderate",
+        "Somewhat Conservative",
+        "Conservative",
+        "Very Conservative"
+      )
+    )
+  )
+
+make_ideo_table <- function(data, party_name) {
+  
+  data %>%
+    dplyr::filter(party4 == party_name) %>%
+    dplyr::arrange(ideology_type, ideology_label) %>%
+    dplyr::mutate(
+      `N (%)` = sprintf("%d (%.1f\\%%)", n, percent)
+    ) %>%
+    dplyr::select(
+      `Ideology Measure` = ideology_type,
+      `Ideological Placement` = ideology_label,
+      `N (%)`
+    ) %>%
+    kable(
+      format = "latex",
+      booktabs = TRUE,
+      longtable = TRUE,
+      caption = paste(
+        "Ideological Self-Placement Among",
+        party_name,
+        "Respondents"
+      ),
+      escape = FALSE,
+      align = c("l", "l", "r")
+    ) %>%
+    kable_styling(
+      latex_options = "repeat_header",
+      font_size = 9
+    )
+}
+
+dem_ideo_table <- make_ideo_table(
+  ideo_party_table,
+  "Democrat"
+)
+
+rep_ideo_table <- make_ideo_table(
+  ideo_party_table,
+  "Republican"
+)
+
+ind_ideo_table <- make_ideo_table(
+  ideo_party_table,
+  "Independent"
+)
+
+other_ideo_table <- make_ideo_table(
+  ideo_party_table,
+  "Other"
+)
+
+writeLines(
+  as.character(dem_ideo_table),
+  "democrat_ideology_table.tex"
+)
+
+writeLines(
+  as.character(rep_ideo_table),
+  "republican_ideology_table.tex"
+)
+
+writeLines(
+  as.character(ind_ideo_table),
+  "independent_ideology_table.tex"
+)
+
+writeLines(
+  as.character(other_ideo_table),
+  "other_ideology_table.tex"
+)
+```
 
 
 ## race
