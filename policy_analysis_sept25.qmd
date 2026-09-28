@@ -686,7 +686,7 @@ results_table_tex <- make_policy_panel_latex_table(
   model2_title = "Model 2",
   model3_title = "Model 3",
   row_vars = c("impact", "incarc", "knowincarc", "vict"),
-  control_vars = c("Black", "Hispanic/Latino", "AllOthers", "gender"),
+  control_vars = c("Black", "Hisp_Latino", "AllOthers", "gender"),
   control_labels = c(
     Black = "Black",
     Hisp_Latino = "Hispanic/Latino",
@@ -707,10 +707,10 @@ writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.
 dep_variable <-(sample$knowincarc)
 desor_model <- lm(desor_core ~ dep_variable + Black + Hisp_Latino + AllOthers + fiscal_ideology + social_ideology, data = sample)
 
-summary(desor_model)
-
 writeLines(results_table_tex, "desor_controls_table.tex")
 ```
+
+
 
 ```{r}
 # ------------------------------------------------------------
@@ -727,7 +727,7 @@ results_table_tex <- make_policy_panel_latex_table(
   model2_title = "Model 2",
   model3_title = "Model 3",
   row_vars = c("impact", "incarc", "knowincarc", "vict"),
-  control_vars = c("Black", "Hispanic/Latino", "AllOthers", "gender"),
+  control_vars = c("Black", "Hisp_Latino", "AllOthers", "gender"),
   control_labels = c(
     Black = "Black",
     Hisp_Latino = "Hispanic/Latino",
