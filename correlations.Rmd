@@ -879,3 +879,42 @@ Alpha for all = 0.85 – reason to use as one.
 ADD DECISION WRITE UP
 
 Decision: two layers. First (index), second (ones that hang together best), then last (3) created above.
+
+
+
+# ------------------------------------------------------------
+# Punitive Policy -- confirm correlation
+# ------------------------------------------------------------
+```{r}
+
+pen_vars <-c("dpen_rev", "lwop_rev") 
+
+pen_data <- sample %>%
+  select(all_of(pen_vars))
+
+
+cor(pen_data,
+    use = "pairwise.complete.obs")
+
+
+print(psych::corr.test(pen_data))
+
+print(psych::alpha(pen_data))
+
+# Quick look
+#psych::describe(pen_data)
+
+# Correlation (more interpretable than alpha for 2 items)
+cor(sample[pen_vars], use = "pairwise.complete.obs")
+
+# Cronbach's alpha (fine to report, but remember it's 2 items)
+psych::alpha(pen_data, check.keys = FALSE)
+
+summary(raw_data_cleaned$dpen_rev)
+
+summary(raw_data_cleaned$lwop_rev)
+
+```
+
+
+
