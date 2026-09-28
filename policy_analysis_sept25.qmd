@@ -75,7 +75,7 @@ This section continues to use variable_labels.R. The goal of this section was to
 
 PRE 08-26, it had two sets of regression models.
 
-Set 1 are asks "across the full sample, how is each form of impact associated with each policy outcome before adding controls (ie, prisonhelp \~ incarc) and then after/as we add controls (ie, prisonhelp \~incarc + Black + Hispanic + OtherRace + gender). (policy_dummies_waves)
+Set 1 are asks "across the full sample, how is each form of impact associated with each policy outcome before adding controls (ie, prisonhelp \~ incarc) and then after/as we add controls (ie, prisonhelp \~incarc + Black + Hispanic + AllOthers + gender). (policy_dummies_waves)
 
 Set 2 asks instead how each impacted subgroup compares specifically compares with respondents who are fully not-impacted. ie, I throw out respondents who are impacted in some other way, but not directly incarcerated; I compare impact == 0 to incarc == 1).
 
@@ -154,7 +154,7 @@ demo_controls_labels <- c(
 #   White = "White",
 #   Black = "Black",
 #   Hisp_Latino = "Hisp_Latino",
-#   OtherRaces = "AllOthers"
+#   AllOtherss = "AllOthers"
 # )
 
 party_ideo_controls <- c(
@@ -439,12 +439,6 @@ for (dv_name in policy_vars) {
 
 ### 3.4 Compare Each Impacted Subgroup to Non-Impacted
 
-Restricted sample comparison logic (not impacted vs incarcerated) ultimate goal: no-controls to controls main results table built from the restricted-sample non-impacted-versus-subgroup models. then extend the restricted-sample models rather than rebuilding everything from scratch when adding controls.
-
-Why doing this instead of a factor variable for all impact: -restricted-sample regressions keep the logic consistent with everything I are already doing and make it much easier to scale to later models with controls. A t-test table and a restricted-sample dummy regression are telling the same story in the no-controls case. But the regression route gives me a single framework you can preserve when you later add demographic controls, then political controls, then attitudinal controls. If I switch to t-tests for model 2 and regressions for later models, I create an unnecessary break in the workflow and probably more formatting work.
-
-A single categorical variable like 0 = not impacted, 1 = direct only, 2 = proximal only, 3 = victim only, 4 = multiple forms would answer a different question. It would force you to partition the sample into mutually exclusive bins, which is useful for some appendix descriptives and maybe later robustness checks, but it would also collapse substantively important overlap into a catch-all “multiple forms” group and make it harder to estimate the specific contrast you currently care about: whether each exposure type, as experienced in the real world, is associated with different outcomes relative to the fully non-impacted. For your main table, the restricted-sample approach is cleaner and more faithful to the theory.
-
 ### 3.5 Tables Loop
 # ============================================================
 # Tables
@@ -497,14 +491,7 @@ chunk_vector <- function(x, chunk_size = 2) {
 
 # ------------------------------------------------------------
 # MAIN TABLE BUILDER HERE
-#
-# dv_vec: which DVs go in the columns for each model block
-# model2_list: required (your no-controls restricted-sample list)
-# model3_list: optional, NULL for now
-# row_vars: rows to display under carceral contact
-# include_placeholder_control_rows: include blank future rows
 # -----------------------------------------------------------
-
 
 ```{r}
 make_policy_panel_latex_table <- function(
@@ -549,12 +536,13 @@ make_policy_panel_latex_table <- function(
   cmid_model3 <- paste0("\\cmidrule(lr){", 2 + n_dv, "-", 1 + (2 * n_dv), "}")
   cmid_line <- paste(cmid_model2, cmid_model3, collapse = " ")
 
-  # ----- helper: extract a specific term from a model -----
+  # ----- helper: extract a specific term from a model -----#
+  
   get_term_cell <- function(model_list, dv, iv, term_name, robust = TRUE) {
 
     if (is.null(model_list)) return("")
 
-    model_name <- paste0("comp_", dv, "_", iv)
+    model_name <- paste0("m_", dv, "_", iv)
     if (!model_name %in% names(model_list)) return("")
 
     mod <- model_list[[model_name]]
@@ -674,8 +662,6 @@ make_policy_panel_latex_table <- function(
     "\\begin{tablenotes}[flushleft]",
     "\\footnotesize",
     "\\item Entries are OLS coefficients with HC1 robust standard errors in parentheses.",
-    "\\item Each cell is estimated from a separate restricted-sample regression comparing the named subgroup to the non-impacted group.",
-    "\\item Because rows come from different restricted samples, observation counts and $R^2$ are not shown in this table format.",
     "\\item * p$<$0.05, ** p$<$0.01, *** p$<$0.001.",
     "\\end{tablenotes}",
     "\\end{threeparttable}",
@@ -687,15 +673,16 @@ make_policy_panel_latex_table <- function(
 ```
 
 TEll the function which DVs and model waves to display 
+
 ```{r}
 results_dvs <- c("prisonhelp", "prisonpen")
 
 results_table_tex <- make_policy_panel_latex_table(
   dv_vec = results_dvs,
-  model2_list = policy_vs_nonimp_nocontrol_models,
-  model3_list = policy_vs_nonimp_demo_models,
-  caption_text = "OLS Models of Carceral Policy Orientations - No controls to Demographic Controls",
-  label_text = "tab:carceral_policy_orientations_nocontrol_demo",
+  model2_list = policy_dummies_models,
+  model3_list = policy_dummies_demo_models,
+  caption_text = "OLS Models of Policy Ors - None to Demographic Controls",
+  label_text = "tab:carceral_policy_ors_nocontrol_demo",
   model2_title = "Model 2",
   model3_title = "Model 3",
   row_vars = c("impact", "incarc", "knowincarc", "vict"),
@@ -703,19 +690,23 @@ results_table_tex <- make_policy_panel_latex_table(
   control_labels = c(
     Black = "Black",
     Hisp_Latino = "Hispanic/Latino",
-    AllOthers = "Other Race",
+    AllOthers = "Other_Race",
     gender = "Male"
   ),
   robust = TRUE
 )
 
 writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
+```
 
+
+```{r}
 
 ##model for just desor
 
 dep_variable <-(sample$knowincarc)
-desor_model <- lm(desor_core ~ dep_variable + Black+Hisp_Latino+OtherRace+fiscal_ideology+social_ideology, data = sample)
+desor_model <- lm(desor_core ~ dep_variable + Black + Hisp_Latino + AllOthers + fiscal_ideology + social_ideology, data = sample)
+
 summary(desor_model)
 
 writeLines(results_table_tex, "desor_controls_table.tex")
@@ -851,164 +842,4 @@ results_table_tex <- make_policy_panel_latex_table(
 )
 
 writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.tex")
-```
-
-## Sept 26 now duplicative ## 4-8 Policy MV Regressions (non-restricted)
-
-```{r}
-#checkin that reported restricted table matches
-#restricted_incarc <- sample %>%
-#  filter(impact == 0 | incarc == 1)
-
-#m_check <- lm(prisonhelp ~ incarc + Black + Hispanic + OtherRace + #gender + Republican + Democrat + fiscal_ideology + social_ideology #+desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data #= restricted_incarc)
-
-#summary(m_check)
-# 
-# 
-# #impact - help 
-# test_impact_full <- lm(prisonhelp ~ impact + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-# 
-# test_incarc_full <- lm(prisonhelp ~ incarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-# 
-# #knowincarc 
-# test_knowincarc_full <- lm(prisonhelp ~ knowincarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-# 
-# test_vict_full <- lm(prisonhelp ~ vict + Black + Hisp_Latino + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-# 
-# test_impact_full
-# test_knowincarc_full
-# test_incarc_full
-# test_vict_full
-# 
-# #impact - pun 
-# test_impact_full_pen <- lm(prisonpen ~ impact + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-# 
-# test_incarc_full_pen <- lm(prisonpen ~ incarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-# 
-# #knowincarc 
-# test_knowincarc_full_pen <- lm(prisonpen ~ knowincarc + Black + Hisp_Latino + OtherRace + gender + Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-# 
-# test_vict_full_pen <- lm(prisonpen ~ vict + Black + Hisp_Latino + OtherRace + gender +  Republican + Democrat + fiscal_ideology + social_ideology +desor_core + fire_rare + fire_privilege + fire_angry + fire_fear, data = sample)
-# 
-# test_impact_full_pen
-# test_knowincarc_full_pen
-# test_incarc_full_pen
-# test_vict_full_pen
-
-```
-
-also duplicative 
-
-```{r}
-policy_dvs <- policy_map %>%
-  dplyr::filter(!var %in% c("prisonhelp", "prisonpen")) %>%
-  dplyr::pull(var)
-
-impact_vars <- c("impact", "incarc", "knowincarc", "vict")
-
-policy_models <- list()
-
-for (dv in policy_dvs) {
-  for (iv in impact_vars) {
-    
-    model_name <- paste0("m_", dv, "_", iv)
-    
-    formula <- as.formula(paste(dv, "~", iv))
-    
-    policy_models[[model_name]] <- lm(formula, data = sample)
-  }
-}
-
-policy_models_by_dv <- split(
-  policy_models,
-  gsub("m_(.*)_(impact|incarc|knowincarc|vict)", "\\1", names(policy_models))
-)
-
-length(policy_models_by_dv)        # should be 32
-names(policy_models_by_dv)         # all model names
-
-# print one
-summary(policy_models[["m_q23_2_rev_impact"]])
-
-# or loop through all
-lapply(policy_models, summary)
-
-#table for appendix
-library(dplyr)
-library(purrr)
-library(broom)
-library(stringr)
-library(tidyr)
-
-impact_labels <- c(
-  impact = "Any impact",
-  incarc = "Direct incarceration",
-  knowincarc = "Proximal incarceration contact",
-  vict = "Victimization"
-)
-
-comparison_table <- imap_dfr(policy_models, function(model, model_name) {
-  
-  tidied <- broom::tidy(model)
-  glanced <- broom::glance(model)
-  
-  dv <- str_match(model_name, "^m_(.*)_(impact|incarc|knowincarc|vict)$")[,2]
-  iv <- str_match(model_name, "^m_(.*)_(impact|incarc|knowincarc|vict)$")[,3]
-  
-  coef_row <- tidied %>%
-    filter(term == iv)
-  
-  tibble(
-    model_name = model_name,
-    dv = dv,
-    impact_var = iv,
-    impact_label = impact_labels[iv],
-    estimate = coef_row$estimate,
-    std.error = coef_row$std.error,
-    statistic = coef_row$statistic,
-    p.value = coef_row$p.value,
-    n = glanced$nobs,
-    r.squared = glanced$r.squared,
-    adj.r.squared = glanced$adj.r.squared
-  )
-})
-
-#add readable dv labels and significance stars
-comparison_table <- comparison_table %>%
-  left_join(
-    policy_map %>% dplyr::select(var, label, section),
-    by = c("dv" = "var")
-  ) %>%
-  mutate(
-    stars = case_when(
-      p.value < .001 ~ "***",
-      p.value < .01  ~ "**",
-      p.value < .05  ~ "*",
-      p.value < .1   ~ "†",
-      TRUE ~ ""
-    ),
-    coef_with_stars = paste0(sprintf("%.3f", estimate), stars),
-    se_fmt = paste0("(", sprintf("%.3f", std.error), ")"),
-    p_fmt = sprintf("%.3f", p.value),
-    r2_fmt = sprintf("%.3f", r.squared)
-  ) %>%
-  dplyr::select(
-    section, label, dv, impact_label, impact_var,
-    coef_with_stars, se_fmt, p_fmt, n, r2_fmt,
-    estimate, std.error, p.value, r.squared, adj.r.squared, model_name
-  ) %>%
-  arrange(section, label, factor(impact_var, levels = c("impact", "incarc", "knowincarc", "vict")))
-
-appendix_table_wide <- comparison_table %>%
-  dplyr::select(label, section, impact_var, coef_with_stars, se_fmt, n, r2_fmt) %>%
-  mutate(result = paste0(coef_with_stars, " ", se_fmt)) %>%
-  dplyr::select(label, section, impact_var, result, n, r2_fmt) %>%
-  pivot_wider(
-    names_from = impact_var,
-    values_from = c(result, n, r2_fmt),
-    names_glue = "{impact_var}_{.value}"
-  ) %>%
-  relocate(section, label)
-
-View(appendix_table_wide)
 ```
