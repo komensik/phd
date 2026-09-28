@@ -288,6 +288,417 @@ policy_dummies_full_models <- policy_dummies_waves[["full_attitudes"]]
 #names(policy_dummies_full_models)
 ```
 
+# ------------------------------------------------------------
+# START 4-Wave Results Table SEPT 27 -- CREATING LATEX FOR ALL TABLES FOR INSPECTION
+# ------------------------------------------------------------
+
+First, define order and printed names of the 4 model waves 
+
+Second, create one helper whose only job is to extract the focal IV result from one model
+
+Third, create a function that builds one table for one DV
+
+Fourth, arrange extracted results into the 4 column table
+
+Fifth, create second function that turns that one DV results object into LaTex
+
+Sixth, loop across every DV and write one .tex file per DV. 
+
+# ------------------------------------------------------------
+# 1. Define model-wave order and display labels
+# ------------------------------------------------------------
+
+
+```{r}
+
+wave_order <- c(
+  "nocontrol",
+  "demo",
+  "party_ideo",
+  "full_attitudes"
+)
+
+wave_labels <- c(
+  nocontrol = "No controls",
+  demo = "Demographics",
+  party_ideo = "+ Party/Ideology",
+  full_attitudes = "+ Attitudes"
+)
+
+# DV labels already defined in variable_labels_sept1.R through policy_map
+policy_labels <- setNames(
+  policy_map$label,
+  policy_map$var
+)
+
+# Sanity check: all four desired waves should exist
+missing_waves <- setdiff(wave_order, names(policy_dummies_waves))
+
+if (length(missing_waves) > 0) {
+  stop(
+    "These model waves are missing from policy_dummies_waves: ",
+    paste(missing_waves, collapse = ", ")
+  )
+}
+
+```
+
+```{r}
+# ------------------------------------------------------------
+# 2. Helpers for extracting and formatting one focal estimate
+# ------------------------------------------------------------
+
+p_to_stars <- function(p) {
+  dplyr::case_when(
+    is.na(p) ~ "",
+    p < .001 ~ "***",
+    p < .01  ~ "**",
+    p < .05  ~ "*",
+    TRUE     ~ ""
+  )
+}
+
+fmt_num <- function(x, digits = 3) {
+  ifelse(
+    is.na(x),
+    "",
+    sprintf(paste0("%.", digits, "f"), x)
+  )
+}
+
+
+extract_policy_wave_stats <- function(
+    dv_name,
+    iv_name,
+    wave_name,
+    model_waves = policy_dummies_waves,
+    robust = TRUE
+) {
+
+  # Model names follow the naming system created in your main loop:
+  # e.g. m_prisonhelp_incarc
+  model_name <- paste0("m_", dv_name, "_", iv_name)
+
+  # Check that requested wave exists
+  if (!wave_name %in% names(model_waves)) {
+    stop("Wave not found: ", wave_name)
+  }
+
+  # Pull that wave's model list
+  model_list <- model_waves[[wave_name]]
+
+  # Check that requested model exists
+  if (!model_name %in% names(model_list)) {
+    stop(
+      "Model not found in wave '",
+      wave_name,
+      "': ",
+      model_name
+    )
+  }
+
+  # Pull the actual lm object
+  mod <- model_list[[model_name]]
+
+  # Extract coefficient information
+  if (robust) {
+
+    ct <- lmtest::coeftest(
+      mod,
+      vcov. = sandwich::vcovHC(mod, type = "HC1")
+    )
+
+    coef_table <- data.frame(
+      term = rownames(ct),
+      estimate = ct[, 1],
+      std.error = ct[, 2],
+      p.value = ct[, 4],
+      row.names = NULL
+    )
+
+  } else {
+
+    sm <- summary(mod)$coefficients
+
+    coef_table <- data.frame(
+      term = rownames(sm),
+      estimate = sm[, 1],
+      std.error = sm[, 2],
+      p.value = sm[, 4],
+      row.names = NULL
+    )
+  }
+
+  # The focal coefficient should have the same name as the IV:
+  # impact, incarc, knowincarc, or vict
+  if (!iv_name %in% coef_table$term) {
+    stop(
+      "Term '",
+      iv_name,
+      "' not found in model ",
+      model_name
+    )
+  }
+
+  focal_row <- coef_table[
+    coef_table$term == iv_name,
+  ]
+
+  # Return one tidy row
+  tibble::tibble(
+    dv = dv_name,
+    dv_label = policy_labels[[dv_name]],
+    iv = iv_name,
+    iv_label = impact_labels[[iv_name]],
+    wave = wave_name,
+    wave_label = wave_labels[[wave_name]],
+    estimate = focal_row$estimate,
+    std.error = focal_row$std.error,
+    p.value = focal_row$p.value,
+    n = stats::nobs(mod),
+    r2 = summary(mod)$r.squared
+  )
+}
+```
+
+```{r}
+# ------------------------------------------------------------
+# 3. Gather all four IVs x all four waves for one DV
+# ------------------------------------------------------------
+
+make_wave_results_long <- function(
+    dv_name,
+    model_waves = policy_dummies_waves,
+    row_vars = impact_vars,
+    waves = wave_order,
+    robust = TRUE
+) {
+
+  # Confirm requested DV belongs to current policy outcome set
+  if (!dv_name %in% policy_vars) {
+    stop(
+      "DV not found in policy_vars: ",
+      dv_name
+    )
+  }
+
+  rows <- lapply(row_vars, function(iv_name) {
+
+    wave_rows <- lapply(waves, function(wave_name) {
+
+      extract_policy_wave_stats(
+        dv_name = dv_name,
+        iv_name = iv_name,
+        wave_name = wave_name,
+        model_waves = model_waves,
+        robust = robust
+      )
+    })
+
+    dplyr::bind_rows(wave_rows)
+  })
+
+  dplyr::bind_rows(rows) %>%
+    dplyr::mutate(
+      iv = factor(
+        iv,
+        levels = row_vars
+      ),
+      wave = factor(
+        wave,
+        levels = waves
+      )
+    )
+}
+```
+
+```{r}
+# ------------------------------------------------------------
+# 4. Build one wide inspection table for one DV
+# ------------------------------------------------------------
+
+make_wave_results_table <- function(
+    dv_name,
+    model_waves = policy_dummies_waves,
+    row_vars = impact_vars,
+    waves = wave_order,
+    robust = TRUE
+) {
+
+  results_long <- make_wave_results_long(
+    dv_name = dv_name,
+    model_waves = model_waves,
+    row_vars = row_vars,
+    waves = waves,
+    robust = robust
+  ) %>%
+    dplyr::mutate(
+
+      # What will eventually appear in each LaTeX table cell
+      result = paste0(
+        fmt_num(estimate, 3),
+        p_to_stars(p.value),
+        " (",
+        fmt_num(std.error, 3),
+        ")"
+      ),
+
+      # Preserve desired display order
+      iv_label = factor(
+        iv_label,
+        levels = unname(impact_labels[row_vars])
+      ),
+
+      wave_label = factor(
+        wave_label,
+        levels = unname(wave_labels[waves])
+      )
+    )
+
+  results_wide <- results_long %>%
+    dplyr::select(
+      iv_label,
+      wave_label,
+      result
+    ) %>%
+    tidyr::pivot_wider(
+      names_from = wave_label,
+      values_from = result
+    ) %>%
+    dplyr::arrange(iv_label) %>%
+    dplyr::rename(
+      `Carceral contact` = iv_label
+    )
+
+  results_wide
+}
+```
+
+# =================================================
+# VALIDATE THE FOUR-WAVE TABLE BEFORE ADDING LATEX
+# =================================================
+
+```{r}
+
+# 
+# # 1. Recreate both outputs using the functions from Steps 3 and 4
+# prisonhelp_wave_long <- make_wave_results_long(
+#   dv_name = "prisonhelp",
+#   robust = TRUE
+# )
+# 
+# prisonhelp_wave_table <- make_wave_results_table(
+#   dv_name = "prisonhelp",
+#   robust = TRUE
+# )
+# 
+# # ------------------------------------------------------------
+# # 2. Check the structure and labels
+# # ------------------------------------------------------------
+# 
+# stopifnot(
+#   # Four comparisons x four waves = 16 model results
+#   nrow(prisonhelp_wave_long) == 16L,
+# 
+#   # No duplicated comparison-wave combinations
+#   anyDuplicated(prisonhelp_wave_long[c("iv", "wave")]) == 0L,
+# 
+#   # Display table: four rows and five columns
+#   # (comparison label + four model-wave columns)
+#   nrow(prisonhelp_wave_table) == 4L,
+#   ncol(prisonhelp_wave_table) == 5L,
+# 
+#   # Columns appear in the intended wave order
+#   identical(
+#     names(prisonhelp_wave_table),
+#     c("Carceral contact", unname(wave_labels[wave_order]))
+#   ),
+# 
+#   # Rows use the existing impact labels in the intended order
+#   identical(
+#     as.character(prisonhelp_wave_table[["Carceral contact"]]),
+#     as.character(impact_labels[impact_vars])
+#   )
+# )
+# 
+# # ------------------------------------------------------------
+# # 3. Check all 16 extracted results against their stored models
+# # ------------------------------------------------------------
+# 
+# for (i in seq_len(nrow(prisonhelp_wave_long))) {
+# 
+#   check_row <- prisonhelp_wave_long[i, ]
+# 
+#   # These columns were made into factors; use their text names
+#   iv_name <- as.character(check_row$iv)
+#   wave_name <- as.character(check_row$wave)
+# 
+#   model_name <- paste0("m_prisonhelp_", iv_name)
+# 
+#   # Retrieve the original stored model directly
+#   mod <- policy_dummies_waves[[wave_name]][[model_name]]
+# 
+#   # Calculate HC1 inference directly from that model
+#   ct <- lmtest::coeftest(
+#     mod,
+#     vcov. = sandwich::vcovHC(mod, type = "HC1")
+#   )
+# 
+#   # Values obtained directly from the stored model:
+#   # coefficient, HC1 SE, p-value, N, R-squared
+#   expected <- c(
+#     unname(ct[iv_name, c(1, 2, 4)]),
+#     stats::nobs(mod),
+#     summary(mod)$r.squared
+#   )
+# 
+#   # Corresponding values returned by our extraction function
+#   extracted <- c(
+#     check_row$estimate,
+#     check_row$std.error,
+#     check_row$p.value,
+#     check_row$n,
+#     check_row$r2
+#   )
+# 
+#   # Stop and identify the affected model if anything is missing
+#   # or fails to match within a very small numerical tolerance
+#   if (
+#     any(!is.finite(extracted)) ||
+#     !isTRUE(all.equal(
+#       unname(extracted),
+#       unname(expected),
+#       tolerance = 1e-10
+#     ))
+#   ) {
+#     stop(
+#       "Validation failed for ", model_name,
+#       " in wave '", wave_name, "'.",
+#       call. = FALSE
+#     )
+#   }
+# }
+# 
+# message(
+#   "PASS: table structure and labels are correct; ",
+#   "all 16 extracted results match their stored models."
+# )
+
+# ------------------------------------------------------------
+# 4. Display the four-wave table
+# ------------------------------------------------------------
+
+print(prisonhelp_wave_table, width = Inf)
+
+```
+
+
+# ------------------------------------------------------------
+# END TEMPORARY SEPT 27 -- CREATING LATEX FOR ALL TABLES FOR INSPECTION
+# ------------------------------------------------------------
+
+
+
 ### 3.3 Appendix Tables - Each IV Model Grouped around DV
 
 ```{r}
@@ -437,9 +848,6 @@ for (dv_name in policy_vars) {
 }
 ```
 
-
-
-### 3.4 Compare Each Impacted Subgroup to Non-Impacted
 
 ### 3.5 Tables Loop
 # ============================================================

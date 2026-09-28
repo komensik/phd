@@ -1,0 +1,40 @@
+\begin{table}[!htbp]
+\centering
+\begin{threeparttable}
+\caption{OLS models of Life without parole sentences}
+\label{tab:policy-waves-lwop_rev}
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth}*{4}{>{\centering\arraybackslash}X}@{}}
+\toprule
+Carceral contact & No controls & Demographics & + Party/Ideology & + Attitudes \\
+\midrule
+Any Impact & \makecell[c]{-0.143** \\ (0.044)} & \makecell[c]{-0.143** \\ (0.044)} & \makecell[c]{-0.153*** \\ (0.045)} & \makecell[c]{-0.151*** \\ (0.045)} \\
+\quad N & 1,600 & 1,600 & 1,525 & 1,517 \\
+\quad $R^2$ & 0.007 & 0.008 & 0.019 & 0.025 \\
+\addlinespace
+Direct & \makecell[c]{-0.278** \\ (0.090)} & \makecell[c]{-0.270** \\ (0.090)} & \makecell[c]{-0.300** \\ (0.093)} & \makecell[c]{-0.317*** \\ (0.094)} \\
+\quad N & 1,122 & 1,122 & 1,077 & 1,072 \\
+\quad $R^2$ & 0.010 & 0.013 & 0.031 & 0.041 \\
+\addlinespace
+Proximal & \makecell[c]{-0.125** \\ (0.046)} & \makecell[c]{-0.127** \\ (0.046)} & \makecell[c]{-0.139** \\ (0.047)} & \makecell[c]{-0.134** \\ (0.047)} \\
+\quad N & 1,502 & 1,502 & 1,431 & 1,424 \\
+\quad $R^2$ & 0.005 & 0.007 & 0.020 & 0.027 \\
+\addlinespace
+Victim & \makecell[c]{-0.163* \\ (0.073)} & \makecell[c]{-0.167* \\ (0.074)} & \makecell[c]{-0.174* \\ (0.077)} & \makecell[c]{-0.180* \\ (0.077)} \\
+\quad N & 1,194 & 1,194 & 1,142 & 1,136 \\
+\quad $R^2$ & 0.005 & 0.007 & 0.020 & 0.031 \\
+\addlinespace
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Entries are OLS coefficients with HC1 robust standard errors in parentheses.
+\item Each focal coefficient comes from a separate regression. The reference group reports none of the three focal experiences: personal incarceration, knowing someone incarcerated, or personal victimization. Exposure groups may overlap.
+\item Controls accumulate from left to right: none; demographics; demographics plus party/ideology; then additionally FIRE and core deservingness controls. Control coefficients are not displayed.
+\item N and $R^2$ refer to the model immediately above them. Each model retains its own estimation sample; sample sizes may differ across comparisons and waves.
+\item * $p<0.05$, ** $p<0.01$, *** $p<0.001$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

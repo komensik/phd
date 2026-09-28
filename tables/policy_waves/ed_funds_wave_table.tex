@@ -1,0 +1,40 @@
+\begin{table}[!htbp]
+\centering
+\begin{threeparttable}
+\caption{OLS models of Funding GED and college courses in prisons}
+\label{tab:policy-waves-ed_funds}
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth}*{4}{>{\centering\arraybackslash}X}@{}}
+\toprule
+Carceral contact & No controls & Demographics & + Party/Ideology & + Attitudes \\
+\midrule
+Any Impact & \makecell[c]{0.137** \\ (0.043)} & \makecell[c]{0.123** \\ (0.043)} & \makecell[c]{0.166*** \\ (0.042)} & \makecell[c]{0.121** \\ (0.041)} \\
+\quad N & 1,600 & 1,600 & 1,525 & 1,517 \\
+\quad $R^2$ & 0.006 & 0.017 & 0.131 & 0.222 \\
+\addlinespace
+Direct & \makecell[c]{0.283*** \\ (0.084)} & \makecell[c]{0.267** \\ (0.084)} & \makecell[c]{0.356*** \\ (0.085)} & \makecell[c]{0.282*** \\ (0.081)} \\
+\quad N & 1,122 & 1,122 & 1,077 & 1,072 \\
+\quad $R^2$ & 0.010 & 0.020 & 0.148 & 0.253 \\
+\addlinespace
+Proximal & \makecell[c]{0.143** \\ (0.046)} & \makecell[c]{0.128** \\ (0.045)} & \makecell[c]{0.171*** \\ (0.044)} & \makecell[c]{0.126** \\ (0.043)} \\
+\quad N & 1,502 & 1,502 & 1,431 & 1,424 \\
+\quad $R^2$ & 0.006 & 0.016 & 0.140 & 0.227 \\
+\addlinespace
+Victim & \makecell[c]{0.177* \\ (0.072)} & \makecell[c]{0.148* \\ (0.071)} & \makecell[c]{0.176* \\ (0.070)} & \makecell[c]{0.101 \\ (0.068)} \\
+\quad N & 1,194 & 1,194 & 1,142 & 1,136 \\
+\quad $R^2$ & 0.006 & 0.021 & 0.147 & 0.248 \\
+\addlinespace
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Entries are OLS coefficients with HC1 robust standard errors in parentheses.
+\item Each focal coefficient comes from a separate regression. The reference group reports none of the three focal experiences: personal incarceration, knowing someone incarcerated, or personal victimization. Exposure groups may overlap.
+\item Controls accumulate from left to right: none; demographics; demographics plus party/ideology; then additionally FIRE and core deservingness controls. Control coefficients are not displayed.
+\item N and $R^2$ refer to the model immediately above them. Each model retains its own estimation sample; sample sizes may differ across comparisons and waves.
+\item * $p<0.05$, ** $p<0.01$, *** $p<0.001$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

@@ -1,0 +1,40 @@
+\begin{table}[!htbp]
+\centering
+\begin{threeparttable}
+\caption{OLS models of Minimum wage for prison labor}
+\label{tab:policy-waves-min_wage}
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth}*{4}{>{\centering\arraybackslash}X}@{}}
+\toprule
+Carceral contact & No controls & Demographics & + Party/Ideology & + Attitudes \\
+\midrule
+Any Impact & \makecell[c]{0.122* \\ (0.050)} & \makecell[c]{0.095 \\ (0.050)} & \makecell[c]{0.140** \\ (0.049)} & \makecell[c]{0.112* \\ (0.049)} \\
+\quad N & 1,600 & 1,600 & 1,525 & 1,517 \\
+\quad $R^2$ & 0.004 & 0.021 & 0.137 & 0.175 \\
+\addlinespace
+Direct & \makecell[c]{0.293** \\ (0.091)} & \makecell[c]{0.253** \\ (0.094)} & \makecell[c]{0.368*** \\ (0.097)} & \makecell[c]{0.329*** \\ (0.096)} \\
+\quad N & 1,122 & 1,122 & 1,077 & 1,072 \\
+\quad $R^2$ & 0.008 & 0.027 & 0.163 & 0.196 \\
+\addlinespace
+Proximal & \makecell[c]{0.097 \\ (0.053)} & \makecell[c]{0.070 \\ (0.053)} & \makecell[c]{0.112* \\ (0.052)} & \makecell[c]{0.084 \\ (0.051)} \\
+\quad N & 1,502 & 1,502 & 1,431 & 1,424 \\
+\quad $R^2$ & 0.002 & 0.019 & 0.144 & 0.182 \\
+\addlinespace
+Victim & \makecell[c]{0.184* \\ (0.082)} & \makecell[c]{0.138 \\ (0.082)} & \makecell[c]{0.150 \\ (0.083)} & \makecell[c]{0.123 \\ (0.081)} \\
+\quad N & 1,194 & 1,194 & 1,142 & 1,136 \\
+\quad $R^2$ & 0.005 & 0.028 & 0.160 & 0.196 \\
+\addlinespace
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Entries are OLS coefficients with HC1 robust standard errors in parentheses.
+\item Each focal coefficient comes from a separate regression. The reference group reports none of the three focal experiences: personal incarceration, knowing someone incarcerated, or personal victimization. Exposure groups may overlap.
+\item Controls accumulate from left to right: none; demographics; demographics plus party/ideology; then additionally FIRE and core deservingness controls. Control coefficients are not displayed.
+\item N and $R^2$ refer to the model immediately above them. Each model retains its own estimation sample; sample sizes may differ across comparisons and waves.
+\item * $p<0.05$, ** $p<0.01$, *** $p<0.001$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

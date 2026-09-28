@@ -1,0 +1,40 @@
+\begin{table}[!htbp]
+\centering
+\begin{threeparttable}
+\caption{OLS models of Death penalty for people convicted of murder}
+\label{tab:policy-waves-dpen_rev}
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth}*{4}{>{\centering\arraybackslash}X}@{}}
+\toprule
+Carceral contact & No controls & Demographics & + Party/Ideology & + Attitudes \\
+\midrule
+Any Impact & \makecell[c]{-0.042 \\ (0.050)} & \makecell[c]{-0.041 \\ (0.050)} & \makecell[c]{-0.087 \\ (0.049)} & \makecell[c]{-0.064 \\ (0.049)} \\
+\quad N & 1,600 & 1,600 & 1,525 & 1,517 \\
+\quad $R^2$ & 0.000 & 0.006 & 0.141 & 0.158 \\
+\addlinespace
+Direct & \makecell[c]{-0.091 \\ (0.101)} & \makecell[c]{-0.115 \\ (0.102)} & \makecell[c]{-0.233* \\ (0.100)} & \makecell[c]{-0.218* \\ (0.099)} \\
+\quad N & 1,122 & 1,122 & 1,077 & 1,072 \\
+\quad $R^2$ & 0.001 & 0.007 & 0.163 & 0.176 \\
+\addlinespace
+Proximal & \makecell[c]{-0.038 \\ (0.053)} & \makecell[c]{-0.037 \\ (0.054)} & \makecell[c]{-0.075 \\ (0.053)} & \makecell[c]{-0.052 \\ (0.052)} \\
+\quad N & 1,502 & 1,502 & 1,431 & 1,424 \\
+\quad $R^2$ & 0.000 & 0.006 & 0.140 & 0.159 \\
+\addlinespace
+Victim & \makecell[c]{-0.056 \\ (0.083)} & \makecell[c]{-0.056 \\ (0.083)} & \makecell[c]{-0.085 \\ (0.080)} & \makecell[c]{-0.062 \\ (0.080)} \\
+\quad N & 1,194 & 1,194 & 1,142 & 1,136 \\
+\quad $R^2$ & 0.000 & 0.005 & 0.161 & 0.174 \\
+\addlinespace
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Entries are OLS coefficients with HC1 robust standard errors in parentheses.
+\item Each focal coefficient comes from a separate regression. The reference group reports none of the three focal experiences: personal incarceration, knowing someone incarcerated, or personal victimization. Exposure groups may overlap.
+\item Controls accumulate from left to right: none; demographics; demographics plus party/ideology; then additionally FIRE and core deservingness controls. Control coefficients are not displayed.
+\item N and $R^2$ refer to the model immediately above them. Each model retains its own estimation sample; sample sizes may differ across comparisons and waves.
+\item * $p<0.05$, ** $p<0.01$, *** $p<0.001$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

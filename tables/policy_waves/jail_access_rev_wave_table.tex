@@ -1,0 +1,40 @@
+\begin{table}[!htbp]
+\centering
+\begin{threeparttable}
+\caption{OLS models of Requiring eligible incarcerated people ability to vote}
+\label{tab:policy-waves-jail_access_rev}
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth}*{4}{>{\centering\arraybackslash}X}@{}}
+\toprule
+Carceral contact & No controls & Demographics & + Party/Ideology & + Attitudes \\
+\midrule
+Any Impact & \makecell[c]{0.196*** \\ (0.038)} & \makecell[c]{0.190*** \\ (0.039)} & \makecell[c]{0.221*** \\ (0.039)} & \makecell[c]{0.193*** \\ (0.038)} \\
+\quad N & 1,600 & 1,600 & 1,525 & 1,517 \\
+\quad $R^2$ & 0.015 & 0.017 & 0.107 & 0.147 \\
+\addlinespace
+Direct & \makecell[c]{0.269*** \\ (0.067)} & \makecell[c]{0.264*** \\ (0.067)} & \makecell[c]{0.334*** \\ (0.074)} & \makecell[c]{0.295*** \\ (0.074)} \\
+\quad N & 1,122 & 1,122 & 1,077 & 1,072 \\
+\quad $R^2$ & 0.010 & 0.011 & 0.123 & 0.160 \\
+\addlinespace
+Proximal & \makecell[c]{0.201*** \\ (0.041)} & \makecell[c]{0.194*** \\ (0.041)} & \makecell[c]{0.222*** \\ (0.041)} & \makecell[c]{0.192*** \\ (0.041)} \\
+\quad N & 1,502 & 1,502 & 1,431 & 1,424 \\
+\quad $R^2$ & 0.015 & 0.016 & 0.113 & 0.156 \\
+\addlinespace
+Victim & \makecell[c]{0.291*** \\ (0.053)} & \makecell[c]{0.281*** \\ (0.053)} & \makecell[c]{0.303*** \\ (0.055)} & \makecell[c]{0.264*** \\ (0.055)} \\
+\quad N & 1,194 & 1,194 & 1,142 & 1,136 \\
+\quad $R^2$ & 0.018 & 0.021 & 0.135 & 0.172 \\
+\addlinespace
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Entries are OLS coefficients with HC1 robust standard errors in parentheses.
+\item Each focal coefficient comes from a separate regression. The reference group reports none of the three focal experiences: personal incarceration, knowing someone incarcerated, or personal victimization. Exposure groups may overlap.
+\item Controls accumulate from left to right: none; demographics; demographics plus party/ideology; then additionally FIRE and core deservingness controls. Control coefficients are not displayed.
+\item N and $R^2$ refer to the model immediately above them. Each model retains its own estimation sample; sample sizes may differ across comparisons and waves.
+\item * $p<0.05$, ** $p<0.01$, *** $p<0.001$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
