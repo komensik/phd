@@ -675,7 +675,7 @@ make_policy_panel_latex_table <- function(
 TEll the function which DVs and model waves to display 
 
 ```{r}
-results_dvs <- c("prisonhelp", "prisonpen")
+results_dvs <- c("prisonhelp", "dpen_rev", "lwop_rev")
 
 results_table_tex <- make_policy_panel_latex_table(
   dv_vec = results_dvs,
@@ -714,9 +714,10 @@ writeLines(results_table_tex, "desor_controls_table.tex")
 
 ```{r}
 # ------------------------------------------------------------
-# 1. RESULTS-SECTION TABLE
+# Results Table
 # ------------------------------------------------------------
-results_dvs <- c("prisonhelp", "prisonpen")
+
+results_dvs <- c("prisonhelp", "dpen_rev", "lwop_rev")
 
 results_table_tex <- make_policy_panel_latex_table(
   dv_vec = results_dvs,
@@ -747,6 +748,7 @@ writeLines(results_table_tex, "results_policy_orientations_nocontrol_demo_table.
 # 2. APPENDIX TABLES FOR REMAINING POLICY DVs
 #    Same architecture, chunked two DVs at a time
 # ------------------------------------------------------------
+
 appendix_dvs <- setdiff(policy_vars, results_dvs)
 
 # You can keep help/punish separated if you want cleaner appendix organization
@@ -804,29 +806,29 @@ for (i in seq_along(appendix_punish_chunks)) {
 Looking just at prison help and prison pun after adding in demographic factors
 
 ```{r}
-summary(policy_vs_nonimp_demo_models$comp_prisonhelp_impact)
-summary(policy_vs_nonimp_demo_models$comp_prisonpen_impact)
+# summary(policy_vs_nonimp_demo_models$comp_prisonhelp_impact)
+# summary(policy_vs_nonimp_demo_models$comp_prisonpen_impact)
+# 
+# summary(policy_vs_nonimp_demo_models$comp_prisonhelp_incarc)
+# summary(policy_vs_nonimp_demo_models$comp_prisonpen_incarc)
+# 
+# summary(policy_vs_nonimp_demo_models$comp_prisonhelp_knowincarc)
+# summary(policy_vs_nonimp_demo_models$comp_prisonpen_knowincarc)
+# 
+# summary(policy_vs_nonimp_demo_models$comp_prisonhelp_vict)
+# summary(policy_vs_nonimp_demo_models$comp_prisonpen_vict)
+# 
+# 
+# comp_prisonhelp_incarc     
+# comp_prisonhelp_knowincarc  
+# comp_prisonhelp_vict       
+# comp_prisonpen_impact       
+# comp_prisonpen_incarc      
+# comp_prisonpen_knowincarc  
+# comp_prisonpen_vict        
 
-summary(policy_vs_nonimp_demo_models$comp_prisonhelp_incarc)
-summary(policy_vs_nonimp_demo_models$comp_prisonpen_incarc)
 
-summary(policy_vs_nonimp_demo_models$comp_prisonhelp_knowincarc)
-summary(policy_vs_nonimp_demo_models$comp_prisonpen_knowincarc)
-
-summary(policy_vs_nonimp_demo_models$comp_prisonhelp_vict)
-summary(policy_vs_nonimp_demo_models$comp_prisonpen_vict)
-
-
-comp_prisonhelp_incarc     
-comp_prisonhelp_knowincarc  
-comp_prisonhelp_vict       
-comp_prisonpen_impact       
-comp_prisonpen_incarc      
-comp_prisonpen_knowincarc  
-comp_prisonpen_vict        
-
-
-results_dvs <- c("prisonhelp", "prisonpen")
+results_dvs <- c("prisonhelp", "dpen_rev", "lwop_rev")
 
 results_table_tex <- make_policy_panel_latex_table(
   dv_vec = results_dvs,
