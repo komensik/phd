@@ -956,9 +956,9 @@ raw_data_cleaned <- raw_data_cleaned %>%
     ~ case_when(
     . == 6 ~ 1,          
     . == 7 ~ 2,
-    . == 8 ~ 3,
-    . == 9 ~ 4,
-    . == 10 ~ 5,        
+    . == 8 ~ 2.5,
+    . == 9 ~ 3,
+    . == 10 ~ 4,        
     TRUE ~ NA_real_
   )
   ))

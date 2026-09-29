@@ -68,9 +68,124 @@ sample <- read_csv("data/cleaned_control_data.csv")
 
 not_full <- read_csv("data/cleaned_sans_control_data.csv")
 
+names(sample)
 ```
 
-# ORIGINAL STARTS HERE
+
+
+# Policy Certainty
+
+Difs in 2.5 by impact groups
+```{r}
+sample <- sample %>%
+  mutate(
+    noimpact = ifelse(impact == 0, 1, 0)
+    )
+
+table(sample$knowincarc)
+
+help_nums_by_impact <- sample %>%
+  group_by(prisonhelp) %>%
+  summarise(
+    n = n(),
+    incarc = sum(incarc, na.rm = TRUE),
+    knowincarc = sum(knowincarc, na.rm = TRUE),
+    vict = sum(vict, na.rm = TRUE),
+    impact = sum(impact, na.rm = TRUE),
+    noimpact = sum(noimpact, na.rm = TRUE)
+  )
+#print(help_nums_by_impact, n = 23)
+```
+
+Uncertainty across help vars
+```{r}
+m <- m_prisonhelp_impact_verify
+mf <- model.frame(m)
+
+prison_items <- c(
+  policy_vars,
+  police_items
+)
+
+# 
+# prison_items <- c(
+#   "min_wage",
+#   "free_calls",
+#   "ed_funds",
+#   "alt_sentencing",
+#   "lwop_rev",
+#   "dpen_rev",
+#   
+# )
+
+# Separate audit object
+audit <- sample
+
+# Identify complete cases for the current model's variables
+model_vars <- all.vars(formula(m))
+
+audit$in_model <- complete.cases(
+  audit[, model_vars, drop = FALSE]
+)
+
+# Check that these reproduce the fitted model's observations
+audit_mf <- audit[audit$in_model, names(mf), drop = FALSE]
+
+stopifnot(
+  nrow(audit_mf) == nrow(mf),
+  all(vapply(
+    names(mf),
+    function(v) {
+      isTRUE(all.equal(
+        audit_mf[[v]],
+        mf[[v]],
+        check.attributes = FALSE
+      ))
+    },
+    logical(1)
+  ))
+)
+
+# Individual policy responses, not the prisonhelp average
+help_mat <- as.matrix(audit[, help_items, drop = FALSE])
+
+# Check the expected coding
+stopifnot(
+  is.numeric(help_mat),
+  all(is.na(help_mat) | help_mat %in% c(1, 2, 2.5, 3, 4))
+)
+
+audit$n_help_answered <- rowSums(!is.na(help_mat))
+audit$n_help_dk <- rowSums(help_mat == 2.5, na.rm = TRUE)
+
+# Compare actual DK use within the regression sample
+audit %>%
+  dplyr::filter(in_model) %>%
+  dplyr::group_by(impact) %>%
+  dplyr::summarise(
+    n = dplyr::n(),
+    fewer_than_four_answers = sum(n_help_answered < 4),
+    any_dk_n = sum(n_help_dk > 0),
+    any_dk_pct = 100 * mean(n_help_dk > 0),
+    all_four_dk_n = sum(n_help_dk == 4),
+    midpoint_with_four_answers_and_no_dk = sum(
+      prisonhelp == 2.5 &
+        n_help_answered == 4 &
+        n_help_dk == 0
+    ),
+    .groups = "drop"
+  )
+
+# Decompose the midpoint respondents by their actual response pattern
+audit %>%
+  dplyr::filter(in_model, prisonhelp == 2.5) %>%
+  dplyr::count(impact, n_help_answered, n_help_dk)
+```
+
+
+
+
+# Policy Prefs Loop
 
 This section continues to use variable_labels.R. The goal of this section was to avoid and clean up extensive seperated regressions, and instead incorporate use loop that iteratively work through outcome variables and incorporate controls.
 
@@ -1243,106 +1358,6 @@ V_HC3 <- sandwich::vcovHC(m, type = "HC3")
 lmtest::coeftest(m, vcov. = V_HC3)
 ```
 
-Difs in 2.5 by impact groups
-```{r}
-sample <- sample %>%
-  mutate(
-    noimpact = ifelse(impact == 0, 1, 0)
-    )
-
-table(sample$knowincarc)
-
-help_nums_by_impact <- sample %>%
-  group_by(prisonhelp) %>%
-  summarise(
-    n = n(),
-    incarc = sum(incarc, na.rm = TRUE),
-    knowincarc = sum(knowincarc, na.rm = TRUE),
-    vict = sum(vict, na.rm = TRUE),
-    impact = sum(impact, na.rm = TRUE),
-    noimpact = sum(noimpact, na.rm = TRUE)
-  )
-#print(help_nums_by_impact, n = 23)
-```
-
-Uncertainty across help vars
-```{r}
-m <- m_prisonhelp_impact_verify
-mf <- model.frame(m)
-
-prison_items <- c(
-  "min_wage",
-  "free_calls",
-  "ed_funds",
-  "alt_sentencing",
-  "lwop_rev",
-  "dpen_rev"
-)
-
-# Separate audit object
-audit <- sample
-
-# Identify complete cases for the current model's variables
-model_vars <- all.vars(formula(m))
-
-audit$in_model <- complete.cases(
-  audit[, model_vars, drop = FALSE]
-)
-
-# Check that these reproduce the fitted model's observations
-audit_mf <- audit[audit$in_model, names(mf), drop = FALSE]
-
-stopifnot(
-  nrow(audit_mf) == nrow(mf),
-  all(vapply(
-    names(mf),
-    function(v) {
-      isTRUE(all.equal(
-        audit_mf[[v]],
-        mf[[v]],
-        check.attributes = FALSE
-      ))
-    },
-    logical(1)
-  ))
-)
-
-# Individual policy responses, not the prisonhelp average
-help_mat <- as.matrix(audit[, help_items, drop = FALSE])
-
-# Check the expected coding
-stopifnot(
-  is.numeric(help_mat),
-  all(is.na(help_mat) | help_mat %in% c(1, 2, 2.5, 3, 4))
-)
-
-audit$n_help_answered <- rowSums(!is.na(help_mat))
-audit$n_help_dk <- rowSums(help_mat == 2.5, na.rm = TRUE)
-
-# Compare actual DK use within the regression sample
-audit %>%
-  dplyr::filter(in_model) %>%
-  dplyr::group_by(impact) %>%
-  dplyr::summarise(
-    n = dplyr::n(),
-    fewer_than_four_answers = sum(n_help_answered < 4),
-    any_dk_n = sum(n_help_dk > 0),
-    any_dk_pct = 100 * mean(n_help_dk > 0),
-    all_four_dk_n = sum(n_help_dk == 4),
-    midpoint_with_four_answers_and_no_dk = sum(
-      prisonhelp == 2.5 &
-        n_help_answered == 4 &
-        n_help_dk == 0
-    ),
-    .groups = "drop"
-  )
-
-# Decompose the midpoint respondents by their actual response pattern
-audit %>%
-  dplyr::filter(in_model, prisonhelp == 2.5) %>%
-  dplyr::count(impact, n_help_answered, n_help_dk)
-```
-
 
 # ------------------------------------------------------------
 # What about when we make controls our outcome variables
@@ -1886,6 +1901,23 @@ for (i in seq_along(appendix_punish_chunks)) {
   appendix_tables[[paste0("punish_", i)]] <- tex
   writeLines(tex, paste0("appendix_punish_restricted_table_", i, ".tex"))
 }
+```
+
+# ------------------------------------------------------------
+# ------------------------------------------------------------
+# Analysis with IDKs Excluded
+# ------------------------------------------------------------
+# ------------------------------------------------------------
+
+
+```{r}
+
+sample <- sample %>%
+  mutate(
+    dpen_no_idk
+  )
+
+
 ```
 
 
