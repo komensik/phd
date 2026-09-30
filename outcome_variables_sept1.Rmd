@@ -46,7 +46,350 @@ Standardize? No -- in my prelim, I write: To ensure that I do not control for a 
 
 12 While constructing composite or control variables involving other deservingness targets, I assess whether their inclusion introduces collinearity or conceptual overlap with the dependent variable. In particular, I examine correlations between group-level deservingness ratings to ensure that any included groups are not too closely tied to perceptions of incarcerated people. If preliminary checks reveal that including a particular group (e.g., “criminals” or “formerly incarcerated individuals”) would obscure key variance or conflate target constructs, I exclude it from the model and treat it as conceptually non-distinct for the purposes of this analysis.
 
+## A. Groupings
+```{r}
+# =============================================================================
+# Policy target groupings
+# 41 target items (no variable exists for "Incarcerated Women", so it's omitted)
+# Each tribble assigns every item to exactly one section on one dimension.
+# =============================================================================
+
+library(tidyverse)
+
+df <- read_csv("data/cleaned_control_data_no_drop.csv")
+
+# -----------------------------------------------------------------------------
+# 1. Entity type: what kind of thing is being rated
+# -----------------------------------------------------------------------------
+des_by_entity <- tibble::tribble(
+  ~var,                    ~label,                                  ~section,
+  "d_black_afam_abc",      "Black/African Americans",               "Race_Ethnic",
+  "d_native_ind_abc",      "Native/Indigenous Americans",           "Race_Ethnic",
+  "d_asianam_abc",         "Asian Americans",                       "Race_Ethnic",
+  "d_latino_his_abc",      "Latino/Hispanic Americans",             "Race_Ethnic",
+  "d_whiteam_abc",         "White Americans",                       "Race_Ethnic",
+  "d_mideastam_abc",       "Middle Eastern Americans",              "Race_Ethnic",
+  "d_collegewom_abc",      "Women in College",                      "Identity_LifeStage",
+  "d_lgbt_abc",            "LGBTQ+ People",                         "Identity_LifeStage",
+  "d_trans_abc",           "Transgender Adults",                    "Identity_LifeStage",
+  "d_transkids_abc",       "Transgender Children",                  "Identity_LifeStage",
+  "d_child_abc",           "Children",                              "Identity_LifeStage",
+  "d_welfare_tanf_abc",    "Cash Welfare/TANF Recipients",          "Program_Recipient",
+  "d_fstamps_snap_abc",    "Food Stamps/SNAP Recipients",           "Program_Recipient",
+  "d_medicaid_abc",        "Medicaid Recipients",                   "Program_Recipient",
+  "d_medicare_abc",        "Medicare/SSN Recipients",               "Program_Recipient",
+  "d_unemployed_abc",      "Unemployed",                            "Program_Recipient",
+  "d_poorfam_abc",         "Poor Families",                         "Economic_Class",
+  "d_wealthy_abc",         "Wealthy People",                        "Economic_Class",
+  "d_crim_abc",            "Criminals",                             "Legal_Status",
+  "d_incppl_pris_abc",     "Incarcerated People/Prisoners",         "Legal_Status",
+  "d_unauth_undoc_abc",    "Unauthorized/Undocumented Immigrants",  "Legal_Status",
+  "d_immigrants_abc",      "Immigrants",                            "Legal_Status",       # judgment call: nativity/citizenship status
+  "d_homeless_abc",        "Homeless Individuals",                  "Legal_Status",       # judgment call: could be Economic_Class
+  "d_police_abc",          "Police",                                "Occupation",
+  "d_teachers_abc",        "Teachers",                              "Occupation",
+  "d_sci_experts_abc",     "Scientists/Experts",                    "Occupation",
+  "d_abortprov_abc",       "Abortion Providers",                    "Occupation",         # could be Organization
+  "d_enviro_abc",          "Environmentalists",                     "Movement_Affiliation",
+  "d_feminists_abc",       "Feminists",                             "Movement_Affiliation",
+  "d_proabort_choice_abc", "Pro-Abortion/Pro-Choice Movement",      "Movement_Affiliation",
+  "d_gunowners_abc",       "Gun Owners",                            "Movement_Affiliation",
+  "d_unions_abc",          "Labor Unions",                          "Organization",
+  "d_nra_abc",             "National Rifle Association (NRA)",      "Organization",
+  "d_ice_abc",             "ICE",                                   "Organization",
+  "d_gunmans_abc",         "Gun Manufacturers",                     "Organization",
+  "d_bigbank_abc",         "Big Banks & Lenders",                   "Organization",
+  "d_bigcorp_abc",         "Big Corporations",                      "Organization",
+  "d_socmed_abc",          "Social Media Organizations",            "Organization",
+  "d_uni_abc",             "4-Year Colleges & Universities",        "Organization",
+  "d_comcoll_abc",         "Community Colleges",                    "Organization",
+  "d_voters_abc",          "Voters",                                "Civic_Role"
+)
+
+# -----------------------------------------------------------------------------
+# 2. Partisan/ideological coding
+#    `explicit` = TRUE if the item is openly a partisan or movement object;
+#    FALSE if it is politicized implicitly (e.g., through program or policy
+#    associations). Race groups are left uncoded.
+# -----------------------------------------------------------------------------
+des_by_LR_code <- tibble::tribble(
+  ~var,                    ~label,                                  ~section,               ~explicit,
+  "d_enviro_abc",          "Environmentalists",                     "Left_Coded",           TRUE,
+  "d_feminists_abc",       "Feminists",                             "Left_Coded",           TRUE,
+  "d_proabort_choice_abc", "Pro-Abortion/Pro-Choice Movement",      "Left_Coded",           TRUE,
+  "d_abortprov_abc",       "Abortion Providers",                    "Left_Coded",           TRUE,
+  "d_unions_abc",          "Labor Unions",                          "Left_Coded",           TRUE,
+  "d_sci_experts_abc",     "Scientists/Experts",                    "Left_Coded",           FALSE,
+  "d_uni_abc",             "4-Year Colleges & Universities",        "Left_Coded",           FALSE,
+
+  "d_police_abc",          "Police",                                "Right_Coded",          TRUE,
+  "d_ice_abc",             "ICE",                                   "Right_Coded",          TRUE,
+  "d_nra_abc",             "National Rifle Association (NRA)",      "Right_Coded",          TRUE,
+  "d_gunowners_abc",       "Gun Owners",                            "Right_Coded",          TRUE,
+  "d_gunmans_abc",         "Gun Manufacturers",                     "Right_Coded",          TRUE,
+)
+
+# -----------------------------------------------------------------------------
+# 3. Relationship to the state
+# -----------------------------------------------------------------------------
+des_by_state_relat <- tibble::tribble(
+  ~var,                    ~label,                                  ~section,
+  "d_welfare_tanf_abc",    "Cash Welfare/TANF Recipients",          "Transfer_Beneficiary",
+  "d_fstamps_snap_abc",    "Food Stamps/SNAP Recipients",           "Transfer_Beneficiary",
+  "d_medicaid_abc",        "Medicaid Recipients",                   "Transfer_Beneficiary",
+  "d_medicare_abc",        "Medicare/SSN Recipients",               "Transfer_Beneficiary",
+  "d_unemployed_abc",      "Unemployed",                            "Transfer_Beneficiary",
+  "d_poorfam_abc",         "Poor Families",                         "Transfer_Beneficiary",
+  "d_homeless_abc",        "Homeless Individuals",                  "Transfer_Beneficiary",
+  "d_crim_abc",            "Criminals",                             "Subject_of_Coercion",
+  "d_incppl_pris_abc",     "Incarcerated People/Prisoners",         "Subject_of_Coercion",
+  "d_unauth_undoc_abc",    "Unauthorized/Undocumented Immigrants",  "Subject_of_Coercion",
+  "d_immigrants_abc",      "Immigrants",                            "No_Code",  # via immigration enforcement; judgment call
+  "d_police_abc",          "Police",                                "Agent_of_Coercion",
+  "d_ice_abc",             "ICE",                                   "Agent_of_Coercion",
+  "d_bigbank_abc",         "Big Banks & Lenders",                   "Regulated_Actor",
+  "d_bigcorp_abc",         "Big Corporations",                      "Regulated_Actor",
+  "d_wealthy_abc",         "Wealthy People",                        "Regulated_Actor",      # via taxation; judgment call
+  "d_uni_abc",             "4-Year Colleges & Universities",        "Public_Service",
+  "d_comcoll_abc",         "Community Colleges",                    "Public_Service",
+  "d_teachers_abc",        "Teachers",                              "Public_Service",
+  "d_sci_experts_abc",     "Scientists/Experts",                    "Public_Service",
+  "d_enviro_abc",          "Environmentalists",                     "Advocacy_Civil_Society",
+  "d_feminists_abc",       "Feminists",                             "Advocacy_Civil_Society",
+  "d_proabort_choice_abc", "Pro-Abortion/Pro-Choice Movement",      "Advocacy_Civil_Society",
+  "d_unions_abc",          "Labor Unions",                          "Advocacy_Civil_Society",
+  "d_nra_abc",             "National Rifle Association (NRA)",      "Advocacy_Civil_Society"
+)
+
+# -----------------------------------------------------------------------------
+# 4. Schneider & Ingram social construction (theoretical placement)
+#    "Contested" = placement likely depends heavily on the respondent.
+#    Race groups are deliberately not placed.
+# -----------------------------------------------------------------------------
+des_by_soc_construct <- tibble::tribble(
+  ~var,                    ~label,                                  ~section,
+  "d_medicare_abc",        "Medicare/SSN Recipients",               "Advantaged",
+  "d_teachers_abc",        "Teachers",                              "Advantaged",
+  "d_sci_experts_abc",     "Scientists/Experts",                    "Advantaged",
+  "d_police_abc",          "Police",                                "Advantaged",
+  "d_comcoll_abc",         "Community Colleges",                    "Advantaged",
+  "d_wealthy_abc",         "Wealthy People",                        "Contender",
+  "d_bigbank_abc",         "Big Banks & Lenders",                   "Contender",
+  "d_bigcorp_abc",         "Big Corporations",                      "Contender",
+  "d_socmed_abc",          "Social Media Organizations",            "Contender",
+  "d_nra_abc",             "National Rifle Association (NRA)",      "Contender",
+  "d_gunmans_abc",         "Gun Manufacturers",                     "Contender",
+  "d_unions_abc",          "Labor Unions",                          "Contender",
+  "d_uni_abc",             "4-Year Colleges & Universities",        "Contender",
+  "d_child_abc",           "Children",                              "Dependent",
+  "d_poorfam_abc",         "Poor Families",                         "Dependent",
+  "d_medicaid_abc",        "Medicaid Recipients",                   "Dependent",
+  "d_fstamps_snap_abc",    "Food Stamps/SNAP Recipients",           "Dependent",
+  "d_unemployed_abc",      "Unemployed",                            "Dependent",
+  "d_collegewom_abc",      "Women in College",                      "Dependent",
+  "d_crim_abc",            "Criminals",                             "Deviant",
+  "d_incppl_pris_abc",     "Incarcerated People/Prisoners",         "Deviant",
+  "d_unauth_undoc_abc",    "Unauthorized/Undocumented Immigrants",  "Deviant",
+  "d_welfare_tanf_abc",    "Cash Welfare/TANF Recipients",          "Deviant",
+  "d_homeless_abc",        "Homeless Individuals",                  "Deviant",
+  "d_lgbt_abc",            "LGBTQ+ People",                         "Contested",
+  "d_trans_abc",           "Transgender Adults",                    "Contested",
+  "d_transkids_abc",       "Transgender Children",                  "Contested",
+  "d_immigrants_abc",      "Immigrants",                            "Contested",
+  "d_feminists_abc",       "Feminists",                             "Contested",
+  "d_enviro_abc",          "Environmentalists",                     "Contested",
+  "d_proabort_choice_abc", "Pro-Abortion/Pro-Choice Movement",      "Contested",
+  "d_abortprov_abc",       "Abortion Providers",                    "Contested",
+  "d_ice_abc",             "ICE",                                   "Contested",
+)
+
+# -----------------------------------------------------------------------------
+# 5. Deservingness among benefit-related items
+# -----------------------------------------------------------------------------
+des_by_benefit_type <- tibble::tribble(
+  ~var,                    ~label,                                  ~section,
+  "d_medicare_abc",        "Medicare/SSN Recipients",               "Contributory",
+  "d_unemployed_abc",      "Unemployed",                            "Contributory",
+  "d_welfare_tanf_abc",    "Cash Welfare/TANF Recipients",          "Means_Tested",
+  "d_fstamps_snap_abc",    "Food Stamps/SNAP Recipients",           "Means_Tested",
+  "d_medicaid_abc",        "Medicaid Recipients",                   "Means_Tested",
+  "d_poorfam_abc",         "Poor Families",                         "Need_No_Program",
+  "d_homeless_abc",        "Homeless Individuals",                  "Need_No_Program"
+)
+
+
+# confirm the vars exist in your data (replace `df` with your data)
+setdiff(all_vars, names(df))
+
+# =============================================================================
+# Combined coding matrix: one row per item, one column per dimension
+# =============================================================================
+target_matrix <- des_by_entity %>%
+  rename(entity = section) %>%
+  left_join(des_by_LR_code       %>% select(var, lr = section, lr_explicit = explicit), by = "var") %>%
+  left_join(des_by_state_relat   %>% select(var, state_relat = section),                by = "var") %>%
+  left_join(des_by_soc_construct %>% select(var, soc_construct = section),              by = "var") %>%
+  left_join(des_by_benefit_type  %>% select(var, benefit_type = section),               by = "var")
+
+ #View(target_matrix)
+```
+
+
+```{r}
+# =============================================================================
+# mean score by section, by party (edit names to match your data)
+# =============================================================================
+df %>%
+  select(response_id, impact, all_of(all_vars)) %>%
+  pivot_longer(all_of(all_vars), names_to = "var", values_to = "score") %>%
+  left_join(target_matrix, by = "var") %>%
+  group_by(impact, soc_construct) %>%
+  summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop")
+
+
+```
+Corrs?
+
+```{r}
+vars  <- target_matrix$var
+items <- df %>% select(all_of(vars))
+
+r_raw  <- cor(items, use = "pairwise.complete.obs")
+```
+
+Vis - social constructions
+```{r}
+ord <- target_matrix %>% arrange(soc_construct, var) %>% pull(var)
+corrplot::corrplot(r_raw[ord, ord], method = "color",
+                   tl.cex = 0.6, tl.col = "black")
+```
+
+Vis - lr
+```{r}
+ord <- target_matrix %>% arrange(lr, var) %>% pull(var)
+corrplot::corrplot(r_raw[ord, ord], method = "color",
+                   tl.cex = 0.6, tl.col = "black")
+```
+
+Vis - state-relationships
+
+```{r}
+ord <- target_matrix %>% arrange(state_relat, var) %>% pull(var)
+corrplot::corrplot(r_raw[ord, ord], method = "color",
+                   tl.cex = 0.6, tl.col = "black")
+```
+
+Vis - entity
+```{r}
+ord <- target_matrix %>% arrange(entity, var) %>% pull(var)
+corrplot::corrplot(r_raw[ord, ord], method = "color",
+                   tl.cex = 0.6, tl.col = "black")
+```
+
+For each dimension, compare the average correlation among items in the same section with the average among items in different sections. A dimension that organizes responses well will show a large gap:
+```{r}
+within_between <- function(r, dim) {
+  as_tibble(r, rownames = "v1") %>%
+    pivot_longer(-v1, names_to = "v2", values_to = "r") %>%
+    filter(v1 < v2) %>%
+    left_join(select(target_matrix, var, g1 = {{ dim }}), by = c("v1" = "var")) %>%
+    left_join(select(target_matrix, var, g2 = {{ dim }}), by = c("v2" = "var")) %>%
+    filter(!is.na(g1), !is.na(g2)) %>%
+    mutate(same = g1 == g2)
+}
+
+wb <- within_between(r_raw, state_relat)
+wb %>% group_by(same) %>% summarise(mean_r = mean(r), n = n())
+
+wb %>% filter(same) %>% group_by(g1) %>% summarise(mean_r = mean(r), n = n())
+
+```
+
+Response style?
+
+```{r}
+mean(r_raw[upper.tri(r_raw)])   
+```
+
+```{r}
+library(psych)
+
+item_stats <- function(data, vars) {
+  sub <- data %>% select(all_of(vars))
+  a   <- psych::alpha(sub, check.keys = FALSE)
+
+  list(
+    alpha = a$total$raw_alpha,
+    items = a$item.stats %>%
+      as_tibble(rownames = "var") %>%
+      select(var, n, r.drop, r.cor, mean, sd) %>%
+      left_join(select(target_matrix, var, label), by = "var"),
+    alpha_if_dropped = a$alpha.drop %>%
+      as_tibble(rownames = "var") %>%
+      select(var, raw_alpha),
+    cor = round(cor(sub, use = "pairwise.complete.obs"), 2)
+  )
+}
+
+# (1) All items in des_by_benefit_type
+benefit_stats <- item_stats(df, des_by_benefit_type$var)
+
+# (2) Advantaged items in des_by_soc_construct
+adv_vars <- des_by_soc_construct %>%
+  filter(section == "Advantaged") %>%
+  pull(var)
+adv_stats <- item_stats(df, adv_vars)
+
+benefit_stats$items
+benefit_stats$cor
+adv_stats$items
+adv_stats$cor
+```
+
+
+
 ## B. Tendencies
+
+
+```{r}
+
+# 
+# 
+# des_by_entity <- tibble::tribble(
+#   ~var, ~label, ~ section,
+#   "d_black_afam_abc", "Black/African_Americans", "Race/Ethnic Groups",
+#   ...
+# )
+# 
+# 
+# des_by_LR_code <- tibble::tribble(
+#   ~var, ~label, ~ section,
+#   "d_enviro_abc", "Environmentalists", "Left_Coded",
+#   ...
+# )
+# 
+# des_by_state_relat <- tibble::tribble(
+#   ~var, ~label, ~ section,
+#   "d_unemployed", "Unemployed", "Beneficiaries",
+#   ...
+# )
+#  
+#  
+#  
+# 
+# des_race_groups <- c(
+#   "d_black_afam_abc", 
+#   "d_native_ind_abc", 
+#   "d_asianam_abc",
+#   "d_latino_his_abc",
+#   "d_whiteam_abc", 
+#   "d_mideastam_abc"
+# )
+
+
+
+
+```
 
 
 ## B. Sympathy "desor_core" control
@@ -55,6 +398,7 @@ Standardize? No -- in my prelim, I write: To ensure that I do not control for a 
 # ------------------------------------------------------------
 # Deservingness / "sympathy" orientation: CORE items
 # ------------------------------------------------------------
+
 
 desor_core_vars <- c(
   "d_welfare_tanf_abc",
@@ -66,6 +410,8 @@ desor_core_vars <- c(
   "d_homeless_abc",
   "d_immigrants_abc"
 )
+
+
 # took "d_unauth_undoc_abc" out because sub 5 corr.
 
 # desor_rulebreak <- c(
@@ -188,10 +534,10 @@ raw_data_cleaned <- raw_data_cleaned %>%
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(penalpoint_ord = factor(
     penalpoint,
-    levels = 1:7,
+    levels = 0:6,
     labels = c(
-      "Rehab (1)", "Rehab (2)", "Rehab (3)", "Neutral (4)",
-      "Punish (5)", "Punish (6)", "Punish (7)"
+      "Rehab (0)", "Rehab (1)", "Rehab (2)", "Neutral (3)",
+      "Punish (4)", "Punish (5)", "Punish (6)"
     ),
     ordered = TRUE
   ))
@@ -618,7 +964,7 @@ cor(q25_help_data,
 
 ## Election Items
 
-```{r, electionhelpqs}
+```{r}
 names(raw_data_cleaned) %>% stringr::str_subset("q25|q23")
 
 # Define Q23 help-oriented items (election - q23_2 is elects_reenfranchise and q23_7 is voting in jail (Requiring that jail and election officers ensure that people who are eligible to vote while incarcerated are able to exercise that right.) OG 1 = favor, 2 = oppose, 3 = DK
@@ -659,9 +1005,11 @@ raw_data_cleaned <- raw_data_cleaned %>%
 #   mutate(all_electoral_means = mean(c_across(c(auto_reg_rev, post_felony_vote_rev, early_vote_rev, election_holiday_rev, voter_id_rev, noncit_local_rev, jail_access_rev)), na.rm = TRUE)) %>%
 #   ungroup()
 
-#summary(raw_data_cleaned$all_electoral_means)#all_election_items now exists as #mean across all 7 Q23 questions, reverse coded, for each observation. 
+#summary(raw_data_cleaned$all_electoral_means)#all_election_items now exists as #mean across all 7 Q23 questions, reverse coded, for each observation.
+```
 
-## Jail voting and rights restoration
+### Jail voting, rights restoration
+```{r}
 
 incarc_electoral_vars <- c("post_felony_vote_rev", "jail_access_rev")
 
@@ -705,18 +1053,23 @@ raw_data_cleaned <- raw_data_cleaned %>%
       NA_real_
     )
   )
+
 hist(raw_data_cleaned$post_felony_vote_rev)
 hist(raw_data_cleaned$jail_access_rev)
 
 print(summary(raw_data_cleaned$post_felony_vote_rev))
 print(summary(raw_data_cleaned$jail_access_rev))
+
+
+
+# produces: post_felony_vote_rev_1_to_4, jail_access_rev_1_to_4
 ```
 
 Come out of above block with: post_felony_vote_rev individual item, 1–3 jail_access_rev individual item, 1–3 incarc_electoral_mean combined measure, 1–3
 
 post_felony_vote_rev_1_to_4 comparable item, 1–4 jail_access_rev_1_to_4 comparable item, 1–4 incarc_electoral_mean_1_to_4 comparable combined measure, 1–4
 
-#### D.4_C Prison/Election Items Descriptive look
+#### Descriptive
 
 What's up
 
@@ -1006,9 +1359,9 @@ raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     gov_attn = case_when(
       as.numeric(gov_attn) == -99 ~ NA_real_,
-      as.numeric(gov_attn) == 1 ~ 3,
-      as.numeric(gov_attn) == 2 ~ 2,
-      as.numeric(gov_attn) == 3 ~ 1,
+      as.numeric(gov_attn) == 1 ~ 2,
+      as.numeric(gov_attn) == 2 ~ 1,
+      as.numeric(gov_attn) == 3 ~ 0,
       TRUE ~ NA_real_
     )
   )
@@ -1057,11 +1410,11 @@ raw_data_cleaned <- raw_data_cleaned %>%
   mutate(
     gets_issues = case_when(
       as.numeric(gets_issues) == -99 ~ NA_real_,
-      as.numeric(gets_issues) == 1 ~ 5,
-      as.numeric(gets_issues) == 2 ~ 4,
-      as.numeric(gets_issues) == 3 ~ 3,
-      as.numeric(gets_issues) == 4 ~ 2,
-      as.numeric(gets_issues) == 5 ~ 1,
+      as.numeric(gets_issues) == 1 ~ 4,
+      as.numeric(gets_issues) == 2 ~ 3,
+      as.numeric(gets_issues) == 3 ~ 2,
+      as.numeric(gets_issues) == 4 ~ 1,
+      as.numeric(gets_issues) == 5 ~ 0,
       TRUE ~ NA_real_
     )
   )

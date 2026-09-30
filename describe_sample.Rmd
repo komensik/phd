@@ -1404,7 +1404,75 @@ cat(latex_tables[["Other Race"]])
 
 ```
 
+## Rationing
+```{r}
 
+cor(data_full$ration_scripts, data_full$ration_food, use = "pairwise.complete.obs")
+
+
+data_full %>%
+  group_by(ration_food) %>% 
+  summarise (
+    n = n(), 
+    White = sum(White, na.rm = TRUE),
+    Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
+    Black = sum(Black, na.rm = TRUE),
+    AllOthers = sum(AllOthers, na.rm = TRUE)
+  )
+
+ration_model <- lm(ration_food ~ ration_scripts, data = data_full)
+
+summary(ration_model)
+```
+
+## Econ Experiences
+
+```{r}
+table(data_full$tanf)
+
+table(data_full$snap)
+
+table(data_full$uninsured)
+
+table(data_full$unionmember)
+
+table(data_full$on_medicaid)
+
+
+data_full%>%
+  summarise(
+    n = n(),
+    total = 1600,
+    tanf = sum(tanf, na.rm = TRUE),
+    tanf_pct = ((tanf/total)*100),
+    snap = sum(snap, na.rm = TRUE),
+    snap_pct = ((snap/total)*100),
+    uninsured = sum(uninsured, na.rm = TRUE),
+    uninsured_pct = ((uninsured/total)*100),
+    unionmember = sum(unionmember, na.rm = TRUE),
+    union_pct = ((unionmember/total)*100),
+    on_medicaid = sum(on_medicaid, na.rm = TRUE),
+    medicaid_pct = ((on_medicaid/total)*100)
+  )
+
+View(data_full%>%
+       group_by(incarc)%>%
+  summarise(
+    n = n(),
+    total = 1600,
+    tanf = sum(tanf, na.rm = TRUE),
+    
+    snap = sum(snap, na.rm = TRUE),
+   
+    uninsured = sum(uninsured, na.rm = TRUE),
+   
+    unionmember = sum(unionmember, na.rm = TRUE),
+    
+    on_medicaid = sum(on_medicaid, na.rm = TRUE),
+    
+  ))
+
+```
 
 
 # FIRE
@@ -1435,12 +1503,32 @@ data_full %>%
 
 ```
 
+# Trust Gov?
+
+```{r}
+
+m_trust <- lm(gov_attn ~ incarc, data = data_full)
+
+summary(m_trust)
+
+```
 
 
 # ------------------------------------------------------------
-# desor core vars -- confirm correlation
+# D Scores
 # -----------------------------------------------------------
 
+```{r}
+
+
+
+```
+
+
+
+## desor core vars 
+### -- confirm correlation
+ 
 ```{r}
 
 desor_core_vars <- c(

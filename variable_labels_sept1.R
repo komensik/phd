@@ -244,8 +244,9 @@ all_attitudinal_controls <- c(
   fire_controls
 )
 
-ration_vars <- c("ration_scripts", "ration_period", "ration_food")
+ration_vars <- c("ration_scripts", "ration_food")
 
 ration_labels <- c(
-  
+  ration_scripts = "Rationed Prescription Meds",
+  ration_food = "Rationed Food"
 )
