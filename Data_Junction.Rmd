@@ -44,7 +44,7 @@ sept 15 N is 2327
 
 used <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc",
           "impact", "incarc", "knowincarc", "vict",
-          "local_police", "no_strangle", "police_tracker", "police_training", "charge_police","dpen", "min_wage", "free_calls", "ed_funds", "alt_sentencing", "lwop",
+           "dpen_rev", "min_wage", "free_calls", "ed_funds", "alt_sentencing", "lwop_rev",
 "gov_attn", "vote2020", "willvote", "auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access_rev", "White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am",  "Pac_Island", "MENA", "race_notlisted",
   "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology")
 
@@ -67,7 +67,7 @@ used_missing <- raw_data_cleaned %>%
   ) %>%
   arrange(desc(pct_missing))
 
-View(used_missing)
+#View(used_missing)
 
 ```
 
@@ -164,6 +164,7 @@ table(df_no_control$ration_food)
 This could change, but these are variables that you are really probably not using
 
 ```{r}
+
 deserving_block_drop <- c(
   # Block A
   "d_hsteen_a",
@@ -226,6 +227,7 @@ deserving_block_drop <- c(
   "d_gay_c",
   "d_lesbians_c"
 )
+
 ```
 
 ```{r}
@@ -364,37 +366,78 @@ classic_racism <- unique(c(
 ))
 
 # ------------------------------------------------------------
-# 11. experience binaries
+# 11. experience items 
 # ------------------------------------------------------------
+
+#binaries
 
 experience_bins <- unique(c(
   "on_medicaid_bin",
   "no_medicaid_bin",
+  "knowmedicaid_bin",
+  
   "tanf_bin",
   "notanf_bin",
   "knowtanf_bin",
+  
   "snap_bin",
   "knowsnap_bin",
+  "nosnap_bin",
+  
   "immigrated_bin",
   "knowimmigrated_bin",
+  "noimmigrated_bin",
+  
   "unionmember_bin",
   "nounion_bin",
   "knowunion_bin",
+  
   "aborted_bin",
   "knowaborted_bin",
   "noaborted_bin",
-  "unemployment_bin",
+  
+  "unemployed_bin",
   "knowunemployed_bin",
-  "noemployed_bin",
+  "nounemployed_bin",
+  
   "uninsured_bin",
   "knowuninsured_bin",
+  "nouninsured_bin",
+  
   "unable_vote_bin",
   "know_unable_vote_bin",
   "no_unable_vote_bin"
 ))
+
+# know items
+
+experience_knows <- unique(c(
+  "knowmedicaid", 
+  "knowtanf",
+  "knowsnap",
+  "knowimmigrated",
+  "knowunion",
+  "knowunemployed",
+  "know_unable_vote"
+))
+
+# no experience
+no_experience <- unique(c(
+  "no_medicaid", 
+  "notanf",
+  "nosnap",
+  "nonion",
+  "nounemployed",
+  "nouninsured",
+  "no_unable_vote"
+))
+
+#experience
+
 ```
 
 ```{r}
+
 vars_to_drop <- c(
   deserving_block_drop,
   #deserving_other_drop,
@@ -406,7 +449,11 @@ vars_to_drop <- c(
   regulation_drop,
   known_people_drop,
   raw_vars,
-  sm_use
+  sm_use,
+  classic_racism,
+  experience_bins,
+  experience_knows,
+  no_experience
 )
 
 
@@ -429,6 +476,8 @@ data_full <- data_full %>%
 
 df_no_control <- df_no_control %>%
   select(-any_of(vars_to_drop))
+
+names(data_full)
 ```
 
 

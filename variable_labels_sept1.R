@@ -222,6 +222,18 @@ desor_core_label <- c(
   desor_core = "Deservingness Orientation"
   )
 
+desor_core_vars <- c(
+  "d_welfare_tanf_abc",
+  "d_fstamps_snap_abc",
+  "d_medicaid_abc",
+  "d_medicare_abc",
+  "d_unemployed_abc",
+  "d_poorfam_abc",
+  "d_homeless_abc",
+  "d_immigrants_abc",
+  "d_unauth_undoc_abc"
+)
+
 #FIRE controls 
 fire_controls <- c(
   "fire_rare",
@@ -250,3 +262,14 @@ ration_labels <- c(
   ration_scripts = "Rationed Prescription Meds",
   ration_food = "Rationed Food"
 )
+
+experience_buffet <- c(
+  "tanf",
+  "snap",
+  "uninsured",
+  "unionmember",
+  "on_mediaid",
+  "unemployed",
+  "immigrated"
+  )
+  

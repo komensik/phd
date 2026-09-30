@@ -572,7 +572,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
     . == 4 ~ 1,
     . == 5 ~ 2.5,         # DK = neutral midpoint
     TRUE ~ NA_real_
-  ),  # note: we skip 5 = DK
+  ),  
     .names = "{.col}_rev"
   ))
 
