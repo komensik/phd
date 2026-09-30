@@ -296,8 +296,6 @@ for (experience in names(experience_sets)) {
 
 ### C. Ration, Hardship Block
 
-### 
-
 ```{r}
 
 

@@ -68,121 +68,8 @@ sample <- read_csv("data/cleaned_control_data.csv")
 
 not_full <- read_csv("data/cleaned_sans_control_data.csv")
 
-names(sample)
+
 ```
-
-
-
-# Policy Certainty
-
-Difs in 2.5 by impact groups
-```{r}
-sample <- sample %>%
-  mutate(
-    noimpact = ifelse(impact == 0, 1, 0)
-    )
-
-table(sample$knowincarc)
-
-help_nums_by_impact <- sample %>%
-  group_by(prisonhelp) %>%
-  summarise(
-    n = n(),
-    incarc = sum(incarc, na.rm = TRUE),
-    knowincarc = sum(knowincarc, na.rm = TRUE),
-    vict = sum(vict, na.rm = TRUE),
-    impact = sum(impact, na.rm = TRUE),
-    noimpact = sum(noimpact, na.rm = TRUE)
-  )
-#print(help_nums_by_impact, n = 23)
-```
-
-Uncertainty across help vars
-```{r}
-m <- m_prisonhelp_impact_verify
-mf <- model.frame(m)
-
-prison_items <- c(
-  policy_vars,
-  police_items
-)
-
-# 
-# prison_items <- c(
-#   "min_wage",
-#   "free_calls",
-#   "ed_funds",
-#   "alt_sentencing",
-#   "lwop_rev",
-#   "dpen_rev",
-#   
-# )
-
-# Separate audit object
-audit <- sample
-
-# Identify complete cases for the current model's variables
-model_vars <- all.vars(formula(m))
-
-audit$in_model <- complete.cases(
-  audit[, model_vars, drop = FALSE]
-)
-
-# Check that these reproduce the fitted model's observations
-audit_mf <- audit[audit$in_model, names(mf), drop = FALSE]
-
-stopifnot(
-  nrow(audit_mf) == nrow(mf),
-  all(vapply(
-    names(mf),
-    function(v) {
-      isTRUE(all.equal(
-        audit_mf[[v]],
-        mf[[v]],
-        check.attributes = FALSE
-      ))
-    },
-    logical(1)
-  ))
-)
-
-# Individual policy responses, not the prisonhelp average
-help_mat <- as.matrix(audit[, help_items, drop = FALSE])
-
-# Check the expected coding
-stopifnot(
-  is.numeric(help_mat),
-  all(is.na(help_mat) | help_mat %in% c(1, 2, 2.5, 3, 4))
-)
-
-audit$n_help_answered <- rowSums(!is.na(help_mat))
-audit$n_help_dk <- rowSums(help_mat == 2.5, na.rm = TRUE)
-
-# Compare actual DK use within the regression sample
-audit %>%
-  dplyr::filter(in_model) %>%
-  dplyr::group_by(impact) %>%
-  dplyr::summarise(
-    n = dplyr::n(),
-    fewer_than_four_answers = sum(n_help_answered < 4),
-    any_dk_n = sum(n_help_dk > 0),
-    any_dk_pct = 100 * mean(n_help_dk > 0),
-    all_four_dk_n = sum(n_help_dk == 4),
-    midpoint_with_four_answers_and_no_dk = sum(
-      prisonhelp == 2.5 &
-        n_help_answered == 4 &
-        n_help_dk == 0
-    ),
-    .groups = "drop"
-  )
-
-# Decompose the midpoint respondents by their actual response pattern
-audit %>%
-  dplyr::filter(in_model, prisonhelp == 2.5) %>%
-  dplyr::count(impact, n_help_answered, n_help_dk)
-```
-
-
 
 
 # Policy Prefs Loop
@@ -333,9 +220,9 @@ make_policy_model <- function(df, dv, iv, controls = character(0)) { #character(
 
 ```
 
-# ============================================================
+# ===========================================================
 # MAIN MODEL GENERATING LOOOP 
-# ============================================================
+# ===========================================================
 Now, I need to line up buckets to put the models 
  that place is "policy_dummies_waves"
 
@@ -1239,6 +1126,7 @@ summary(policy_dummies_partyideo_models[["m_prisonhelp_incarc"]])
 # Demographics + party/ideology + FIRE + core deservingness
 summary(policy_dummies_full_models[["m_prisonhelp_incarc"]])
 
+
 ```
 
 To look at w/HC1 Robust SEs:
@@ -1356,6 +1244,117 @@ lmtest::coefci(m, vcov. = V_HC1)
 V_HC3 <- sandwich::vcovHC(m, type = "HC3")
 
 lmtest::coeftest(m, vcov. = V_HC3)
+```
+
+
+# Policy Certainty
+
+Difs in 2.5 by impact groups
+```{r}
+sample <- sample %>%
+  mutate(
+    noimpact = ifelse(impact == 0, 1, 0)
+    )
+
+table(sample$knowincarc)
+
+help_nums_by_impact <- sample %>%
+  group_by(prisonhelp) %>%
+  summarise(
+    n = n(),
+    incarc = sum(incarc, na.rm = TRUE),
+    knowincarc = sum(knowincarc, na.rm = TRUE),
+    vict = sum(vict, na.rm = TRUE),
+    impact = sum(impact, na.rm = TRUE),
+    noimpact = sum(noimpact, na.rm = TRUE)
+  )
+#print(help_nums_by_impact, n = 23)
+```
+
+Uncertainty across help vars
+```{r}
+m <- m_prisonhelp_impact_verify
+mf <- model.frame(m)
+
+
+
+help_items <- c(
+  "min_wage",
+  "free_calls",
+  "ed_funds",
+  "alt_sentencing",
+  "lwop_rev",
+  "dpen_rev",
+  "local_police",
+  "no_strangle",
+  "police_tracker",
+  "police_training",
+  "charge_police"
+
+)
+
+# Separate audit object
+audit <- sample
+
+# Identify complete cases for the current model's variables
+model_vars <- all.vars(formula(m))
+
+audit$in_model <- complete.cases(
+  audit[, model_vars, drop = FALSE]
+)
+
+# Check that these reproduce the fitted model's observations
+audit_mf <- audit[audit$in_model, names(mf), drop = FALSE]
+
+stopifnot(
+  nrow(audit_mf) == nrow(mf),
+  all(vapply(
+    names(mf),
+    function(v) {
+      isTRUE(all.equal(
+        audit_mf[[v]],
+        mf[[v]],
+        check.attributes = FALSE
+      ))
+    },
+    logical(1)
+  ))
+)
+
+# Individual policy responses, not the prisonhelp average
+help_mat <- as.matrix(audit[, help_items, drop = FALSE])
+
+# Check the expected coding
+stopifnot(
+  is.numeric(help_mat),
+  all(is.na(help_mat) | help_mat %in% c(1, 2, 2.5, 3, 4))
+)
+
+audit$n_help_answered <- rowSums(!is.na(help_mat))
+audit$n_help_dk <- rowSums(help_mat == 2.5, na.rm = TRUE)
+
+# Compare actual DK use within the regression sample
+audit %>%
+  dplyr::filter(in_model) %>%
+  dplyr::group_by(impact) %>%
+  dplyr::summarise(
+    n = dplyr::n(),
+    fewer_than_four_answers = sum(n_help_answered < 4),
+    any_dk_n = sum(n_help_dk > 0),
+    any_dk_pct = 100 * mean(n_help_dk > 0),
+    all_four_dk_n = sum(n_help_dk == 4),
+    midpoint_with_four_answers_and_no_dk = sum(
+      prisonhelp == 2.5 &
+        n_help_answered == 4 &
+        n_help_dk == 0
+    ),
+    .groups = "drop"
+  )
+
+# Decompose the midpoint respondents by their actual response pattern
+audit %>%
+  dplyr::filter(in_model, prisonhelp == 2.5) %>%
+  dplyr::count(impact, n_help_answered, n_help_dk)
 ```
 
 
@@ -1905,21 +1904,347 @@ for (i in seq_along(appendix_punish_chunks)) {
 
 # ------------------------------------------------------------
 # ------------------------------------------------------------
+
 # Analysis with IDKs Excluded
+
 # ------------------------------------------------------------
 # ------------------------------------------------------------
 
 
 ```{r}
 
-sample <- sample %>%
+dk_2_vars <- c(
+  "post_felony_vote_rev",
+  "jail_access_rev"
+)
+
+dk_2.5_policy_vars <- setdiff(
+  policy_vars,
+  dk_2_vars
+)
+
+sample_no_dk <- sample %>%
   mutate(
-    dpen_no_idk
+    
+    # Policy variables where DK = 2.5
+    across(
+      all_of(dk_2.5_policy_vars),
+      ~ na_if(.x, 2.5)
+    ),
+    
+    # Policy variables where DK = 2
+    across(
+      all_of(dk_2_vars),
+      ~ na_if(.x, 2)
+    ),
+    
+    # Police variables where DK = 2.5
+    across(
+      all_of(police_items),
+      ~ na_if(.x, 2.5)
+    )
   )
 
 
+table(sample_no_dk$min_wage)
+
+names(sample_no_dk)
+
+hist(sample_no_dk$prisonhelp)
+
+```
+
+## 1. Define model-wave order and display labels
+
+
+```{r}
+
+wave_order <- c(
+  "nocontrol",
+  "demo",
+  "party_ideo",
+  "full_attitudes"
+)
+
+wave_labels <- c(
+  nocontrol = "No controls",
+  demo = "Demographics",
+  party_ideo = "+ Party/Ideology",
+  full_attitudes = "+ Attitudes"
+)
+
+# DV labels already defined in variable_labels_sept1.R through policy_map
+policy_labels <- setNames(
+  policy_map$label,
+  policy_map$var
+)
+
+# Sanity check: all four desired waves should exist
+missing_waves <- setdiff(wave_order, names(policy_dummies_waves))
+
+if (length(missing_waves) > 0) {
+  stop(
+    "These model waves are missing from policy_dummies_waves: ",
+    paste(missing_waves, collapse = ", ")
+  )
+}
+
+```
+
+```{r}
+# ------------------------------------------------------------
+# 2. Helpers for extracting and formatting one focal estimate
+# ------------------------------------------------------------
+
+p_to_stars <- function(p) {
+  dplyr::case_when(
+    is.na(p) ~ "",
+    p < .001 ~ "***",
+    p < .01  ~ "**",
+    p < .05  ~ "*",
+    TRUE     ~ ""
+  )
+}
+
+fmt_num <- function(x, digits = 3) {
+  ifelse(
+    is.na(x),
+    "",
+    sprintf(paste0("%.", digits, "f"), x)
+  )
+}
+
+
+extract_policy_wave_stats <- function(
+    dv_name,
+    iv_name,
+    wave_name,
+    model_waves = policy_dummies_waves,
+    robust = TRUE
+) {
+
+  # Model names follow the naming system created in your main loop:
+  # e.g. m_prisonhelp_incarc
+  model_name <- paste0("m_", dv_name, "_", iv_name)
+
+  # Check that requested wave exists
+  if (!wave_name %in% names(model_waves)) {
+    stop("Wave not found: ", wave_name)
+  }
+
+  # Pull that wave's model list
+  model_list <- model_waves[[wave_name]]
+
+  # Check that requested model exists
+  if (!model_name %in% names(model_list)) {
+    stop(
+      "Model not found in wave '",
+      wave_name,
+      "': ",
+      model_name
+    )
+  }
+
+  # Pull the actual lm object
+  mod <- model_list[[model_name]]
+
+  # Extract coefficient information
+  if (robust) {
+
+    ct <- lmtest::coeftest(
+      mod,
+      vcov. = sandwich::vcovHC(mod, type = "HC1")
+    )
+
+    coef_table <- data.frame(
+      term = rownames(ct),
+      estimate = ct[, 1],
+      std.error = ct[, 2],
+      p.value = ct[, 4],
+      row.names = NULL
+    )
+
+  } else {
+
+    sm <- summary(mod)$coefficients
+
+    coef_table <- data.frame(
+      term = rownames(sm),
+      estimate = sm[, 1],
+      std.error = sm[, 2],
+      p.value = sm[, 4],
+      row.names = NULL
+    )
+  }
+
+  # The focal coefficient should have the same name as the IV:
+  # impact, incarc, knowincarc, or vict
+  if (!iv_name %in% coef_table$term) {
+    stop(
+      "Term '",
+      iv_name,
+      "' not found in model ",
+      model_name
+    )
+  }
+
+  focal_row <- coef_table[
+    coef_table$term == iv_name,
+  ]
+
+  # Return one tidy row
+  tibble::tibble(
+    dv = dv_name,
+    dv_label = policy_labels[[dv_name]],
+    iv = iv_name,
+    iv_label = impact_labels[[iv_name]],
+    wave = wave_name,
+    wave_label = wave_labels[[wave_name]],
+    estimate = focal_row$estimate,
+    std.error = focal_row$std.error,
+    p.value = focal_row$p.value,
+    n = stats::nobs(mod),
+    r2 = summary(mod)$r.squared
+  )
+}
+```
+
+```{r}
+# ------------------------------------------------------------
+# 3. Gather all four IVs x all four waves for one DV
+# ------------------------------------------------------------
+
+make_wave_results_long <- function(
+    dv_name,
+    model_waves = policy_dummies_waves,
+    row_vars = impact_vars,
+    waves = wave_order,
+    robust = TRUE
+) {
+
+  # Confirm requested DV belongs to current policy outcome set
+  if (!dv_name %in% policy_vars) {
+    stop(
+      "DV not found in policy_vars: ",
+      dv_name
+    )
+  }
+
+  rows <- lapply(row_vars, function(iv_name) {
+
+    wave_rows <- lapply(waves, function(wave_name) {
+
+      extract_policy_wave_stats(
+        dv_name = dv_name,
+        iv_name = iv_name,
+        wave_name = wave_name,
+        model_waves = model_waves,
+        robust = robust
+      )
+    })
+
+    dplyr::bind_rows(wave_rows)
+  })
+
+  dplyr::bind_rows(rows) %>%
+    dplyr::mutate(
+      iv = factor(
+        iv,
+        levels = row_vars
+      ),
+      wave = factor(
+        wave,
+        levels = waves
+      )
+    )
+}
 ```
 
 
+```{r}
+# ------------------------------------------------------------
+# 4. Build one wide inspection table for one DV
+# ------------------------------------------------------------
 
+make_wave_results_table <- function(
+    dv_name,
+    model_waves = policy_dummies_waves,
+    row_vars = impact_vars,
+    waves = wave_order,
+    robust = TRUE
+) {
+
+  results_long <- make_wave_results_long(
+    dv_name = dv_name,
+    model_waves = model_waves,
+    row_vars = row_vars,
+    waves = waves,
+    robust = robust
+  ) %>%
+    dplyr::mutate(
+
+      # What will eventually appear in each LaTeX table cell
+      result = paste0(
+        fmt_num(estimate, 3),
+        p_to_stars(p.value),
+        " (",
+        fmt_num(std.error, 3),
+        ")"
+      ),
+
+      # Preserve desired display order
+      iv_label = factor(
+        iv_label,
+        levels = unname(impact_labels[row_vars])
+      ),
+
+      wave_label = factor(
+        wave_label,
+        levels = unname(wave_labels[waves])
+      )
+    )
+
+  results_wide <- results_long %>%
+    dplyr::select(
+      iv_label,
+      wave_label,
+      result
+    ) %>%
+    tidyr::pivot_wider(
+      names_from = wave_label,
+      values_from = result
+    ) %>%
+    dplyr::arrange(iv_label) %>%
+    dplyr::rename(
+      `Carceral contact` = iv_label
+    )
+
+  results_wide
+}
+```
+
+## Model outputs for 2.5s excluded
+
+```{r}
+# Show the four wave names
+names(policy_dummies_waves)
+
+# Show every model stored in a given wave name (for ex, full-attitudes wave)
+names(policy_dummies_full_models)
+# Demographics + party/ideology + FIRE + core deservingness
+
+
+# No controls
+summary(policy_dummies_models[["m_prisonhelp_incarc"]])
+
+# Demographic controls
+summary(policy_dummies_demo_models[["m_prisonhelp_incarc"]])
+
+# Demographics + party/ideology
+summary(policy_dummies_partyideo_models[["m_prisonhelp_incarc"]])
+
+summary(policy_dummies_full_models[["m_prisonhelp_incarc"]])
+
+
+```
 

@@ -412,6 +412,17 @@ vars_to_drop <- c(
 
 ```
 
+Backup pre-drop
+```{r}
+
+data_full_undropped <- data_full
+
+write_csv(data_full_undropped, "data/cleaned_control_data_no_drop.csv")
+
+```
+
+
+
 ```{r}
 data_full <- data_full %>%
   select(-any_of(vars_to_drop))

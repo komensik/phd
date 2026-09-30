@@ -243,3 +243,9 @@ all_attitudinal_controls <- c(
   desor_core,
   fire_controls
 )
+
+ration_vars <- c("ration_scripts", "ration_period", "ration_food")
+
+ration_labels <- c(
+  
+)

@@ -57,9 +57,20 @@ Standardize? No -- in my prelim, I write: To ensure that I do not control for a 
 # ------------------------------------------------------------
 
 desor_core_vars <- c(
-  "d_welfare_tanf_abc","d_fstamps_snap_abc","d_medicaid_abc","d_medicare_abc",
-  "d_unemployed_abc","d_poorfam_abc","d_homeless_abc","d_immigrants_abc","d_unauth_undoc_abc"
+  "d_welfare_tanf_abc",
+  "d_fstamps_snap_abc",
+  "d_medicaid_abc",
+  "d_medicare_abc",
+  "d_unemployed_abc",
+  "d_poorfam_abc",
+  "d_homeless_abc",
+  "d_immigrants_abc"
 )
+# took "d_unauth_undoc_abc" out because sub 5 corr.
+
+# desor_rulebreak <- c(
+#   
+# )
 
 #no -99s, are all numeric
 
@@ -69,7 +80,7 @@ desor_core_vars <- c(
 
 # Item-only data
 core_mat <- raw_data_cleaned %>%
-  select(all_of(desor_core_vars))
+  dplyr::select(all_of(desor_core_vars))
 
 #names(raw_data_cleaned)
 # Number of observed items per respondent
@@ -237,7 +248,7 @@ Takeaway: prison pen, prison pen 1 = dpen, prison pen 5 = lwop now -confirmed th
 ```{r}
 
 pen_data <- raw_data_cleaned %>%
-  select(all_of(pen_vars))
+  dplyr::select(all_of(pen_vars))
 
 
 cor(pen_data,
@@ -287,7 +298,7 @@ Interpretation
 # ------------------------------------------------------------
 
 pen_data <- raw_data_cleaned %>%
-  select(all_of(pen_vars)) %>%
+  dplyr::select(all_of(pen_vars)) %>%
   pivot_longer(
     cols = everything(),
     names_to = "item",
@@ -445,7 +456,7 @@ library(ggplot2)
 
 
 q25_long <- raw_data_cleaned %>%
-  select(all_of(q25_help_vars)) %>%
+  dplyr::select(all_of(q25_help_vars)) %>%
   pivot_longer(
     cols = everything(),
     names_to = "item",
@@ -487,7 +498,7 @@ ggplot(q25_long, aes(x = response)) +
 
 # Create plotting data
 q25_plot_data <- raw_data_cleaned %>%
-  select(
+  dplyr::select(
     min_wage,
     free_calls,
     ed_funds,
@@ -583,7 +594,7 @@ q25_barplot
 ```{r}
 
 q25_help_data <- raw_data_cleaned %>%
-  select(all_of(q25_help_vars))
+  dplyr::select(all_of(q25_help_vars))
 
 cor(q25_help_data,
     use = "pairwise.complete.obs")
@@ -599,7 +610,7 @@ cor(q25_help_data, use = "pairwise.complete.obs")
 psych::alpha(q25_help_data, check.keys = FALSE)
 
 q25_help_data <- raw_data_cleaned %>%
-  select(all_of(q25_help_vars))
+  dplyr::select(all_of(q25_help_vars))
 
 cor(q25_help_data,
     use = "pairwise.complete.obs")
@@ -715,7 +726,7 @@ What's up
 
 # Create plotting data
 incarc_electoral_data <- raw_data_cleaned %>%
-  select(
+  dplyr::select(
     post_felony_vote_rev,
     jail_access_rev
   ) %>%
@@ -805,7 +816,7 @@ incarc_electoral_barplot
 ```{r}
 
 incarc_electoral_data <- raw_data_cleaned %>%
-  select(all_of(incarc_electoral_vars))
+  dplyr::select(all_of(incarc_electoral_vars))
 
 cor(incarc_electoral_data,
     use = "pairwise.complete.obs")
@@ -837,7 +848,7 @@ all_help_items <- c(
 
 #df for the six total vars
 all_help_data <- raw_data_cleaned %>%
-  select(all_of(all_help_items))
+  dplyr::select(all_of(all_help_items))
 
 # now, pairwise corrs
 #View(round(
@@ -881,7 +892,7 @@ combined_items <- c(
 
 
 combined_data <- raw_data_cleaned %>%
-  select(all_of(combined_items))
+  dplyr::select(all_of(combined_items))
 
 # Pairwise correlations
 # View(round(
