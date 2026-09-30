@@ -68,7 +68,7 @@ sample <- read_csv("data/cleaned_control_data.csv")
 
 not_full <- read_csv("data/cleaned_sans_control_data.csv")
 
-
+names(sample)
 ```
 
 
@@ -1268,10 +1268,11 @@ help_nums_by_impact <- sample %>%
     impact = sum(impact, na.rm = TRUE),
     noimpact = sum(noimpact, na.rm = TRUE)
   )
-#print(help_nums_by_impact, n = 23)
+
+print(help_nums_by_impact, n = 23)
 ```
 
-Uncertainty across help vars
+Uncertainty across help vars -- all impact
 ```{r}
 m <- m_prisonhelp_impact_verify
 mf <- model.frame(m)
@@ -1334,7 +1335,7 @@ audit$n_help_answered <- rowSums(!is.na(help_mat))
 audit$n_help_dk <- rowSums(help_mat == 2.5, na.rm = TRUE)
 
 # Compare actual DK use within the regression sample
-audit %>%
+print(audit %>%
   dplyr::filter(in_model) %>%
   dplyr::group_by(impact) %>%
   dplyr::summarise(
@@ -1349,36 +1350,13 @@ audit %>%
         n_help_dk == 0
     ),
     .groups = "drop"
-  )
+  ))
 
 # Decompose the midpoint respondents by their actual response pattern
-audit %>%
+print(audit %>%
   dplyr::filter(in_model, prisonhelp == 2.5) %>%
-  dplyr::count(impact, n_help_answered, n_help_dk)
+  dplyr::count(impact, n_help_answered, n_help_dk))
 ```
-
-
-# ------------------------------------------------------------
-# What about when we make controls our outcome variables
-# ------------------------------------------------------------
-
-```{r}
-# 
-# hist(sample$fire_rare)
-# 
-# m_fire_fear <- lm(fire_rare ~ incarc + Black + Hisp_Latino + pid_3 + AllOthers, data = sample)
-# 
-# summary(m_fire_fear)
-# 
-# sample %>%
-#   group_by(fire_rare) %>%
-#   summarise(
-#     n = n(),
-#     White = sum(White)
-#   )
-
-```
-
 
 
 
