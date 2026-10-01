@@ -83,7 +83,7 @@ policy_analysis_vars <- c(
   race_vars,
   demo_controls,
   party_ideo_controls,
-  desore_core_vars,
+  desor_core_vars,
   fire_controls,
   ration_vars,
   experience_buffet,
