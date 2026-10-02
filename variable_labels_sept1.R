@@ -25,6 +25,13 @@ policy_vars <- c("prisonhelp",
   "dpen_rev", "lwop_rev" 
 )
 
+punish_vars <- c("dpen_rev", "lwop_rev")
+
+incar_vote_vars <- c(
+  "post_felony_vote_rev",
+  "jail_access_rev"
+)
+
 policy_map <- tibble::tribble(
   ~var,          ~label,                                              ~section,
   "prisonhelp", "Help-oriented CJ policy index",                  "Help",

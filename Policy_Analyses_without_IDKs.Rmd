@@ -1,0 +1,1710 @@
+---
+title: "Policy Analyses without IDKs"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+
+knitr::opts_chunk$set(
+  echo = FALSE,       # Hide code by default
+  warning = FALSE,
+  message = FALSE
+)
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)   # for clean_names()
+library(tibble)
+library(stringr)
+library(haven)
+library(gt)
+library(marginaleffects)
+library(mediation)
+library(naniar)
+library(rsq)
+library(patchwork)
+library(modelsummary)
+library(rlang)
+library(forcats)
+library(ggplot2)
+library(broom)
+library(knitr)
+library(dplyr)
+library(purrr)
+library(lmtest)
+library(sandwich)
+
+source("variable_labels_sept1.R")
+
+```
+
+Note on samples --
+
+This uses sample_all-> sample -> sample_dk -> sample_no_dk
+
+In Sample, as in prev analyses policy variables have "don't know/no answer" coded as a middle value (2.5 or 2).
+
+Sample_dk has new ambivalence DK variables (ie dk_free_calls) indicate whether a respondent gave a policy "dunno."
+- Can use this for analysis of ambivalence, or can use below
+
+sample_no_dk changes the policy variables so that "dunno" is now an NA. It also has the IDk indicator variables. 
+- This (use for analysis of preferences) asks preferences after DK responses have been treated as missing.
+
+# I. Setup
+
+```{r}
+# load data
+sample_all <- read_csv("data/cleaned_control_data.csv")
+
+not_full <- read_csv("data/cleaned_sans_control_data.csv")
+
+# drop variables not working with, keep variables working with 
+## Some variables were dropped in Data_Junction.rmd
+## See variable_labels_sept1
+
+
+more_needed_vars <- unique(c( ##variables I need that are n
+  "state",
+  "county"
+))
+
+policy_analysis_vars <- c(
+  impact_vars, 
+  q25_help_vars,
+  policy_vars,
+  police_items,
+  deserving_vars,
+  political_behavior_vars,
+  race_vars,
+  demo_controls,
+  party_ideo_controls,
+  desor_core_vars,
+  fire_controls,
+  ration_vars,
+  experience_buffet,
+  
+  more_needed_vars
+)
+
+
+sample <- sample_all %>%
+  dplyr::select(any_of(policy_analysis_vars))
+
+
+# Vars where DK is coded 2.5
+q25_help_vars <- c("min_wage", "free_calls","ed_funds","alt_sentencing")
+
+punish_vars <- c("dpen_rev", "lwop_rev")
+
+# Combine
+dk_2.5_policy_vars <- c(
+  q25_help_vars,
+  punish_vars
+)
+
+
+# Variables where DK is coded 2
+incar_vote_vars <- c(
+  "post_felony_vote_rev",
+  "jail_access_rev"
+)
+
+
+# All policy variables we want to examine
+all_policy_vars <- c(
+  q25_help_vars,
+  punish_vars,
+  incar_vote_vars
+)
+
+
+```
+
+Confirm Counts
+
+```{r}
+table(sample$impact)
+
+sample %>%
+  group_by(impact) %>%
+  summarise(
+    n = n(),
+    incarc = sum(incarc, na.rm = TRUE),
+    knowincarc = sum(knowincarc, na.rm = TRUE),
+    vict = sum(vict, na.rm = TRUE),
+  )
+
+# Confirm the comparison-group coding
+table(sample$impact, sample$incarc, useNA = "ifany")
+table(sample$impact, sample$knowincarc, useNA = "ifany")
+table(sample$impact, sample$vict, useNA = "ifany")
+```
+
+## A. New DK Variables
+
+One binary DK variable for each policy item
+
+```{r}
+# ------------------------------------------------------------
+# Item-level DK indicators
+# ------------------------------------------------------------
+
+sample_dk <- sample %>%
+  mutate(
+    
+    # DK = 2 for incarceration/voting items
+    across(
+      all_of(incar_vote_vars),
+      ~ case_when(
+        .x == 2 ~ 1L,          # DK
+        !is.na(.x) ~ 0L,       # answered, but not DK
+        TRUE ~ NA_integer_     # did not answer
+      ),
+      .names = "dk_{.col}"
+    ),
+    
+    # DK = 2.5 for help + punishment items
+    across(
+      all_of(dk_2.5_policy_vars),
+      ~ case_when(
+        .x == 2.5 ~ 1L,        # DK
+        !is.na(.x) ~ 0L,       # answered, but not DK
+        TRUE ~ NA_integer_     # did not answer
+      ),
+      .names = "dk_{.col}"
+    )
+  )
+
+
+#look at min wage:
+
+table(
+  sample_dk$dk_min_wage,
+  useNA = "ifany" #should use usena if any
+)
+
+```
+
+Create group DKs to match how the vars are grouped
+
+```{r}
+# ------------------------------------------------------------
+# Names the new DK indicator variables
+# ------------------------------------------------------------
+
+dk_incar_vote_vars <- paste0(
+  "dk_",
+  incar_vote_vars
+)
+
+dk_q25_help_vars <- paste0(
+  "dk_",
+  q25_help_vars
+)
+
+dk_punish_vars <- paste0(
+  "dk_",
+  punish_vars
+)
+
+dk_all_vars <- c(
+  dk_incar_vote_vars,
+  dk_q25_help_vars,
+  dk_punish_vars
+)
+```
+
+Create total DK counts for each respondent
+
+```{r}
+# ------------------------------------------------------------
+# Respondent-level DK totals
+# ------------------------------------------------------------
+
+sample_dk <- sample_dk %>%
+  mutate(
+    
+    # --------------------------------
+    # Number of DK responses
+    # --------------------------------
+    
+    dk_total_all =
+      rowSums(
+        pick(all_of(dk_all_vars)),
+        na.rm = TRUE
+      ),
+    
+    dk_total_incar_vote =
+      rowSums(
+        pick(all_of(dk_incar_vote_vars)),
+        na.rm = TRUE
+      ),
+    
+    dk_total_q25_help =
+      rowSums(
+        pick(all_of(dk_q25_help_vars)),
+        na.rm = TRUE
+      ),
+    
+    dk_total_punish =
+      rowSums(
+        pick(all_of(dk_punish_vars)),
+        na.rm = TRUE
+      ),
+    
+    
+    # --------------------------------
+    # Number of items actually answered
+    # --------------------------------
+    
+    dk_answered_all =
+      rowSums(
+        !is.na(pick(all_of(dk_all_vars)))
+      ),
+    
+    dk_answered_incar_vote =
+      rowSums(
+        !is.na(pick(all_of(dk_incar_vote_vars)))
+      ),
+    
+    dk_answered_q25_help =
+      rowSums(
+        !is.na(pick(all_of(dk_q25_help_vars)))
+      ),
+    
+    dk_answered_punish =
+      rowSums(
+        !is.na(pick(all_of(dk_punish_vars)))
+      )
+  )
+
+```
+
+Respondents might not have the same number of observed answers.
+
+Proportions of answered items that were DK
+
+```{r}
+
+sample_dk <- sample_dk %>%
+  mutate(
+    
+    dk_prop_all = if_else(
+      dk_answered_all > 0,
+      dk_total_all / dk_answered_all,
+      NA_real_
+    ),
+    
+    dk_prop_incar_vote = if_else(
+      dk_answered_incar_vote > 0,
+      dk_total_incar_vote / dk_answered_incar_vote,
+      NA_real_
+    ),
+    
+    dk_prop_q25_help = if_else(
+      dk_answered_q25_help > 0,
+      dk_total_q25_help / dk_answered_q25_help,
+      NA_real_
+    ),
+    
+    dk_prop_punish = if_else(
+      dk_answered_punish > 0,
+      dk_total_punish / dk_answered_punish,
+      NA_real_
+    )
+  )
+
+```
+
+## B. Edit Sample 
+
+### "sample_no_idk"
+- has dk_policy indicator variables 
+- IDK responses now remove from policy vars themselves by converting to NA
+
+```{r}
+sample_no_dk <- sample_dk %>%
+  mutate(
+    
+    # Incarceration/voting variables: DK = 2
+    across(
+      all_of(incar_vote_vars),
+      ~ na_if(.x, 2)
+    ),
+    
+    # Help + punishment variables: DK = 2.5
+    across(
+      all_of(dk_2.5_policy_vars),
+      ~ na_if(.x, 2.5)
+    ),
+    
+    # Police variables
+    across(
+      all_of(police_items),
+      ~ na_if(.x, 2.5)
+    )
+  )
+
+View(sample_no_dk)
+
+```
+
+## C. Counts code (revise if needed)
+
+```{r}
+# ------------------------------------------------------------
+# Count DK responses overall and by impact status
+# ------------------------------------------------------------
+
+dk_policy_summary <- sample %>%
+  
+  # Put policy items into long format
+  pivot_longer(
+    cols = all_of(all_policy_vars),
+    names_to = "policy",
+    values_to = "response"
+  ) %>%
+  
+  # Identify whether each response is DK
+  mutate(
+    is_dk = case_when(
+      policy %in% incar_vote_vars ~ response == 2,
+      policy %in% dk_2.5_policy_vars ~ response == 2.5,
+      TRUE ~ FALSE
+    )
+  ) %>%
+  
+  group_by(policy) %>%
+  
+  summarise(
+    
+    # Total number of DK responses
+    total_dk = sum(is_dk, na.rm = TRUE),
+    
+    # Number of DK responses from each group
+    incarc_dk = sum(is_dk & incarc == 1, na.rm = TRUE),
+    knowincarc_dk = sum(is_dk & knowincarc == 1, na.rm = TRUE),
+    vict_dk = sum(is_dk & vict == 1, na.rm = TRUE),
+    impact_dk = sum(is_dk & impact == 1, na.rm = TRUE),
+    
+    .groups = "drop"
+  ) %>%
+  
+  # Calculate each group's share of all DK responses
+  mutate(
+    incarc_pct = if_else(
+      total_dk > 0,
+      100 * incarc_dk / total_dk,
+      NA_real_
+    ),
+    
+    knowincarc_pct = if_else(
+      total_dk > 0,
+      100 * knowincarc_dk / total_dk,
+      NA_real_
+    ),
+    
+    vict_pct = if_else(
+      total_dk > 0,
+      100 * vict_dk / total_dk,
+      NA_real_
+    ),
+    
+    impact_pct = if_else(
+      total_dk > 0,
+      100 * impact_dk / total_dk,
+      NA_real_
+    )
+  ) %>%
+  
+  # Optional: make percentages easier to read
+  mutate(
+    across(
+      ends_with("_pct"),
+      ~ round(.x, 2)
+    )
+  )
+
+dk_policy_summary
+
+```
+
+```{r}
+
+# Group sizes in the original sample
+group_totals <- sample %>%
+  summarise(
+    incarc_total = sum(incarc == 1, na.rm = TRUE),
+    knowincarc_total = sum(knowincarc == 1, na.rm = TRUE),
+    vict_total = sum(vict == 1, na.rm = TRUE),
+    impact_total = sum(impact == 1, na.rm = TRUE)
+  )
+
+
+dk_policy_summary <- dk_policy_summary %>%
+  mutate(
+    incarc_dk_rate =
+      100 * incarc_dk / group_totals$incarc_total,
+    
+    knowincarc_dk_rate =
+      100 * knowincarc_dk / group_totals$knowincarc_total,
+    
+    vict_dk_rate =
+      100 * vict_dk / group_totals$vict_total,
+    
+    impact_dk_rate =
+      100 * impact_dk / group_totals$impact_total
+  ) %>%
+  mutate(
+    across(
+      ends_with("_rate"),
+      ~ round(.x, 2)
+    )
+  )
+
+dk_policy_summary
+```
+
+# II. Analysis: Preferences
+
+
+
+## A. Name waves
+
+Each wave is controls, so first group controls (tho these should
+already/eventually be clear in variable labels R file)
+
+```{r}
+demo_controls <- c(
+  "Black", "Hisp_Latino", "AllOthers", "gender"
+)
+
+demo_controls_labels <- c(
+  Black = "Black",
+  Hisp_Latino    = "Hispanic/Latino", 
+  AllOthers = "Other RID",
+  gender = "Men"
+)
+
+party_ideo_controls <- c(
+  "Republican",
+  "Democrat",
+  "fiscal_ideology",
+  "social_ideology"
+)
+
+party_ideo_controls_labels <- c(
+  # pid_3 = "Party ID",
+  Republican = "Republican",
+  Democrat = "Democrat",
+  fiscal_ideology = "Fiscal ideology",
+  social_ideology = "Social ideology"
+)
+
+fire_controls <- c(
+  "fire_rare",
+  "fire_privilege",
+  "fire_angry",
+  "fire_fear"
+)
+
+fire_controls_labels <- c(
+  fire_rare = "Racism rare",
+  fire_privilege = "White privilege",
+  fire_angry = "Angry about racism",
+  fire_fear = "Fear other races"
+)
+
+control_waves <- list(
+  nocontrol = character(0),
+  demo = demo_controls,
+  party_ideo = c(demo_controls, party_ideo_controls),
+  full_attitudes = c(demo_controls, party_ideo_controls,
+                     fire_controls)
+)
+
+# , desor_core
+
+
+```
+
+```{r}
+
+wave_order <- c(
+  "nocontrol",
+  "demo",
+  "party_ideo",
+  "full_attitudes"
+)
+
+wave_labels <- c(
+  nocontrol = "No controls",
+  demo = "Demographics",
+  party_ideo = "+ Party/Ideology",
+  full_attitudes = "+ Attitudes"
+)
+
+# DV labels already defined in variable_labels_sept1.R through policy_map
+policy_labels <- setNames(
+  policy_map$label,
+  policy_map$var
+)
+
+```
+
+## B. Define model
+
+The waves are waves of a model. So now define that model:
+
+"whenever (later) I give this function a dataset (df), a dependent
+variable (dv), an independent variable (iv), and some controls
+(controls), R should:
+
+(a) start with a default of assuming there are no controls, if no
+    controls are given (character (0));
+(b) in the right-hand side (rhs) or the equation, use the supplied iv
+    and supplied controls to make a vector with all vraibles that should
+    appear to the right of \~
+(c) (fml) construct an ordinary regression syntax with the supplied dv
+    on the left of \~, then supplied rhs info and turn it into a signle
+    string (collapse = "+"), and
+(d) treat this as a statistical formula rather than a string
+    (as.formula())
+(e) run the regression
+
+```{r}
+
+make_policy_model <- function(df, dv, iv, controls = character(0)) { #character(0) just means empty character vector so this function works for uncontrolled model then for controlled model
+  rhs <- c(iv, controls)
+  fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
+  lm(fml, data = df)
+}
+
+
+```
+
+Create bucket to store things (policy_dummies_waves)
+
+```{r}
+# When I run the models it will produce stuff, so first I need to create buckets to put the models: 
+policy_dummies_waves <- list() #this is actually now main model generating loop
+
+```
+
+Created bucket to store things (policy_dummies_waves), and created the
+basic model structure (make_policy_model), now explain how to fill
+bucket.
+
+How to fill the things: with waves of models that loop through the DVs
+and iteratively add controls for each DV, generating 4 substantive
+comparisons right now: 1. impact versus non impact 2. incarc versus non
+impact 3. knowincarc versus non impact 4. victimized vs non impact
+
+```{r}
+
+# Now I am saying how I will fill the buckets: 
+
+for (wave_name in names(control_waves)) {#calls list of waves in control waves
+
+  model_list <- list() #fresh model list within each wave
+
+  for (dv in policy_vars) {
+    for (iv in impact_vars) { #loop thru dvs, ivs, labels file gives the 4 ivs; fits 4 models for each outcome
+
+      model_name <- paste0("m_", dv, "_", iv) #ie model using prisonhelp and incarc will be named m_prisonhelp_incarc
+
+      # NOW, actually telling it to run and store the regressions
+      model_list[[model_name]] <- make_policy_model(
+        df = sample_no_dk,
+        dv = dv, 
+        iv = iv,
+        controls = control_waves[[wave_name]]
+      )
+    }
+  }
+
+  policy_dummies_waves[[wave_name]] <- model_list
+}
+
+```
+
+This should have made something like:
+
+policy_dummies_waves \| \|-- nocontrol \| \|-- m_prisonhelp_impact \|
+\|-- m_prisonhelp_incarc \| \|-- m_prisonhelp_knowincarc \| \|--
+m_prisonhelp_vict \| \|-- ... \| \|-- demo \| \|-- m_prisonhelp_impact
+\| \|-- m_prisonhelp_incarc \| \|-- ... \| \|-- party_ideo \| \|--
+full_attitudes
+
+It is helpful to not need to type out the full
+(policy_dummies_waves[["nocontrol"]][["m_prisonhelp_incarc"]]).
+
+Making shortcuts/names
+
+```{r}
+
+policy_dummies_models <- policy_dummies_waves[["nocontrol"]]
+
+policy_dummies_demo_models <- policy_dummies_waves[["demo"]]
+
+policy_dummies_partyideo_models <- policy_dummies_waves[["party_ideo"]]
+
+policy_dummies_full_models <- policy_dummies_waves[["full_attitudes"]]
+
+```
+
+For example "policy_dummies_full_models" shows the list of models with
+all controls included
+
+```{r}
+
+names(policy_dummies_full_models)
+
+
+```
+
+## C. Run the models?
+
+```{r}
+
+# ------------------------------------------------------------
+# 2. Helpers for extracting and formatting one focal estimate
+# ------------------------------------------------------------
+
+p_to_stars <- function(p) {
+  dplyr::case_when(
+    is.na(p) ~ "",
+    p < .001 ~ "***",
+    p < .01  ~ "**",
+    p < .05  ~ "*",
+    TRUE     ~ ""
+  )
+}
+
+fmt_num <- function(x, digits = 3) {
+  ifelse(
+    is.na(x),
+    "",
+    sprintf(paste0("%.", digits, "f"), x)
+  )
+}
+
+
+extract_policy_wave_stats <- function(
+    dv_name,
+    iv_name,
+    wave_name,
+    model_waves = policy_dummies_waves,
+    robust = TRUE
+) {
+
+  # Model names follow the naming system created in your main loop:
+  # e.g. m_prisonhelp_incarc
+  model_name <- paste0("m_", dv_name, "_", iv_name)
+
+  # Check that requested wave exists
+  if (!wave_name %in% names(model_waves)) {
+    stop("Wave not found: ", wave_name)
+  }
+
+  # Pull that wave's model list
+  model_list <- model_waves[[wave_name]]
+
+  # Check that requested model exists
+  if (!model_name %in% names(model_list)) {
+    stop(
+      "Model not found in wave '",
+      wave_name,
+      "': ",
+      model_name
+    )
+  }
+
+  # Pull the actual lm object
+  mod <- model_list[[model_name]]
+
+  # Extract coefficient information
+  if (robust) {
+
+    ct <- lmtest::coeftest(
+      mod,
+      vcov. = sandwich::vcovHC(mod, type = "HC1")
+    )
+
+    coef_table <- data.frame(
+      term = rownames(ct),
+      estimate = ct[, 1],
+      std.error = ct[, 2],
+      p.value = ct[, 4],
+      row.names = NULL
+    )
+
+  } else {
+
+    sm <- summary(mod)$coefficients
+
+    coef_table <- data.frame(
+      term = rownames(sm),
+      estimate = sm[, 1],
+      std.error = sm[, 2],
+      p.value = sm[, 4],
+      row.names = NULL
+    )
+  }
+
+  # The focal coefficient should have the same name as the IV:
+  # impact, incarc, knowincarc, or vict
+  if (!iv_name %in% coef_table$term) {
+    stop(
+      "Term '",
+      iv_name,
+      "' not found in model ",
+      model_name
+    )
+  }
+
+  focal_row <- coef_table[
+    coef_table$term == iv_name,
+  ]
+
+  # Return one tidy row
+  tibble::tibble(
+    dv = dv_name,
+    dv_label = policy_labels[[dv_name]],
+    iv = iv_name,
+    iv_label = impact_labels[[iv_name]],
+    wave = wave_name,
+    wave_label = wave_labels[[wave_name]],
+    estimate = focal_row$estimate,
+    std.error = focal_row$std.error,
+    p.value = focal_row$p.value,
+    n = stats::nobs(mod),
+    r2 = summary(mod)$r.squared
+  )
+}
+
+```
+
+```{r}
+# ------------------------------------------------------------
+# 3. Gather all four IVs x all four waves for one DV
+# ------------------------------------------------------------
+
+make_wave_results_long <- function(
+    dv_name,
+    model_waves = policy_dummies_waves,
+    row_vars = impact_vars,
+    waves = wave_order,
+    robust = TRUE
+) {
+
+  # Confirm requested DV belongs to current policy outcome set
+  if (!dv_name %in% policy_vars) {
+    stop(
+      "DV not found in policy_vars: ",
+      dv_name
+    )
+  }
+
+  rows <- lapply(row_vars, function(iv_name) {
+
+    wave_rows <- lapply(waves, function(wave_name) {
+
+      extract_policy_wave_stats(
+        dv_name = dv_name,
+        iv_name = iv_name,
+        wave_name = wave_name,
+        model_waves = model_waves,
+        robust = robust
+      )
+    })
+
+    dplyr::bind_rows(wave_rows)
+  })
+
+  dplyr::bind_rows(rows) %>%
+    dplyr::mutate(
+      iv = factor(
+        iv,
+        levels = row_vars
+      ),
+      wave = factor(
+        wave,
+        levels = waves
+      )
+    )
+}
+```
+
+```{r}
+# ------------------------------------------------------------
+# 4. Build one wide inspection table for one DV
+# ------------------------------------------------------------
+
+make_wave_results_table <- function(
+    dv_name,
+    model_waves = policy_dummies_waves,
+    row_vars = impact_vars,
+    waves = wave_order,
+    robust = TRUE
+) {
+
+  results_long <- make_wave_results_long(
+    dv_name = dv_name,
+    model_waves = model_waves,
+    row_vars = row_vars,
+    waves = waves,
+    robust = robust
+  ) %>%
+    dplyr::mutate(
+
+      # What will eventually appear in each LaTeX table cell
+      result = paste0(
+        fmt_num(estimate, 3),
+        p_to_stars(p.value),
+        " (",
+        fmt_num(std.error, 3),
+        ")"
+      ),
+
+      # Preserve desired display order
+      iv_label = factor(
+        iv_label,
+        levels = unname(impact_labels[row_vars])
+      ),
+
+      wave_label = factor(
+        wave_label,
+        levels = unname(wave_labels[waves])
+      )
+    )
+
+  results_wide <- results_long %>%
+    dplyr::select(
+      iv_label,
+      wave_label,
+      result
+    ) %>%
+    tidyr::pivot_wider(
+      names_from = wave_label,
+      values_from = result
+    ) %>%
+    dplyr::arrange(iv_label) %>%
+    dplyr::rename(
+      `Carceral contact` = iv_label
+    )
+
+  results_wide
+}
+```
+
+
+
+# Results:
+
+## Model outputs for 2.5s excluded
+
+```{r}
+# Show the four wave names
+names(policy_dummies_waves)
+
+# Show every model stored in a given wave name (for ex, full-attitudes wave)
+names(policy_dummies_full_models)
+# Demographics + party/ideology + FIRE + core deservingness
+
+
+# No controls
+summary(policy_dummies_models[["m_prisonhelp_incarc"]])
+
+# Demographic controls
+summary(policy_dummies_demo_models[["m_prisonhelp_incarc"]])
+
+# Demographics + party/ideology
+summary(policy_dummies_partyideo_models[["m_prisonhelp_incarc"]])
+
+summary(policy_dummies_full_models[["m_prisonhelp_incarc"]])
+
+```
+
+```{r}
+summary(policy_dummies_full_models[["m_min_wage_vict"]])
+```
+
+
+### Voting Variables
+
+```{r}
+summary(policy_dummies_full_models[["m_post_felony_vote_rev_impact"]])
+```
+
+```{r}
+summary(policy_dummies_full_models[["m_jail_access_rev_impact"]])
+```
+
+```{r}
+summary(policy_dummies_full_models[["m_post_felony_vote_rev_vict"]])
+```
+
+```{r}
+summary(policy_dummies_full_models[["m_jail_access_rev_incarc"]])
+```
+
+# Latex 
+
+This assumes that analses steps A, B, and C have already run. This "picks up" from the end of C.
+
+## Per DV, 1 4W Table:
+
+
+```{r}
+# Assumes Steps 1-4 have already run, including:
+#   make_wave_results_long()
+#   fmt_num()
+#   p_to_stars()
+#   wave_order
+#   wave_labels
+#
+# Outcome and comparison labels are already attached by
+# make_wave_results_long(), using policy_labels and impact_labels.
+
+# Step A. Escape plain-text labels for Latex
+
+wave_tex_escape <- function(x) {
+
+  replacements <- c(
+    "\\" = "\\textbackslash{}",
+    "&" = "\\&",
+    "%" = "\\%",
+    "$" = "\\$",
+    "#" = "\\#",
+    "_" = "\\_",
+    "{" = "\\{",
+    "}" = "\\}",
+    "~" = "\\textasciitilde{}",
+    "^" = "\\textasciicircum{}"
+  )
+
+  vapply(as.character(x), function(txt) {
+
+    if (is.na(txt)) {
+      stop("A table label is missing.", call. = FALSE)
+    }
+
+    chars <- strsplit(txt, "", fixed = TRUE)[[1]]
+    positions <- match(chars, names(replacements))
+    replace <- !is.na(positions)
+
+    chars[replace] <- unname(
+      replacements[positions[replace]]
+    )
+
+    paste0(chars, collapse = "")
+
+  }, character(1), USE.NAMES = FALSE)
+}
+
+# Step B. What to print
+
+## for each comparison, print: coefficient with SE underneath, N, R-squared
+
+make_wave_latex_table <- function(
+    dv_name,
+    model_waves = policy_dummies_waves,
+    row_vars = impact_vars,
+    waves = wave_order,
+    robust = TRUE,
+    digits = 3
+) {
+
+  if (length(waves) != 4L || anyDuplicated(waves)) {
+    stop(
+      "Supply four distinct model waves.",
+      call. = FALSE
+    )
+  }
+
+  # Use the checked extraction function from Step 3.
+  # This retains unrounded statistics, N, R2, and existing labels.
+  results <- make_wave_results_long(
+    dv_name = dv_name,
+    model_waves = model_waves,
+    row_vars = row_vars,
+    waves = waves,
+    robust = robust
+  )
+
+  results$iv <- as.character(results$iv)
+  results$wave <- as.character(results$wave)
+
+  # Do not silently export missing or duplicated results.
+  if (
+    nrow(results) != length(row_vars) * length(waves) ||
+    anyDuplicated(results[c("iv", "wave")])
+  ) {
+    stop(
+      "Missing or duplicated model results for: ",
+      dv_name,
+      call. = FALSE
+    )
+  }
+
+  numeric_cols <- c(
+    "estimate", "std.error", "p.value", "n", "r2"
+  )
+
+  if (any(!is.finite(as.matrix(results[numeric_cols])))) {
+    stop(
+      "Non-finite model statistics for: ",
+      dv_name,
+      call. = FALSE
+    )
+  }
+
+  # Use the outcome label already obtained from policy_map.
+  dv_label <- unique(as.character(results$dv_label))
+
+  if (
+    length(dv_label) != 1L ||
+    anyNA(dv_label) ||
+    !nzchar(dv_label)
+  ) {
+    stop(
+      "Check the policy_map label for: ",
+      dv_name,
+      call. = FALSE
+    )
+  }
+
+  # Join cells and add the LaTeX end-of-row marker.
+  tex_row <- function(cells) {
+    paste0(paste(cells, collapse = " & "), " \\\\")
+  }
+
+  body_lines <- character(0)
+
+  # Build one comparison block at a time.
+  for (iv_name in row_vars) {
+
+    block <- results[results$iv == iv_name, ]
+
+    # Put the four results in the specified wave order.
+    block <- block[match(waves, block$wave), ]
+
+    if (anyNA(block$wave)) {
+      stop(
+        "A wave is missing for ",
+        dv_name, " / ", iv_name,
+        call. = FALSE
+      )
+    }
+
+    # Use the comparison label supplied through impact_labels.
+    iv_label <- as.character(block$iv_label[1])
+
+    # Round only for display.
+    # Significance stars use the unrounded p-values.
+    cells <- paste0(
+      "\\makecell[c]{",
+      fmt_num(block$estimate, digits),
+      p_to_stars(block$p.value),
+      " \\\\ (",
+      fmt_num(block$std.error, digits),
+      ")}"
+    )
+
+    body_lines <- c(
+      body_lines,
+
+      # Coefficient and SE row
+      tex_row(c(
+        wave_tex_escape(iv_label),
+        cells
+      )),
+
+      # Sample size for each model in this comparison
+      tex_row(c(
+        "\\quad N",
+        formatC(
+          as.integer(block$n),
+          format = "d",
+          big.mark = ","
+        )
+      )),
+
+      # R-squared for each model in this comparison
+      tex_row(c(
+        "\\quad $R^2$",
+        fmt_num(block$r2, digits)
+      )),
+
+      "\\addlinespace"
+    )
+  }
+
+  # Keep the note consistent with the requested SE method.
+  se_note <- if (robust) {
+    "Entries are OLS coefficients with HC1 robust standard errors in parentheses."
+  } else {
+    "Entries are OLS coefficients with conventional OLS standard errors in parentheses."
+  }
+
+  # Reference keys are identifiers, not printed labels:
+  # do not escape underscores here.
+  label_key <- paste0("tab:policy-waves-", dv_name)
+
+  # Assemble the complete table.
+  c(
+    "\\begin{table}[!htbp]",
+    "\\centering",
+    "\\begin{threeparttable}",
+
+    paste0(
+      "\\caption{",
+      wave_tex_escape(paste0("OLS models of ", dv_label)),
+      "}"
+    ),
+
+    paste0("\\label{", label_key, "}"),
+
+    "\\small",
+    "\\setlength{\\tabcolsep}{4pt}",
+    "\\renewcommand{\\arraystretch}{1.12}",
+
+    "\\begin{tabularx}{\\textwidth}{@{}>{\\raggedright\\arraybackslash}p{0.22\\textwidth}*{4}{>{\\centering\\arraybackslash}X}@{}}",
+
+    "\\toprule",
+
+    tex_row(c(
+      "Carceral contact",
+      wave_tex_escape(unname(wave_labels[waves]))
+    )),
+
+    "\\midrule",
+    body_lines,
+    "\\bottomrule",
+    "\\end{tabularx}",
+
+    "\\begin{tablenotes}[flushleft]",
+    "\\footnotesize",
+
+    paste0("\\item ", se_note),
+
+    "\\item Each focal coefficient comes from a separate regression. The reference group reports none of the three focal experiences: personal incarceration, knowing someone incarcerated, or personal victimization. Exposure groups may overlap.",
+
+    "\\item Controls accumulate from left to right: none; demographics; demographics plus party/ideology; then additionally FIRE and core deservingness controls. Control coefficients are not displayed.",
+
+    "\\item N and $R^2$ refer to the model immediately above them. Each model retains its own estimation sample; sample sizes may differ across comparisons and waves.",
+
+    "\\item * $p<0.05$, ** $p<0.01$, *** $p<0.001$.",
+
+    "\\end{tablenotes}",
+    "\\end{threeparttable}",
+    "\\end{table}"
+  )
+}
+
+
+```
+
+## Export the Per DV 1 4W Tables
+
+```{r}
+
+# ------------------------------------------------------------
+# 6A. Generate one table for every DV in policy_vars
+# Uses policy_vars, NOT the narrower results_dvs.
+# ------------------------------------------------------------
+
+# Keep filenames and LaTeX reference keys safe and unique.
+if (
+  length(policy_vars) == 0L ||
+  anyNA(policy_vars) ||
+  anyDuplicated(policy_vars) ||
+  any(!grepl("^[A-Za-z0-9_][A-Za-z0-9_.-]*$", policy_vars))
+) {
+  stop(
+    "policy_vars must contain unique, nonmissing, filename-safe variable names."
+  )
+}
+
+wave_latex_tables <- setNames(
+  lapply(policy_vars, function(dv_name) {
+
+    make_wave_latex_table(
+      dv_name = dv_name,
+      model_waves = policy_dummies_waves,
+      row_vars = impact_vars,
+      waves = wave_order,
+      robust = TRUE
+    )
+
+  }),
+  policy_vars
+)
+
+
+# ------------------------------------------------------------
+# 6B. Write one .tex file per DV
+# ------------------------------------------------------------
+
+wave_table_dir <- file.path("tables", "policy_waves")
+
+dir.create(
+  wave_table_dir,
+  recursive = TRUE,
+  showWarnings = FALSE
+)
+
+if (!dir.exists(wave_table_dir)) {
+  stop("Could not create output folder: ", wave_table_dir)
+}
+
+# Named vector linking each DV to its output filename.
+wave_table_files <- setNames(
+  paste0(policy_vars, "_wave_table.tex"),
+  policy_vars
+)
+
+for (dv_name in policy_vars) {
+
+  writeLines(
+    wave_latex_tables[[dv_name]],
+    con = file.path(
+      wave_table_dir,
+      wave_table_files[[dv_name]]
+    )
+  )
+
+}
+
+
+# ------------------------------------------------------------
+# 6C. Create an Overleaf main document
+#
+# The main file and individual table files belong together
+# in the same folder.
+#
+# Each DV starts on a fresh page, in policy_vars order.
+# ------------------------------------------------------------
+
+input_lines <- unlist(
+  lapply(unname(wave_table_files), function(filename) {
+
+    c(
+      paste0("\\input{", filename, "}"),
+      "\\clearpage"
+    )
+
+  }),
+  use.names = FALSE
+)
+
+master_tex <- c(
+  "\\documentclass[11pt,letterpaper]{article}",
+  "\\usepackage[margin=0.75in]{geometry}",
+  "\\usepackage[T1]{fontenc}",
+  "\\usepackage[utf8]{inputenc}",
+  "\\usepackage{booktabs,tabularx,array,threeparttable,makecell}",
+  "\\begin{document}",
+  input_lines,
+  "\\end{document}"
+)
+
+writeLines(
+  master_tex,
+  con = file.path(
+    wave_table_dir,
+    "all_policy_wave_tables.tex"
+  )
+)
+
+
+# ------------------------------------------------------------
+# 6D. Print the completion status and exact output location
+# ------------------------------------------------------------
+
+cat(
+  "Exported ",
+  length(wave_latex_tables),
+  " four-wave DV tables.\n",
+
+  "Folder: ",
+  normalizePath(wave_table_dir, winslash = "/"),
+  "\n",
+
+  "Overleaf main file: all_policy_wave_tables.tex\n",
+
+  sep = ""
+)
+```
+
+
+# III. Analysis: Ambivalence
+
+Can use either sample_no_dk or sample_dk for this. 
+
+
+## A. Name waves
+
+DVs are different here.
+
+```{r}
+
+vars <- c(
+  "dk_post_felony_vote_rev",
+  "dk_jail_access_rev",
+  "dk_min_wage",
+  "dk_free_calls",
+  "dk_ed_funds",
+  "dk_alt_sentencing",
+  "dk_dpen_rev",
+  "dk_lwop_rev",
+  "dk_total_all",
+  "dk_total_incar_vote",
+  "dk_total_q25_help",
+  "dk_total_punish",
+  "dk_prop_all",
+  "dk_prop_incar_vote",
+  "dk_prop_q25_help",
+  "dk_prop_punish"
+)
+
+vars_labels <- c(
+  "DK: Rest. voting rights",
+  "DK: Jail voting access",
+  "DK: Min wage",
+  "DK: Free calls",
+  "DK: Ed funding",
+  "DK: Sentencing Alts",
+  "DK: Death penalty",
+  "DK: Life without parole",
+  "Total DK responses: All policy items",
+  "Total DK responses: Incarceration/voting policies",
+  "Total DK responses: Help policies",
+  "Total DK responses: Punishment policies",
+  "Proportion DK: All policy items",
+  "Proportion DK: Incarceration/voting policies",
+  "Proportion DK: Help policies",
+  "Proportion DK: Punishment policies"
+)
+
+
+# info about answered per 
+
+vars_1 <- c(
+  "dk_answered_all",
+  "dk_answered_incar_vote",
+  "dk_answered_q25_help",
+  "dk_answered_punish"
+)
+
+vars_1_labels <- c(
+  "Number of policy items answered: All",
+  "Number of policy items answered: Incarceration/voting",
+  "Number of policy items answered: Help policies",
+  "Number of policy items answered: Punishment policies"
+)
+
+
+```
+
+
+Controls will be applied in waves, so  group controls (tho these should already/eventually be clear in variable labels R file)
+
+```{r}
+
+demo_controls <- c(
+  "Black", "Hisp_Latino", "AllOthers", "gender"
+)
+
+demo_controls_labels <- c(
+  Black = "Black",
+  Hisp_Latino    = "Hispanic/Latino", 
+  AllOthers = "Other RID",
+  gender = "Men"
+)
+
+party_ideo_controls <- c(
+  "Republican",
+  "Democrat",
+  "fiscal_ideology",
+  "social_ideology"
+)
+
+party_ideo_controls_labels <- c(
+  # pid_3 = "Party ID",
+  Republican = "Republican",
+  Democrat = "Democrat",
+  fiscal_ideology = "Fiscal ideology",
+  social_ideology = "Social ideology"
+)
+
+fire_controls <- c(
+  "fire_rare",
+  "fire_privilege",
+  "fire_angry",
+  "fire_fear"
+)
+
+fire_controls_labels <- c(
+  fire_rare = "Racism rare",
+  fire_privilege = "White privilege",
+  fire_angry = "Angry about racism",
+  fire_fear = "Fear other races"
+)
+
+control_waves <- list(
+  nocontrol = character(0),
+  demo = demo_controls,
+  party_ideo = c(demo_controls, party_ideo_controls),
+  full_attitudes = c(demo_controls, party_ideo_controls,
+                     fire_controls)
+)
+
+# , desor_core
+
+
+```
+
+```{r}
+
+wave_order <- c(
+  "nocontrol",
+  "demo",
+  "party_ideo",
+  "full_attitudes"
+)
+
+wave_labels <- c(
+  nocontrol = "No controls",
+  demo = "Demographics",
+  party_ideo = "+ Party/Ideology",
+  full_attitudes = "+ Attitudes"
+)
+
+```
+
+## B. Define model
+
+### Logit or OLS? 
+
+Basic idea is dk_policy ~ impact. The DV's are binary. 
+
+lm() with a binary DV would give the wrong error structure and produce heteroskedastic errors.
+-also assumes effects are constant in probability units
+
+Logistic regression might be better. 
+- it models a transformation of the probability (log odds)
+
+### Logit Exploration
+
+#### Free Calls
+
+```{r}
+
+m_freecalls_1 <- glm(
+  dk_free_calls ~ impact,
+  data = sample_no_dk,
+  family = binomial(link = "logit")
+)
+
+summary(m_freecalls_1)
+
+exp(coef(m_freecalls_1))
+
+
+```
+Interpretation - 
+
+$$
+log( \frac{P(DK=1)}{1-P(DK=1)} ) = B(intercept) +B(impact) = -1.785 - .968
+$$
+Intercept -- 
+
+Coefficients are in log-odds units, so the -0.968 coefficient is not really substantive to interpret. Intercept is 0/1, so it describes non-impacted respondents. It is exponentiated (exp(-1.784)) giving the 0.167 Intercept. 
+
+Convert the intercept to probability:
+
+$$
+P(DK = 1 | impact = 0) = \frac{e^-1.78}{1 + e^-1.78} = 0.144
+$$
+So the intercept tells that: 
+
+Among respondents with impact = 0, the predictability of answering DK on the free calls item is about 14.4%. 
+
+Impact --
+
+Impact coefficient: -0.96786
+
+The reported 0.3798937 is the odds ratio:
+  - exp(-0.96786) = 0.3799 ~ 0.380
+  
+  - it means that the odds of answering DK among respondents with impact = 1 are about 0.38 times the odds among respondents with impact = 0. IE: impacted respondents have approximately a 62% lower odds of answering DK than do respondents with impact = 1.
+
+In terms of probabilities, the linear predictor becomes 
+
+$$
+-1.78489-.96786=-2.75275
+$$
+
+
+Respondents with carceral/victimization impact were substantially less likely to select “don't know/no opinion” on the free-calls item. The predicted probability of a DK response was approximately 14.4% among respondents without impact and 6.0% among impacted respondents, a difference of roughly 8.4 percentage points.
+
+
+```{r}
+
+m_freecalls_2 <- glm(
+  dk_free_calls ~ impact + Black + Hisp_Latino + AllOthers + gender,
+  data = sample_no_dk,
+  family = binomial(link = "logit")
+)
+
+summary(m_freecalls_2)
+
+exp(coef(m_freecalls_2))
+
+```
+
+Interpretation via odds:
+
+
+Model fit test with ANOVA asks:
+
+"Does adding this set of four demographic controls improve model fit enough to provide evidence that Model 2 fits the outcome better than the simpler impact-only model?"
+
+```{r}
+anova(m_freecalls_1, m_freecalls_2, test = "Chisq")
+```
+
+Adding these four demographic variables does not significantly improve model fit over the impact-only model according to the likelihood-ratio test.
+
+The two models have essentially indistinguishable AIC values; adding the demographic controls does not yield a clear improvement in the fit–complexity tradeoff.
+
+Model 1: Impact is strongly associated with a lower likelihood of DK responding on free calls. The observed/model-implied probability is approximately 14.4% among non-impacted respondents and 6.0% among impacted respondents, an unadjusted difference of about 8.4 percentage points. The corresponding odds ratio is .38.
+
+Model 2: That relationship remains essentially intact after introducing the four demographic controls. The adjusted odds ratio for impact is .39. None of the demographic variables individually provides strong evidence of an association with DK responding, and the demographic block does not significantly improve model fit over the impact-only model (\(\chi^2(4)=7.40,\ p=.116\)). Both models use the same 1,600 observations.
+
+#### Education Funding
+
+```{r}
+
+m_ed_funds_1 <- glm(
+  dk_ed_funds ~ impact,
+  data = sample_no_dk,
+  family = binomial(link = "logit")
+)
+
+summary(m_ed_funds_1)
+
+exp(coef(m_ed_funds_1))
+
+
+```
+Interpretation - 
+
+#### Alternative Sentencing
+
+```{r}
+
+m_alt_sentencing_1 <- glm(
+  dk_alt_sentencing ~ impact,
+  data = sample_no_dk,
+  family = binomial(link = "logit")
+)
+
+summary(m_alt_sentencing_1)
+
+exp(coef(m_alt_sentencing_1))
+
+
+```
+Interpretation - 
+
+#### Min Wage
+
+```{r}
+
+m_min_wage_1 <- glm(
+  dk_min_wage ~ impact,
+  data = sample_no_dk,
+  family = binomial(link = "logit")
+)
+
+summary(m_min_wage_1)
+
+exp(coef(m_min_wage_1))
+
+
+```
+Interpretation - 
+
+#### Rights Restoration
+
+```{r}
+
+m_rr_1 <- glm(
+  dk_post_felony_vote_rev ~ impact,
+  data = sample_no_dk,
+  family = binomial(link = "logit")
+)
+
+summary(m_rr_1)
+
+exp(coef(m_rr_1))
+
+
+```
+Interpretation - 
+
+#### Jail Voting
+
+```{r}
+
+m_jailvote_1 <- glm(
+  dk_jail_access_rev ~ impact,
+  data = sample_no_dk,
+  family = binomial(link = "logit")
+)
+
+summary(m_jailvote_1)
+
+exp(coef(m_jailvote_1))
+
+```
+
+#### Death Penalty
+```{r}
+
+m_dpen_1 <- glm(
+  dk_dpen_rev ~ impact,
+  data = sample_no_dk,
+  family = binomial(link = "logit")
+)
+
+summary(m_dpen_1)
+
+exp(coef(m_dpen_1))
+
+```
+
+
+#### LWOP
+
+```{r}
+
+m_lwop_1 <- glm(
+  dk_lwop_rev ~ impact,
+  data = sample_no_dk,
+  family = binomial(link = "logit")
+)
+
+summary(m_lwop_1)
+
+exp(coef(m_lwop_1))
+
+```
