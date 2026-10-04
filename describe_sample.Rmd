@@ -936,7 +936,52 @@ view(data_full) %>%
 table(data_full$vict_bin, useNA = "ifany")
 
 table(data_full$vict, useNA = "ifany")
+
+
+
+data_full %>%
+  summarise(
+    all_three_n = sum(
+      incarc == 1 & knowincarc == 1 & vict == 1,
+      na.rm = TRUE
+    )
+  )
+
+
 ```
+
+```{r}
+data_full %>%
+  summarise(
+    incarc_ki_n = sum(
+      incarc == 1 & knowincarc == 1,
+      na.rm = TRUE
+    )
+  )
+```
+```{r}
+data_full %>%
+  summarise(
+    incarc_vict_n = sum(
+      incarc == 1 & vict == 1,
+      na.rm = TRUE
+    )
+  )
+```
+
+
+
+```{r}
+data_full %>%
+  group_by(knowincarc) %>%
+  summarise(
+    n = n(),
+    incarc = sum(incarc, na.rm = TRUE),
+    vict = sum(vict, na.rm = TRUE)
+  )
+```
+
+
 
 ```{r}
 table(not_full$vict, useNA = "ifany")
@@ -1428,13 +1473,16 @@ summary(ration_model)
 ## Econ Experiences
 
 ```{r}
+"uninsured" %in% names(data_full)
+
+names(data_full)
 table(data_full$tanf)
 
 table(data_full$snap)
 
 table(data_full$uninsured)
 
-table(data_full$unionmember)
+# table(data_full$unionmember)
 
 table(data_full$on_medicaid)
 
@@ -1473,6 +1521,200 @@ View(data_full%>%
   ))
 
 ```
+
+
+Econ Experiences Across Impact Groups
+
+```{r}
+economic_vars <- c(
+  "snap",
+  "medicaid",
+  "unemployed",
+  "uninsured"
+)
+
+economic_impact_summary <- purrr::map_dfr(
+  economic_vars,
+  function(var) {
+    
+    data_full %>%
+      filter(.data[[var]] == 1) %>%
+      summarise(
+        variable = var,
+        n_group = n(),
+        
+        incarc_n = sum(incarc == 1, na.rm = TRUE),
+        incarc_prop = mean(incarc == 1, na.rm = TRUE),
+        
+        knowincarc_n = sum(knowincarc == 1, na.rm = TRUE),
+        knowincarc_prop = mean(knowincarc == 1, na.rm = TRUE),
+        
+        vict_n = sum(vict == 1, na.rm = TRUE),
+        vict_prop = mean(vict == 1, na.rm = TRUE),
+        
+        impact_n = sum(impact == 1, na.rm = TRUE),
+        impact_prop = mean(impact == 1, na.rm = TRUE),
+        
+        no_impact_n = sum(impact == 0, na.rm = TRUE),
+        no_impact_prop = mean(impact == 0, na.rm = TRUE)
+      )
+  }
+)
+
+economic_impact_summary
+
+
+
+```
+
+
+```{r}
+
+
+economic_impact_plot <- economic_impact_summary %>%
+  dplyr::select(
+    variable,
+    incarc_prop,
+    knowincarc_prop,
+    vict_prop,
+    impact_prop,
+    no_impact_prop
+  ) %>%
+  pivot_longer(
+    cols = -variable,
+    names_to = "impact_type",
+    values_to = "proportion"
+  ) %>%
+  mutate(
+    impact_type = recode(
+      impact_type,
+      incarc_prop = "Direct",
+      knowincarc_prop = "Proximal",
+      vict_prop = "Victim",
+      impact_prop = "Any Impact",
+      no_impact_prop = "No Impact"
+    ),
+    impact_type = factor(
+      impact_type,
+      levels = c(
+        "Direct",
+        "Proximal",
+        "Victim",
+        "Any Impact",
+        "No Impact"
+      )
+    )
+  )
+
+economic_impact_plot 
+
+```
+
+```{r}
+
+make_economic_plot <- function(var_name, plot_title) {
+  
+  economic_impact_plot %>%
+    filter(variable == var_name) %>%
+    ggplot(
+      aes(
+        x = impact_type,
+        y = proportion
+      )
+    ) +
+    geom_col() +
+    geom_text(
+      aes(label = scales::percent(proportion, accuracy = 0.1)),
+      vjust = -0.4
+    ) +
+    scale_y_continuous(
+      labels = scales::percent,
+      limits = c(0, 0.6)
+    ) +
+    labs(
+      title = plot_title,
+      x = NULL,
+      y = "Proportion of Group Reporting Yes"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(
+        angle = 30,
+        hjust = 1
+      )
+    )
+}
+
+plot_snap <- make_economic_plot(
+  "snap",
+  "SNAP Recipients"
+)
+
+plot_medicaid <- make_economic_plot(
+  "medicaid",
+  "Medicaid Recipients"
+)
+
+plot_unemployed <- make_economic_plot(
+  "unemployed",
+  "Unemployed Respondents"
+)
+
+plot_uninsured <- make_economic_plot(
+  "uninsured",
+  "Uninsured Respondents"
+)
+
+```
+
+```{r}
+
+plot_snap
+plot_uninsured
+plot_medicaid
+plot_uninsured
+
+```
+
+```{r}
+# Create a folder for figures if you don't already have one
+dir.create("figures", showWarnings = FALSE)
+
+# Save each figure as a PDF
+ggsave(
+  filename = "figures/snap_impact_groups.pdf",
+  plot = plot_snap,
+  width = 7,
+  height = 5,
+  units = "in"
+)
+
+ggsave(
+  filename = "figures/medicaid_impact_groups.pdf",
+  plot = plot_medicaid,
+  width = 7,
+  height = 5,
+  units = "in"
+)
+
+ggsave(
+  filename = "figures/unemployed_impact_groups.pdf",
+  plot = plot_unemployed,
+  width = 7,
+  height = 5,
+  units = "in"
+)
+
+ggsave(
+  filename = "figures/uninsured_impact_groups.pdf",
+  plot = plot_uninsured,
+  width = 7,
+  height = 5,
+  units = "in"
+)
+```
+
+
 
 
 # FIRE

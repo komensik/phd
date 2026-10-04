@@ -143,6 +143,15 @@ sample %>%
 table(sample$impact, sample$incarc, useNA = "ifany")
 table(sample$impact, sample$knowincarc, useNA = "ifany")
 table(sample$impact, sample$vict, useNA = "ifany")
+
+
+sample %>%
+  group_by(knowincarc) %>%
+  summarise(
+    n = n(),
+    incarc = sum(incarc, na.rm = TRUE)
+  )
+
 ```
 
 ## A. New DK Variables
