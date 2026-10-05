@@ -1566,7 +1566,7 @@ race_experience_plot <- purrr::map_dfr(race_vars, function(rv) {
   )
 })
 
-race_experience_plot
+print(n=24, race_experience_plot)
 
 ```
 
@@ -1744,42 +1744,68 @@ Econ Experiences Across Impact Groups
 ```{r}
 economic_vars <- c(
   "snap",
+  "tanf",
   "medicaid",
   "unemployed",
   "uninsured"
 )
+# 
+# economic_impact_summary <- purrr::map_dfr(
+#   economic_vars,
+#   function(var) {
+#     
+#     data_full %>%
+#       filter(.data[[var]] == 1) %>%
+#       summarise(
+#         variable = var,
+#         n_group = n(),
+#         
+#         incarc_n = sum(incarc == 1, na.rm = TRUE),
+#         incarc_prop = mean(incarc == 1, na.rm = TRUE),
+#         
+#         knowincarc_n = sum(knowincarc == 1, na.rm = TRUE),
+#         knowincarc_prop = mean(knowincarc == 1, na.rm = TRUE),
+#         
+#         vict_n = sum(vict == 1, na.rm = TRUE),
+#         vict_prop = mean(vict == 1, na.rm = TRUE),
+#         
+#         impact_n = sum(impact == 1, na.rm = TRUE),
+#         impact_prop = mean(impact == 1, na.rm = TRUE),
+#         
+#         no_impact_n = sum(impact == 0, na.rm = TRUE),
+#         no_impact_prop = mean(impact == 0, na.rm = TRUE)
+#       )
+#   }
+# )
+# 
+# economic_impact_summary
 
-economic_impact_summary <- purrr::map_dfr(
+economic_by_impact <- purrr::map_dfr(
   economic_vars,
   function(var) {
     
     data_full %>%
-      filter(.data[[var]] == 1) %>%
+      filter(impact %in% c(0, 1)) %>%
+      group_by(impact) %>%
       summarise(
         variable = var,
+        
         n_group = n(),
+        n_nonmissing = sum(!is.na(.data[[var]])),
+        n_yes = sum(.data[[var]] == 1, na.rm = TRUE),
         
-        incarc_n = sum(incarc == 1, na.rm = TRUE),
-        incarc_prop = mean(incarc == 1, na.rm = TRUE),
+        prop_yes = mean(.data[[var]] == 1, na.rm = TRUE),
         
-        knowincarc_n = sum(knowincarc == 1, na.rm = TRUE),
-        knowincarc_prop = mean(knowincarc == 1, na.rm = TRUE),
-        
-        vict_n = sum(vict == 1, na.rm = TRUE),
-        vict_prop = mean(vict == 1, na.rm = TRUE),
-        
-        impact_n = sum(impact == 1, na.rm = TRUE),
-        impact_prop = mean(impact == 1, na.rm = TRUE),
-        
-        no_impact_n = sum(impact == 0, na.rm = TRUE),
-        no_impact_prop = mean(impact == 0, na.rm = TRUE)
+        .groups = "drop"
       )
   }
-)
-
-economic_impact_summary
-
-
+) %>%
+  mutate(
+    impact_group = case_when(
+      impact == 1 ~ "Any Impact",
+      impact == 0 ~ "No Impact"
+    )
+  )
 
 ```
 
@@ -1845,7 +1871,7 @@ make_economic_plot <- function(var_name, plot_title) {
     ) +
     scale_y_continuous(
       labels = scales::percent,
-      limits = c(0, 0.6)
+      limits = c(0, 0.75)
     ) +
     labs(
       title = plot_title,
@@ -1864,6 +1890,11 @@ make_economic_plot <- function(var_name, plot_title) {
 plot_snap <- make_economic_plot(
   "snap",
   "SNAP Recipients"
+)
+
+plot_tanf <- make_economic_plot(
+  "tanf",
+  "TANF Recipients"
 )
 
 plot_medicaid <- make_economic_plot(
@@ -1890,15 +1921,16 @@ plot_uninsured
 plot_medicaid
 plot_uninsured
 
+plot_tanf
+
 ```
 
 ```{r}
-# Create a folder for figures if you don't already have one
-dir.create("figures", showWarnings = FALSE)
+
 
 # Save each figure as a PDF
 ggsave(
-  filename = "figures/snap_impact_groups.pdf",
+  filename = "figures/snap_impact_groups_10_5.pdf",
   plot = plot_snap,
   width = 7,
   height = 5,
@@ -1906,7 +1938,15 @@ ggsave(
 )
 
 ggsave(
-  filename = "figures/medicaid_impact_groups.pdf",
+  filename = "figures/tanf_impact_groups_10_5.pdf",
+  plot = plot_snap,
+  width = 7,
+  height = 5,
+  units = "in"
+)
+
+ggsave(
+  filename = "figures/medicaid_impact_groups_10_5.pdf",
   plot = plot_medicaid,
   width = 7,
   height = 5,
@@ -1914,7 +1954,7 @@ ggsave(
 )
 
 ggsave(
-  filename = "figures/unemployed_impact_groups.pdf",
+  filename = "figures/unemployed_impact_groups_10_5.pdf",
   plot = plot_unemployed,
   width = 7,
   height = 5,
@@ -1922,7 +1962,7 @@ ggsave(
 )
 
 ggsave(
-  filename = "figures/uninsured_impact_groups.pdf",
+  filename = "figures/uninsured_impact_groups_10_5.pdf",
   plot = plot_uninsured,
   width = 7,
   height = 5,
