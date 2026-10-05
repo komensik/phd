@@ -1097,7 +1097,8 @@ data_full %>%
   )
 ```
 
-Probability of or proportion of being incarcerated, knowincarc, vict, impact by RID
+### Impact by Race
+of being incarcerated, knowincarc, vict, impact by RID
 
 ```{r}
 
@@ -1189,7 +1190,7 @@ incarc_race_table <- tibble(
     Percent_Incarcerated = round(Percent_Incarcerated, 2)
   )
 
-incarc_race_table
+print(incarc_race_table)
 
 ```
 for overleaf
@@ -1226,7 +1227,7 @@ library(dplyr)
 library(tidyr)
 library(purrr)
 library(stringr)
-source("variable_labels.R")
+source("variable_labels_sept1.R")
 
 total_n <- nrow(data_full)
 
@@ -1259,7 +1260,7 @@ impact_race_table <- map_dfr(impact_vars, function(iv) {
     mutate(
       Total = sprintf("%d (%.1f%%)", Total_n, Total_pct)
     ) %>%
-    select(
+    dplyr::select(
       Impact,
       all_of(unname(race_labels)),
       Total
@@ -1297,7 +1298,7 @@ impact_race_table <- bind_rows(
   overall_row
 )
 
-impact_race_table
+print(impact_race_table)
 ```
 
 Bar plots of impact x race
@@ -1340,7 +1341,7 @@ ggplot(impact_by_race, aes(x = fct_reorder(race, pct_impacted), y = pct_impacted
   labs(
     x = NULL,
     y = "Share with any impact",
-    title = "Proportion of each racial group with any carceral contact"
+    title = "Any carceral contact"
   ) +
   coord_flip() +
   theme_minimal()
@@ -1383,12 +1384,12 @@ library(purrr)
 library(tibble)
 
 # race vars and labels
-race_vars <- c("White", "Black", "Hispanic", "OtherRace")
+race_vars <- c("White", "Black", "Hisp_Latino", "OtherRace")
 
 race_labels <- c(
   White = "White",
   Black = "Black",
-  Hispanic = "Hispanic",
+  Hisp_Latino = "Hisp_Latino",
   OtherRace = "Other Race"
 )
 
@@ -1448,6 +1449,136 @@ cat(latex_tables[["Hispanic"]])
 cat(latex_tables[["Other Race"]])
 
 ```
+
+### Proportion Race Reporting Impact
+
+```{r}
+
+
+
+# Race vars (in case r script not working)
+race_vars <- c(
+  "White",
+  "Black",
+  "Hisp_Latino",
+  "Asian_Am",
+  "Native_Am",
+  "OtherRace"
+)
+
+race_labels <- c(
+  White       = "White",
+  Black       = "Black",
+  Hisp_Latino = "Hispanic/Latino",
+  Asian_Am    = "Asian American",
+  Native_Am   = "Native American",
+  OtherRace   = "Other Race"
+)
+
+# recoding experience vars for this table so na's make more sense
+
+
+experience_vars <- c(
+  incarc = "Incarcerated",
+  knowincarc = "Know Incarcerated",
+  vict = "Victimized"
+)
+
+
+# pull
+
+race_experience_plot <- purrr::map_dfr(race_vars, function(rv) {
+  
+  race_name <- race_labels[[rv]]
+  
+  bind_rows(
+    
+    # Incarcerated
+    data_full %>%
+      filter(.data[[rv]] == 1, !is.na(incarc)) %>%
+      summarise(
+        Race = race_name,
+        Experience = "Incarcerated",
+        denominator = n(),
+        numerator = sum(incarc == 1),
+        proportion = numerator / denominator
+      ),
+    
+    # Know incarcerated
+    data_full %>%
+      filter(.data[[rv]] == 1, !is.na(knowincarc)) %>%
+      summarise(
+        Race = race_name,
+        Experience = "Know Incarcerated",
+        denominator = n(),
+        numerator = sum(knowincarc == 1),
+        proportion = numerator / denominator
+      ),
+    
+    # Victimized
+    data_full %>%
+      filter(.data[[rv]] == 1, !is.na(vict)) %>%
+      summarise(
+        Race = race_name,
+        Experience = "Victimized",
+        denominator = n(),
+        numerator = sum(vict == 1),
+        proportion = numerator / denominator
+      ),
+    
+    # No impact
+    data_full %>%
+      filter(.data[[rv]] == 1, !is.na(impact)) %>%
+      summarise(
+        Race = race_name,
+        Experience = "No Impact",
+        denominator = n(),
+        numerator = sum(impact == 0),
+        proportion = numerator / denominator
+      )
+  )
+})
+
+race_experience_plot
+
+```
+
+```{r}
+
+race_experience_plot <- race_experience_plot %>%
+  mutate(
+    Race = factor(
+      Race,
+      levels = c(
+        "Black",
+        "Hispanic/Latino",
+        "Native American",
+        "Asian American",
+        "White",
+        "Other Race"
+      )
+    ),
+    Experience = factor(
+      Experience,
+      levels = c(
+        "Incarcerated",
+        "Know Incarcerated",
+        "Victimized",
+        "No Impact"
+      )
+    )
+  )
+
+
+print(n = 25,
+race_experience_plot %>%
+  dplyr::select(Race, Experience, denominator)
+)
+
+```
+
+
+
 
 ## Rationing
 ```{r}
