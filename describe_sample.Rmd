@@ -1454,7 +1454,18 @@ cat(latex_tables[["Other Race"]])
 
 ```{r}
 
+experiences <- c(
+  "incarc",
+  "knowincarc",
+  "vict",
+  "impact"
+)
 
+binary_versions <- c(
+  "incarc_bin",
+  "knowincarc_bin",
+  "vict_bin"
+)
 
 # Race vars (in case r script not working)
 race_vars <- c(
@@ -1475,15 +1486,28 @@ race_labels <- c(
   OtherRace   = "Other Race"
 )
 
-# recoding experience vars for this table so na's make more sense
 
+props_data <- c(
+  experiences,
+  binary_versions,
+  race_vars,
+  "impact"
+)
+
+props_sample <- data_full %>%
+  dplyr::select(props_data)
+
+  
+names(props_sample)
+
+# rename experience
 
 experience_vars <- c(
   incarc = "Incarcerated",
   knowincarc = "Know Incarcerated",
-  vict = "Victimized"
+  vict = "Victimized",
+  impact = "Any Impact"
 )
-
 
 # pull
 
@@ -1491,49 +1515,52 @@ race_experience_plot <- purrr::map_dfr(race_vars, function(rv) {
   
   race_name <- race_labels[[rv]]
   
+  # Same racial-group denominator for every experience
+  race_dat <- props_sample %>%
+    filter(
+      .data[[rv]] == 1,
+      !is.na(impact)
+    )
+  
   bind_rows(
     
     # Incarcerated
-    data_full %>%
-      filter(.data[[rv]] == 1, !is.na(incarc)) %>%
+    race_dat %>%
       summarise(
         Race = race_name,
         Experience = "Incarcerated",
         denominator = n(),
-        numerator = sum(incarc == 1),
-        proportion = numerator / denominator
-      ),
-    
-    # Know incarcerated
-    data_full %>%
-      filter(.data[[rv]] == 1, !is.na(knowincarc)) %>%
-      summarise(
-        Race = race_name,
-        Experience = "Know Incarcerated",
-        denominator = n(),
-        numerator = sum(knowincarc == 1),
+        numerator = sum(incarc == 1, na.rm = TRUE),
         proportion = numerator / denominator
       ),
     
     # Victimized
-    data_full %>%
-      filter(.data[[rv]] == 1, !is.na(vict)) %>%
+    race_dat %>%
       summarise(
         Race = race_name,
         Experience = "Victimized",
         denominator = n(),
-        numerator = sum(vict == 1),
+        numerator = sum(vict == 1, na.rm = TRUE),
         proportion = numerator / denominator
       ),
     
-    # No impact
-    data_full %>%
-      filter(.data[[rv]] == 1, !is.na(impact)) %>%
+    # Know incarcerated
+    race_dat %>%
       summarise(
         Race = race_name,
-        Experience = "No Impact",
+        Experience = "Know Incarcerated",
         denominator = n(),
-        numerator = sum(impact == 0),
+        numerator = sum(knowincarc == 1, na.rm = TRUE),
+        proportion = numerator / denominator
+      ),
+    
+    # Impact
+    race_dat %>%
+      summarise(
+        Race = race_name,
+        Experience = "Any Impact",
+        denominator = n(),
+        numerator = sum(impact == 1, na.rm = TRUE),
         proportion = numerator / denominator
       )
   )
@@ -1553,18 +1580,18 @@ race_experience_plot <- race_experience_plot %>%
         "Black",
         "Hispanic/Latino",
         "Native American",
+        "Other Race",
         "Asian American",
-        "White",
-        "Other Race"
+        "White"
       )
     ),
     Experience = factor(
       Experience,
       levels = c(
         "Incarcerated",
-        "Know Incarcerated",
         "Victimized",
-        "No Impact"
+        "Know Incarcerated",
+        "Any Impact"
       )
     )
   )
@@ -1576,6 +1603,64 @@ race_experience_plot %>%
 )
 
 ```
+#### 2 x 2
+
+```{r}
+
+race_experience_figure <- ggplot(
+  race_experience_plot,
+  aes(
+    x = Race,
+    y = proportion
+  )
+) +
+  geom_col(width = 0.75) +
+  
+  # Four panels, arranged 2 x 2
+  facet_wrap(
+    ~ Experience,
+    ncol = 2,
+    scales = "free_y"
+  ) +
+  
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1),
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+  
+  labs(
+    x = NULL,
+    y = "Proportion of Group Reporting Yes"
+  ) +
+  
+  theme_minimal() +
+  theme(
+    strip.text = element_text(
+      face = "bold",
+      size = 11
+    ),
+    axis.text.x = element_text(
+      angle = 30,
+      hjust = 1
+    ),
+    panel.grid.major.x = element_blank()
+  )
+
+race_experience_figure
+
+```
+
+save for overleaf
+```{r}
+ggsave(
+  filename = "figures/race_experience_figure.pdf",
+  plot = race_experience_figure,
+  width = 8,
+  height = 6,
+  units = "in"
+)
+```
+
 
 
 
