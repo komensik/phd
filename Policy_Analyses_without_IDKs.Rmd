@@ -500,6 +500,18 @@ demo_controls_labels <- c(
   gender = "Men"
 )
 
+
+party_controls <- c(
+  "Republican",
+  "Democrat"
+)
+
+party_controls_labels <- c(
+  Republican = "Republican",
+  Democrat = "Democrat"
+)
+
+
 party_ideo_controls <- c(
   "Republican",
   "Democrat",
@@ -532,6 +544,7 @@ fire_controls_labels <- c(
 control_waves <- list(
   nocontrol = character(0),
   demo = demo_controls,
+  demo_party = c(demo_controls, party_controls),
   party_ideo = c(demo_controls, party_ideo_controls),
   full_attitudes = c(demo_controls, party_ideo_controls,
                      fire_controls)
@@ -547,6 +560,7 @@ control_waves <- list(
 wave_order <- c(
   "nocontrol",
   "demo",
+  "demo_party",
   "party_ideo",
   "full_attitudes"
 )
@@ -554,6 +568,7 @@ wave_order <- c(
 wave_labels <- c(
   nocontrol = "No controls",
   demo = "Demographics",
+  demo_party = "+ Party",
   party_ideo = "+ Party/Ideology",
   full_attitudes = "+ Attitudes"
 )
@@ -660,6 +675,8 @@ Making shortcuts/names
 policy_dummies_models <- policy_dummies_waves[["nocontrol"]]
 
 policy_dummies_demo_models <- policy_dummies_waves[["demo"]]
+
+policy_dummies_demo_party_models <- policy_dummies_waves[["demo_party"]]
 
 policy_dummies_partyideo_models <- policy_dummies_waves[["party_ideo"]]
 
@@ -933,12 +950,16 @@ summary(policy_dummies_models[["m_prisonhelp_incarc"]])
 # Demographic controls
 summary(policy_dummies_demo_models[["m_prisonhelp_incarc"]])
 
+# Demographics + party
+summary(policy_dummies_demo_party_models[["m_prisonhelp_knowincarc"]])
+
 # Demographics + party/ideology
 summary(policy_dummies_partyideo_models[["m_prisonhelp_incarc"]])
 
 summary(policy_dummies_full_models[["m_prisonhelp_incarc"]])
 
 ```
+
 
 ```{r}
 summary(policy_dummies_full_models[["m_min_wage_vict"]])
@@ -948,7 +969,20 @@ summary(policy_dummies_full_models[["m_min_wage_vict"]])
 ### Voting Variables
 
 ```{r}
+
+summary(policy_dummies_demo_models[["m_post_felony_vote_rev_impact"]])
+
+
+summary(policy_dummies_demo_party_models[["m_post_felony_vote_rev_impact"]])
+
+
+summary(policy_dummies_partyideo_models[["m_post_felony_vote_rev_impact"]])
+
+
 summary(policy_dummies_full_models[["m_post_felony_vote_rev_impact"]])
+
+
+
 ```
 
 ```{r}
@@ -956,11 +990,30 @@ summary(policy_dummies_full_models[["m_jail_access_rev_impact"]])
 ```
 
 ```{r}
+
+
+summary(policy_dummies_demo_models[["m_post_felony_vote_rev_vict"]])
+
+
+summary(policy_dummies_demo_party_models[["m_post_felony_vote_rev_vict"]])
+
+
+summary(policy_dummies_partyideo_models[["m_post_felony_vote_rev_vict"]])
+
+
 summary(policy_dummies_full_models[["m_post_felony_vote_rev_vict"]])
 ```
 
 ```{r}
-summary(policy_dummies_full_models[["m_jail_access_rev_incarc"]])
+
+summary(policy_dummies_demo_models[["m_jail_access_rev_vict"]])
+
+
+summary(policy_dummies_demo_party_models[["m_jail_access_rev_vict"]])
+
+summary(policy_dummies_partyideo_models[["m_jail_access_rev_vict"])
+
+summary(policy_dummies_full_models[["m_jail_access_rev_vict"]])
 ```
 
 # Latex 
@@ -1717,3 +1770,199 @@ summary(m_lwop_1)
 exp(coef(m_lwop_1))
 
 ```
+
+# IV. Correlations w/out DK
+
+# Help Outcome Correlations
+
+Correlations when full, incarc, knowincarc, vict, impacted, not impacted
+
+```{r, desor0}
+# ------------------------------------------------------------
+# Carceral state help policies
+# ------------------------------------------------------------
+
+q25_help_vars <- c("min_wage", "free_calls", "ed_funds", "alt_sentencing")
+
+# ------------------------------------------------------------
+# 1. Define analysis groups
+# ------------------------------------------------------------
+
+help_groups <- list(
+  
+  full_sample = sample,
+  
+  incarc_1 = sample %>%
+    filter(incarc == 1),
+  
+  knowincarc_1 = sample %>%
+    filter(knowincarc == 1),
+  
+  vict_1 = sample %>%
+    filter(vict == 1),
+  
+  impact_1 = sample %>%
+    filter(impact == 1),
+  
+  impact_0 = sample %>%
+    filter(impact == 0)
+)
+
+
+# Check N in each group
+sapply(help_groups, nrow)
+
+# ------------------------------------------------------------
+# 2. Correlations within each group
+# ------------------------------------------------------------
+
+help_cont_corrs <- purrr::map(
+  help_groups,
+  ~ psych::corr.test(
+      .x %>% dplyr::select(all_of(q25_help_vars)),
+      use = "pairwise",
+      method = "pearson",
+      adjust = "none"
+    )
+)
+```
+
+# ------------------------------------------------------------
+# Inspect
+# ------------------------------------------------------------
+
+```{r, desor1}
+# Full sample correlations
+round(help_cont_corrs$full_sample$r, 2)
+
+# Incarcerated respondents
+round(help_cont_corrs$incarc_1$r, 2)
+
+# Know someone incarcerated
+round(help_cont_corrs$knowincarc_1$r, 2)
+
+# Victimized respondents
+round(help_cont_corrs$vict_1$r, 2)
+
+# Any impact
+round(help_cont_corrs$impact_1$r, 2)
+
+# Not impacted
+round(help_cont_corrs$impact_0$r, 2)
+
+help_cont_corrs$full_sample$n
+
+help_cont_corrs$incarc_1$n
+
+help_cont_corrs$knowincarc_1$n
+
+help_cont_corrs$vict_1$n
+
+help_cont_corrs$impact_1$n
+
+help_cont_corrs$impact_0$n
+
+```
+
+
+
+```{r, desor2}
+# ------------------------------------------------------------
+# 3. Number of observed deservingness items, by group
+# ------------------------------------------------------------
+
+help_item_counts <- purrr::map(
+  help_groups,
+  ~ {
+    help_mat <- .x %>%
+      dplyr::select(all_of(q25_help_vars))
+    
+    help_n <- rowSums(!is.na(help_mat))
+    
+    table(help_n, useNA = "ifany")
+  }
+)
+
+help_item_counts
+
+
+# ------------------------------------------------------------
+# 4. Reliability / internal consistency by group
+# ------------------------------------------------------------
+
+help_alpha <- purrr::map(
+  help_groups,
+  ~ {
+    
+    help_mat <- .x %>%
+      dplyr::select(all_of(q25_help_vars))
+    
+    help_n <- rowSums(!is.na(help_mat))
+    
+    help_keep <- help_n >= 4
+    
+    psych::alpha(
+      help_mat[help_keep, ],
+      check.keys = TRUE
+    )
+  }
+)
+
+# Full sample
+help_alpha$full_sample$total$raw_alpha
+help_alpha$full_sample$total$std.alpha
+help_alpha$full_sample$total$average_r
+help_alpha$full_sample$n.obs
+
+# Incarcerated
+help_alpha$incarc_1$total$raw_alpha
+help_alpha$incarc_1$total$std.alpha
+help_alpha$incarc_1$total$average_r
+help_alpha$incarc_1$n.obs
+
+# vict
+help_alpha$vict_1$total$raw_alpha
+
+# Know Incarcerated
+help_alpha$knowincarc_1$total$raw_alpha
+
+# Impacted
+help_alpha$impact_1$total$raw_alpha
+
+
+# Not impacted
+help_alpha$impact_0$total$raw_alpha
+```
+
+
+```{r}
+# Item Stats
+View(help_alpha$full_sample$item.stats)
+```
+
+
+```{r}
+View(help_alpha$incarc_1$item.stats)
+```
+
+
+```{r}
+View(help_alpha$vict_1$item.stats)
+```
+
+
+```{r}
+View(help_alpha$knowincarc_1$item.stats)
+```
+
+
+```{r}
+View(help_alpha$impact_1$item.stats)
+```
+
+
+```{r}
+View(help_alpha$impact_0$item.stats)
+
+```
+

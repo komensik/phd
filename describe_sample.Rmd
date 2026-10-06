@@ -1716,31 +1716,35 @@ data_full%>%
     unionmember = sum(unionmember, na.rm = TRUE),
     union_pct = ((unionmember/total)*100),
     on_medicaid = sum(on_medicaid, na.rm = TRUE),
-    medicaid_pct = ((on_medicaid/total)*100)
+    medicaid_pct = ((on_medicaid/total)*100),
+    unemployed = sum(unemployed, na.rm = TRUE),
+    unemployed_pct = ((unemployed/total)*100)
   )
 
 View(data_full%>%
        group_by(incarc)%>%
   summarise(
     n = n(),
+    
     total = 1600,
+    
     tanf = sum(tanf, na.rm = TRUE),
     
     snap = sum(snap, na.rm = TRUE),
    
     uninsured = sum(uninsured, na.rm = TRUE),
-   
-    unionmember = sum(unionmember, na.rm = TRUE),
-    
+  
     on_medicaid = sum(on_medicaid, na.rm = TRUE),
+    
+    unemployed = sum(unemployed, na.rm = TRUE)
     
   ))
 
 ```
 
-
 Econ Experiences Across Impact Groups
 
+P(impact | economic experience)
 ```{r}
 economic_vars <- c(
   "snap",
@@ -1749,68 +1753,37 @@ economic_vars <- c(
   "unemployed",
   "uninsured"
 )
-# 
-# economic_impact_summary <- purrr::map_dfr(
-#   economic_vars,
-#   function(var) {
-#     
-#     data_full %>%
-#       filter(.data[[var]] == 1) %>%
-#       summarise(
-#         variable = var,
-#         n_group = n(),
-#         
-#         incarc_n = sum(incarc == 1, na.rm = TRUE),
-#         incarc_prop = mean(incarc == 1, na.rm = TRUE),
-#         
-#         knowincarc_n = sum(knowincarc == 1, na.rm = TRUE),
-#         knowincarc_prop = mean(knowincarc == 1, na.rm = TRUE),
-#         
-#         vict_n = sum(vict == 1, na.rm = TRUE),
-#         vict_prop = mean(vict == 1, na.rm = TRUE),
-#         
-#         impact_n = sum(impact == 1, na.rm = TRUE),
-#         impact_prop = mean(impact == 1, na.rm = TRUE),
-#         
-#         no_impact_n = sum(impact == 0, na.rm = TRUE),
-#         no_impact_prop = mean(impact == 0, na.rm = TRUE)
-#       )
-#   }
-# )
-# 
-# economic_impact_summary
 
-economic_by_impact <- purrr::map_dfr(
+economic_impact_summary <- purrr::map_dfr(
   economic_vars,
   function(var) {
-    
+
     data_full %>%
-      filter(impact %in% c(0, 1)) %>%
-      group_by(impact) %>%
+      filter(.data[[var]] == 1) %>%
       summarise(
         variable = var,
-        
         n_group = n(),
-        n_nonmissing = sum(!is.na(.data[[var]])),
-        n_yes = sum(.data[[var]] == 1, na.rm = TRUE),
-        
-        prop_yes = mean(.data[[var]] == 1, na.rm = TRUE),
-        
-        .groups = "drop"
+
+        incarc_n = sum(incarc == 1, na.rm = TRUE),
+        incarc_prop = mean(incarc == 1, na.rm = TRUE),
+
+        knowincarc_n = sum(knowincarc == 1, na.rm = TRUE),
+        knowincarc_prop = mean(knowincarc == 1, na.rm = TRUE),
+
+        vict_n = sum(vict == 1, na.rm = TRUE),
+        vict_prop = mean(vict == 1, na.rm = TRUE),
+
+        impact_n = sum(impact == 1, na.rm = TRUE),
+        impact_prop = mean(impact == 1, na.rm = TRUE),
+
+        no_impact_n = sum(impact == 0, na.rm = TRUE),
+        no_impact_prop = mean(impact == 0, na.rm = TRUE)
       )
   }
-) %>%
-  mutate(
-    impact_group = case_when(
-      impact == 1 ~ "Any Impact",
-      impact == 0 ~ "No Impact"
-    )
-  )
+)
 
-```
+economic_impact_summary
 
-
-```{r}
 
 
 economic_impact_plot <- economic_impact_summary %>%
@@ -1848,9 +1821,13 @@ economic_impact_plot <- economic_impact_summary %>%
     )
   )
 
-economic_impact_plot 
-
+print(n = 25, economic_impact_plot)
 ```
+
+
+
+
+save P(impact | economic experience) plots
 
 ```{r}
 
@@ -1971,6 +1948,82 @@ ggsave(
 ```
 
 
+P(Econ Experience | Impact)
+```{r}
+
+economic_vars <- c(
+  "snap",
+  "tanf",
+  "medicaid",
+  "unemployed",
+  "uninsured"
+)
+
+```
+
+```{r}
+economic_by_impact <- purrr::map_dfr(
+  economic_vars,
+  function(var) {
+    
+    data_full %>%
+      filter(impact %in% c(0, 1)) %>%
+      group_by(impact) %>%
+      summarise(
+        variable = var,
+        
+        n_group = n(),
+        n_nonmissing = sum(!is.na(.data[[var]])),
+        n_yes = sum(.data[[var]] == 1, na.rm = TRUE),
+        
+        prop_yes = mean(.data[[var]] == 1, na.rm = TRUE),
+        
+        .groups = "drop"
+      )
+  }
+) %>%
+  mutate(
+    impact_group = case_when(
+      impact == 1 ~ "Any Impact",
+      impact == 0 ~ "No Impact"
+    )
+  )
+
+economic_comparison <- economic_by_impact %>%
+  dplyr::select(
+    variable,
+    impact,
+    n_nonmissing,
+    n_yes,
+    prop_yes
+  ) %>%
+  tidyr::pivot_wider(
+    names_from = impact,
+    values_from = c(n_nonmissing, n_yes, prop_yes),
+    names_glue = "{.value}_impact{impact}"
+  ) %>%
+  mutate(
+    pct_impact = 100 * prop_yes_impact1,
+    pct_no_impact = 100 * prop_yes_impact0,
+    
+    pp_difference =
+      100 * (prop_yes_impact1 - prop_yes_impact0),
+    
+    prevalence_ratio =
+      prop_yes_impact1 / prop_yes_impact0
+  ) %>%
+  dplyr::select(
+    variable,
+    n_yes_impact1,
+    n_yes_impact0,
+    pct_impact,
+    pct_no_impact,
+    pp_difference,
+    prevalence_ratio
+  )
+
+view(economic_comparison)
+```
 
 
 # FIRE
