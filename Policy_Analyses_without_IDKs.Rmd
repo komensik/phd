@@ -1966,3 +1966,187 @@ View(help_alpha$impact_0$item.stats)
 
 ```
 
+# ------------------------------------------------------------
+# Gov Pays Attn
+# ------------------------------------------------------------
+
+## Impact
+```{r}
+
+names(sample_no_dk)
+
+m_trust = lm(gov_attn ~ impact, data = sample_no_dk)
+
+summary(m_trust)
+```
+
+```{r}
+
+m_trust_demo = lm(gov_attn ~ impact + Black + Hisp_Latino + AllOthers + gender, data = sample_no_dk)
+
+summary(m_trust_demo)
+
+```
+
+```{r}
+
+m_trust_pid = lm(gov_attn ~ impact + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat, data = sample_no_dk)
+
+summary(m_trust_pid)
+
+```
+
+```{r}
+
+m_trust_pid_ideo = lm(gov_attn ~ impact + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology, data = sample_no_dk)
+
+summary(m_trust_pid_ideo)
+
+```
+
+
+```{r}
+
+m_trust_pid_ideo_rr = lm(gov_attn ~ impact + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology + fire_rare, data = sample_no_dk)
+
+summary(m_trust_pid_ideo_rr)
+
+```
+
+
+## Incarc
+
+```{r}
+
+names(sample_no_dk)
+
+m_trust = lm(gov_attn ~ incarc, data = sample_no_dk)
+
+summary(m_trust)
+```
+
+```{r}
+
+m_trust_demo = lm(gov_attn ~ incarc + Black + Hisp_Latino + AllOthers + gender, data = sample_no_dk)
+
+summary(m_trust_demo)
+
+```
+
+```{r}
+
+m_trust_pid = lm(gov_attn ~ incarc + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat, data = sample_no_dk)
+
+summary(m_trust_pid)
+
+```
+
+```{r}
+
+m_trust_pid_ideo = lm(gov_attn ~ incarc + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology, data = sample_no_dk)
+
+summary(m_trust_pid_ideo)
+
+```
+
+
+```{r}
+
+m_trust_pid_ideo_rr = lm(gov_attn ~ incarc + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology + fire_rare, data = sample_no_dk)
+
+summary(m_trust_pid_ideo_rr)
+
+```
+## knowinc
+```{r}
+
+
+
+m_trust = lm(gov_attn ~ knowincarc, data = sample_no_dk)
+
+summary(m_trust)
+```
+
+```{r}
+
+m_trust_demo = lm(gov_attn ~ knowincarc + Black + Hisp_Latino + AllOthers + gender, data = sample_no_dk)
+
+summary(m_trust_demo)
+
+```
+
+```{r}
+
+m_trust_pid = lm(gov_attn ~ knowincarc + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat, data = sample_no_dk)
+
+summary(m_trust_pid)
+
+```
+
+```{r}
+
+m_trust_pid_ideo = lm(gov_attn ~ knowincarc + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology, data = sample_no_dk)
+
+summary(m_trust_pid_ideo)
+
+```
+
+
+```{r}
+
+m_trust_pid_ideo_rr = lm(gov_attn ~ knowincarc + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology + fire_rare, data = sample_no_dk)
+
+summary(m_trust_pid_ideo_rr)
+
+```
+
+## victims
+```{r}
+
+
+
+m_trust = lm(gov_attn ~ vict, data = sample_no_dk)
+
+summary(m_trust)
+```
+
+```{r}
+
+m_trust_demo = lm(gov_attn ~ vict + Black + Hisp_Latino + AllOthers + gender, data = sample_no_dk)
+
+summary(m_trust_demo)
+
+```
+
+```{r}
+
+m_trust_pid = lm(gov_attn ~ vict + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat, data = sample_no_dk)
+
+summary(m_trust_pid)
+
+```
+
+```{r}
+
+m_trust_pid_ideo = lm(gov_attn ~ vict + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology, data = sample_no_dk)
+
+summary(m_trust_pid_ideo)
+
+```
+
+
+```{r}
+
+m_trust_pid_ideo_rr = lm(gov_attn ~ vict + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology + fire_rare, data = sample_no_dk)
+
+summary(m_trust_pid_ideo_rr)
+
+```
+
+```{r}
+
+mabc = lm(fire_angry ~ vict + Republican + Democrat, data = sample_no_dk)
+
+summary(mabc)
+
+```

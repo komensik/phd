@@ -427,11 +427,35 @@ Index?
 
 ```
 
+# Survey Example
+
 ### E. Race
 
-q51\_ ▢ White (1) ▢ Black or African American (2) ▢ Native American / Alaska Native (3) ▢ Asian / Asian American (4) ▢ Native Hawaiian / Other Pacific Islander (5) ▢ Middle Eastern/ North African (6) ▢ Hispanic/Latino/a/e (7) ▢ My preferred response not listed (8)
+q51: What racial or ethnic group best describes you? Select one or more.
 
--measured as set of binary indicator variables in the survey, rather than as one categorical race variable. - 1 = selected that category - 0 = ? did not select? - NA = c
+▢ White (1)
+
+▢ Black or African American (2)
+
+▢ Native American / Alaska Native (3)
+
+▢ Asian / Asian American (4)
+
+▢ Native Hawaiian / Other Pacific Islander (5)
+
+▢ Middle Eastern/ North African (6)
+
+▢ Hispanic/Latino/a/e (7)
+
+▢ My preferred response not listed (8)
+
+(measured as set of binary indicator variables in the survey, rather than as one categorical race variable.
+
+1 = selected that category
+
+0 = did not select
+
+NA = skipped
 
 ```{r}
 
@@ -454,6 +478,14 @@ raw_data_cleaned %>%
 
 ```
 
+How many respondents?
+
+```{r}
+
+nrow(raw_data_cleaned)
+
+```
+
 How many multiracial respondents?
 
 ```{r}
@@ -472,11 +504,16 @@ race_df <- raw_data_cleaned %>%
   )
 
 count(race_df, n_races)
-count(race_df, multiracial)
+
+```
+
+```{r}
 
 summary(race_df$n_races)
 
 ```
+
+193 + 19 + 6 = 218
 
 I have 218 multiracial respondents.
 
