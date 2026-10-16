@@ -2143,10 +2143,83 @@ summary(m_trust_pid_ideo_rr)
 
 ```
 
+Victins -- with pid controls only more likely to report angry racism exists (than non-impact)
 ```{r}
 
 mabc = lm(fire_angry ~ vict + Republican + Democrat, data = sample_no_dk)
 
 summary(mabc)
 
+
+mabc1 = lm(fire_rare ~ vict + Republican + Democrat, data = sample_no_dk)
+
+summary(mabc1)
+
+
+mabc2 = lm(fire_privilege ~ vict + Republican + Democrat, data = sample_no_dk)
+
+summary(mabc2)
+
+
+mabc3 = lm(fire_fear ~ vict + Republican + Democrat, data = sample_no_dk)
+
+summary(mabc3)
+
+
 ```
+
+```{r}
+
+mabc4 = lm(lwop_rev ~ vict + Republican + Democrat, data = sample_no_dk)
+
+summary(mabc4)
+
+
+mabc5 = lm(dpen_rev ~ vict + Republican + Democrat, data = sample_no_dk)
+
+summary(mabc5)
+
+
+mabc6 = lm(min_wage ~ vict + Republican + Democrat + White, data = sample_no_dk)
+
+summary(mabc6)
+
+
+mabc7 = lm(free_calls ~ vict + Republican + Democrat, data = sample_no_dk)
+
+summary(mabc7)
+
+
+
+mabc8 = lm(alt_sentencing ~ vict + Republican + Democrat, data = sample_no_dk)
+
+summary(mabc8)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
