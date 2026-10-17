@@ -1,10 +1,10 @@
-   ---
-title: "Policy Analyses without IDKs"
-output: html_notebook
-editor_options: 
-  markdown: 
-    wrap: 72
----
+|                                    |
+|------------------------------------|
+| le: "Policy Analyses without IDKs" |
+| put: html_notebook                 |
+| tor_options:                       |
+| arkdown:                           |
+| wrap: 72                           |
 
 ```{r setup, include=FALSE, echo=FALSE}
 
@@ -45,15 +45,13 @@ source("variable_labels_sept1.R")
 
 Note on samples --
 
-This uses sample_all-> sample -> sample_dk -> sample_no_dk
+This uses sample_all-\> sample -\> sample_dk -\> sample_no_dk
 
 In Sample, as in prev analyses policy variables have "don't know/no answer" coded as a middle value (2.5 or 2).
 
-Sample_dk has new ambivalence DK variables (ie dk_free_calls) indicate whether a respondent gave a policy "dunno."
-- Can use this for analysis of ambivalence, or can use below
+Sample_dk has new ambivalence DK variables (ie dk_free_calls) indicate whether a respondent gave a policy "dunno." - Can use this for analysis of ambivalence, or can use below
 
-sample_no_dk changes the policy variables so that "dunno" is now an NA. It also has the IDk indicator variables. 
-- This (use for analysis of preferences) asks preferences after DK responses have been treated as missing.
+sample_no_dk changes the policy variables so that "dunno" is now an NA. It also has the IDk indicator variables. - This (use for analysis of preferences) asks preferences after DK responses have been treated as missing.
 
 # I. Setup
 
@@ -115,7 +113,7 @@ incar_vote_vars <- c(
 )
 
 
-# All policy variables we want to examine
+# All policy variables I want to use
 all_policy_vars <- c(
   q25_help_vars,
   punish_vars,
@@ -226,6 +224,7 @@ dk_all_vars <- c(
   dk_q25_help_vars,
   dk_punish_vars
 )
+
 ```
 
 Create total DK counts for each respondent
@@ -330,10 +329,11 @@ sample_dk <- sample_dk %>%
 
 ```
 
-## B. Edit Sample 
+## B. Edit Sample
 
 ### "sample_no_idk"
-- has dk_policy indicator variables 
+
+- has dk_policy indicator variables
 - IDK responses now remove from policy vars themselves by converting to NA
 
 ```{r}
@@ -481,12 +481,9 @@ dk_policy_summary
 
 # II. Analysis: Preferences
 
-
-
 ## A. Name waves
 
-Each wave is controls, so first group controls (tho these should
-already/eventually be clear in variable labels R file)
+Each wave is controls, so first group controls (tho these should already/eventually be clear in variable labels R file)
 
 ```{r}
 demo_controls <- c(
@@ -585,20 +582,12 @@ policy_labels <- setNames(
 
 The waves are waves of a model. So now define that model:
 
-"whenever (later) I give this function a dataset (df), a dependent
-variable (dv), an independent variable (iv), and some controls
-(controls), R should:
+"whenever (later) I give this function a dataset (df), a dependent variable (dv), an independent variable (iv), and some controls (controls), R should:
 
-(a) start with a default of assuming there are no controls, if no
-    controls are given (character (0));
-(b) in the right-hand side (rhs) or the equation, use the supplied iv
-    and supplied controls to make a vector with all vraibles that should
-    appear to the right of \~
-(c) (fml) construct an ordinary regression syntax with the supplied dv
-    on the left of \~, then supplied rhs info and turn it into a signle
-    string (collapse = "+"), and
-(d) treat this as a statistical formula rather than a string
-    (as.formula())
+(a) start with a default of assuming there are no controls, if no controls are given (character (0));
+(b) in the right-hand side (rhs) or the equation, use the supplied iv and supplied controls to make a vector with all vraibles that should appear to the right of \~
+(c) (fml) construct an ordinary regression syntax with the supplied dv on the left of \~, then supplied rhs info and turn it into a signle string (collapse = "+"), and
+(d) treat this as a statistical formula rather than a string (as.formula())
 (e) run the regression
 
 ```{r}
@@ -620,14 +609,9 @@ policy_dummies_waves <- list() #this is actually now main model generating loop
 
 ```
 
-Created bucket to store things (policy_dummies_waves), and created the
-basic model structure (make_policy_model), now explain how to fill
-bucket.
+Created bucket to store things (policy_dummies_waves), and created the basic model structure (make_policy_model), now explain how to fill bucket.
 
-How to fill the things: with waves of models that loop through the DVs
-and iteratively add controls for each DV, generating 4 substantive
-comparisons right now: 1. impact versus non impact 2. incarc versus non
-impact 3. knowincarc versus non impact 4. victimized vs non impact
+How to fill the things: with waves of models that loop through the DVs and iteratively add controls for each DV, generating 4 substantive comparisons right now: 1. impact versus non impact 2. incarc versus non impact 3. knowincarc versus non impact 4. victimized vs non impact
 
 ```{r}
 
@@ -659,14 +643,9 @@ for (wave_name in names(control_waves)) {#calls list of waves in control waves
 
 This should have made something like:
 
-policy_dummies_waves \| \|-- nocontrol \| \|-- m_prisonhelp_impact \|
-\|-- m_prisonhelp_incarc \| \|-- m_prisonhelp_knowincarc \| \|--
-m_prisonhelp_vict \| \|-- ... \| \|-- demo \| \|-- m_prisonhelp_impact
-\| \|-- m_prisonhelp_incarc \| \|-- ... \| \|-- party_ideo \| \|--
-full_attitudes
+policy_dummies_waves \| \|-- nocontrol \| \|-- m_prisonhelp_impact \| \|-- m_prisonhelp_incarc \| \|-- m_prisonhelp_knowincarc \| \|-- m_prisonhelp_vict \| \|-- ... \| \|-- demo \| \|-- m_prisonhelp_impact \| \|-- m_prisonhelp_incarc \| \|-- ... \| \|-- party_ideo \| \|-- full_attitudes
 
-It is helpful to not need to type out the full
-(policy_dummies_waves[["nocontrol"]][["m_prisonhelp_incarc"]]).
+It is helpful to not need to type out the full (policy_dummies_waves[["nocontrol"]][["m_prisonhelp_incarc"]]).
 
 Making shortcuts/names
 
@@ -684,8 +663,7 @@ policy_dummies_full_models <- policy_dummies_waves[["full_attitudes"]]
 
 ```
 
-For example "policy_dummies_full_models" shows the list of models with
-all controls included
+For example "policy_dummies_full_models" shows the list of models with all controls included
 
 ```{r}
 
@@ -929,8 +907,6 @@ make_wave_results_table <- function(
 }
 ```
 
-
-
 # Results:
 
 ## Model outputs for 2.5s excluded
@@ -960,11 +936,9 @@ summary(policy_dummies_full_models[["m_prisonhelp_incarc"]])
 
 ```
 
-
 ```{r}
 summary(policy_dummies_full_models[["m_min_wage_vict"]])
 ```
-
 
 ### Voting Variables
 
@@ -1016,12 +990,11 @@ summary(policy_dummies_partyideo_models[["m_jail_access_rev_vict"])
 summary(policy_dummies_full_models[["m_jail_access_rev_vict"]])
 ```
 
-# Latex 
+# Latex
 
 This assumes that analses steps A, B, and C have already run. This "picks up" from the end of C.
 
 ## Per DV, 1 4W Table:
-
 
 ```{r}
 # Assumes Steps 1-4 have already run, including:
@@ -1405,11 +1378,9 @@ cat(
 )
 ```
 
-
 # III. Analysis: Ambivalence
 
-Can use either sample_no_dk or sample_dk for this. 
-
+Can use either sample_no_dk or sample_dk for this.
 
 ## A. Name waves
 
@@ -1475,8 +1446,7 @@ vars_1_labels <- c(
 
 ```
 
-
-Controls will be applied in waves, so  group controls (tho these should already/eventually be clear in variable labels R file)
+Controls will be applied in waves, so group controls (tho these should already/eventually be clear in variable labels R file)
 
 ```{r}
 
@@ -1553,15 +1523,13 @@ wave_labels <- c(
 
 ## B. Define model
 
-### Logit or OLS? 
+### Logit or OLS?
 
-Basic idea is dk_policy ~ impact. The DV's are binary. 
+Basic idea is dk_policy \~ impact. The DV's are binary.
 
-lm() with a binary DV would give the wrong error structure and produce heteroskedastic errors.
--also assumes effects are constant in probability units
+lm() with a binary DV would give the wrong error structure and produce heteroskedastic errors. -also assumes effects are constant in probability units
 
-Logistic regression might be better. 
-- it models a transformation of the probability (log odds)
+Logistic regression might be better. - it models a transformation of the probability (log odds)
 
 ### Logit Exploration
 
@@ -1581,42 +1549,38 @@ exp(coef(m_freecalls_1))
 
 
 ```
-Interpretation - 
+
+Interpretation -
 
 $$
 log( \frac{P(DK=1)}{1-P(DK=1)} ) = B(intercept) +B(impact) = -1.785 - .968
-$$
-Intercept -- 
+$$ Intercept --
 
-Coefficients are in log-odds units, so the -0.968 coefficient is not really substantive to interpret. Intercept is 0/1, so it describes non-impacted respondents. It is exponentiated (exp(-1.784)) giving the 0.167 Intercept. 
+Coefficients are in log-odds units, so the -0.968 coefficient is not really substantive to interpret. Intercept is 0/1, so it describes non-impacted respondents. It is exponentiated (exp(-1.784)) giving the 0.167 Intercept.
 
 Convert the intercept to probability:
 
 $$
 P(DK = 1 | impact = 0) = \frac{e^-1.78}{1 + e^-1.78} = 0.144
-$$
-So the intercept tells that: 
+$$ So the intercept tells that:
 
-Among respondents with impact = 0, the predictability of answering DK on the free calls item is about 14.4%. 
+Among respondents with impact = 0, the predictability of answering DK on the free calls item is about 14.4%.
 
 Impact --
 
 Impact coefficient: -0.96786
 
-The reported 0.3798937 is the odds ratio:
-  - exp(-0.96786) = 0.3799 ~ 0.380
-  
-  - it means that the odds of answering DK among respondents with impact = 1 are about 0.38 times the odds among respondents with impact = 0. IE: impacted respondents have approximately a 62% lower odds of answering DK than do respondents with impact = 1.
+The reported 0.3798937 is the odds ratio: - exp(-0.96786) = 0.3799 \~ 0.380
 
-In terms of probabilities, the linear predictor becomes 
+- it means that the odds of answering DK among respondents with impact = 1 are about 0.38 times the odds among respondents with impact = 0. IE: impacted respondents have approximately a 62% lower odds of answering DK than do respondents with impact = 1.
+
+In terms of probabilities, the linear predictor becomes
 
 $$
 -1.78489-.96786=-2.75275
 $$
 
-
 Respondents with carceral/victimization impact were substantially less likely to select “don't know/no opinion” on the free-calls item. The predicted probability of a DK response was approximately 14.4% among respondents without impact and 6.0% among impacted respondents, a difference of roughly 8.4 percentage points.
-
 
 ```{r}
 
@@ -1634,7 +1598,6 @@ exp(coef(m_freecalls_2))
 
 Interpretation via odds:
 
-
 Model fit test with ANOVA asks:
 
 "Does adding this set of four demographic controls improve model fit enough to provide evidence that Model 2 fits the outcome better than the simpler impact-only model?"
@@ -1649,7 +1612,7 @@ The two models have essentially indistinguishable AIC values; adding the demogra
 
 Model 1: Impact is strongly associated with a lower likelihood of DK responding on free calls. The observed/model-implied probability is approximately 14.4% among non-impacted respondents and 6.0% among impacted respondents, an unadjusted difference of about 8.4 percentage points. The corresponding odds ratio is .38.
 
-Model 2: That relationship remains essentially intact after introducing the four demographic controls. The adjusted odds ratio for impact is .39. None of the demographic variables individually provides strong evidence of an association with DK responding, and the demographic block does not significantly improve model fit over the impact-only model (\(\chi^2(4)=7.40,\ p=.116\)). Both models use the same 1,600 observations.
+Model 2: That relationship remains essentially intact after introducing the four demographic controls. The adjusted odds ratio for impact is .39. None of the demographic variables individually provides strong evidence of an association with DK responding, and the demographic block does not significantly improve model fit over the impact-only model ($\chi^2(4)=7.40,\ p=.116$). Both models use the same 1,600 observations.
 
 #### Education Funding
 
@@ -1667,7 +1630,8 @@ exp(coef(m_ed_funds_1))
 
 
 ```
-Interpretation - 
+
+Interpretation -
 
 #### Alternative Sentencing
 
@@ -1685,7 +1649,8 @@ exp(coef(m_alt_sentencing_1))
 
 
 ```
-Interpretation - 
+
+Interpretation -
 
 #### Min Wage
 
@@ -1703,7 +1668,8 @@ exp(coef(m_min_wage_1))
 
 
 ```
-Interpretation - 
+
+Interpretation -
 
 #### Rights Restoration
 
@@ -1721,7 +1687,8 @@ exp(coef(m_rr_1))
 
 
 ```
-Interpretation - 
+
+Interpretation -
 
 #### Jail Voting
 
@@ -1740,6 +1707,7 @@ exp(coef(m_jailvote_1))
 ```
 
 #### Death Penalty
+
 ```{r}
 
 m_dpen_1 <- glm(
@@ -1753,7 +1721,6 @@ summary(m_dpen_1)
 exp(coef(m_dpen_1))
 
 ```
-
 
 #### LWOP
 
@@ -1828,7 +1795,9 @@ help_cont_corrs <- purrr::map(
 ```
 
 # ------------------------------------------------------------
+
 # Inspect
+
 # ------------------------------------------------------------
 
 ```{r, desor1}
@@ -1863,8 +1832,6 @@ help_cont_corrs$impact_1$n
 help_cont_corrs$impact_0$n
 
 ```
-
-
 
 ```{r, desor2}
 # ------------------------------------------------------------
@@ -1934,32 +1901,26 @@ help_alpha$impact_1$total$raw_alpha
 help_alpha$impact_0$total$raw_alpha
 ```
 
-
 ```{r}
 # Item Stats
 View(help_alpha$full_sample$item.stats)
 ```
 
-
 ```{r}
 View(help_alpha$incarc_1$item.stats)
 ```
-
 
 ```{r}
 View(help_alpha$vict_1$item.stats)
 ```
 
-
 ```{r}
 View(help_alpha$knowincarc_1$item.stats)
 ```
 
-
 ```{r}
 View(help_alpha$impact_1$item.stats)
 ```
-
 
 ```{r}
 View(help_alpha$impact_0$item.stats)
@@ -1967,10 +1928,13 @@ View(help_alpha$impact_0$item.stats)
 ```
 
 # ------------------------------------------------------------
+
 # Gov Pays Attn
+
 # ------------------------------------------------------------
 
 ## Impact
+
 ```{r}
 
 names(sample_no_dk)
@@ -2004,7 +1968,6 @@ summary(m_trust_pid_ideo)
 
 ```
 
-
 ```{r}
 
 m_trust_pid_ideo_rr = lm(gov_attn ~ impact + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology + fire_rare, data = sample_no_dk)
@@ -2012,7 +1975,6 @@ m_trust_pid_ideo_rr = lm(gov_attn ~ impact + Black + Hisp_Latino + AllOthers + g
 summary(m_trust_pid_ideo_rr)
 
 ```
-
 
 ## Incarc
 
@@ -2049,7 +2011,6 @@ summary(m_trust_pid_ideo)
 
 ```
 
-
 ```{r}
 
 m_trust_pid_ideo_rr = lm(gov_attn ~ incarc + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology + fire_rare, data = sample_no_dk)
@@ -2057,7 +2018,9 @@ m_trust_pid_ideo_rr = lm(gov_attn ~ incarc + Black + Hisp_Latino + AllOthers + g
 summary(m_trust_pid_ideo_rr)
 
 ```
+
 ## knowinc
+
 ```{r}
 
 
@@ -2091,7 +2054,6 @@ summary(m_trust_pid_ideo)
 
 ```
 
-
 ```{r}
 
 m_trust_pid_ideo_rr = lm(gov_attn ~ knowincarc + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology + fire_rare, data = sample_no_dk)
@@ -2101,6 +2063,7 @@ summary(m_trust_pid_ideo_rr)
 ```
 
 ## victims
+
 ```{r}
 
 
@@ -2134,7 +2097,6 @@ summary(m_trust_pid_ideo)
 
 ```
 
-
 ```{r}
 
 m_trust_pid_ideo_rr = lm(gov_attn ~ vict + Black + Hisp_Latino + AllOthers + gender + Republican + Democrat + fiscal_ideology + social_ideology + fire_rare, data = sample_no_dk)
@@ -2144,6 +2106,7 @@ summary(m_trust_pid_ideo_rr)
 ```
 
 Victins -- with pid controls only more likely to report angry racism exists (than non-impact)
+
 ```{r}
 
 mabc = lm(fire_angry ~ vict + Republican + Democrat, data = sample_no_dk)
@@ -2198,28 +2161,614 @@ summary(mabc8)
 
 ```
 
+# ------------------------------------------------------------
+
+# Deservingness
+
+# ------------------------------------------------------------
+
+Using sample DK (most recently)
+
+```{r}
+source("variable_labels.R")
+
+
+long_df_table <- sample_dk %>%
+  dplyr::select(all_of(impact_vars), all_of(deserving_vars)) %>%
+  pivot_longer(
+    cols = all_of(deserving_vars),
+    names_to = "target",
+    values_to = "deservingness"
+  )
+
+get_diff_table <- function(df, group_var) {
+  df %>%
+    dplyr::filter(!is.na(deservingness)) %>%
+    dplyr::group_by(target, !!rlang::sym(group_var)) %>%
+    dplyr::summarise(mean = mean(deservingness, na.rm = TRUE), .groups = "drop") %>%
+    tidyr::pivot_wider(names_from = !!rlang::sym(group_var), values_from = mean) %>%
+    dplyr::mutate(
+      baseline = `0`,
+      diff = `1` - `0`,
+      pct_diff = 100 * (diff / `0`)
+    ) %>%
+    dplyr::select(target, baseline, pct_diff)
+}
+
+names(long_df)
+
+
+impact_tab <- get_diff_table(long_df_table, "impact")
+incarc_tab <- get_diff_table(long_df_table, "incarc")
+know_tab   <- get_diff_table(long_df_table, "knowincarc")
+vict_tab   <- get_diff_table(long_df_table, "vict")
+
+get_pvals_impact <- function(df) {
+  df %>%
+    dplyr::filter(!is.na(deservingness), !is.na(impact)) %>%
+    dplyr::group_by(target) %>%
+    dplyr::summarise(
+      pval = t.test(deservingness ~ impact)$p.value,
+      .groups = "drop"
+    )
+}
+
+add_stars <- function(p) {
+  dplyr::case_when(
+    p < 0.001 ~ "***",
+    p < 0.01  ~ "**",
+    p < 0.05  ~ "*",
+    TRUE ~ ""
+  )
+}
+
+names(long_df_table)
+
+
+impact_pvals <- get_pvals_impact(long_df_table)
+
+impact_tab <- impact_tab %>%
+  dplyr::left_join(impact_pvals, by = "target") %>%
+  dplyr::mutate(
+    pct_diff = paste0(round(pct_diff, 1), add_stars(pval))
+  ) %>%
+  dplyr::select(-pval)
+
+density_compare <- function(df, subgroup_var, label, xvar) {
+
+  plot_df <- df %>%
+    dplyr::transmute(
+      d = .data[[xvar]],
+      group = dplyr::case_when(
+        impact == 0 ~ "Not impacted",
+        .data[[subgroup_var]] == 1 ~ label,
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    dplyr::filter(!is.na(group), !is.na(d))
+
+  means_df <- plot_df %>%
+    dplyr::group_by(group) %>%
+    dplyr::summarise(mean_val = mean(d, na.rm = TRUE), .groups = "drop")
+
+  ggplot2::ggplot(plot_df, ggplot2::aes(x = d, color = group)) +
+    ggplot2::geom_density(linewidth = 1.2) +
+    ggplot2::geom_vline(
+      data = means_df,
+      ggplot2::aes(xintercept = mean_val, color = group),
+      linetype = "dashed"
+    ) +
+    ggplot2::labs(x = "Deservingness", y = "Density", color = NULL) +
+    ggplot2::theme_minimal()
+}
+
+```
+
+Tables
+
+```{r}
+
+
+impact_tab <- impact_tab %>%
+  dplyr::rename(pct_impact = pct_diff)
+
+incarc_tab <- incarc_tab %>%
+  dplyr::rename(pct_incarc = pct_diff)
+
+know_tab <- know_tab %>%
+  dplyr::rename(pct_knowincarc = pct_diff)
+
+vict_tab <- vict_tab %>%
+  dplyr::rename(pct_vict = pct_diff)
+
+table_out <- impact_tab %>%
+  dplyr::select(target, baseline, pct_impact) %>%
+  dplyr::left_join(
+    incarc_tab %>% dplyr::select(target, pct_incarc),
+    by = "target"
+  ) %>%
+  dplyr::left_join(
+    know_tab %>% dplyr::select(target, pct_knowincarc),
+    by = "target"
+  ) %>%
+  dplyr::left_join(
+    vict_tab %>% dplyr::select(target, pct_vict),
+    by = "target"
+  )
+
+# readable row labels from variable_labels.R
+table_out <- table_out %>%
+  dplyr::mutate(
+    target = unname(targets[target])
+  )
+
+table_out <- table_out %>%
+  dplyr::mutate(
+    baseline = round(baseline, 1),
+    pct_incarc = round(pct_incarc, 1),
+    pct_knowincarc = round(pct_knowincarc, 1),
+    pct_vict = round(pct_vict, 1)
+  )
+
+table_out_print <- table_out %>%
+  dplyr::mutate(
+    pct_impact = paste0(pct_impact, "\\%"),
+    pct_incarc = paste0(pct_incarc, "\\%"),
+    pct_knowincarc = paste0(pct_knowincarc, "\\%"),
+    pct_vict = paste0(pct_vict, "\\%")
+  )
+
+latex_tab <- knitr::kable(
+  table_out_print,
+  format = "latex",
+  booktabs = TRUE,
+  escape = FALSE,
+  col.names = c(
+    "Group",
+    "Not impacted mean",
+    "\\% change: Impacted",
+    "\\% change: Incarcerated",
+    "\\% change: Knows incarcerated",
+    "\\% change: Victim"
+  ),
+  align = c("l", "c", "c", "c", "c", "c")
+)
+
+cat(latex_tab)
 
 
 
 
+```
+
+Into Plots
+```{r}
+
+# -----------------------------
+# 2. helper to build one comparison
+# -----------------------------
+make_plot_df <- function(df, xvar, subgroup_var, subgroup_label, targets) {
+  df %>%
+    transmute(
+      deserving = .data[[xvar]],
+      group = case_when(
+        impact == 0 ~ "Not impacted",
+        .data[[subgroup_var]] == 1 ~ subgroup_label,
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    filter(!is.na(deserving), !is.na(group)) %>%
+    mutate(
+      target = targets,
+      comparison = subgroup_label
+    )
+}
+
+# -----------------------------
+# 3. build full plotting data
+# -----------------------------
+plot_df <- bind_rows(
+  make_plot_df(sample, "d_incppl_pris_abc", "impact", "Impacted", "Incarcerated people"),
+  make_plot_df(sample, "d_incppl_pris_abc", "incarc", "Ever incarcerated", "Incarcerated people"),
+  make_plot_df(sample, "d_incppl_pris_abc", "knowincarc", "Knows incarcerated", "Incarcerated people"),
+  make_plot_df(sample, "d_incppl_pris_abc", "vict", "Victim", "Incarcerated people"),
+
+  make_plot_df(sample, "d_crim_abc", "impact", "Impacted", "Criminals"),
+  make_plot_df(sample, "d_crim_abc", "incarc", "Ever incarcerated", "Criminals"),
+  make_plot_df(sample, "d_crim_abc", "knowincarc", "Knows incarcerated", "Criminals"),
+  make_plot_df(sample, "d_crim_abc", "vict", "Victim", "Criminals"),
+
+  make_plot_df(sample, "d_incwomen_abc", "impact", "Impacted", "Incarcerated women"),
+  make_plot_df(sample, "d_incwomen_abc", "incarc", "Ever incarcerated", "Incarcerated women"),
+  make_plot_df(sample, "d_incwomen_abc", "knowincarc", "Knows incarcerated", "Incarcerated women"),
+  make_plot_df(sample, "d_incwomen_abc", "vict", "Victim", "Incarcerated women")
+)
+
+# order facets nicely
+plot_df <- plot_df %>%
+  mutate(
+    target = factor(
+      target,
+      levels = c("Incarcerated people", "Criminals", "Incarcerated women")
+    ),
+    comparison = factor(
+      comparison,
+      levels = c("Impacted", "Ever incarcerated", "Knows incarcerated", "Victim")
+    ),
+    group = factor(
+      group,
+      levels = c("Not impacted", "Impacted", "Ever incarcerated", "Knows incarcerated", "Victim")
+    )
+  )
+
+# -----------------------------
+# 4. means for dashed lines
+# -----------------------------
+means_df <- plot_df %>%
+  group_by(target, comparison, group) %>%
+  summarise(mean_val = mean(deserving, na.rm = TRUE), .groups = "drop")
+
+# -----------------------------
+# 5. plot
+# -----------------------------
+p <- ggplot(plot_df, aes(x = deserving, color = group)) +
+  geom_density(linewidth = 1) +
+  geom_vline(
+    data = means_df,
+    aes(xintercept = mean_val, color = group),
+    linetype = "dashed",
+    linewidth = 0.8,
+    show.legend = FALSE
+  ) +
+  facet_grid(target ~ comparison) +
+  coord_cartesian(xlim = c(0, 100)) +
+  labs(
+    x = "Deservingness score",
+    y = "Density",
+    color = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold")
+  )
 
 
 
+ggsave(
+  "deservingness_3x4_density.png",
+  plot = p,
+  width = 14,
+  height = 9,
+  dpi = 300,
+  bg = "white"
+)
+
+ggsave(
+  "deservingness_3x4_density.pdf",
+  plot = p,
+  width = 14,
+  height = 9
+)
+
+```
+
+```{r}
+# ============================================================
+# EXPORT ALL MODEL SUMMARIES AND ROBUST COEFFICIENT TABLES
+# ============================================================
+
+library(lmtest)
+library(sandwich)
+
+# -----------------------------
+# 1. Collect all model lists
+# -----------------------------
+all_model_lists <- list(
+  goal1_nocontrol   = policy_dummies_models,
+  goal1_demo        = policy_dummies_demo_models,
+  goal1_partyideo   = policy_dummies_partyideo_models,
+  goal1_full        = policy_dummies_full_models,
+  goal2_nocontrol   = policy_vs_nonimp_nocontrol_models,
+  goal2_demo        = policy_vs_nonimp_demo_models,
+  goal2_partyideo   = policy_vs_nonimp_partyideo_models,
+  goal2_full        = policy_vs_nonimp_full_models
+)
+
+# -----------------------------
+# 2. Helper: write one model list
+# -----------------------------
+write_model_list_outputs <- function(model_list, list_name, out_dir = "model_outputs") {
+
+  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+
+  summary_file <- file.path(out_dir, paste0(list_name, "_summary_output.txt"))
+  robust_file  <- file.path(out_dir, paste0(list_name, "_robust_output.txt"))
+
+  # -------- summary() output --------
+  con_sum <- file(summary_file, open = "wt")
+  for (model_name in names(model_list)) {
+    mod <- model_list[[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_sum)
+
+    capture.output(summary(mod), file = con_sum, append = TRUE)
+    writeLines("\n\n", con_sum)
+  }
+  close(con_sum)
+
+  # -------- robust coefficient output --------
+  con_rob <- file(robust_file, open = "wt")
+  for (model_name in names(model_list)) {
+    mod <- model_list[[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_rob)
+
+    robust_tab <- lmtest::coeftest(mod, vcov. = sandwich::vcovHC(mod, type = "HC1"))
+    capture.output(print(robust_tab), file = con_rob, append = TRUE)
+
+    writeLines("\n--- Model fit ---\n", con_rob)
+    fit_info <- c(
+      paste("N   =", nobs(mod)),
+      paste("R2  =", round(summary(mod)$r.squared, 4)),
+      paste("Adj =", round(summary(mod)$adj.r.squared, 4))
+    )
+    writeLines(fit_info, con_rob)
+
+    writeLines("\n\n", con_rob)
+  }
+  close(con_rob)
+
+  invisible(list(
+    summary_file = summary_file,
+    robust_file = robust_file
+  ))
+}
+
+# -----------------------------
+# 3. Run for all model lists
+# -----------------------------
+output_files <- lapply(names(all_model_lists), function(list_name) {
+  write_model_list_outputs(
+    model_list = all_model_lists[[list_name]],
+    list_name = list_name,
+    out_dir = "model_outputs"
+  )
+})
+
+names(output_files) <- names(all_model_lists)
+
+# -----------------------------
+# 4. Optional: make one master file
+# -----------------------------
+master_summary_file <- file.path("model_outputs", "ALL_MODEL_SUMMARIES.txt")
+master_robust_file  <- file.path("model_outputs", "ALL_MODEL_ROBUST.txt")
+
+con_master_sum <- file(master_summary_file, open = "wt")
+for (list_name in names(all_model_lists)) {
+  writeLines(paste0(
+    "\n\n",
+    strrep("#", 100), "\n",
+    "MODEL LIST: ", list_name, "\n",
+    strrep("#", 100), "\n"
+  ), con_master_sum)
+
+  for (model_name in names(all_model_lists[[list_name]])) {
+    mod <- all_model_lists[[list_name]][[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_master_sum)
+
+    capture.output(summary(mod), file = con_master_sum, append = TRUE)
+    writeLines("\n\n", con_master_sum)
+  }
+}
+close(con_master_sum)
+
+con_master_rob <- file(master_robust_file, open = "wt")
+for (list_name in names(all_model_lists)) {
+  writeLines(paste0(
+    "\n\n",
+    strrep("#", 100), "\n",
+    "MODEL LIST: ", list_name, "\n",
+    strrep("#", 100), "\n"
+  ), con_master_rob)
+
+  for (model_name in names(all_model_lists[[list_name]])) {
+    mod <- all_model_lists[[list_name]][[model_name]]
+
+    writeLines(paste0(
+      "\n",
+      strrep("=", 90), "\n",
+      "MODEL: ", model_name, "\n",
+      strrep("=", 90), "\n"
+    ), con_master_rob)
+
+    robust_tab <- lmtest::coeftest(mod, vcov. = sandwich::vcovHC(mod, type = "HC1"))
+    capture.output(print(robust_tab), file = con_master_rob, append = TRUE)
+
+    writeLines("\n--- Model fit ---\n", con_master_rob)
+    fit_info <- c(
+      paste("N   =", nobs(mod)),
+      paste("R2  =", round(summary(mod)$r.squared, 4)),
+      paste("Adj =", round(summary(mod)$adj.r.squared, 4))
+    )
+    writeLines(fit_info, con_master_rob)
+
+    writeLines("\n\n", con_master_rob)
+  }
+}
+close(con_master_rob)
+
+# -----------------------------
+# 5. Confirm output locations
+# -----------------------------
+print(output_files)
+cat("\nMaster files written to:\n",
+    master_summary_file, "\n",
+    master_robust_file, "\n")
+```
 
 
+deservingness means by target by impact
 
+```{r}
+library(dplyr)
+library(tidyr)
 
+# -----------------------------
+# 1. Define the three targets
+# -----------------------------
+deserving_vars <- c("d_incppl_pris_abc", "d_crim_abc", "d_incwomen_abc")
 
+targets <- c(
+  d_incppl_pris_abc = "Incarcerated people",
+  d_crim_abc = "Criminals",
+  d_incwomen_abc = "Incarcerated women"
+)
 
+# -----------------------------
+# 2. Create simple group flags
+# -----------------------------
+df <- sample %>%
+  mutate(
+    not_impacted = if_else(impact == 0, 1, 0, missing = 0),
+    impacted_grp = if_else(impact == 1, 1, 0, missing = 0),
+    incarcerated_grp = if_else(incarc == 1, 1, 0, missing = 0),
+    knowincarc_grp = if_else(knowincarc == 1, 1, 0, missing = 0),
+    victim_grp = if_else(vict == 1, 1, 0, missing = 0)
+  )
 
+# -----------------------------
+# 3. Put the data in long format
+# -----------------------------
+long_df <- df %>%
+  dplyr::select(
+    not_impacted, impacted_grp, incarcerated_grp, knowincarc_grp, victim_grp,
+    all_of(deserving_vars)
+  ) %>%
+  pivot_longer(
+    cols = all_of(deserving_vars),
+    names_to = "target",
+    values_to = "score"
+  ) %>%
+  mutate(
+    target = recode(target, !!!targets)
+  )
 
+# -----------------------------
+# 4. Compute means for each group x target
+# -----------------------------
+group_means <- bind_rows(
+  long_df %>%
+    filter(not_impacted == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Not impacted"),
 
+  long_df %>%
+    filter(impacted_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Impacted"),
 
+  long_df %>%
+    filter(incarcerated_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Incarcerated"),
 
+  long_df %>%
+    filter(knowincarc_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Knows incarcerated"),
 
+  long_df %>%
+    filter(victim_grp == 1) %>%
+    group_by(target) %>%
+    summarise(mean_score = mean(score, na.rm = TRUE), .groups = "drop") %>%
+    mutate(group = "Victim")
+) %>%
+  dplyr::select(group, target, mean_score)
 
+# View the long table
+group_means
+group_means_wide <- group_means %>%
+  pivot_wider(
+    names_from = target,
+    values_from = mean_score
+  )
 
+group_means_wide
 
+group_differences <- group_means_wide %>%
+  mutate(
+    `Incarcerated people - Criminals` =
+      `Incarcerated people` - `Criminals`,
 
+    `Incarcerated women - Criminals` =
+      `Incarcerated women` - `Criminals`,
 
+    `Incarcerated women - Incarcerated people` =
+      `Incarcerated women` - `Incarcerated people`
+  )
+
+group_differences
+
+final_deservingness_table <- group_differences %>%
+  mutate(across(where(is.numeric), ~ round(.x, 2)))
+
+View(final_deservingness_table)
+```
+
+```{r}
+
+kable(
+  final_deservingness_table,
+  format = "latex",
+  booktabs = TRUE,
+  digits = 2,
+  align = c("l", rep("r", ncol(final_deservingness_table) - 1)),
+  caption = "Mean deservingness scores and within-group target differences"
+)
+
+library(knitr)
+
+kable(
+  final_deservingness_table,
+  format = "latex",
+  booktabs = TRUE,
+  digits = 2,
+  align = c("l", rep("r", ncol(final_deservingness_table) - 1)),
+  caption = "Mean deservingness scores and within-group target differences"
+) %>%
+  cat()
+```
+
+Mediation?
+
+```{r}
+
+names(sample_dk)
+mediation_1 <- lm(prisonhelp ~ d_incppl_pris_abc * impact,
+            data = sample_dk)
+
+summary(mediation_1)
+
+```
 

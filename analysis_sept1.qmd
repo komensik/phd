@@ -36,6 +36,7 @@ source("variable_labels_sept1.R")
 ```
 
 Load Data
+
 ```{r}
 
 here::here()
@@ -55,8 +56,6 @@ not_full <- read_csv("data/cleaned_sans_control_data.csv")
 excluded <- readr::read_csv("data/cleaned_sans_control_data.csv")
 
 ```
-
-
 
 # Descriptive Analyses
 

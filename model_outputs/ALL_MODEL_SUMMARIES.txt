@@ -6,230 +6,6 @@ MODEL LIST: goal1_nocontrol
 
 
 ==========================================================================================
-MODEL: m_prisonhelp_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.11143 -0.40125  0.09875  0.43209  1.09875 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.90125    0.01847 157.108  < 2e-16 ***
-impact       0.21019    0.02995   7.018 3.06e-12 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.656 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.02364,	Adjusted R-squared:  0.02316 
-F-statistic: 49.25 on 1 and 2034 DF,  p-value: 3.059e-12
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonhelp_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.95774 -0.45774  0.04226  0.54226  1.04226 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.95774    0.01519 194.692  < 2e-16 ***
-incarc       0.30759    0.05506   5.586 2.63e-08 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6589 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.01511,	Adjusted R-squared:  0.01463 
-F-statistic: 31.21 on 1 and 2034 DF,  p-value: 2.629e-08
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonhelp_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.12017 -0.42014  0.07986  0.49653  1.07986 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.92014    0.01748  167.07  < 2e-16 ***
-knowincarc   0.20003    0.03165    6.32  3.2e-10 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6575 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.01926,	Adjusted R-squared:  0.01878 
-F-statistic: 39.95 on 1 and 2034 DF,  p-value: 3.199e-10
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonhelp_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.17152 -0.45463  0.04537  0.54537  1.04537 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.95463    0.01562 189.216  < 2e-16 ***
-vict         0.21689    0.04465   4.857 1.28e-06 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6601 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.01147,	Adjusted R-squared:  0.01098 
-F-statistic:  23.6 on 1 and 2034 DF,  p-value: 1.28e-06
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.87401 -0.37401 -0.05911  0.62599  1.19089 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.87401    0.01992 144.268   <2e-16 ***
-impact      -0.06490    0.03231  -2.009   0.0447 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7077 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.00198,	Adjusted R-squared:  0.001489 
-F-statistic: 4.035 on 1 and 2034 DF,  p-value: 0.0447
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.86005 -0.36005  0.03065  0.63995  1.28065 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.86005    0.01631  175.34   <2e-16 ***
-incarc      -0.14069    0.05912   -2.38   0.0174 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7074 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.002777,	Adjusted R-squared:  0.002287 
-F-statistic: 5.664 on 1 and 2034 DF,  p-value: 0.01741
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.86802 -0.36802 -0.05676  0.63198  1.19324 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.86802    0.01882 152.415   <2e-16 ***
-knowincarc  -0.06126    0.03407  -1.798   0.0723 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7078 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.001587,	Adjusted R-squared:  0.001096 
-F-statistic: 3.232 on 1 and 2034 DF,  p-value: 0.07234
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.85814 -0.35814 -0.03614  0.64186  1.21386 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.85814    0.01675 170.651   <2e-16 ***
-vict        -0.07200    0.04789  -1.503    0.133    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.708 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.00111,	Adjusted R-squared:  0.0006188 
-F-statistic:  2.26 on 1 and 2034 DF,  p-value: 0.1329
-
-
-
-
-
-==========================================================================================
 MODEL: m_q23_2_rev_impact
 ==========================================================================================
 
@@ -902,236 +678,6 @@ F-statistic: 19.49 on 1 and 2033 DF,  p-value: 1.066e-05
 
 
 ==========================================================================================
-MODEL: m_prisonpen_1_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7742 -0.7397  0.2258  1.2258  1.2603 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.77417    0.02716 102.144   <2e-16 ***
-impact      -0.03450    0.04405  -0.783    0.434    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9648 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.0003016,	Adjusted R-squared:  -0.0001899 
-F-statistic: 0.6136 on 1 and 2034 DF,  p-value: 0.4335
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7687 -0.7687  0.2313  1.2313  1.3323 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.76874    0.02224 124.489   <2e-16 ***
-incarc      -0.10100    0.08061  -1.253     0.21    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9646 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.0007712,	Adjusted R-squared:  0.00028 
-F-statistic:  1.57 on 1 and 2034 DF,  p-value: 0.2104
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7693 -0.7423  0.2307  1.2307  1.2576 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.76926    0.02565 107.960   <2e-16 ***
-knowincarc  -0.02691    0.04645  -0.579    0.562    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9649 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.000165,	Adjusted R-squared:  -0.0003266 
-F-statistic: 0.3356 on 1 and 2034 DF,  p-value: 0.5624
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7683 -0.7683  0.2317  1.2317  1.2912 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.76833    0.02282 121.298   <2e-16 ***
-vict        -0.05949    0.06526  -0.912    0.362    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9648 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.0004084,	Adjusted R-squared:  -8.305e-05 
-F-statistic: 0.831 on 1 and 2034 DF,  p-value: 0.3621
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.97385 -0.47385  0.02615  1.02615  1.12145 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.97385    0.02340 127.102   <2e-16 ***
-impact      -0.09530    0.03795  -2.511   0.0121 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8312 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.003091,	Adjusted R-squared:  0.002601 
-F-statistic: 6.307 on 1 and 2034 DF,  p-value: 0.01211
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.95136 -0.45136  0.04864  1.04864  1.22903 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.95136    0.01916 154.016  < 2e-16 ***
-incarc      -0.18039    0.06945  -2.597  0.00946 ** 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8311 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.003306,	Adjusted R-squared:  0.002816 
-F-statistic: 6.746 on 1 and 2034 DF,  p-value: 0.009463
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.96678 -0.46678  0.03322  1.03322  1.12882 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.96678    0.02210 134.247   <2e-16 ***
-knowincarc  -0.09561    0.04002  -2.389    0.017 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8313 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.002799,	Adjusted R-squared:  0.002309 
-F-statistic: 5.709 on 1 and 2034 DF,  p-value: 0.01697
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.94796 -0.44796  0.05204  1.05204  1.13655 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.94796    0.01968 149.780   <2e-16 ***
-vict        -0.08450    0.05628  -1.501    0.133    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.832 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.001107,	Adjusted R-squared:  0.0006161 
-F-statistic: 2.254 on 1 and 2034 DF,  p-value: 0.1334
-
-
-
-
-
-
-####################################################################################################
-MODEL LIST: goal1_demo
-####################################################################################################
-
-
-==========================================================================================
 MODEL: m_prisonhelp_impact
 ==========================================================================================
 
@@ -1141,23 +687,19 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.97009 -0.45918  0.09786  0.47158  1.13825 
+-2.11143 -0.40125  0.09875  0.43209  1.09875 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.95934    0.02741 107.947  < 2e-16 ***
-impact       0.19280    0.03397   5.676 1.63e-08 ***
-Black        0.10833    0.04630   2.340  0.01941 *  
-Hispanic     0.05704    0.04698   1.214  0.22487    
-OtherRace    0.01769    0.07588   0.233  0.81564    
-gender      -0.09759    0.03258  -2.995  0.00279 ** 
+(Intercept)  2.90125    0.01847 157.108  < 2e-16 ***
+impact       0.21019    0.02995   7.018 3.06e-12 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.6499 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.03021,	Adjusted R-squared:  0.02717 
-F-statistic: 9.949 on 5 and 1597 DF,  p-value: 2.187e-09
+Residual standard error: 0.656 on 2034 degrees of freedom
+  (186 observations deleted due to missingness)
+Multiple R-squared:  0.02364,	Adjusted R-squared:  0.02316 
+F-statistic: 49.25 on 1 and 2034 DF,  p-value: 3.059e-12
 
 
 
@@ -1173,23 +715,19 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--2.01930 -0.42788  0.09495  0.48879  1.09761 
+-1.95774 -0.45774  0.04226  0.54226  1.04226 
 
 Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  3.011214   0.025208 119.453  < 2e-16 ***
-incarc       0.308348   0.065903   4.679 3.13e-06 ***
-Black        0.114250   0.046412   2.462  0.01393 *  
-Hispanic     0.071475   0.047018   1.520  0.12867    
-OtherRace   -0.002654   0.076102  -0.035  0.97218    
-gender      -0.106165   0.032748  -3.242  0.00121 ** 
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  2.95774    0.01519 194.692  < 2e-16 ***
+incarc       0.30759    0.05506   5.586 2.63e-08 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.6519 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.02402,	Adjusted R-squared:  0.02096 
-F-statistic: 7.861 on 5 and 1597 DF,  p-value: 2.528e-07
+Residual standard error: 0.6589 on 2034 degrees of freedom
+  (186 observations deleted due to missingness)
+Multiple R-squared:  0.01511,	Adjusted R-squared:  0.01463 
+F-statistic: 31.21 on 1 and 2034 DF,  p-value: 2.629e-08
 
 
 
@@ -1204,24 +742,20 @@ Call:
 lm(formula = fml, data = df)
 
 Residuals:
-    Min      1Q  Median      3Q     Max 
--1.9952 -0.4556  0.1039  0.4691  1.1199 
+     Min       1Q   Median       3Q      Max 
+-2.12017 -0.42014  0.07986  0.49653  1.07986 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.97524    0.02699 110.223  < 2e-16 ***
-knowincarc   0.17088    0.03564   4.795 1.78e-06 ***
-Black        0.11518    0.04637   2.484  0.01310 *  
-Hispanic     0.05946    0.04712   1.262  0.20717    
-OtherRace    0.01740    0.07611   0.229  0.81915    
-gender      -0.09518    0.03268  -2.913  0.00363 ** 
+(Intercept)  2.92014    0.01748  167.07  < 2e-16 ***
+knowincarc   0.20003    0.03165    6.32  3.2e-10 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.6517 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.02468,	Adjusted R-squared:  0.02163 
-F-statistic: 8.084 on 5 and 1597 DF,  p-value: 1.526e-07
+Residual standard error: 0.6575 on 2034 degrees of freedom
+  (186 observations deleted due to missingness)
+Multiple R-squared:  0.01926,	Adjusted R-squared:  0.01878 
+F-statistic: 39.95 on 1 and 2034 DF,  p-value: 3.199e-10
 
 
 
@@ -1237,154 +771,28 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--2.02748 -0.42023  0.09249  0.49643  1.09249 
-
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  3.003565   0.025641 117.139  < 2e-16 ***
-vict         0.201407   0.052099   3.866 0.000115 ***
-Black        0.119970   0.046460   2.582 0.009906 ** 
-Hispanic     0.068588   0.047151   1.455 0.145963    
-OtherRace    0.006217   0.076251   0.082 0.935028    
-gender      -0.096057   0.032757  -2.932 0.003412 ** 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6533 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.01981,	Adjusted R-squared:  0.01675 
-F-statistic: 6.457 on 5 and 1597 DF,  p-value: 5.965e-06
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.92023 -0.36623  0.04002  0.57977  1.38221 
+-2.17152 -0.45463  0.04537  0.54537  1.04537 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.85118    0.02980  95.673   <2e-16 ***
-impact      -0.09219    0.03692  -2.497   0.0126 *  
-Black       -0.05401    0.05033  -1.073   0.2834    
-Hispanic     0.01130    0.05107   0.221   0.8250    
-OtherRace   -0.14120    0.08248  -1.712   0.0871 .  
-gender       0.06905    0.03542   1.950   0.0514 .  
+(Intercept)  2.95463    0.01562 189.216  < 2e-16 ***
+vict         0.21689    0.04465   4.857 1.28e-06 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.7064 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.008782,	Adjusted R-squared:  0.005679 
-F-statistic:  2.83 on 5 and 1597 DF,  p-value: 0.01499
+Residual standard error: 0.6601 on 2034 degrees of freedom
+  (186 observations deleted due to missingness)
+Multiple R-squared:  0.01147,	Adjusted R-squared:  0.01098 
+F-statistic:  23.6 on 1 and 2034 DF,  p-value: 1.28e-06
 
 
 
 
 
-==========================================================================================
-MODEL: m_prisonpen_incarc
-==========================================================================================
 
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.90061 -0.40061  0.05412  0.59474  1.39191 
-
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.826981   0.027325 103.459   <2e-16 ***
-incarc      -0.162977   0.071435  -2.281   0.0227 *  
-Black       -0.055910   0.050308  -1.111   0.2666    
-Hispanic     0.004648   0.050965   0.091   0.9273    
-OtherRace   -0.131102   0.082491  -1.589   0.1122    
-gender       0.073629   0.035498   2.074   0.0382 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7067 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.008146,	Adjusted R-squared:  0.00504 
-F-statistic: 2.623 on 5 and 1597 DF,  p-value: 0.0227
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.9077 -0.4077  0.0369  0.5923  1.3682 
-
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.839704   0.029288  96.957   <2e-16 ***
-knowincarc  -0.067914   0.038666  -1.756   0.0792 .  
-Black       -0.058686   0.050316  -1.166   0.2436    
-Hispanic     0.008763   0.051131   0.171   0.8639    
-OtherRace   -0.140037   0.082578  -1.696   0.0901 .  
-gender       0.068029   0.035456   1.919   0.0552 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7071 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.006831,	Adjusted R-squared:  0.003722 
-F-statistic: 2.197 on 5 and 1597 DF,  p-value: 0.05223
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.89701 -0.39701  0.00339  0.60299  1.38899 
-
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.828638   0.027761 101.894   <2e-16 ***
-vict        -0.082025   0.056406  -1.454   0.1461    
-Black       -0.060464   0.050301  -1.202   0.2295    
-Hispanic     0.005215   0.051049   0.102   0.9186    
-OtherRace   -0.135606   0.082554  -1.643   0.1007    
-gender       0.068372   0.035465   1.928   0.0541 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7074 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.006229,	Adjusted R-squared:  0.003117 
-F-statistic: 2.002 on 5 and 1597 DF,  p-value: 0.07558
-
-
-
+####################################################################################################
+MODEL LIST: goal1_demo
+####################################################################################################
 
 
 ==========================================================================================
@@ -2156,268 +1564,6 @@ F-statistic: 3.312 on 5 and 1597 DF,  p-value: 0.005574
 
 
 ==========================================================================================
-MODEL: m_prisonpen_1_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.8655 -0.7106  0.1634  1.1345  1.4147 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.71058    0.04076  66.508  < 2e-16 ***
-impact      -0.04268    0.05049  -0.845  0.39816    
-Black       -0.05936    0.06883  -0.863  0.38854    
-Hispanic     0.02895    0.06984   0.415  0.67856    
-OtherRace   -0.08257    0.11280  -0.732  0.46426    
-gender       0.12598    0.04844   2.601  0.00938 ** 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9661 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.005699,	Adjusted R-squared:  0.002586 
-F-statistic: 1.831 on 5 and 1597 DF,  p-value: 0.1038
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.8547 -0.7000  0.1715  1.1453  1.4501 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.69998    0.03735  72.279  < 2e-16 ***
-incarc      -0.09070    0.09766  -0.929  0.35313    
-Black       -0.05934    0.06877  -0.863  0.38839    
-Hispanic     0.02612    0.06967   0.375  0.70777    
-OtherRace   -0.07754    0.11277  -0.688  0.49184    
-gender       0.12857    0.04853   2.649  0.00814 ** 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9661 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.005791,	Adjusted R-squared:  0.002679 
-F-statistic: 1.861 on 5 and 1597 DF,  p-value: 0.09824
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.8587 -0.7054  0.1691  1.1413  1.4086 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.70541    0.04002  67.603  < 2e-16 ***
-knowincarc  -0.03192    0.05283  -0.604  0.54577    
-Black       -0.06148    0.06875  -0.894  0.37132    
-Hispanic     0.02783    0.06986   0.398  0.69047    
-OtherRace   -0.08207    0.11283  -0.727  0.46710    
-gender       0.12550    0.04845   2.591  0.00967 ** 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9662 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.005482,	Adjusted R-squared:  0.002368 
-F-statistic: 1.761 on 5 and 1597 DF,  p-value: 0.1179
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.8526 -0.7006  0.1737  1.1474  1.4223 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.70063    0.03792  71.218  < 2e-16 ***
-vict        -0.04286    0.07705  -0.556  0.57812    
-Black       -0.06205    0.06871  -0.903  0.36665    
-Hispanic     0.02633    0.06973   0.378  0.70582    
-OtherRace   -0.08002    0.11277  -0.710  0.47805    
-gender       0.12565    0.04845   2.594  0.00958 ** 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9662 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.005447,	Adjusted R-squared:  0.002333 
-F-statistic: 1.749 on 5 and 1597 DF,  p-value: 0.1203
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.00390 -0.49177  0.00823  0.99610  1.34976 
-
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.991773   0.035026  85.415  < 2e-16 ***
-impact      -0.141702   0.043396  -3.265  0.00112 ** 
-Black       -0.048647   0.059151  -0.822  0.41095    
-Hispanic    -0.006358   0.060025  -0.106  0.91566    
-OtherRace   -0.199830   0.096946  -2.061  0.03944 *  
-gender       0.012125   0.041629   0.291  0.77088    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8303 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.00956,	Adjusted R-squared:  0.006459 
-F-statistic: 3.083 on 5 and 1597 DF,  p-value: 0.008949
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.97268 -0.45398  0.04602  1.02732  1.46593 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.95398    0.03213  91.929  < 2e-16 ***
-incarc      -0.23525    0.08401  -2.800  0.00517 ** 
-Black       -0.05248    0.05916  -0.887  0.37514    
-Hispanic    -0.01683    0.05993  -0.281  0.77895    
-OtherRace   -0.18467    0.09701  -1.904  0.05714 .  
-gender       0.01869    0.04174   0.448  0.65438    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.831 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.007819,	Adjusted R-squared:  0.004713 
-F-statistic: 2.517 on 5 and 1597 DF,  p-value: 0.028
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-   Min     1Q Median     3Q    Max 
--1.985 -0.474  0.026  1.015  1.328 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.97400    0.03445  86.333   <2e-16 ***
-knowincarc  -0.10390    0.04548  -2.285   0.0225 *  
-Black       -0.05589    0.05918  -0.944   0.3451    
-Hispanic    -0.01030    0.06014  -0.171   0.8640    
-OtherRace   -0.19800    0.09712  -2.039   0.0416 *  
-gender       0.01055    0.04170   0.253   0.8002    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8317 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.006196,	Adjusted R-squared:  0.003084 
-F-statistic: 1.991 on 5 and 1597 DF,  p-value: 0.07711
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.96774 -0.45665  0.04335  1.03226  1.35573 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.95665    0.03266  90.527   <2e-16 ***
-vict        -0.12119    0.06636  -1.826   0.0680 .  
-Black       -0.05888    0.05918  -0.995   0.3199    
-Hispanic    -0.01590    0.06006  -0.265   0.7913    
-OtherRace   -0.19119    0.09712  -1.969   0.0492 *  
-gender       0.01109    0.04172   0.266   0.7904    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8322 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.005025,	Adjusted R-squared:  0.00191 
-F-statistic: 1.613 on 5 and 1597 DF,  p-value: 0.1533
-
-
-
-
-
-
-####################################################################################################
-MODEL LIST: goal1_partyideo
-####################################################################################################
-
-
-==========================================================================================
 MODEL: m_prisonhelp_impact
 ==========================================================================================
 
@@ -2427,27 +1573,23 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.93013 -0.37017  0.06832  0.40635  1.66438 
+-1.97009 -0.45918  0.09786  0.47158  1.13825 
 
 Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      3.37641    0.04385  77.004  < 2e-16 ***
-impact           0.23082    0.03050   7.567 6.42e-14 ***
-Black            0.04927    0.04299   1.146  0.25195    
-Hispanic         0.01857    0.04232   0.439  0.66090    
-OtherRace       -0.06944    0.06817  -1.019  0.30857    
-gender          -0.05251    0.02929  -1.793  0.07323 .  
-Republican      -0.02018    0.04329  -0.466  0.64106    
-Democrat         0.05060    0.03572   1.417  0.15680    
-fiscal_ideology -0.05972    0.02164  -2.760  0.00585 ** 
-social_ideology -0.13390    0.02074  -6.457 1.41e-10 ***
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  2.95934    0.02741 107.947  < 2e-16 ***
+impact       0.19280    0.03397   5.676 1.63e-08 ***
+Black        0.10833    0.04630   2.340  0.01941 *  
+Hispanic     0.05704    0.04698   1.214  0.22487    
+OtherRace    0.01769    0.07588   0.233  0.81564    
+gender      -0.09759    0.03258  -2.995  0.00279 ** 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.5818 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.2256,	Adjusted R-squared:  0.2212 
-F-statistic: 51.45 on 9 and 1590 DF,  p-value: < 2.2e-16
+Residual standard error: 0.6499 on 1597 degrees of freedom
+  (619 observations deleted due to missingness)
+Multiple R-squared:  0.03021,	Adjusted R-squared:  0.02717 
+F-statistic: 9.949 on 5 and 1597 DF,  p-value: 2.187e-09
 
 
 
@@ -2463,27 +1605,23 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.98404 -0.36188  0.06036  0.41643  1.61309 
+-2.01930 -0.42788  0.09495  0.48879  1.09761 
 
 Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      3.43327    0.04313  79.603  < 2e-16 ***
-incarc           0.38040    0.05929   6.416 1.84e-10 ***
-Black            0.05331    0.04320   1.234  0.21743    
-Hispanic         0.03476    0.04243   0.819  0.41268    
-OtherRace       -0.09470    0.06851  -1.382  0.16706    
-gender          -0.06348    0.02948  -2.153  0.03146 *  
-Republican      -0.03055    0.04351  -0.702  0.48265    
-Democrat         0.05251    0.03590   1.463  0.14373    
-fiscal_ideology -0.05813    0.02176  -2.672  0.00762 ** 
-social_ideology -0.13233    0.02084  -6.351 2.78e-10 ***
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  3.011214   0.025208 119.453  < 2e-16 ***
+incarc       0.308348   0.065903   4.679 3.13e-06 ***
+Black        0.114250   0.046412   2.462  0.01393 *  
+Hispanic     0.071475   0.047018   1.520  0.12867    
+OtherRace   -0.002654   0.076102  -0.035  0.97218    
+gender      -0.106165   0.032748  -3.242  0.00121 ** 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.5847 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.2179,	Adjusted R-squared:  0.2135 
-F-statistic: 49.22 on 9 and 1590 DF,  p-value: < 2.2e-16
+Residual standard error: 0.6519 on 1597 degrees of freedom
+  (619 observations deleted due to missingness)
+Multiple R-squared:  0.02402,	Adjusted R-squared:  0.02096 
+F-statistic: 7.861 on 5 and 1597 DF,  p-value: 2.528e-07
 
 
 
@@ -2498,28 +1636,24 @@ Call:
 lm(formula = fml, data = df)
 
 Residuals:
-     Min       1Q   Median       3Q      Max 
--1.95673 -0.37809  0.06706  0.41107  1.63437 
+    Min      1Q  Median      3Q     Max 
+-1.9952 -0.4556  0.1039  0.4691  1.1199 
 
 Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      3.39757    0.04384  77.508  < 2e-16 ***
-knowincarc       0.19759    0.03206   6.163 9.05e-10 ***
-Black            0.06044    0.04316   1.400  0.16163    
-Hispanic         0.02257    0.04257   0.530  0.59597    
-OtherRace       -0.06914    0.06859  -1.008  0.31358    
-gender          -0.05014    0.02947  -1.701  0.08907 .  
-Republican      -0.01470    0.04356  -0.337  0.73583    
-Democrat         0.04765    0.03592   1.326  0.18488    
-fiscal_ideology -0.06430    0.02177  -2.954  0.00318 ** 
-social_ideology -0.12912    0.02084  -6.196 7.36e-10 ***
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  2.97524    0.02699 110.223  < 2e-16 ***
+knowincarc   0.17088    0.03564   4.795 1.78e-06 ***
+Black        0.11518    0.04637   2.484  0.01310 *  
+Hispanic     0.05946    0.04712   1.262  0.20717    
+OtherRace    0.01740    0.07611   0.229  0.81915    
+gender      -0.09518    0.03268  -2.913  0.00363 ** 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.5852 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.2164,	Adjusted R-squared:  0.2119 
-F-statistic: 48.78 on 9 and 1590 DF,  p-value: < 2.2e-16
+Residual standard error: 0.6517 on 1597 degrees of freedom
+  (619 observations deleted due to missingness)
+Multiple R-squared:  0.02468,	Adjusted R-squared:  0.02163 
+F-statistic: 8.084 on 5 and 1597 DF,  p-value: 1.526e-07
 
 
 
@@ -2534,175 +1668,33 @@ Call:
 lm(formula = fml, data = df)
 
 Residuals:
-    Min      1Q  Median      3Q     Max 
--2.0007 -0.3713  0.0656  0.4293  1.5968 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      3.42169    0.04367  78.352  < 2e-16 ***
-vict             0.21638    0.04704   4.600 4.55e-06 ***
-Black            0.06588    0.04338   1.519   0.1291    
-Hispanic         0.03409    0.04271   0.798   0.4249    
-OtherRace       -0.08162    0.06891  -1.184   0.2364    
-gender          -0.05176    0.02962  -1.748   0.0807 .  
-Republican      -0.02008    0.04377  -0.459   0.6465    
-Democrat         0.05039    0.03612   1.395   0.1632    
-fiscal_ideology -0.05650    0.02192  -2.577   0.0100 *  
-social_ideology -0.13283    0.02099  -6.328 3.22e-10 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.5883 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.2082,	Adjusted R-squared:  0.2037 
-F-statistic: 46.45 on 9 and 1590 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--2.2214 -0.4042 -0.0326  0.4638  1.5976 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.47758    0.05054  49.019  < 2e-16 ***
-impact          -0.12102    0.03516  -3.442 0.000593 ***
-Black           -0.01269    0.04955  -0.256 0.797936    
-Hispanic         0.04338    0.04878   0.889 0.373930    
-OtherRace       -0.07280    0.07859  -0.926 0.354428    
-gender           0.03381    0.03377   1.001 0.316876    
-Republican       0.05643    0.04990   1.131 0.258243    
-Democrat         0.02470    0.04117   0.600 0.548638    
-fiscal_ideology  0.07168    0.02495   2.873 0.004117 ** 
-social_ideology  0.08324    0.02390   3.482 0.000511 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6706 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.1095,	Adjusted R-squared:  0.1045 
-F-statistic: 21.73 on 9 and 1590 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
      Min       1Q   Median       3Q      Max 
--2.25491 -0.42297 -0.02775  0.45756  1.61638 
+-2.02748 -0.42023  0.09249  0.49643  1.09249 
 
 Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.44831    0.04950  49.460  < 2e-16 ***
-incarc          -0.21577    0.06805  -3.171  0.00155 ** 
-Black           -0.01369    0.04959  -0.276  0.78256    
-Hispanic         0.03520    0.04869   0.723  0.46992    
-OtherRace       -0.05907    0.07863  -0.751  0.45260    
-gender           0.04002    0.03384   1.183  0.23709    
-Republican       0.06218    0.04994   1.245  0.21326    
-Democrat         0.02348    0.04120   0.570  0.56883    
-fiscal_ideology  0.07064    0.02497   2.829  0.00473 ** 
-social_ideology  0.08267    0.02391   3.457  0.00056 ***
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  3.003565   0.025641 117.139  < 2e-16 ***
+vict         0.201407   0.052099   3.866 0.000115 ***
+Black        0.119970   0.046460   2.582 0.009906 ** 
+Hispanic     0.068588   0.047151   1.455 0.145963    
+OtherRace    0.006217   0.076251   0.082 0.935028    
+gender      -0.096057   0.032757  -2.932 0.003412 ** 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.671 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.1085,	Adjusted R-squared:  0.1035 
-F-statistic: 21.51 on 9 and 1590 DF,  p-value: < 2.2e-16
+Residual standard error: 0.6533 on 1597 degrees of freedom
+  (619 observations deleted due to missingness)
+Multiple R-squared:  0.01981,	Adjusted R-squared:  0.01675 
+F-statistic: 6.457 on 5 and 1597 DF,  p-value: 5.965e-06
 
 
 
 
 
-==========================================================================================
-MODEL: m_prisonpen_knowincarc
-==========================================================================================
 
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.23334 -0.41781 -0.02495  0.44978  1.58700 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.46290    0.05033  48.938  < 2e-16 ***
-knowincarc      -0.08896    0.03681  -2.417 0.015781 *  
-Black           -0.01995    0.04956  -0.403 0.687261    
-Hispanic         0.03985    0.04887   0.815 0.414932    
-OtherRace       -0.07189    0.07875  -0.913 0.361456    
-gender           0.03275    0.03383   0.968 0.333142    
-Republican       0.05419    0.05001   1.083 0.278757    
-Democrat         0.02625    0.04125   0.637 0.524530    
-fiscal_ideology  0.07396    0.02499   2.960 0.003127 ** 
-social_ideology  0.08053    0.02393   3.366 0.000782 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6719 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.1062,	Adjusted R-squared:  0.1011 
-F-statistic: 20.99 on 9 and 1590 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.30457 -0.41354 -0.03154  0.45305  1.57866 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.45114    0.04993  49.094  < 2e-16 ***
-vict            -0.08931    0.05377  -1.661 0.096947 .  
-Black           -0.02291    0.04959  -0.462 0.644204    
-Hispanic         0.03438    0.04883   0.704 0.481471    
-OtherRace       -0.06620    0.07878  -0.840 0.400859    
-gender           0.03352    0.03386   0.990 0.322382    
-Republican       0.05673    0.05004   1.134 0.257131    
-Democrat         0.02513    0.04129   0.609 0.542883    
-fiscal_ideology  0.07068    0.02506   2.820 0.004856 ** 
-social_ideology  0.08195    0.02400   3.415 0.000654 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6726 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.1044,	Adjusted R-squared:  0.09938 
-F-statistic:  20.6 on 9 and 1590 DF,  p-value: < 2.2e-16
-
-
-
+####################################################################################################
+MODEL LIST: goal1_partyideo
+####################################################################################################
 
 
 ==========================================================================================
@@ -3570,300 +2562,6 @@ F-statistic: 10.95 on 9 and 1590 DF,  p-value: < 2.2e-16
 
 
 ==========================================================================================
-MODEL: m_prisonpen_1_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.58215 -0.51116  0.03626  0.65328  1.94461 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.18382    0.06764  32.285  < 2e-16 ***
-impact          -0.08944    0.04705  -1.901   0.0575 .  
-Black            0.01725    0.06632   0.260   0.7948    
-Hispanic         0.07919    0.06528   1.213   0.2253    
-OtherRace        0.02773    0.10517   0.264   0.7921    
-gender           0.07151    0.04519   1.582   0.1137    
-Republican       0.07804    0.06678   1.169   0.2427    
-Democrat        -0.03898    0.05510  -0.708   0.4793    
-fiscal_ideology  0.07270    0.03339   2.177   0.0296 *  
-social_ideology  0.16122    0.03199   5.040 5.19e-07 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8975 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.1444,	Adjusted R-squared:  0.1396 
-F-statistic: 29.82 on 9 and 1590 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.55994 -0.50413  0.04394  0.64445  1.89697 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.16291    0.06620  32.671  < 2e-16 ***
-incarc          -0.18104    0.09101  -1.989   0.0468 *  
-Black            0.01799    0.06632   0.271   0.7862    
-Hispanic         0.07354    0.06512   1.129   0.2590    
-OtherRace        0.03851    0.10516   0.366   0.7142    
-gender           0.07671    0.04526   1.695   0.0903 .  
-Republican       0.08270    0.06679   1.238   0.2158    
-Democrat        -0.04017    0.05510  -0.729   0.4661    
-fiscal_ideology  0.07167    0.03339   2.146   0.0320 *  
-social_ideology  0.16114    0.03198   5.039 5.22e-07 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8974 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.1446,	Adjusted R-squared:  0.1397 
-F-statistic: 29.86 on 9 and 1590 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--2.5641 -0.5134  0.0408  0.6446  1.9294 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.17258    0.06727  32.298  < 2e-16 ***
-knowincarc      -0.06413    0.04920  -1.303   0.1926    
-Black            0.01173    0.06624   0.177   0.8595    
-Hispanic         0.07642    0.06532   1.170   0.2422    
-OtherRace        0.02852    0.10526   0.271   0.7865    
-gender           0.07075    0.04522   1.565   0.1179    
-Republican       0.07645    0.06685   1.144   0.2529    
-Democrat        -0.03783    0.05513  -0.686   0.4926    
-fiscal_ideology  0.07437    0.03340   2.227   0.0261 *  
-social_ideology  0.15920    0.03198   4.978 7.11e-07 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8981 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.1434,	Adjusted R-squared:  0.1385 
-F-statistic: 29.57 on 9 and 1590 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.54679 -0.50594  0.03723  0.64293  1.92587 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.163629   0.066688  32.444  < 2e-16 ***
-vict            -0.060252   0.071826  -0.839   0.4017    
-Black            0.009339   0.066243   0.141   0.8879    
-Hispanic         0.072328   0.065218   1.109   0.2676    
-OtherRace        0.032653   0.105230   0.310   0.7564    
-gender           0.071321   0.045230   1.577   0.1150    
-Republican       0.078341   0.066842   1.172   0.2414    
-Democrat        -0.038590   0.055153  -0.700   0.4842    
-fiscal_ideology  0.072129   0.033475   2.155   0.0313 *  
-social_ideology  0.160104   0.032054   4.995 6.54e-07 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8983 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.1428,	Adjusted R-squared:  0.138 
-F-statistic: 29.44 on 9 and 1590 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.19327 -0.48890  0.00484  0.85828  1.48256 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.771344   0.062214  44.545  < 2e-16 ***
-impact          -0.152589   0.043279  -3.526 0.000434 ***
-Black           -0.042630   0.060994  -0.699 0.484707    
-Hispanic         0.007578   0.060043   0.126 0.899581    
-OtherRace       -0.173320   0.096733  -1.792 0.073364 .  
-gender          -0.003894   0.041562  -0.094 0.925364    
-Republican       0.034825   0.061418   0.567 0.570781    
-Democrat         0.088384   0.050677   1.744 0.081344 .  
-fiscal_ideology  0.070656   0.030707   2.301 0.021521 *  
-social_ideology  0.005249   0.029423   0.178 0.858430    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8255 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.02419,	Adjusted R-squared:  0.01867 
-F-statistic:  4.38 on 9 and 1590 DF,  p-value: 1.141e-05
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.18591 -0.46364  0.03152  0.85573  1.47574 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.733722   0.060963  44.842  < 2e-16 ***
-incarc          -0.250502   0.083807  -2.989  0.00284 ** 
-Black           -0.045370   0.061069  -0.743  0.45764    
-Hispanic        -0.003148   0.059970  -0.052  0.95814    
-OtherRace       -0.156650   0.096834  -1.618  0.10592    
-gender           0.003333   0.041675   0.080  0.93626    
-Republican       0.041662   0.061503   0.677  0.49825    
-Democrat         0.087130   0.050742   1.717  0.08615 .  
-fiscal_ideology  0.069617   0.030752   2.264  0.02372 *  
-social_ideology  0.004197   0.029450   0.143  0.88668    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8264 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.02206,	Adjusted R-squared:  0.01652 
-F-statistic: 3.985 on 9 and 1590 DF,  p-value: 4.777e-05
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.16897 -0.47421  0.02055  0.85017  1.34890 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.753233   0.061951  44.442   <2e-16 ***
-knowincarc      -0.113782   0.045314  -2.511   0.0121 *  
-Black           -0.051636   0.061003  -0.846   0.3974    
-Hispanic         0.003286   0.060161   0.055   0.9565    
-OtherRace       -0.172294   0.096938  -1.777   0.0757 .  
-gender          -0.005243   0.041646  -0.126   0.8998    
-Republican       0.031928   0.061564   0.519   0.6041    
-Democrat         0.090342   0.050771   1.779   0.0754 .  
-fiscal_ideology  0.073549   0.030762   2.391   0.0169 *  
-social_ideology  0.001858   0.029452   0.063   0.9497    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8271 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.02045,	Adjusted R-squared:  0.0149 
-F-statistic: 3.688 on 9 and 1590 DF,  p-value: 0.0001379
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.18105 -0.46649  0.03023  0.86567  1.47602 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.738644   0.061458  44.561   <2e-16 ***
-vict            -0.118365   0.066193  -1.788   0.0739 .  
-Black           -0.055156   0.061048  -0.903   0.3664    
-Hispanic        -0.003569   0.060104  -0.059   0.9527    
-OtherRace       -0.165057   0.096978  -1.702   0.0890 .  
-gender          -0.004281   0.041683  -0.103   0.9182    
-Republican       0.035116   0.061600   0.570   0.5687    
-Democrat         0.088849   0.050828   1.748   0.0807 .  
-fiscal_ideology  0.069238   0.030850   2.244   0.0249 *  
-social_ideology  0.003804   0.029540   0.129   0.8976    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8279 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.01854,	Adjusted R-squared:  0.01298 
-F-statistic: 3.337 on 9 and 1590 DF,  p-value: 0.0004716
-
-
-
-
-
-
-####################################################################################################
-MODEL LIST: goal1_full
-####################################################################################################
-
-
-==========================================================================================
 MODEL: m_prisonhelp_impact
 ==========================================================================================
 
@@ -3873,32 +2571,27 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.77776 -0.32487  0.06026  0.37798  1.49981 
+-1.93013 -0.37017  0.06832  0.40635  1.66438 
 
 Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.5867005  0.1289361  20.062  < 2e-16 ***
-impact           0.1928984  0.0288213   6.693 3.03e-11 ***
-Black           -0.0254826  0.0412880  -0.617 0.537198    
-Hispanic        -0.0206369  0.0398985  -0.517 0.605065    
-OtherRace       -0.0444683  0.0640719  -0.694 0.487761    
-gender           0.0118246  0.0279578   0.423 0.672393    
-Republican      -0.0042787  0.0407730  -0.105 0.916438    
-Democrat        -0.0156418  0.0339964  -0.460 0.645506    
-fiscal_ideology -0.0296122  0.0204857  -1.446 0.148514    
-social_ideology -0.0794810  0.0199808  -3.978 7.27e-05 ***
-desor_core       0.0071999  0.0008217   8.763  < 2e-16 ***
-fire_rare        0.0541586  0.0185252   2.924 0.003510 ** 
-fire_privilege  -0.0815906  0.0173224  -4.710 2.69e-06 ***
-fire_angry      -0.0665954  0.0201687  -3.302 0.000982 ***
-fire_fear        0.0733571  0.0209580   3.500 0.000478 ***
+                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      3.37641    0.04385  77.004  < 2e-16 ***
+impact           0.23082    0.03050   7.567 6.42e-14 ***
+Black            0.04927    0.04299   1.146  0.25195    
+Hispanic         0.01857    0.04232   0.439  0.66090    
+OtherRace       -0.06944    0.06817  -1.019  0.30857    
+gender          -0.05251    0.02929  -1.793  0.07323 .  
+Republican      -0.02018    0.04329  -0.466  0.64106    
+Democrat         0.05060    0.03572   1.417  0.15680    
+fiscal_ideology -0.05972    0.02164  -2.760  0.00585 ** 
+social_ideology -0.13390    0.02074  -6.457 1.41e-10 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.5449 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.3224,	Adjusted R-squared:  0.3164 
-F-statistic: 53.56 on 14 and 1576 DF,  p-value: < 2.2e-16
+Residual standard error: 0.5818 on 1590 degrees of freedom
+  (622 observations deleted due to missingness)
+Multiple R-squared:  0.2256,	Adjusted R-squared:  0.2212 
+F-statistic: 51.45 on 9 and 1590 DF,  p-value: < 2.2e-16
 
 
 
@@ -3914,32 +2607,27 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.83362 -0.32884  0.06889  0.37462  1.44958 
+-1.98404 -0.36188  0.06036  0.41643  1.61309 
 
 Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.6482542  0.1289020  20.545  < 2e-16 ***
-incarc           0.3426855  0.0554799   6.177 8.31e-10 ***
-Black           -0.0286900  0.0414335  -0.692 0.488767    
-Hispanic        -0.0097154  0.0399126  -0.243 0.807713    
-OtherRace       -0.0677039  0.0642048  -1.054 0.291816    
-gender           0.0036710  0.0280698   0.131 0.895965    
-Republican      -0.0131617  0.0408697  -0.322 0.747464    
-Democrat        -0.0172554  0.0340613  -0.507 0.612507    
-fiscal_ideology -0.0264188  0.0205366  -1.286 0.198483    
-social_ideology -0.0772613  0.0200072  -3.862 0.000117 ***
-desor_core       0.0074154  0.0008221   9.020  < 2e-16 ***
-fire_rare        0.0562959  0.0185607   3.033 0.002460 ** 
-fire_privilege  -0.0878687  0.0173342  -5.069 4.47e-07 ***
-fire_angry      -0.0656465  0.0202166  -3.247 0.001190 ** 
-fire_fear        0.0649178  0.0209923   3.092 0.002020 ** 
+                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      3.43327    0.04313  79.603  < 2e-16 ***
+incarc           0.38040    0.05929   6.416 1.84e-10 ***
+Black            0.05331    0.04320   1.234  0.21743    
+Hispanic         0.03476    0.04243   0.819  0.41268    
+OtherRace       -0.09470    0.06851  -1.382  0.16706    
+gender          -0.06348    0.02948  -2.153  0.03146 *  
+Republican      -0.03055    0.04351  -0.702  0.48265    
+Democrat         0.05251    0.03590   1.463  0.14373    
+fiscal_ideology -0.05813    0.02176  -2.672  0.00762 ** 
+social_ideology -0.13233    0.02084  -6.351 2.78e-10 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.546 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.3196,	Adjusted R-squared:  0.3136 
-F-statistic: 52.88 on 14 and 1576 DF,  p-value: < 2.2e-16
+Residual standard error: 0.5847 on 1590 degrees of freedom
+  (622 observations deleted due to missingness)
+Multiple R-squared:  0.2179,	Adjusted R-squared:  0.2135 
+F-statistic: 49.22 on 9 and 1590 DF,  p-value: < 2.2e-16
 
 
 
@@ -3955,32 +2643,27 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.78658 -0.33272  0.06109  0.38544  1.57663 
+-1.95673 -0.37809  0.06706  0.41107  1.63437 
 
 Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.6071807  0.1294310  20.143  < 2e-16 ***
-knowincarc       0.1647029  0.0302248   5.449 5.86e-08 ***
-Black           -0.0180395  0.0414373  -0.435 0.663372    
-Hispanic        -0.0179187  0.0400896  -0.447 0.654961    
-OtherRace       -0.0440437  0.0643875  -0.684 0.494050    
-gender           0.0149624  0.0280854   0.533 0.594285    
-Republican       0.0002100  0.0409815   0.005 0.995912    
-Democrat        -0.0195210  0.0341444  -0.572 0.567593    
-fiscal_ideology -0.0329042  0.0205877  -1.598 0.110190    
-social_ideology -0.0749714  0.0200472  -3.740 0.000191 ***
-desor_core       0.0072905  0.0008252   8.835  < 2e-16 ***
-fire_rare        0.0538941  0.0186144   2.895 0.003840 ** 
-fire_privilege  -0.0827664  0.0174029  -4.756 2.16e-06 ***
-fire_angry      -0.0691698  0.0202567  -3.415 0.000655 ***
-fire_fear        0.0724292  0.0210566   3.440 0.000597 ***
+                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      3.39757    0.04384  77.508  < 2e-16 ***
+knowincarc       0.19759    0.03206   6.163 9.05e-10 ***
+Black            0.06044    0.04316   1.400  0.16163    
+Hispanic         0.02257    0.04257   0.530  0.59597    
+OtherRace       -0.06914    0.06859  -1.008  0.31358    
+gender          -0.05014    0.02947  -1.701  0.08907 .  
+Republican      -0.01470    0.04356  -0.337  0.73583    
+Democrat         0.04765    0.03592   1.326  0.18488    
+fiscal_ideology -0.06430    0.02177  -2.954  0.00318 ** 
+social_ideology -0.12912    0.02084  -6.196 7.36e-10 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.5474 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.316,	Adjusted R-squared:   0.31 
-F-statistic: 52.02 on 14 and 1576 DF,  p-value: < 2.2e-16
+Residual standard error: 0.5852 on 1590 degrees of freedom
+  (622 observations deleted due to missingness)
+Multiple R-squared:  0.2164,	Adjusted R-squared:  0.2119 
+F-statistic: 48.78 on 9 and 1590 DF,  p-value: < 2.2e-16
 
 
 
@@ -3995,200 +2678,37 @@ Call:
 lm(formula = fml, data = df)
 
 Residuals:
-     Min       1Q   Median       3Q      Max 
--1.83135 -0.33459  0.06771  0.37932  1.53901 
-
-Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.6165127  0.1301151  20.109  < 2e-16 ***
-vict             0.1653149  0.0444142   3.722 0.000205 ***
-Black           -0.0142889  0.0416441  -0.343 0.731555    
-Hispanic        -0.0089810  0.0402288  -0.223 0.823371    
-OtherRace       -0.0557543  0.0646675  -0.862 0.388726    
-gender           0.0136036  0.0282268   0.482 0.629917    
-Republican      -0.0037559  0.0411731  -0.091 0.927327    
-Democrat        -0.0183300  0.0343291  -0.534 0.593452    
-fiscal_ideology -0.0262173  0.0207111  -1.266 0.205751    
-social_ideology -0.0763600  0.0201858  -3.783 0.000161 ***
-desor_core       0.0073340  0.0008298   8.838  < 2e-16 ***
-fire_rare        0.0574456  0.0187049   3.071 0.002169 ** 
-fire_privilege  -0.0875519  0.0174661  -5.013 5.97e-07 ***
-fire_angry      -0.0639628  0.0204275  -3.131 0.001773 ** 
-fire_fear        0.0714393  0.0211653   3.375 0.000755 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.5502 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.3092,	Adjusted R-squared:  0.3031 
-F-statistic: 50.39 on 14 and 1576 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
     Min      1Q  Median      3Q     Max 
--2.0535 -0.4107 -0.0244  0.4633  1.5701 
+-2.0007 -0.3713  0.0656  0.4293  1.5968 
 
 Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.477161   0.157947  15.683  < 2e-16 ***
-impact          -0.106983   0.035306  -3.030  0.00248 ** 
-Black            0.019691   0.050578   0.389  0.69710    
-Hispanic         0.063673   0.048876   1.303  0.19285    
-OtherRace       -0.058817   0.078488  -0.749  0.45375    
-gender           0.020693   0.034248   0.604  0.54579    
-Republican       0.054690   0.049947   1.095  0.27371    
-Democrat         0.051336   0.041646   1.233  0.21788    
-fiscal_ideology  0.060526   0.025095   2.412  0.01599 *  
-social_ideology  0.072098   0.024477   2.946  0.00327 ** 
-desor_core      -0.002854   0.001007  -2.836  0.00463 ** 
-fire_rare       -0.011173   0.022693  -0.492  0.62253    
-fire_privilege   0.058574   0.021220   2.760  0.00584 ** 
-fire_angry      -0.051139   0.024707  -2.070  0.03863 *  
-fire_fear        0.063921   0.025674   2.490  0.01289 *  
+                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      3.42169    0.04367  78.352  < 2e-16 ***
+vict             0.21638    0.04704   4.600 4.55e-06 ***
+Black            0.06588    0.04338   1.519   0.1291    
+Hispanic         0.03409    0.04271   0.798   0.4249    
+OtherRace       -0.08162    0.06891  -1.184   0.2364    
+gender          -0.05176    0.02962  -1.748   0.0807 .  
+Republican      -0.02008    0.04377  -0.459   0.6465    
+Democrat         0.05039    0.03612   1.395   0.1632    
+fiscal_ideology -0.05650    0.02192  -2.577   0.0100 *  
+social_ideology -0.13283    0.02099  -6.328 3.22e-10 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.6675 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.1226,	Adjusted R-squared:  0.1148 
-F-statistic: 15.73 on 14 and 1576 DF,  p-value: < 2.2e-16
+Residual standard error: 0.5883 on 1590 degrees of freedom
+  (622 observations deleted due to missingness)
+Multiple R-squared:  0.2082,	Adjusted R-squared:  0.2037 
+F-statistic: 46.45 on 9 and 1590 DF,  p-value: < 2.2e-16
 
 
 
 
 
-==========================================================================================
-MODEL: m_prisonpen_incarc
-==========================================================================================
 
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.12332 -0.40982 -0.04356  0.45793  1.59418 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.442785   0.157518  15.508  < 2e-16 ***
-incarc          -0.219200   0.067796  -3.233  0.00125 ** 
-Black            0.023408   0.050632   0.462  0.64391    
-Hispanic         0.058117   0.048773   1.192  0.23361    
-OtherRace       -0.044969   0.078458  -0.573  0.56662    
-gender           0.026163   0.034301   0.763  0.44573    
-Republican       0.060182   0.049943   1.205  0.22838    
-Democrat         0.051768   0.041623   1.244  0.21378    
-fiscal_ideology  0.058436   0.025096   2.329  0.02001 *  
-social_ideology  0.071405   0.024449   2.921  0.00354 ** 
-desor_core      -0.002964   0.001005  -2.951  0.00322 ** 
-fire_rare       -0.012365   0.022681  -0.545  0.58571    
-fire_privilege   0.062074   0.021182   2.930  0.00343 ** 
-fire_angry      -0.052061   0.024705  -2.107  0.03525 *  
-fire_fear        0.068869   0.025653   2.685  0.00734 ** 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6672 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.1233,	Adjusted R-squared:  0.1155 
-F-statistic: 15.83 on 14 and 1576 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.06715 -0.41155 -0.02687  0.45634  1.59229 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.461759   0.158071  15.574  < 2e-16 ***
-knowincarc      -0.073949   0.036913  -2.003  0.04531 *  
-Black            0.014279   0.050606   0.282  0.77786    
-Hispanic         0.060677   0.048961   1.239  0.21542    
-OtherRace       -0.057747   0.078635  -0.734  0.46283    
-gender           0.018969   0.034300   0.553  0.58033    
-Republican       0.052910   0.050050   1.057  0.29061    
-Democrat         0.053823   0.041700   1.291  0.19699    
-fiscal_ideology  0.062062   0.025143   2.468  0.01368 *  
-social_ideology  0.069170   0.024483   2.825  0.00478 ** 
-desor_core      -0.002930   0.001008  -2.907  0.00370 ** 
-fire_rare       -0.011272   0.022733  -0.496  0.62007    
-fire_privilege   0.059744   0.021254   2.811  0.00500 ** 
-fire_angry      -0.049591   0.024739  -2.005  0.04518 *  
-fire_fear        0.064897   0.025716   2.524  0.01171 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6686 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.1197,	Adjusted R-squared:  0.1119 
-F-statistic: 15.31 on 14 and 1576 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.12168 -0.40858 -0.03628  0.45723  1.60383 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.458539   0.158212  15.539  < 2e-16 ***
-vict            -0.079761   0.054005  -1.477  0.13990    
-Black            0.012877   0.050637   0.254  0.79930    
-Hispanic         0.056837   0.048916   1.162  0.24544    
-OtherRace       -0.052511   0.078632  -0.668  0.50436    
-gender           0.019619   0.034322   0.572  0.56766    
-Republican       0.054598   0.050064   1.091  0.27563    
-Democrat         0.053142   0.041742   1.273  0.20317    
-fiscal_ideology  0.058928   0.025183   2.340  0.01941 *  
-social_ideology  0.069975   0.024545   2.851  0.00442 ** 
-desor_core      -0.002943   0.001009  -2.917  0.00359 ** 
-fire_rare       -0.012908   0.022744  -0.568  0.57044    
-fire_privilege   0.061888   0.021238   2.914  0.00362 ** 
-fire_angry      -0.052141   0.024839  -2.099  0.03596 *  
-fire_fear        0.065228   0.025736   2.535  0.01136 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.669 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.1187,	Adjusted R-squared:  0.1109 
-F-statistic: 15.16 on 14 and 1576 DF,  p-value: < 2.2e-16
-
-
-
+####################################################################################################
+MODEL LIST: goal1_full
+####################################################################################################
 
 
 ==========================================================================================
@@ -5176,7 +3696,7 @@ F-statistic: 17.25 on 14 and 1576 DF,  p-value: < 2.2e-16
 
 
 ==========================================================================================
-MODEL: m_prisonpen_1_impact
+MODEL: m_prisonhelp_impact
 ==========================================================================================
 
 
@@ -5185,203 +3705,39 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--2.38915 -0.55139 -0.00243  0.65563  2.01056 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.321090   0.210922  11.004  < 2e-16 ***
-impact          -0.064285   0.047148  -1.363 0.172929    
-Black            0.078295   0.067542   1.159 0.246548    
-Hispanic         0.115051   0.065269   1.763 0.078139 .  
-OtherRace        0.042058   0.104813   0.401 0.688276    
-gender           0.041982   0.045735   0.918 0.358791    
-Republican       0.076711   0.066699   1.150 0.250276    
-Democrat         0.008474   0.055613   0.152 0.878908    
-fiscal_ideology  0.053891   0.033512   1.608 0.108009    
-social_ideology  0.137590   0.032686   4.209  2.7e-05 ***
-desor_core      -0.004849   0.001344  -3.607 0.000319 ***
-fire_rare       -0.007864   0.030305  -0.259 0.795288    
-fire_privilege   0.097812   0.028337   3.452 0.000572 ***
-fire_angry      -0.057086   0.032993  -1.730 0.083786 .  
-fire_fear        0.048737   0.034285   1.422 0.155356    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8914 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.1601,	Adjusted R-squared:  0.1527 
-F-statistic: 21.46 on 14 and 1576 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.37265 -0.54323 -0.00407  0.64397  1.96583 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.300053   0.210298  10.937  < 2e-16 ***
-incarc          -0.178531   0.090513  -1.972 0.048736 *  
-Black            0.083643   0.067597   1.237 0.216130    
-Hispanic         0.112517   0.065116   1.728 0.084192 .  
-OtherRace        0.051923   0.104748   0.496 0.620174    
-gender           0.046791   0.045795   1.022 0.307053    
-Republican       0.080920   0.066677   1.214 0.225078    
-Democrat         0.007990   0.055570   0.144 0.885683    
-fiscal_ideology  0.052123   0.033505   1.556 0.119978    
-social_ideology  0.138039   0.032641   4.229 2.48e-05 ***
-desor_core      -0.004899   0.001341  -3.653 0.000268 ***
-fire_rare       -0.008591   0.030281  -0.284 0.776681    
-fire_privilege   0.099943   0.028280   3.534 0.000421 ***
-fire_angry      -0.058277   0.032983  -1.767 0.077439 .  
-fire_fear        0.052140   0.034248   1.522 0.128103    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8908 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.1612,	Adjusted R-squared:  0.1538 
-F-statistic: 21.64 on 14 and 1576 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.37513 -0.55418 -0.00141  0.65336  1.99828 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.311390   0.210817  10.964  < 2e-16 ***
-knowincarc      -0.042519   0.049230  -0.864 0.387895    
-Black            0.074902   0.067493   1.110 0.267269    
-Hispanic         0.113087   0.065298   1.732 0.083495 .  
-OtherRace        0.042845   0.104874   0.409 0.682937    
-gender           0.040948   0.045746   0.895 0.370860    
-Republican       0.075720   0.066751   1.134 0.256814    
-Democrat         0.010006   0.055614   0.180 0.857247    
-fiscal_ideology  0.054782   0.033533   1.634 0.102528    
-social_ideology  0.135784   0.032653   4.158 3.38e-05 ***
-desor_core      -0.004897   0.001344  -3.643 0.000278 ***
-fire_rare       -0.007950   0.030319  -0.262 0.793184    
-fire_privilege   0.098572   0.028346   3.477 0.000520 ***
-fire_angry      -0.056142   0.032994  -1.702 0.089030 .  
-fire_fear        0.049374   0.034297   1.440 0.150179    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8917 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.1595,	Adjusted R-squared:  0.1521 
-F-statistic: 21.37 on 14 and 1576 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.36044 -0.54905  0.00413  0.64975  1.96366 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.307390   0.210919  10.940  < 2e-16 ***
-vict            -0.033589   0.071996  -0.467 0.640894    
-Black            0.073472   0.067506   1.088 0.276596    
-Hispanic         0.110496   0.065212   1.694 0.090383 .  
-OtherRace        0.045904   0.104827   0.438 0.661521    
-gender           0.041232   0.045756   0.901 0.367660    
-Republican       0.076895   0.066742   1.152 0.249450    
-Democrat         0.009938   0.055648   0.179 0.858283    
-fiscal_ideology  0.053273   0.033573   1.587 0.112762    
-social_ideology  0.135844   0.032722   4.152 3.48e-05 ***
-desor_core      -0.004919   0.001345  -3.657 0.000264 ***
-fire_rare       -0.008800   0.030321  -0.290 0.771686    
-fire_privilege   0.099813   0.028313   3.525 0.000435 ***
-fire_angry      -0.057138   0.033113  -1.726 0.084630 .  
-fire_fear        0.049815   0.034309   1.452 0.146719    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8918 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.1593,	Adjusted R-squared:  0.1518 
-F-statistic: 21.32 on 14 and 1576 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.16071 -0.47051  0.01338  0.84568  1.56558 
+-1.77776 -0.32487  0.06026  0.37798  1.49981 
 
 Coefficients:
                   Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.6332312  0.1952321  13.488  < 2e-16 ***
-impact          -0.1496816  0.0436406  -3.430 0.000619 ***
-Black           -0.0389135  0.0625174  -0.622 0.533740    
-Hispanic         0.0122955  0.0604134   0.204 0.838753    
-OtherRace       -0.1596916  0.0970162  -1.646 0.099957 .  
-gender          -0.0005959  0.0423331  -0.014 0.988771    
-Republican       0.0326681  0.0617376   0.529 0.596781    
-Democrat         0.0941973  0.0514765   1.830 0.067452 .  
-fiscal_ideology  0.0671601  0.0310189   2.165 0.030527 *  
-social_ideology  0.0066052  0.0302545   0.218 0.827206    
-desor_core      -0.0008597  0.0012441  -0.691 0.489645    
-fire_rare       -0.0144828  0.0280504  -0.516 0.605707    
-fire_privilege   0.0193364  0.0262291   0.737 0.461105    
-fire_angry      -0.0451914  0.0305390  -1.480 0.139128    
-fire_fear        0.0791050  0.0317342   2.493 0.012778 *  
+(Intercept)      2.5867005  0.1289361  20.062  < 2e-16 ***
+impact           0.1928984  0.0288213   6.693 3.03e-11 ***
+Black           -0.0254826  0.0412880  -0.617 0.537198    
+Hispanic        -0.0206369  0.0398985  -0.517 0.605065    
+OtherRace       -0.0444683  0.0640719  -0.694 0.487761    
+gender           0.0118246  0.0279578   0.423 0.672393    
+Republican      -0.0042787  0.0407730  -0.105 0.916438    
+Democrat        -0.0156418  0.0339964  -0.460 0.645506    
+fiscal_ideology -0.0296122  0.0204857  -1.446 0.148514    
+social_ideology -0.0794810  0.0199808  -3.978 7.27e-05 ***
+desor_core       0.0071999  0.0008217   8.763  < 2e-16 ***
+fire_rare        0.0541586  0.0185252   2.924 0.003510 ** 
+fire_privilege  -0.0815906  0.0173224  -4.710 2.69e-06 ***
+fire_angry      -0.0665954  0.0201687  -3.302 0.000982 ***
+fire_fear        0.0733571  0.0209580   3.500 0.000478 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.8251 on 1576 degrees of freedom
+Residual standard error: 0.5449 on 1576 degrees of freedom
   (631 observations deleted due to missingness)
-Multiple R-squared:  0.02999,	Adjusted R-squared:  0.02137 
-F-statistic:  3.48 on 14 and 1576 DF,  p-value: 1.235e-05
+Multiple R-squared:  0.3224,	Adjusted R-squared:  0.3164 
+F-statistic: 53.56 on 14 and 1576 DF,  p-value: < 2.2e-16
 
 
 
 
 
 ==========================================================================================
-MODEL: m_prisonpen_5_incarc
+MODEL: m_prisonhelp_incarc
 ==========================================================================================
 
 
@@ -5390,80 +3746,39 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--2.27547 -0.47038  0.02136  0.84981  1.71768 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.585517   0.194913  13.265  < 2e-16 ***
-incarc          -0.259869   0.083891  -3.098  0.00198 ** 
-Black           -0.036827   0.062652  -0.588  0.55675    
-Hispanic         0.003717   0.060352   0.062  0.95090    
-OtherRace       -0.141861   0.097084  -1.461  0.14416    
-gender           0.005535   0.042444   0.130  0.89627    
-Republican       0.039444   0.061799   0.638  0.52340    
-Democrat         0.095545   0.051504   1.855  0.06377 .  
-fiscal_ideology  0.064748   0.031053   2.085  0.03722 *  
-social_ideology  0.004771   0.030253   0.158  0.87470    
-desor_core      -0.001029   0.001243  -0.828  0.40794    
-fire_rare       -0.016140   0.028066  -0.575  0.56532    
-fire_privilege   0.024204   0.026211   0.923  0.35592    
-fire_angry      -0.045846   0.030570  -1.500  0.13389    
-fire_fear        0.085598   0.031743   2.697  0.00708 ** 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8256 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.02866,	Adjusted R-squared:  0.02003 
-F-statistic: 3.321 on 14 and 1576 DF,  p-value: 2.802e-05
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.17452 -0.46548  0.01946  0.85498  1.45211 
+-1.83362 -0.32884  0.06889  0.37462  1.44958 
 
 Coefficients:
                   Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.6121274  0.1954630  13.364   <2e-16 ***
-knowincarc      -0.1053784  0.0456446  -2.309   0.0211 *  
-Black           -0.0463432  0.0625774  -0.741   0.4591    
-Hispanic         0.0082674  0.0605422   0.137   0.8914    
-OtherRace       -0.1583387  0.0972361  -1.628   0.1036    
-gender          -0.0030103  0.0424138  -0.071   0.9434    
-Republican       0.0300997  0.0618891   0.486   0.6268    
-Democrat         0.0976399  0.0515639   1.894   0.0585 .  
-fiscal_ideology  0.0693417  0.0310910   2.230   0.0259 *  
-social_ideology  0.0025559  0.0302747   0.084   0.9327    
-desor_core      -0.0009626  0.0012462  -0.772   0.4400    
-fire_rare       -0.0145941  0.0281109  -0.519   0.6037    
-fire_privilege   0.0209154  0.0262814   0.796   0.4263    
-fire_angry      -0.0430390  0.0305911  -1.407   0.1597    
-fire_fear        0.0804192  0.0317991   2.529   0.0115 *  
+(Intercept)      2.6482542  0.1289020  20.545  < 2e-16 ***
+incarc           0.3426855  0.0554799   6.177 8.31e-10 ***
+Black           -0.0286900  0.0414335  -0.692 0.488767    
+Hispanic        -0.0097154  0.0399126  -0.243 0.807713    
+OtherRace       -0.0677039  0.0642048  -1.054 0.291816    
+gender           0.0036710  0.0280698   0.131 0.895965    
+Republican      -0.0131617  0.0408697  -0.322 0.747464    
+Democrat        -0.0172554  0.0340613  -0.507 0.612507    
+fiscal_ideology -0.0264188  0.0205366  -1.286 0.198483    
+social_ideology -0.0772613  0.0200072  -3.862 0.000117 ***
+desor_core       0.0074154  0.0008221   9.020  < 2e-16 ***
+fire_rare        0.0562959  0.0185607   3.033 0.002460 ** 
+fire_privilege  -0.0878687  0.0173342  -5.069 4.47e-07 ***
+fire_angry      -0.0656465  0.0202166  -3.247 0.001190 ** 
+fire_fear        0.0649178  0.0209923   3.092 0.002020 ** 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.8267 on 1576 degrees of freedom
+Residual standard error: 0.546 on 1576 degrees of freedom
   (631 observations deleted due to missingness)
-Multiple R-squared:  0.02604,	Adjusted R-squared:  0.01739 
-F-statistic:  3.01 on 14 and 1576 DF,  p-value: 0.0001359
+Multiple R-squared:  0.3196,	Adjusted R-squared:  0.3136 
+F-statistic: 52.88 on 14 and 1576 DF,  p-value: < 2.2e-16
 
 
 
 
 
 ==========================================================================================
-MODEL: m_prisonpen_5_vict
+MODEL: m_prisonhelp_knowincarc
 ==========================================================================================
 
 
@@ -5472,32 +3787,73 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--2.15757 -0.46310  0.02193  0.85618  1.58189 
+-1.78658 -0.33272  0.06109  0.38544  1.57663 
 
 Coefficients:
                   Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.6096873  0.1956342  13.340   <2e-16 ***
-vict            -0.1259322  0.0667789  -1.886   0.0595 .  
-Black           -0.0477186  0.0626138  -0.762   0.4461    
-Hispanic         0.0031779  0.0604859   0.053   0.9581    
-OtherRace       -0.1509250  0.0972306  -1.552   0.1208    
-gender          -0.0019935  0.0424404  -0.047   0.9625    
-Republican       0.0323015  0.0619058   0.522   0.6019    
-Democrat         0.0963452  0.0516154   1.867   0.0621 .  
-fiscal_ideology  0.0645818  0.0311400   2.074   0.0382 *  
-social_ideology  0.0041065  0.0303503   0.135   0.8924    
-desor_core      -0.0009666  0.0012476  -0.775   0.4386    
-fire_rare       -0.0170160  0.0281237  -0.605   0.5452    
-fire_privilege   0.0239637  0.0262611   0.913   0.3616    
-fire_angry      -0.0471442  0.0307137  -1.535   0.1250    
-fire_fear        0.0806411  0.0318231   2.534   0.0114 *  
+(Intercept)      2.6071807  0.1294310  20.143  < 2e-16 ***
+knowincarc       0.1647029  0.0302248   5.449 5.86e-08 ***
+Black           -0.0180395  0.0414373  -0.435 0.663372    
+Hispanic        -0.0179187  0.0400896  -0.447 0.654961    
+OtherRace       -0.0440437  0.0643875  -0.684 0.494050    
+gender           0.0149624  0.0280854   0.533 0.594285    
+Republican       0.0002100  0.0409815   0.005 0.995912    
+Democrat        -0.0195210  0.0341444  -0.572 0.567593    
+fiscal_ideology -0.0329042  0.0205877  -1.598 0.110190    
+social_ideology -0.0749714  0.0200472  -3.740 0.000191 ***
+desor_core       0.0072905  0.0008252   8.835  < 2e-16 ***
+fire_rare        0.0538941  0.0186144   2.895 0.003840 ** 
+fire_privilege  -0.0827664  0.0174029  -4.756 2.16e-06 ***
+fire_angry      -0.0691698  0.0202567  -3.415 0.000655 ***
+fire_fear        0.0724292  0.0210566   3.440 0.000597 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.8272 on 1576 degrees of freedom
+Residual standard error: 0.5474 on 1576 degrees of freedom
   (631 observations deleted due to missingness)
-Multiple R-squared:  0.02495,	Adjusted R-squared:  0.01628 
-F-statistic:  2.88 on 14 and 1576 DF,  p-value: 0.0002584
+Multiple R-squared:  0.316,	Adjusted R-squared:   0.31 
+F-statistic: 52.02 on 14 and 1576 DF,  p-value: < 2.2e-16
+
+
+
+
+
+==========================================================================================
+MODEL: m_prisonhelp_vict
+==========================================================================================
+
+
+Call:
+lm(formula = fml, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.83135 -0.33459  0.06771  0.37932  1.53901 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      2.6165127  0.1301151  20.109  < 2e-16 ***
+vict             0.1653149  0.0444142   3.722 0.000205 ***
+Black           -0.0142889  0.0416441  -0.343 0.731555    
+Hispanic        -0.0089810  0.0402288  -0.223 0.823371    
+OtherRace       -0.0557543  0.0646675  -0.862 0.388726    
+gender           0.0136036  0.0282268   0.482 0.629917    
+Republican      -0.0037559  0.0411731  -0.091 0.927327    
+Democrat        -0.0183300  0.0343291  -0.534 0.593452    
+fiscal_ideology -0.0262173  0.0207111  -1.266 0.205751    
+social_ideology -0.0763600  0.0201858  -3.783 0.000161 ***
+desor_core       0.0073340  0.0008298   8.838  < 2e-16 ***
+fire_rare        0.0574456  0.0187049   3.071 0.002169 ** 
+fire_privilege  -0.0875519  0.0174661  -5.013 5.97e-07 ***
+fire_angry      -0.0639628  0.0204275  -3.131 0.001773 ** 
+fire_fear        0.0714393  0.0211653   3.375 0.000755 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.5502 on 1576 degrees of freedom
+  (631 observations deleted due to missingness)
+Multiple R-squared:  0.3092,	Adjusted R-squared:  0.3031 
+F-statistic: 50.39 on 14 and 1576 DF,  p-value: < 2.2e-16
 
 
 
@@ -5507,230 +3863,6 @@ F-statistic:  2.88 on 14 and 1576 DF,  p-value: 0.0002584
 ####################################################################################################
 MODEL LIST: goal2_nocontrol
 ####################################################################################################
-
-
-==========================================================================================
-MODEL: comp_prisonhelp_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.11143 -0.40125  0.09875  0.43209  1.09875 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.90125    0.01847 157.108  < 2e-16 ***
-impact       0.21019    0.02995   7.018 3.06e-12 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.656 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.02364,	Adjusted R-squared:  0.02316 
-F-statistic: 49.25 on 1 and 2034 DF,  p-value: 3.059e-12
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonhelp_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.90125 -0.40125  0.09875  0.43209  1.09875 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.90125    0.01878 154.475  < 2e-16 ***
-treat        0.36407    0.05679   6.411 1.96e-10 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6672 on 1415 degrees of freedom
-  (118 observations deleted due to missingness)
-Multiple R-squared:  0.02823,	Adjusted R-squared:  0.02754 
-F-statistic:  41.1 on 1 and 1415 DF,  p-value: 1.961e-10
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonhelp_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.12017 -0.40125  0.09875  0.43209  1.09875 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.90125    0.01842 157.500  < 2e-16 ***
-treat        0.21892    0.03208   6.825 1.18e-11 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6544 on 1881 degrees of freedom
-  (171 observations deleted due to missingness)
-Multiple R-squared:  0.02417,	Adjusted R-squared:  0.02365 
-F-statistic: 46.58 on 1 and 1881 DF,  p-value: 1.182e-11
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonhelp_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.17152 -0.40125  0.09875  0.49515  1.09875 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.90125    0.01897 152.942  < 2e-16 ***
-treat        0.27027    0.04673   5.784 8.87e-09 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6739 on 1509 degrees of freedom
-  (131 observations deleted due to missingness)
-Multiple R-squared:  0.02169,	Adjusted R-squared:  0.02104 
-F-statistic: 33.45 on 1 and 1509 DF,  p-value: 8.866e-09
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.87401 -0.37401 -0.05911  0.62599  1.19089 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.87401    0.01992 144.268   <2e-16 ***
-impact      -0.06490    0.03231  -2.009   0.0447 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7077 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.00198,	Adjusted R-squared:  0.001489 
-F-statistic: 4.035 on 1 and 2034 DF,  p-value: 0.0447
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-   Min     1Q Median     3Q    Max 
--1.874 -0.374  0.126  0.626  1.281 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.87401    0.02002 143.578   <2e-16 ***
-treat       -0.15465    0.06052  -2.555   0.0107 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7111 on 1415 degrees of freedom
-  (118 observations deleted due to missingness)
-Multiple R-squared:  0.004593,	Adjusted R-squared:  0.00389 
-F-statistic:  6.53 on 1 and 1415 DF,  p-value: 0.01071
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-   Min     1Q Median     3Q    Max 
--1.874 -0.374  0.126  0.626  1.193 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.87401    0.01973 145.660   <2e-16 ***
-treat       -0.06725    0.03436  -1.957   0.0505 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7009 on 1881 degrees of freedom
-  (171 observations deleted due to missingness)
-Multiple R-squared:  0.002032,	Adjusted R-squared:  0.001502 
-F-statistic: 3.831 on 1 and 1881 DF,  p-value: 0.05047
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-   Min     1Q Median     3Q    Max 
--1.874 -0.374  0.126  0.626  1.214 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.87401    0.02000 143.698   <2e-16 ***
-treat       -0.08786    0.04927  -1.783   0.0747 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7105 on 1509 degrees of freedom
-  (131 observations deleted due to missingness)
-Multiple R-squared:  0.002103,	Adjusted R-squared:  0.001442 
-F-statistic:  3.18 on 1 and 1509 DF,  p-value: 0.07472
-
-
-
 
 
 ==========================================================================================
@@ -6406,236 +4538,6 @@ F-statistic: 23.11 on 1 and 1508 DF,  p-value: 1.685e-06
 
 
 ==========================================================================================
-MODEL: comp_prisonpen_1_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7742 -0.7397  0.2258  1.2258  1.2603 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.77417    0.02716 102.144   <2e-16 ***
-impact      -0.03450    0.04405  -0.783    0.434    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9648 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.0003016,	Adjusted R-squared:  -0.0001899 
-F-statistic: 0.6136 on 1 and 2034 DF,  p-value: 0.4335
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7742 -0.7742  0.2258  1.2258  1.3323 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.77417    0.02737 101.375   <2e-16 ***
-treat       -0.10643    0.08274  -1.286    0.199    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9721 on 1415 degrees of freedom
-  (118 observations deleted due to missingness)
-Multiple R-squared:  0.001168,	Adjusted R-squared:  0.000462 
-F-statistic: 1.654 on 1 and 1415 DF,  p-value: 0.1986
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7742 -0.7423  0.2258  1.2258  1.2576 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.77417    0.02708 102.440   <2e-16 ***
-treat       -0.03182    0.04716  -0.675      0.5    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.962 on 1881 degrees of freedom
-  (171 observations deleted due to missingness)
-Multiple R-squared:  0.000242,	Adjusted R-squared:  -0.0002895 
-F-statistic: 0.4552 on 1 and 1881 DF,  p-value: 0.4999
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7742 -0.7742  0.2258  1.2258  1.2912 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.77417    0.02740 101.245   <2e-16 ***
-treat       -0.06533    0.06750  -0.968    0.333    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9734 on 1509 degrees of freedom
-  (131 observations deleted due to missingness)
-Multiple R-squared:  0.0006205,	Adjusted R-squared:  -4.182e-05 
-F-statistic: 0.9369 on 1 and 1509 DF,  p-value: 0.3332
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.97385 -0.47385  0.02615  1.02615  1.12145 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.97385    0.02340 127.102   <2e-16 ***
-impact      -0.09530    0.03795  -2.511   0.0121 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8312 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.003091,	Adjusted R-squared:  0.002601 
-F-statistic: 6.307 on 1 and 2034 DF,  p-value: 0.01211
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.97385 -0.47385  0.02615  1.02615  1.22903 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.97385    0.02332 127.548  < 2e-16 ***
-treat       -0.20288    0.07050  -2.878  0.00406 ** 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8283 on 1415 degrees of freedom
-  (118 observations deleted due to missingness)
-Multiple R-squared:  0.005819,	Adjusted R-squared:  0.005117 
-F-statistic: 8.282 on 1 and 1415 DF,  p-value: 0.004063
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.97385 -0.47385  0.02615  1.02615  1.12882 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.97385    0.02316 128.377   <2e-16 ***
-treat       -0.10268    0.04034  -2.545    0.011 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8229 on 1881 degrees of freedom
-  (171 observations deleted due to missingness)
-Multiple R-squared:  0.003433,	Adjusted R-squared:  0.002903 
-F-statistic: 6.479 on 1 and 1881 DF,  p-value: 0.01099
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.97385 -0.47385  0.02615  1.02615  1.13655 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.97385    0.02345 126.800   <2e-16 ***
-treat       -0.11040    0.05777  -1.911   0.0562 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8332 on 1509 degrees of freedom
-  (131 observations deleted due to missingness)
-Multiple R-squared:  0.002414,	Adjusted R-squared:  0.001753 
-F-statistic: 3.651 on 1 and 1509 DF,  p-value: 0.05621
-
-
-
-
-
-
-####################################################################################################
-MODEL LIST: goal2_demo
-####################################################################################################
-
-
-==========================================================================================
 MODEL: comp_prisonhelp_impact
 ==========================================================================================
 
@@ -6645,23 +4547,19 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.97009 -0.45918  0.09786  0.47158  1.13825 
+-2.11143 -0.40125  0.09875  0.43209  1.09875 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.95934    0.02741 107.947  < 2e-16 ***
-impact       0.19280    0.03397   5.676 1.63e-08 ***
-Black        0.10833    0.04630   2.340  0.01941 *  
-Hispanic     0.05704    0.04698   1.214  0.22487    
-OtherRace    0.01769    0.07588   0.233  0.81564    
-gender      -0.09759    0.03258  -2.995  0.00279 ** 
+(Intercept)  2.90125    0.01847 157.108  < 2e-16 ***
+impact       0.21019    0.02995   7.018 3.06e-12 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.6499 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.03021,	Adjusted R-squared:  0.02717 
-F-statistic: 9.949 on 5 and 1597 DF,  p-value: 2.187e-09
+Residual standard error: 0.656 on 2034 degrees of freedom
+  (186 observations deleted due to missingness)
+Multiple R-squared:  0.02364,	Adjusted R-squared:  0.02316 
+F-statistic: 49.25 on 1 and 2034 DF,  p-value: 3.059e-12
 
 
 
@@ -6676,24 +4574,20 @@ Call:
 lm(formula = fml, data = df_sub)
 
 Residuals:
-    Min      1Q  Median      3Q     Max 
--1.9649 -0.4548  0.0661  0.4656  1.1270 
+     Min       1Q   Median       3Q      Max 
+-1.90125 -0.40125  0.09875  0.43209  1.09875 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.93390    0.03090  94.948  < 2e-16 ***
-treat        0.35421    0.06871   5.155 2.99e-07 ***
-Black        0.09192    0.05834   1.576    0.115    
-Hispanic     0.10052    0.05962   1.686    0.092 .  
-OtherRace    0.09929    0.08687   1.143    0.253    
-gender      -0.06088    0.03998  -1.523    0.128    
+(Intercept)  2.90125    0.01878 154.475  < 2e-16 ***
+treat        0.36407    0.05679   6.411 1.96e-10 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.6667 on 1119 degrees of freedom
-  (410 observations deleted due to missingness)
-Multiple R-squared:  0.03083,	Adjusted R-squared:  0.0265 
-F-statistic: 7.119 on 5 and 1119 DF,  p-value: 1.445e-06
+Residual standard error: 0.6672 on 1415 degrees of freedom
+  (118 observations deleted due to missingness)
+Multiple R-squared:  0.02823,	Adjusted R-squared:  0.02754 
+F-statistic:  41.1 on 1 and 1415 DF,  p-value: 1.961e-10
 
 
 
@@ -6709,23 +4603,19 @@ lm(formula = fml, data = df_sub)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.96198 -0.46198  0.09708  0.46757  1.13424 
+-2.12017 -0.40125  0.09875  0.43209  1.09875 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.96198    0.02785 106.364  < 2e-16 ***
-treat        0.19094    0.03620   5.274 1.53e-07 ***
-Black        0.08905    0.04832   1.843  0.06554 .  
-Hispanic     0.05300    0.04864   1.090  0.27600    
-OtherRace    0.01357    0.07863   0.173  0.86304    
-gender      -0.09622    0.03377  -2.849  0.00444 ** 
+(Intercept)  2.90125    0.01842 157.500  < 2e-16 ***
+treat        0.21892    0.03208   6.825 1.18e-11 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.6519 on 1499 degrees of freedom
-  (549 observations deleted due to missingness)
-Multiple R-squared:  0.02724,	Adjusted R-squared:  0.024 
-F-statistic: 8.397 on 5 and 1499 DF,  p-value: 7.621e-08
+Residual standard error: 0.6544 on 1881 degrees of freedom
+  (171 observations deleted due to missingness)
+Multiple R-squared:  0.02417,	Adjusted R-squared:  0.02365 
+F-statistic: 46.58 on 1 and 1881 DF,  p-value: 1.182e-11
 
 
 
@@ -6741,154 +4631,28 @@ lm(formula = fml, data = df_sub)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--2.01079 -0.44719  0.07646  0.48079  1.13574 
+-2.17152 -0.40125  0.09875  0.49515  1.09875 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.93979    0.03049  96.426  < 2e-16 ***
-treat        0.24608    0.05457   4.510 7.14e-06 ***
-Black        0.14652    0.05641   2.597  0.00951 ** 
-Hispanic     0.08293    0.05715   1.451  0.14699    
-OtherRace    0.03199    0.08618   0.371  0.71056    
-gender      -0.07553    0.03873  -1.950  0.05142 .  
+(Intercept)  2.90125    0.01897 152.942  < 2e-16 ***
+treat        0.27027    0.04673   5.784 8.87e-09 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.6675 on 1191 degrees of freedom
-  (445 observations deleted due to missingness)
-Multiple R-squared:  0.02829,	Adjusted R-squared:  0.02421 
-F-statistic: 6.936 on 5 and 1191 DF,  p-value: 2.147e-06
+Residual standard error: 0.6739 on 1509 degrees of freedom
+  (131 observations deleted due to missingness)
+Multiple R-squared:  0.02169,	Adjusted R-squared:  0.02104 
+F-statistic: 33.45 on 1 and 1509 DF,  p-value: 8.866e-09
 
 
 
 
 
-==========================================================================================
-MODEL: comp_prisonpen_impact
-==========================================================================================
 
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.92023 -0.36623  0.04002  0.57977  1.38221 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.85118    0.02980  95.673   <2e-16 ***
-impact      -0.09219    0.03692  -2.497   0.0126 *  
-Black       -0.05401    0.05033  -1.073   0.2834    
-Hispanic     0.01130    0.05107   0.221   0.8250    
-OtherRace   -0.14120    0.08248  -1.712   0.0871 .  
-gender       0.06905    0.03542   1.950   0.0514 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7064 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.008782,	Adjusted R-squared:  0.005679 
-F-statistic:  2.83 on 5 and 1597 DF,  p-value: 0.01499
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.9325 -0.4102  0.0675  0.5675  1.3608 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.85653    0.03280  87.083  < 2e-16 ***
-treat       -0.18873    0.07294  -2.588  0.00979 ** 
-Black       -0.02234    0.06193  -0.361  0.71839    
-Hispanic    -0.05254    0.06329  -0.830  0.40663    
-OtherRace   -0.21735    0.09222  -2.357  0.01860 *  
-gender       0.07597    0.04244   1.790  0.07367 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7078 on 1119 degrees of freedom
-  (410 observations deleted due to missingness)
-Multiple R-squared:  0.01383,	Adjusted R-squared:  0.009425 
-F-statistic: 3.139 on 5 and 1119 DF,  p-value: 0.008064
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.91950 -0.37974  0.06689  0.58050  1.39224 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.84969    0.02992  95.233   <2e-16 ***
-treat       -0.08262    0.03890  -2.124   0.0338 *  
-Black       -0.03976    0.05192  -0.766   0.4439    
-Hispanic     0.01361    0.05226   0.260   0.7946    
-OtherRace   -0.15931    0.08450  -1.885   0.0596 .  
-gender       0.06981    0.03629   1.924   0.0546 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7005 on 1499 degrees of freedom
-  (549 observations deleted due to missingness)
-Multiple R-squared:  0.008193,	Adjusted R-squared:  0.004885 
-F-statistic: 2.477 on 5 and 1499 DF,  p-value: 0.03036
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.91313 -0.41313  0.03647  0.58687  1.39652 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.84751    0.03246  87.731   <2e-16 ***
-treat       -0.11005    0.05809  -1.894   0.0584 .  
-Black       -0.02390    0.06006  -0.398   0.6908    
-Hispanic     0.01844    0.06084   0.303   0.7619    
-OtherRace   -0.13397    0.09174  -1.460   0.1445    
-gender       0.06563    0.04124   1.592   0.1118    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7106 on 1191 degrees of freedom
-  (445 observations deleted due to missingness)
-Multiple R-squared:  0.007319,	Adjusted R-squared:  0.003151 
-F-statistic: 1.756 on 5 and 1191 DF,  p-value: 0.119
-
-
-
+####################################################################################################
+MODEL LIST: goal2_demo
+####################################################################################################
 
 
 ==========================================================================================
@@ -7660,268 +5424,6 @@ F-statistic:  3.49 on 5 and 1191 DF,  p-value: 0.003892
 
 
 ==========================================================================================
-MODEL: comp_prisonpen_1_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.8655 -0.7106  0.1634  1.1345  1.4147 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.71058    0.04076  66.508  < 2e-16 ***
-impact      -0.04268    0.05049  -0.845  0.39816    
-Black       -0.05936    0.06883  -0.863  0.38854    
-Hispanic     0.02895    0.06984   0.415  0.67856    
-OtherRace   -0.08257    0.11280  -0.732  0.46426    
-gender       0.12598    0.04844   2.601  0.00938 ** 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9661 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.005699,	Adjusted R-squared:  0.002586 
-F-statistic: 1.831 on 5 and 1597 DF,  p-value: 0.1038
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.8689 -0.6976  0.1604  1.1311  1.4455 
-
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.697627   0.044803  60.211   <2e-16 ***
-treat       -0.113216   0.099620  -1.136   0.2560    
-Black        0.029237   0.084585   0.346   0.7297    
-Hispanic     0.008583   0.086439   0.099   0.9209    
-OtherRace   -0.143143   0.125962  -1.136   0.2560    
-gender       0.142011   0.057961   2.450   0.0144 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9667 on 1119 degrees of freedom
-  (410 observations deleted due to missingness)
-Multiple R-squared:  0.00771,	Adjusted R-squared:  0.003276 
-F-statistic: 1.739 on 5 and 1119 DF,  p-value: 0.1228
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.8816 -0.7053  0.1682  1.1184  1.3891 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.70533    0.04125  65.576   <2e-16 ***
-treat       -0.03871    0.05363  -0.722   0.4706    
-Black       -0.05351    0.07158  -0.748   0.4548    
-Hispanic     0.04979    0.07205   0.691   0.4897    
-OtherRace   -0.05570    0.11649  -0.478   0.6326    
-gender       0.12645    0.05003   2.527   0.0116 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9657 on 1499 degrees of freedom
-  (549 observations deleted due to missingness)
-Multiple R-squared:  0.005727,	Adjusted R-squared:  0.00241 
-F-statistic: 1.727 on 5 and 1499 DF,  p-value: 0.1253
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.8602 -0.7097  0.1753  1.1398  1.4182 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.70971    0.04450  60.893   <2e-16 ***
-treat       -0.05707    0.07965  -0.717   0.4738    
-Black       -0.02484    0.08234  -0.302   0.7629    
-Hispanic     0.03552    0.08341   0.426   0.6703    
-OtherRace   -0.07086    0.12578  -0.563   0.5733    
-gender       0.11498    0.05653   2.034   0.0422 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9743 on 1191 degrees of freedom
-  (445 observations deleted due to missingness)
-Multiple R-squared:  0.004592,	Adjusted R-squared:  0.0004135 
-F-statistic: 1.099 on 5 and 1191 DF,  p-value: 0.3591
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.00390 -0.49177  0.00823  0.99610  1.34976 
-
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.991773   0.035026  85.415  < 2e-16 ***
-impact      -0.141702   0.043396  -3.265  0.00112 ** 
-Black       -0.048647   0.059151  -0.822  0.41095    
-Hispanic    -0.006358   0.060025  -0.106  0.91566    
-OtherRace   -0.199830   0.096946  -2.061  0.03944 *  
-gender       0.012125   0.041629   0.291  0.77088    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8303 on 1597 degrees of freedom
-  (619 observations deleted due to missingness)
-Multiple R-squared:  0.00956,	Adjusted R-squared:  0.006459 
-F-statistic: 3.083 on 5 and 1597 DF,  p-value: 0.008949
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.02537 -0.51543 -0.01543  0.97463  1.54039 
-
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  3.015428   0.037954  79.449  < 2e-16 ***
-treat       -0.264248   0.084392  -3.131  0.00179 ** 
-Black       -0.073912   0.071655  -1.031  0.30253    
-Hispanic    -0.113657   0.073226  -1.552  0.12091    
-OtherRace   -0.291567   0.106707  -2.732  0.00639 ** 
-gender       0.009937   0.049101   0.202  0.83965    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8189 on 1119 degrees of freedom
-  (410 observations deleted due to missingness)
-Multiple R-squared:  0.01777,	Adjusted R-squared:  0.01338 
-F-statistic: 4.049 on 5 and 1119 DF,  p-value: 0.001202
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.00722 -0.49405  0.00595  0.99278  1.39540 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.99405    0.03504  85.453  < 2e-16 ***
-treat       -0.12652    0.04555  -2.778  0.00554 ** 
-Black       -0.02600    0.06079  -0.428  0.66891    
-Hispanic    -0.02257    0.06120  -0.369  0.71236    
-OtherRace   -0.26293    0.09894  -2.658  0.00795 ** 
-gender       0.01316    0.04249   0.310  0.75679    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8202 on 1499 degrees of freedom
-  (549 observations deleted due to missingness)
-Multiple R-squared:  0.009632,	Adjusted R-squared:  0.006328 
-F-statistic: 2.916 on 5 and 1499 DF,  p-value: 0.01261
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--2.0029 -0.4853  0.0147  0.9984  1.3748 
-
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.985305   0.037888  78.792   <2e-16 ***
-treat       -0.163030   0.067815  -2.404   0.0164 *  
-Black       -0.022956   0.070107  -0.327   0.7434    
-Hispanic     0.001353   0.071018   0.019   0.9848    
-OtherRace   -0.197082   0.107096  -1.840   0.0660 .  
-gender       0.016270   0.048136   0.338   0.7354    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8296 on 1191 degrees of freedom
-  (445 observations deleted due to missingness)
-Multiple R-squared:  0.007811,	Adjusted R-squared:  0.003645 
-F-statistic: 1.875 on 5 and 1191 DF,  p-value: 0.09586
-
-
-
-
-
-
-####################################################################################################
-MODEL LIST: goal2_partyideo
-####################################################################################################
-
-
-==========================================================================================
 MODEL: comp_prisonhelp_impact
 ==========================================================================================
 
@@ -7931,27 +5433,23 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.93013 -0.37017  0.06832  0.40635  1.66438 
+-1.97009 -0.45918  0.09786  0.47158  1.13825 
 
 Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      3.37641    0.04385  77.004  < 2e-16 ***
-impact           0.23082    0.03050   7.567 6.42e-14 ***
-Black            0.04927    0.04299   1.146  0.25195    
-Hispanic         0.01857    0.04232   0.439  0.66090    
-OtherRace       -0.06944    0.06817  -1.019  0.30857    
-gender          -0.05251    0.02929  -1.793  0.07323 .  
-Republican      -0.02018    0.04329  -0.466  0.64106    
-Democrat         0.05060    0.03572   1.417  0.15680    
-fiscal_ideology -0.05972    0.02164  -2.760  0.00585 ** 
-social_ideology -0.13390    0.02074  -6.457 1.41e-10 ***
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  2.95934    0.02741 107.947  < 2e-16 ***
+impact       0.19280    0.03397   5.676 1.63e-08 ***
+Black        0.10833    0.04630   2.340  0.01941 *  
+Hispanic     0.05704    0.04698   1.214  0.22487    
+OtherRace    0.01769    0.07588   0.233  0.81564    
+gender      -0.09759    0.03258  -2.995  0.00279 ** 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.5818 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.2256,	Adjusted R-squared:  0.2212 
-F-statistic: 51.45 on 9 and 1590 DF,  p-value: < 2.2e-16
+Residual standard error: 0.6499 on 1597 degrees of freedom
+  (619 observations deleted due to missingness)
+Multiple R-squared:  0.03021,	Adjusted R-squared:  0.02717 
+F-statistic: 9.949 on 5 and 1597 DF,  p-value: 2.187e-09
 
 
 
@@ -7966,28 +5464,24 @@ Call:
 lm(formula = fml, data = df_sub)
 
 Residuals:
-     Min       1Q   Median       3Q      Max 
--1.92025 -0.36259  0.06071  0.41456  1.69124 
+    Min      1Q  Median      3Q     Max 
+-1.9649 -0.4548  0.0661  0.4656  1.1270 
 
 Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      3.397399   0.054606  62.217  < 2e-16 ***
-treat            0.442346   0.060970   7.255 7.51e-13 ***
-Black            0.026510   0.053611   0.494   0.6211    
-Hispanic         0.047882   0.052942   0.904   0.3660    
-OtherRace       -0.005305   0.077067  -0.069   0.9451    
-gender          -0.014684   0.035472  -0.414   0.6790    
-Republican      -0.011575   0.052676  -0.220   0.8261    
-Democrat         0.041888   0.044613   0.939   0.3480    
-fiscal_ideology -0.064024   0.026201  -2.444   0.0147 *  
-social_ideology -0.148452   0.025163  -5.900 4.83e-09 ***
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  2.93390    0.03090  94.948  < 2e-16 ***
+treat        0.35421    0.06871   5.155 2.99e-07 ***
+Black        0.09192    0.05834   1.576    0.115    
+Hispanic     0.10052    0.05962   1.686    0.092 .  
+OtherRace    0.09929    0.08687   1.143    0.253    
+gender      -0.06088    0.03998  -1.523    0.128    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.5887 on 1112 degrees of freedom
-  (413 observations deleted due to missingness)
-Multiple R-squared:  0.2485,	Adjusted R-squared:  0.2424 
-F-statistic: 40.86 on 9 and 1112 DF,  p-value: < 2.2e-16
+Residual standard error: 0.6667 on 1119 degrees of freedom
+  (410 observations deleted due to missingness)
+Multiple R-squared:  0.03083,	Adjusted R-squared:  0.0265 
+F-statistic: 7.119 on 5 and 1119 DF,  p-value: 1.445e-06
 
 
 
@@ -8002,28 +5496,24 @@ Call:
 lm(formula = fml, data = df_sub)
 
 Residuals:
-    Min      1Q  Median      3Q     Max 
--1.9125 -0.3692  0.0607  0.3988  1.6791 
+     Min       1Q   Median       3Q      Max 
+-1.96198 -0.46198  0.09708  0.46757  1.13424 
 
 Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      3.39675    0.04505  75.391  < 2e-16 ***
-treat            0.22477    0.03232   6.956 5.24e-12 ***
-Black            0.02231    0.04454   0.501  0.61658    
-Hispanic         0.01363    0.04359   0.313  0.75461    
-OtherRace       -0.07621    0.07026  -1.085  0.27827    
-gender          -0.04954    0.03021  -1.639  0.10132    
-Republican      -0.03267    0.04523  -0.722  0.47029    
-Democrat         0.04273    0.03670   1.164  0.24456    
-fiscal_ideology -0.05958    0.02226  -2.676  0.00752 ** 
-social_ideology -0.13914    0.02136  -6.516 9.88e-11 ***
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  2.96198    0.02785 106.364  < 2e-16 ***
+treat        0.19094    0.03620   5.274 1.53e-07 ***
+Black        0.08905    0.04832   1.843  0.06554 .  
+Hispanic     0.05300    0.04864   1.090  0.27600    
+OtherRace    0.01357    0.07863   0.173  0.86304    
+gender      -0.09622    0.03377  -2.849  0.00444 ** 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.5805 on 1492 degrees of freedom
-  (552 observations deleted due to missingness)
-Multiple R-squared:  0.2316,	Adjusted R-squared:  0.227 
-F-statistic: 49.97 on 9 and 1492 DF,  p-value: < 2.2e-16
+Residual standard error: 0.6519 on 1499 degrees of freedom
+  (549 observations deleted due to missingness)
+Multiple R-squared:  0.02724,	Adjusted R-squared:  0.024 
+F-statistic: 8.397 on 5 and 1499 DF,  p-value: 7.621e-08
 
 
 
@@ -8038,175 +5528,33 @@ Call:
 lm(formula = fml, data = df_sub)
 
 Residuals:
-    Min      1Q  Median      3Q     Max 
--1.9677 -0.3658  0.0617  0.4247  1.7073 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      3.36690    0.05181  64.986  < 2e-16 ***
-treat            0.27565    0.04836   5.699 1.52e-08 ***
-Black            0.08261    0.05157   1.602   0.1094    
-Hispanic         0.03049    0.05075   0.601   0.5481    
-OtherRace       -0.05587    0.07629  -0.732   0.4641    
-gender          -0.03914    0.03433  -1.140   0.2543    
-Republican      -0.06102    0.05114  -1.193   0.2331    
-Democrat         0.06941    0.04243   1.636   0.1021    
-fiscal_ideology -0.05303    0.02537  -2.090   0.0368 *  
-social_ideology -0.14178    0.02441  -5.809 8.08e-09 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.5892 on 1184 degrees of freedom
-  (448 observations deleted due to missingness)
-Multiple R-squared:  0.2466,	Adjusted R-squared:  0.2409 
-F-statistic: 43.07 on 9 and 1184 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--2.2214 -0.4042 -0.0326  0.4638  1.5976 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.47758    0.05054  49.019  < 2e-16 ***
-impact          -0.12102    0.03516  -3.442 0.000593 ***
-Black           -0.01269    0.04955  -0.256 0.797936    
-Hispanic         0.04338    0.04878   0.889 0.373930    
-OtherRace       -0.07280    0.07859  -0.926 0.354428    
-gender           0.03381    0.03377   1.001 0.316876    
-Republican       0.05643    0.04990   1.131 0.258243    
-Democrat         0.02470    0.04117   0.600 0.548638    
-fiscal_ideology  0.07168    0.02495   2.873 0.004117 ** 
-social_ideology  0.08324    0.02390   3.482 0.000511 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6706 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.1095,	Adjusted R-squared:  0.1045 
-F-statistic: 21.73 on 9 and 1590 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
      Min       1Q   Median       3Q      Max 
--2.21693 -0.42136 -0.02209  0.48319  1.57158 
+-2.01079 -0.44719  0.07646  0.48079  1.13574 
 
 Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.433890   0.061896  39.322  < 2e-16 ***
-treat           -0.252090   0.069110  -3.648 0.000277 ***
-Black            0.025404   0.060768   0.418 0.675988    
-Hispanic        -0.005471   0.060010  -0.091 0.927371    
-OtherRace       -0.134801   0.087355  -1.543 0.123083    
-gender           0.045049   0.040208   1.120 0.262787    
-Republican       0.067968   0.059708   1.138 0.255228    
-Democrat         0.048623   0.050569   0.962 0.336506    
-fiscal_ideology  0.087118   0.029699   2.933 0.003422 ** 
-social_ideology  0.080389   0.028523   2.818 0.004911 ** 
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  2.93979    0.03049  96.426  < 2e-16 ***
+treat        0.24608    0.05457   4.510 7.14e-06 ***
+Black        0.14652    0.05641   2.597  0.00951 ** 
+Hispanic     0.08293    0.05715   1.451  0.14699    
+OtherRace    0.03199    0.08618   0.371  0.71056    
+gender      -0.07553    0.03873  -1.950  0.05142 .  
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.6672 on 1112 degrees of freedom
-  (413 observations deleted due to missingness)
-Multiple R-squared:  0.1274,	Adjusted R-squared:  0.1204 
-F-statistic: 18.04 on 9 and 1112 DF,  p-value: < 2.2e-16
+Residual standard error: 0.6675 on 1191 degrees of freedom
+  (445 observations deleted due to missingness)
+Multiple R-squared:  0.02829,	Adjusted R-squared:  0.02421 
+F-statistic: 6.936 on 5 and 1191 DF,  p-value: 2.147e-06
 
 
 
 
 
-==========================================================================================
-MODEL: comp_prisonpen_knowincarc
-==========================================================================================
 
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.22925 -0.40212 -0.03133  0.45302  1.57486 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.481292   0.051571  48.114  < 2e-16 ***
-treat           -0.109013   0.036989  -2.947 0.003257 ** 
-Black            0.002482   0.050983   0.049 0.961177    
-Hispanic         0.043651   0.049897   0.875 0.381812    
-OtherRace       -0.093393   0.080422  -1.161 0.245712    
-gender           0.033605   0.034584   0.972 0.331355    
-Republican       0.035406   0.051776   0.684 0.494194    
-Democrat         0.016773   0.042010   0.399 0.689754    
-fiscal_ideology  0.063677   0.025480   2.499 0.012559 *  
-social_ideology  0.093915   0.024444   3.842 0.000127 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6644 on 1492 degrees of freedom
-  (552 observations deleted due to missingness)
-Multiple R-squared:  0.1106,	Adjusted R-squared:  0.1052 
-F-statistic: 20.61 on 9 and 1492 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.18404 -0.43029 -0.04595  0.47901  1.59933 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.459941   0.059050  41.659  < 2e-16 ***
-treat           -0.126421   0.055123  -2.293  0.02200 *  
-Black            0.006168   0.058774   0.105  0.91644    
-Hispanic         0.057226   0.057847   0.989  0.32274    
-OtherRace       -0.070003   0.086953  -0.805  0.42094    
-gender           0.042255   0.039122   1.080  0.28033    
-Republican       0.029673   0.058290   0.509  0.61081    
-Democrat         0.009924   0.048357   0.205  0.83744    
-fiscal_ideology  0.087665   0.028913   3.032  0.00248 ** 
-social_ideology  0.075377   0.027820   2.710  0.00684 ** 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6716 on 1184 degrees of freedom
-  (448 observations deleted due to missingness)
-Multiple R-squared:  0.1172,	Adjusted R-squared:  0.1105 
-F-statistic: 17.47 on 9 and 1184 DF,  p-value: < 2.2e-16
-
-
-
+####################################################################################################
+MODEL LIST: goal2_partyideo
+####################################################################################################
 
 
 ==========================================================================================
@@ -9074,300 +6422,6 @@ F-statistic: 10.05 on 9 and 1184 DF,  p-value: 5.323e-15
 
 
 ==========================================================================================
-MODEL: comp_prisonpen_1_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.58215 -0.51116  0.03626  0.65328  1.94461 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.18382    0.06764  32.285  < 2e-16 ***
-impact          -0.08944    0.04705  -1.901   0.0575 .  
-Black            0.01725    0.06632   0.260   0.7948    
-Hispanic         0.07919    0.06528   1.213   0.2253    
-OtherRace        0.02773    0.10517   0.264   0.7921    
-gender           0.07151    0.04519   1.582   0.1137    
-Republican       0.07804    0.06678   1.169   0.2427    
-Democrat        -0.03898    0.05510  -0.708   0.4793    
-fiscal_ideology  0.07270    0.03339   2.177   0.0296 *  
-social_ideology  0.16122    0.03199   5.040 5.19e-07 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8975 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.1444,	Adjusted R-squared:  0.1396 
-F-statistic: 29.82 on 9 and 1590 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.60556 -0.52805  0.01986  0.66396  1.91513 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.13395    0.08254  25.854  < 2e-16 ***
-treat           -0.21929    0.09216  -2.380   0.0175 *  
-Black            0.11110    0.08104   1.371   0.1706    
-Hispanic         0.07355    0.08002   0.919   0.3582    
-OtherRace       -0.01428    0.11649  -0.123   0.9024    
-gender           0.08944    0.05362   1.668   0.0956 .  
-Republican       0.04871    0.07962   0.612   0.5408    
-Democrat        -0.04908    0.06743  -0.728   0.4669    
-fiscal_ideology  0.09025    0.03960   2.279   0.0229 *  
-social_ideology  0.16173    0.03804   4.252 2.29e-05 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8898 on 1112 degrees of freedom
-  (413 observations deleted due to missingness)
-Multiple R-squared:  0.1628,	Adjusted R-squared:  0.1561 
-F-statistic: 24.03 on 9 and 1112 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.58962 -0.49445  0.03479  0.63572  1.92961 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.19941    0.06978  31.521  < 2e-16 ***
-treat           -0.07830    0.05005  -1.565   0.1179    
-Black            0.03128    0.06898   0.454   0.6502    
-Hispanic         0.09793    0.06751   1.451   0.1471    
-OtherRace        0.05329    0.10881   0.490   0.6244    
-gender           0.07262    0.04679   1.552   0.1209    
-Republican       0.08502    0.07005   1.214   0.2251    
-Democrat        -0.05071    0.05684  -0.892   0.3724    
-fiscal_ideology  0.05759    0.03448   1.670   0.0951 .  
-social_ideology  0.16934    0.03307   5.120 3.45e-07 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.899 on 1492 degrees of freedom
-  (552 observations deleted due to missingness)
-Multiple R-squared:  0.1411,	Adjusted R-squared:  0.1359 
-F-statistic: 27.23 on 9 and 1492 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.61196 -0.51610  0.00287  0.67002  1.97147 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.15796    0.07873  27.408  < 2e-16 ***
-treat           -0.09177    0.07350  -1.249   0.2121    
-Black            0.03140    0.07837   0.401   0.6888    
-Hispanic         0.09394    0.07713   1.218   0.2235    
-OtherRace        0.03239    0.11594   0.279   0.7800    
-gender           0.07335    0.05216   1.406   0.1599    
-Republican       0.01305    0.07772   0.168   0.8667    
-Democrat        -0.06906    0.06448  -1.071   0.2843    
-fiscal_ideology  0.08700    0.03855   2.257   0.0242 *  
-social_ideology  0.16773    0.03709   4.522 6.75e-06 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8954 on 1184 degrees of freedom
-  (448 observations deleted due to missingness)
-Multiple R-squared:  0.1625,	Adjusted R-squared:  0.1562 
-F-statistic: 25.53 on 9 and 1184 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.19327 -0.48890  0.00484  0.85828  1.48256 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.771344   0.062214  44.545  < 2e-16 ***
-impact          -0.152589   0.043279  -3.526 0.000434 ***
-Black           -0.042630   0.060994  -0.699 0.484707    
-Hispanic         0.007578   0.060043   0.126 0.899581    
-OtherRace       -0.173320   0.096733  -1.792 0.073364 .  
-gender          -0.003894   0.041562  -0.094 0.925364    
-Republican       0.034825   0.061418   0.567 0.570781    
-Democrat         0.088384   0.050677   1.744 0.081344 .  
-fiscal_ideology  0.070656   0.030707   2.301 0.021521 *  
-social_ideology  0.005249   0.029423   0.178 0.858430    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8255 on 1590 degrees of freedom
-  (622 observations deleted due to missingness)
-Multiple R-squared:  0.02419,	Adjusted R-squared:  0.01867 
-F-statistic:  4.38 on 9 and 1590 DF,  p-value: 1.141e-05
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.15384 -0.46414 -0.02554  0.84592  1.55500 
-
-Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.7338289  0.0753402  36.286  < 2e-16 ***
-treat           -0.2848853  0.0841207  -3.387 0.000732 ***
-Black           -0.0602963  0.0739670  -0.815 0.415145    
-Hispanic        -0.0844923  0.0730438  -1.157 0.247629    
-OtherRace       -0.2553200  0.1063290  -2.401 0.016504 *  
-gender           0.0006609  0.0489414   0.014 0.989228    
-Republican       0.0872223  0.0726772   1.200 0.230343    
-Democrat         0.1463262  0.0615527   2.377 0.017611 *  
-fiscal_ideology  0.0839877  0.0361494   2.323 0.020340 *  
-social_ideology -0.0009563  0.0347177  -0.028 0.978029    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8122 on 1112 degrees of freedom
-  (413 observations deleted due to missingness)
-Multiple R-squared:  0.03826,	Adjusted R-squared:  0.03048 
-F-statistic: 4.916 on 9 and 1112 DF,  p-value: 1.73e-06
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.19904 -0.49621 -0.00546  0.84752  1.39805 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.76318    0.06324  43.696   <2e-16 ***
-treat           -0.13972    0.04536  -3.081   0.0021 ** 
-Black           -0.02632    0.06252  -0.421   0.6738    
-Hispanic        -0.01063    0.06118  -0.174   0.8622    
-OtherRace       -0.24007    0.09861  -2.434   0.0150 *  
-gender          -0.00541    0.04241  -0.128   0.8985    
-Republican      -0.01421    0.06349  -0.224   0.8230    
-Democrat         0.08426    0.05151   1.636   0.1021    
-fiscal_ideology  0.06977    0.03124   2.233   0.0257 *  
-social_ideology  0.01849    0.02997   0.617   0.5375    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8147 on 1492 degrees of freedom
-  (552 observations deleted due to missingness)
-Multiple R-squared:  0.02609,	Adjusted R-squared:  0.02021 
-F-statistic: 4.441 on 9 and 1492 DF,  p-value: 9.227e-06
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.18549 -0.47598 -0.00411  0.88270  1.48903 
-
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.76192    0.07255  38.069   <2e-16 ***
-treat           -0.16107    0.06773  -2.378   0.0176 *  
-Black           -0.01906    0.07221  -0.264   0.7919    
-Hispanic         0.02051    0.07107   0.289   0.7730    
-OtherRace       -0.17239    0.10683  -1.614   0.1069    
-gender           0.01116    0.04807   0.232   0.8164    
-Republican       0.04630    0.07162   0.646   0.5181    
-Democrat         0.08891    0.05941   1.496   0.1348    
-fiscal_ideology  0.08833    0.03552   2.486   0.0130 *  
-social_ideology -0.01698    0.03418  -0.497   0.6195    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8251 on 1184 degrees of freedom
-  (448 observations deleted due to missingness)
-Multiple R-squared:  0.02261,	Adjusted R-squared:  0.01518 
-F-statistic: 3.043 on 9 and 1184 DF,  p-value: 0.001319
-
-
-
-
-
-
-####################################################################################################
-MODEL LIST: goal2_full
-####################################################################################################
-
-
-==========================================================================================
 MODEL: comp_prisonhelp_impact
 ==========================================================================================
 
@@ -9377,32 +6431,27 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.77776 -0.32487  0.06026  0.37798  1.49981 
+-1.93013 -0.37017  0.06832  0.40635  1.66438 
 
 Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.5867005  0.1289361  20.062  < 2e-16 ***
-impact           0.1928984  0.0288213   6.693 3.03e-11 ***
-Black           -0.0254826  0.0412880  -0.617 0.537198    
-Hispanic        -0.0206369  0.0398985  -0.517 0.605065    
-OtherRace       -0.0444683  0.0640719  -0.694 0.487761    
-gender           0.0118246  0.0279578   0.423 0.672393    
-Republican      -0.0042787  0.0407730  -0.105 0.916438    
-Democrat        -0.0156418  0.0339964  -0.460 0.645506    
-fiscal_ideology -0.0296122  0.0204857  -1.446 0.148514    
-social_ideology -0.0794810  0.0199808  -3.978 7.27e-05 ***
-desor_core       0.0071999  0.0008217   8.763  < 2e-16 ***
-fire_rare        0.0541586  0.0185252   2.924 0.003510 ** 
-fire_privilege  -0.0815906  0.0173224  -4.710 2.69e-06 ***
-fire_angry      -0.0665954  0.0201687  -3.302 0.000982 ***
-fire_fear        0.0733571  0.0209580   3.500 0.000478 ***
+                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      3.37641    0.04385  77.004  < 2e-16 ***
+impact           0.23082    0.03050   7.567 6.42e-14 ***
+Black            0.04927    0.04299   1.146  0.25195    
+Hispanic         0.01857    0.04232   0.439  0.66090    
+OtherRace       -0.06944    0.06817  -1.019  0.30857    
+gender          -0.05251    0.02929  -1.793  0.07323 .  
+Republican      -0.02018    0.04329  -0.466  0.64106    
+Democrat         0.05060    0.03572   1.417  0.15680    
+fiscal_ideology -0.05972    0.02164  -2.760  0.00585 ** 
+social_ideology -0.13390    0.02074  -6.457 1.41e-10 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.5449 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.3224,	Adjusted R-squared:  0.3164 
-F-statistic: 53.56 on 14 and 1576 DF,  p-value: < 2.2e-16
+Residual standard error: 0.5818 on 1590 degrees of freedom
+  (622 observations deleted due to missingness)
+Multiple R-squared:  0.2256,	Adjusted R-squared:  0.2212 
+F-statistic: 51.45 on 9 and 1590 DF,  p-value: < 2.2e-16
 
 
 
@@ -9417,33 +6466,28 @@ Call:
 lm(formula = fml, data = df_sub)
 
 Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7971 -0.3359  0.0687  0.3761  1.5469 
+     Min       1Q   Median       3Q      Max 
+-1.92025 -0.36259  0.06071  0.41456  1.69124 
 
 Coefficients:
                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.733364   0.162855  16.784  < 2e-16 ***
-treat            0.390253   0.057569   6.779 1.97e-11 ***
-Black           -0.033046   0.051426  -0.643 0.520622    
-Hispanic        -0.004551   0.050167  -0.091 0.927729    
-OtherRace       -0.008038   0.072692  -0.111 0.911975    
-gender           0.039600   0.033975   1.166 0.244048    
-Republican      -0.029318   0.049871  -0.588 0.556726    
-Democrat        -0.022832   0.042559  -0.536 0.591732    
-fiscal_ideology -0.038136   0.024887  -1.532 0.125715    
-social_ideology -0.081795   0.024696  -3.312 0.000956 ***
-desor_core       0.007191   0.001014   7.088 2.42e-12 ***
-fire_rare        0.028805   0.022600   1.275 0.202732    
-fire_privilege  -0.099298   0.020966  -4.736 2.46e-06 ***
-fire_angry      -0.063063   0.024167  -2.609 0.009192 ** 
-fire_fear        0.068150   0.026597   2.562 0.010529 *  
+(Intercept)      3.397399   0.054606  62.217  < 2e-16 ***
+treat            0.442346   0.060970   7.255 7.51e-13 ***
+Black            0.026510   0.053611   0.494   0.6211    
+Hispanic         0.047882   0.052942   0.904   0.3660    
+OtherRace       -0.005305   0.077067  -0.069   0.9451    
+gender          -0.014684   0.035472  -0.414   0.6790    
+Republican      -0.011575   0.052676  -0.220   0.8261    
+Democrat         0.041888   0.044613   0.939   0.3480    
+fiscal_ideology -0.064024   0.026201  -2.444   0.0147 *  
+social_ideology -0.148452   0.025163  -5.900 4.83e-09 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.5537 on 1101 degrees of freedom
-  (419 observations deleted due to missingness)
-Multiple R-squared:  0.3379,	Adjusted R-squared:  0.3295 
-F-statistic: 40.14 on 14 and 1101 DF,  p-value: < 2.2e-16
+Residual standard error: 0.5887 on 1112 degrees of freedom
+  (413 observations deleted due to missingness)
+Multiple R-squared:  0.2485,	Adjusted R-squared:  0.2424 
+F-statistic: 40.86 on 9 and 1112 DF,  p-value: < 2.2e-16
 
 
 
@@ -9459,32 +6503,27 @@ lm(formula = fml, data = df_sub)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--1.7709 -0.3158  0.0546  0.3683  1.5104 
+-1.9125 -0.3692  0.0607  0.3988  1.6791 
 
 Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.6062393  0.1342659  19.411  < 2e-16 ***
-treat            0.1864070  0.0304657   6.119 1.21e-09 ***
-Black           -0.0502286  0.0426017  -1.179  0.23858    
-Hispanic        -0.0277638  0.0410662  -0.676  0.49910    
-OtherRace       -0.0581874  0.0658442  -0.884  0.37699    
-gender           0.0122415  0.0287332   0.426  0.67014    
-Republican      -0.0208447  0.0425256  -0.490  0.62409    
-Democrat        -0.0223118  0.0348245  -0.641  0.52182    
-fiscal_ideology -0.0285365  0.0210235  -1.357  0.17487    
-social_ideology -0.0824094  0.0205561  -4.009 6.40e-05 ***
-desor_core       0.0072944  0.0008477   8.605  < 2e-16 ***
-fire_rare        0.0599936  0.0191936   3.126  0.00181 ** 
-fire_privilege  -0.0849607  0.0179071  -4.745 2.29e-06 ***
-fire_angry      -0.0640489  0.0206207  -3.106  0.00193 ** 
-fire_fear        0.0660674  0.0217342   3.040  0.00241 ** 
+                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      3.39675    0.04505  75.391  < 2e-16 ***
+treat            0.22477    0.03232   6.956 5.24e-12 ***
+Black            0.02231    0.04454   0.501  0.61658    
+Hispanic         0.01363    0.04359   0.313  0.75461    
+OtherRace       -0.07621    0.07026  -1.085  0.27827    
+gender          -0.04954    0.03021  -1.639  0.10132    
+Republican      -0.03267    0.04523  -0.722  0.47029    
+Democrat         0.04273    0.03670   1.164  0.24456    
+fiscal_ideology -0.05958    0.02226  -2.676  0.00752 ** 
+social_ideology -0.13914    0.02136  -6.516 9.88e-11 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.5425 on 1479 degrees of freedom
-  (560 observations deleted due to missingness)
-Multiple R-squared:  0.3312,	Adjusted R-squared:  0.3249 
-F-statistic: 52.33 on 14 and 1479 DF,  p-value: < 2.2e-16
+Residual standard error: 0.5805 on 1492 degrees of freedom
+  (552 observations deleted due to missingness)
+Multiple R-squared:  0.2316,	Adjusted R-squared:  0.227 
+F-statistic: 49.97 on 9 and 1492 DF,  p-value: < 2.2e-16
 
 
 
@@ -9499,200 +6538,37 @@ Call:
 lm(formula = fml, data = df_sub)
 
 Residuals:
-     Min       1Q   Median       3Q      Max 
--1.79106 -0.34528  0.05867  0.37604  1.54490 
-
-Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.6954948  0.1535288  17.557  < 2e-16 ***
-treat            0.2126476  0.0458491   4.638 3.91e-06 ***
-Black            0.0134917  0.0492251   0.274 0.784070    
-Hispanic        -0.0083822  0.0477207  -0.176 0.860598    
-OtherRace       -0.0304699  0.0717512  -0.425 0.671163    
-gender           0.0220139  0.0327359   0.672 0.501417    
-Republican      -0.0522341  0.0482211  -1.083 0.278933    
-Democrat        -0.0044149  0.0404177  -0.109 0.913037    
-fiscal_ideology -0.0240659  0.0239885  -1.003 0.315959    
-social_ideology -0.0848622  0.0236751  -3.584 0.000352 ***
-desor_core       0.0075843  0.0009736   7.790 1.47e-14 ***
-fire_rare        0.0297877  0.0216609   1.375 0.169337    
-fire_privilege  -0.0973014  0.0201370  -4.832 1.53e-06 ***
-fire_angry      -0.0638154  0.0237663  -2.685 0.007353 ** 
-fire_fear        0.0626105  0.0248765   2.517 0.011974 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.5516 on 1172 degrees of freedom
-  (455 observations deleted due to missingness)
-Multiple R-squared:  0.3416,	Adjusted R-squared:  0.3337 
-F-statistic: 43.43 on 14 and 1172 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
     Min      1Q  Median      3Q     Max 
--2.0535 -0.4107 -0.0244  0.4633  1.5701 
+-1.9677 -0.3658  0.0617  0.4247  1.7073 
 
 Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.477161   0.157947  15.683  < 2e-16 ***
-impact          -0.106983   0.035306  -3.030  0.00248 ** 
-Black            0.019691   0.050578   0.389  0.69710    
-Hispanic         0.063673   0.048876   1.303  0.19285    
-OtherRace       -0.058817   0.078488  -0.749  0.45375    
-gender           0.020693   0.034248   0.604  0.54579    
-Republican       0.054690   0.049947   1.095  0.27371    
-Democrat         0.051336   0.041646   1.233  0.21788    
-fiscal_ideology  0.060526   0.025095   2.412  0.01599 *  
-social_ideology  0.072098   0.024477   2.946  0.00327 ** 
-desor_core      -0.002854   0.001007  -2.836  0.00463 ** 
-fire_rare       -0.011173   0.022693  -0.492  0.62253    
-fire_privilege   0.058574   0.021220   2.760  0.00584 ** 
-fire_angry      -0.051139   0.024707  -2.070  0.03863 *  
-fire_fear        0.063921   0.025674   2.490  0.01289 *  
+                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      3.36690    0.05181  64.986  < 2e-16 ***
+treat            0.27565    0.04836   5.699 1.52e-08 ***
+Black            0.08261    0.05157   1.602   0.1094    
+Hispanic         0.03049    0.05075   0.601   0.5481    
+OtherRace       -0.05587    0.07629  -0.732   0.4641    
+gender          -0.03914    0.03433  -1.140   0.2543    
+Republican      -0.06102    0.05114  -1.193   0.2331    
+Democrat         0.06941    0.04243   1.636   0.1021    
+fiscal_ideology -0.05303    0.02537  -2.090   0.0368 *  
+social_ideology -0.14178    0.02441  -5.809 8.08e-09 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.6675 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.1226,	Adjusted R-squared:  0.1148 
-F-statistic: 15.73 on 14 and 1576 DF,  p-value: < 2.2e-16
+Residual standard error: 0.5892 on 1184 degrees of freedom
+  (448 observations deleted due to missingness)
+Multiple R-squared:  0.2466,	Adjusted R-squared:  0.2409 
+F-statistic: 43.07 on 9 and 1184 DF,  p-value: < 2.2e-16
 
 
 
 
 
-==========================================================================================
-MODEL: comp_prisonpen_incarc
-==========================================================================================
 
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.12691 -0.41406 -0.02975  0.47942  1.56432 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.499638   0.196085  12.748  < 2e-16 ***
-treat           -0.254105   0.069316  -3.666 0.000258 ***
-Black            0.048178   0.061919   0.778 0.436686    
-Hispanic         0.005880   0.060404   0.097 0.922465    
-OtherRace       -0.120554   0.087524  -1.377 0.168674    
-gender           0.038325   0.040908   0.937 0.349037    
-Republican       0.073155   0.060047   1.218 0.223371    
-Democrat         0.062962   0.051243   1.229 0.219444    
-fiscal_ideology  0.081171   0.029965   2.709 0.006856 ** 
-social_ideology  0.070552   0.029735   2.373 0.017831 *  
-desor_core      -0.001465   0.001221  -1.199 0.230712    
-fire_rare       -0.020563   0.027211  -0.756 0.449995    
-fire_privilege   0.043740   0.025244   1.733 0.083434 .  
-fire_angry      -0.059665   0.029099  -2.050 0.040559 *  
-fire_fear        0.036507   0.032024   1.140 0.254542    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6666 on 1101 degrees of freedom
-  (419 observations deleted due to missingness)
-Multiple R-squared:  0.1347,	Adjusted R-squared:  0.1237 
-F-statistic: 12.24 on 14 and 1101 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.09187 -0.41467 -0.03378  0.45702  1.57452 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.538815   0.163401  15.537  < 2e-16 ***
-treat           -0.093838   0.037076  -2.531 0.011479 *  
-Black            0.031885   0.051846   0.615 0.538651    
-Hispanic         0.066362   0.049977   1.328 0.184434    
-OtherRace       -0.081193   0.080132  -1.013 0.311112    
-gender           0.021781   0.034968   0.623 0.533454    
-Republican       0.035429   0.051753   0.685 0.493719    
-Democrat         0.041252   0.042381   0.973 0.330530    
-fiscal_ideology  0.052712   0.025585   2.060 0.039551 *  
-social_ideology  0.082956   0.025017   3.316 0.000935 ***
-desor_core      -0.003388   0.001032  -3.284 0.001047 ** 
-fire_rare       -0.010381   0.023358  -0.444 0.656818    
-fire_privilege   0.055034   0.021793   2.525 0.011664 *  
-fire_angry      -0.065534   0.025095  -2.611 0.009108 ** 
-fire_fear        0.065672   0.026450   2.483 0.013144 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6602 on 1479 degrees of freedom
-  (560 observations deleted due to missingness)
-Multiple R-squared:  0.1262,	Adjusted R-squared:  0.118 
-F-statistic: 15.26 on 14 and 1479 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.03348 -0.41886 -0.04629  0.48509  1.55307 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.443524   0.186340  13.113  < 2e-16 ***
-treat           -0.114773   0.055648  -2.062  0.03938 *  
-Black            0.036202   0.059745   0.606  0.54467    
-Hispanic         0.067626   0.057919   1.168  0.24321    
-OtherRace       -0.056730   0.087086  -0.651  0.51490    
-gender           0.029652   0.039732   0.746  0.45564    
-Republican       0.028916   0.058527   0.494  0.62135    
-Democrat         0.032536   0.049056   0.663  0.50730    
-fiscal_ideology  0.078207   0.029115   2.686  0.00733 ** 
-social_ideology  0.064824   0.028735   2.256  0.02426 *  
-desor_core      -0.002294   0.001182  -1.941  0.05245 .  
-fire_rare       -0.021010   0.026290  -0.799  0.42436    
-fire_privilege   0.048839   0.024441   1.998  0.04592 *  
-fire_angry      -0.046374   0.028846  -1.608  0.10818    
-fire_fear        0.069546   0.030193   2.303  0.02143 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6695 on 1172 degrees of freedom
-  (455 observations deleted due to missingness)
-Multiple R-squared:  0.1286,	Adjusted R-squared:  0.1182 
-F-statistic: 12.35 on 14 and 1172 DF,  p-value: < 2.2e-16
-
-
-
+####################################################################################################
+MODEL LIST: goal2_full
+####################################################################################################
 
 
 ==========================================================================================
@@ -10680,7 +7556,7 @@ F-statistic:    13 on 14 and 1172 DF,  p-value: < 2.2e-16
 
 
 ==========================================================================================
-MODEL: comp_prisonpen_1_impact
+MODEL: comp_prisonhelp_impact
 ==========================================================================================
 
 
@@ -10689,244 +7565,39 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--2.38915 -0.55139 -0.00243  0.65563  2.01056 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.321090   0.210922  11.004  < 2e-16 ***
-impact          -0.064285   0.047148  -1.363 0.172929    
-Black            0.078295   0.067542   1.159 0.246548    
-Hispanic         0.115051   0.065269   1.763 0.078139 .  
-OtherRace        0.042058   0.104813   0.401 0.688276    
-gender           0.041982   0.045735   0.918 0.358791    
-Republican       0.076711   0.066699   1.150 0.250276    
-Democrat         0.008474   0.055613   0.152 0.878908    
-fiscal_ideology  0.053891   0.033512   1.608 0.108009    
-social_ideology  0.137590   0.032686   4.209  2.7e-05 ***
-desor_core      -0.004849   0.001344  -3.607 0.000319 ***
-fire_rare       -0.007864   0.030305  -0.259 0.795288    
-fire_privilege   0.097812   0.028337   3.452 0.000572 ***
-fire_angry      -0.057086   0.032993  -1.730 0.083786 .  
-fire_fear        0.048737   0.034285   1.422 0.155356    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8914 on 1576 degrees of freedom
-  (631 observations deleted due to missingness)
-Multiple R-squared:  0.1601,	Adjusted R-squared:  0.1527 
-F-statistic: 21.46 on 14 and 1576 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.47419 -0.54290 -0.00061  0.65929  1.99888 
+-1.77776 -0.32487  0.06026  0.37798  1.49981 
 
 Coefficients:
                   Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.3951780  0.2607435   9.186  < 2e-16 ***
-treat           -0.2063799  0.0921728  -2.239 0.025352 *  
-Black            0.1544819  0.0823368   1.876 0.060889 .  
-Hispanic         0.1064638  0.0803217   1.325 0.185291    
-OtherRace        0.0030714  0.1163851   0.026 0.978951    
-gender           0.0666926  0.0543968   1.226 0.220446    
-Republican       0.0662856  0.0798469   0.830 0.406629    
-Democrat        -0.0137755  0.0681397  -0.202 0.839825    
-fiscal_ideology  0.0751008  0.0398460   1.885 0.059723 .  
-social_ideology  0.1331419  0.0395404   3.367 0.000786 ***
-desor_core      -0.0041704  0.0016242  -2.568 0.010367 *  
-fire_rare       -0.0005795  0.0361843  -0.016 0.987226    
-fire_privilege   0.0953752  0.0335686   2.841 0.004577 ** 
-fire_angry      -0.0686794  0.0386939  -1.775 0.076184 .  
-fire_fear        0.0014245  0.0425836   0.033 0.973320    
+(Intercept)      2.5867005  0.1289361  20.062  < 2e-16 ***
+impact           0.1928984  0.0288213   6.693 3.03e-11 ***
+Black           -0.0254826  0.0412880  -0.617 0.537198    
+Hispanic        -0.0206369  0.0398985  -0.517 0.605065    
+OtherRace       -0.0444683  0.0640719  -0.694 0.487761    
+gender           0.0118246  0.0279578   0.423 0.672393    
+Republican      -0.0042787  0.0407730  -0.105 0.916438    
+Democrat        -0.0156418  0.0339964  -0.460 0.645506    
+fiscal_ideology -0.0296122  0.0204857  -1.446 0.148514    
+social_ideology -0.0794810  0.0199808  -3.978 7.27e-05 ***
+desor_core       0.0071999  0.0008217   8.763  < 2e-16 ***
+fire_rare        0.0541586  0.0185252   2.924 0.003510 ** 
+fire_privilege  -0.0815906  0.0173224  -4.710 2.69e-06 ***
+fire_angry      -0.0665954  0.0201687  -3.302 0.000982 ***
+fire_fear        0.0733571  0.0209580   3.500 0.000478 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.8864 on 1101 degrees of freedom
-  (419 observations deleted due to missingness)
-Multiple R-squared:  0.1755,	Adjusted R-squared:  0.165 
-F-statistic: 16.74 on 14 and 1101 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.41504 -0.54988  0.00162  0.64872  2.00851 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.345875   0.220865  10.621  < 2e-16 ***
-treat           -0.053096   0.050116  -1.059 0.289556    
-Black            0.086181   0.070079   1.230 0.218980    
-Hispanic         0.138324   0.067553   2.048 0.040773 *  
-OtherRace        0.067429   0.108312   0.623 0.533683    
-gender           0.046439   0.047266   0.983 0.326008    
-Republican       0.087453   0.069954   1.250 0.211444    
-Democrat        -0.006129   0.057286  -0.107 0.914814    
-fiscal_ideology  0.038927   0.034583   1.126 0.260520    
-social_ideology  0.145083   0.033814   4.291  1.9e-05 ***
-desor_core      -0.005416   0.001395  -3.884 0.000107 ***
-fire_rare       -0.003303   0.031573  -0.105 0.916693    
-fire_privilege   0.097977   0.029457   3.326 0.000902 ***
-fire_angry      -0.068701   0.033921  -2.025 0.043010 *  
-fire_fear        0.058369   0.035752   1.633 0.102767    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8924 on 1479 degrees of freedom
-  (560 observations deleted due to missingness)
-Multiple R-squared:  0.1591,	Adjusted R-squared:  0.1512 
-F-statistic: 19.99 on 14 and 1479 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_1_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.43228 -0.55036 -0.00485  0.68626  1.97302 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.390112   0.248078   9.634  < 2e-16 ***
-treat           -0.063788   0.074085  -0.861 0.389410    
-Black            0.085922   0.079540   1.080 0.280261    
-Hispanic         0.116678   0.077109   1.513 0.130509    
-OtherRace        0.040027   0.115939   0.345 0.729972    
-gender           0.044290   0.052896   0.837 0.402591    
-Republican       0.013684   0.077918   0.176 0.860617    
-Democrat        -0.027836   0.065309  -0.426 0.670022    
-fiscal_ideology  0.070218   0.038762   1.812 0.070316 .  
-social_ideology  0.141968   0.038255   3.711 0.000216 ***
-desor_core      -0.004144   0.001573  -2.634 0.008553 ** 
-fire_rare       -0.019531   0.035001  -0.558 0.576945    
-fire_privilege   0.087291   0.032538   2.683 0.007405 ** 
-fire_angry      -0.057236   0.038403  -1.490 0.136385    
-fire_fear        0.026248   0.040197   0.653 0.513886    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8913 on 1172 degrees of freedom
-  (455 observations deleted due to missingness)
-Multiple R-squared:  0.1747,	Adjusted R-squared:  0.1649 
-F-statistic: 17.72 on 14 and 1172 DF,  p-value: < 2.2e-16
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.16071 -0.47051  0.01338  0.84568  1.56558 
-
-Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.6332312  0.1952321  13.488  < 2e-16 ***
-impact          -0.1496816  0.0436406  -3.430 0.000619 ***
-Black           -0.0389135  0.0625174  -0.622 0.533740    
-Hispanic         0.0122955  0.0604134   0.204 0.838753    
-OtherRace       -0.1596916  0.0970162  -1.646 0.099957 .  
-gender          -0.0005959  0.0423331  -0.014 0.988771    
-Republican       0.0326681  0.0617376   0.529 0.596781    
-Democrat         0.0941973  0.0514765   1.830 0.067452 .  
-fiscal_ideology  0.0671601  0.0310189   2.165 0.030527 *  
-social_ideology  0.0066052  0.0302545   0.218 0.827206    
-desor_core      -0.0008597  0.0012441  -0.691 0.489645    
-fire_rare       -0.0144828  0.0280504  -0.516 0.605707    
-fire_privilege   0.0193364  0.0262291   0.737 0.461105    
-fire_angry      -0.0451914  0.0305390  -1.480 0.139128    
-fire_fear        0.0791050  0.0317342   2.493 0.012778 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8251 on 1576 degrees of freedom
+Residual standard error: 0.5449 on 1576 degrees of freedom
   (631 observations deleted due to missingness)
-Multiple R-squared:  0.02999,	Adjusted R-squared:  0.02137 
-F-statistic:  3.48 on 14 and 1576 DF,  p-value: 1.235e-05
+Multiple R-squared:  0.3224,	Adjusted R-squared:  0.3164 
+F-statistic: 53.56 on 14 and 1576 DF,  p-value: < 2.2e-16
 
 
 
 
 
 ==========================================================================================
-MODEL: comp_prisonpen_5_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df_sub)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.22560 -0.46292 -0.02254  0.79721  1.62340 
-
-Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.604097   0.238754  10.907  < 2e-16 ***
-treat           -0.301829   0.084399  -3.576 0.000364 ***
-Black           -0.058125   0.075393  -0.771 0.440893    
-Hispanic        -0.094703   0.073548  -1.288 0.198142    
-OtherRace       -0.244180   0.106570  -2.291 0.022136 *  
-gender           0.009957   0.049809   0.200 0.841598    
-Republican       0.080024   0.073113   1.095 0.273962    
-Democrat         0.139700   0.062393   2.239 0.025353 *  
-fiscal_ideology  0.087241   0.036486   2.391 0.016964 *  
-social_ideology  0.007962   0.036206   0.220 0.825980    
-desor_core       0.001241   0.001487   0.834 0.404191    
-fire_rare       -0.040547   0.033133  -1.224 0.221293    
-fire_privilege  -0.007895   0.030738  -0.257 0.797353    
-fire_angry      -0.050650   0.035431  -1.430 0.153128    
-fire_fear        0.071589   0.038992   1.836 0.066632 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.8117 on 1101 degrees of freedom
-  (419 observations deleted due to missingness)
-Multiple R-squared:  0.04589,	Adjusted R-squared:  0.03376 
-F-statistic: 3.783 on 14 and 1101 DF,  p-value: 2.81e-06
-
-
-
-
-
-==========================================================================================
-MODEL: comp_prisonpen_5_knowincarc
+MODEL: comp_prisonhelp_incarc
 ==========================================================================================
 
 
@@ -10935,39 +7606,80 @@ lm(formula = fml, data = df_sub)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--2.1952 -0.4794  0.0033  0.8358  1.4717 
+-1.7971 -0.3359  0.0687  0.3761  1.5469 
 
 Coefficients:
                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.731756   0.201536  13.555   <2e-16 ***
-treat           -0.134580   0.045730  -2.943   0.0033 ** 
-Black           -0.022411   0.063946  -0.350   0.7260    
-Hispanic        -0.005600   0.061641  -0.091   0.9276    
-OtherRace       -0.229814   0.098833  -2.325   0.0202 *  
-gender          -0.002877   0.043129  -0.067   0.9468    
-Republican      -0.016594   0.063832  -0.260   0.7949    
-Democrat         0.088634   0.052272   1.696   0.0902 .  
-fiscal_ideology  0.066497   0.031557   2.107   0.0353 *  
-social_ideology  0.020828   0.030855   0.675   0.4998    
-desor_core      -0.001360   0.001272  -1.069   0.2853    
-fire_rare       -0.017458   0.028810  -0.606   0.5446    
-fire_privilege   0.012090   0.026879   0.450   0.6529    
-fire_angry      -0.062366   0.030952  -2.015   0.0441 *  
-fire_fear        0.072975   0.032623   2.237   0.0254 *  
+(Intercept)      2.733364   0.162855  16.784  < 2e-16 ***
+treat            0.390253   0.057569   6.779 1.97e-11 ***
+Black           -0.033046   0.051426  -0.643 0.520622    
+Hispanic        -0.004551   0.050167  -0.091 0.927729    
+OtherRace       -0.008038   0.072692  -0.111 0.911975    
+gender           0.039600   0.033975   1.166 0.244048    
+Republican      -0.029318   0.049871  -0.588 0.556726    
+Democrat        -0.022832   0.042559  -0.536 0.591732    
+fiscal_ideology -0.038136   0.024887  -1.532 0.125715    
+social_ideology -0.081795   0.024696  -3.312 0.000956 ***
+desor_core       0.007191   0.001014   7.088 2.42e-12 ***
+fire_rare        0.028805   0.022600   1.275 0.202732    
+fire_privilege  -0.099298   0.020966  -4.736 2.46e-06 ***
+fire_angry      -0.063063   0.024167  -2.609 0.009192 ** 
+fire_fear        0.068150   0.026597   2.562 0.010529 *  
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.8143 on 1479 degrees of freedom
-  (560 observations deleted due to missingness)
-Multiple R-squared:  0.0324,	Adjusted R-squared:  0.02324 
-F-statistic: 3.538 on 14 and 1479 DF,  p-value: 9.271e-06
+Residual standard error: 0.5537 on 1101 degrees of freedom
+  (419 observations deleted due to missingness)
+Multiple R-squared:  0.3379,	Adjusted R-squared:  0.3295 
+F-statistic: 40.14 on 14 and 1101 DF,  p-value: < 2.2e-16
 
 
 
 
 
 ==========================================================================================
-MODEL: comp_prisonpen_5_vict
+MODEL: comp_prisonhelp_knowincarc
+==========================================================================================
+
+
+Call:
+lm(formula = fml, data = df_sub)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.7709 -0.3158  0.0546  0.3683  1.5104 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      2.6062393  0.1342659  19.411  < 2e-16 ***
+treat            0.1864070  0.0304657   6.119 1.21e-09 ***
+Black           -0.0502286  0.0426017  -1.179  0.23858    
+Hispanic        -0.0277638  0.0410662  -0.676  0.49910    
+OtherRace       -0.0581874  0.0658442  -0.884  0.37699    
+gender           0.0122415  0.0287332   0.426  0.67014    
+Republican      -0.0208447  0.0425256  -0.490  0.62409    
+Democrat        -0.0223118  0.0348245  -0.641  0.52182    
+fiscal_ideology -0.0285365  0.0210235  -1.357  0.17487    
+social_ideology -0.0824094  0.0205561  -4.009 6.40e-05 ***
+desor_core       0.0072944  0.0008477   8.605  < 2e-16 ***
+fire_rare        0.0599936  0.0191936   3.126  0.00181 ** 
+fire_privilege  -0.0849607  0.0179071  -4.745 2.29e-06 ***
+fire_angry      -0.0640489  0.0206207  -3.106  0.00193 ** 
+fire_fear        0.0660674  0.0217342   3.040  0.00241 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.5425 on 1479 degrees of freedom
+  (560 observations deleted due to missingness)
+Multiple R-squared:  0.3312,	Adjusted R-squared:  0.3249 
+F-statistic: 52.33 on 14 and 1479 DF,  p-value: < 2.2e-16
+
+
+
+
+
+==========================================================================================
+MODEL: comp_prisonhelp_vict
 ==========================================================================================
 
 
@@ -10976,32 +7688,32 @@ lm(formula = fml, data = df_sub)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--2.17432 -0.47902  0.00076  0.84654  1.66485 
+-1.79106 -0.34528  0.05867  0.37604  1.54490 
 
 Coefficients:
                   Estimate Std. Error t value Pr(>|t|)    
-(Intercept)      2.4969355  0.2291768  10.895  < 2e-16 ***
-treat           -0.1657579  0.0684403  -2.422  0.01559 *  
-Black           -0.0135168  0.0734797  -0.184  0.85408    
-Hispanic         0.0185744  0.0712340   0.261  0.79433    
-OtherRace       -0.1534874  0.1071051  -1.433  0.15211    
-gender           0.0150131  0.0488659   0.307  0.75872    
-Republican       0.0441475  0.0719810   0.613  0.53978    
-Democrat         0.0929091  0.0603327   1.540  0.12384    
-fiscal_ideology  0.0861953  0.0358083   2.407  0.01623 *  
-social_ideology -0.0123205  0.0353405  -0.349  0.72744    
-desor_core      -0.0004445  0.0014533  -0.306  0.75977    
-fire_rare       -0.0224895  0.0323338  -0.696  0.48685    
-fire_privilege   0.0103865  0.0300590   0.346  0.72975    
-fire_angry      -0.0355124  0.0354767  -1.001  0.31703    
-fire_fear        0.1128438  0.0371339   3.039  0.00243 ** 
+(Intercept)      2.6954948  0.1535288  17.557  < 2e-16 ***
+treat            0.2126476  0.0458491   4.638 3.91e-06 ***
+Black            0.0134917  0.0492251   0.274 0.784070    
+Hispanic        -0.0083822  0.0477207  -0.176 0.860598    
+OtherRace       -0.0304699  0.0717512  -0.425 0.671163    
+gender           0.0220139  0.0327359   0.672 0.501417    
+Republican      -0.0522341  0.0482211  -1.083 0.278933    
+Democrat        -0.0044149  0.0404177  -0.109 0.913037    
+fiscal_ideology -0.0240659  0.0239885  -1.003 0.315959    
+social_ideology -0.0848622  0.0236751  -3.584 0.000352 ***
+desor_core       0.0075843  0.0009736   7.790 1.47e-14 ***
+fire_rare        0.0297877  0.0216609   1.375 0.169337    
+fire_privilege  -0.0973014  0.0201370  -4.832 1.53e-06 ***
+fire_angry      -0.0638154  0.0237663  -2.685 0.007353 ** 
+fire_fear        0.0626105  0.0248765   2.517 0.011974 *  
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.8234 on 1172 degrees of freedom
+Residual standard error: 0.5516 on 1172 degrees of freedom
   (455 observations deleted due to missingness)
-Multiple R-squared:  0.03245,	Adjusted R-squared:  0.02089 
-F-statistic: 2.807 on 14 and 1172 DF,  p-value: 0.0003838
+Multiple R-squared:  0.3416,	Adjusted R-squared:  0.3337 
+F-statistic: 43.43 on 14 and 1172 DF,  p-value: < 2.2e-16
 
 
 

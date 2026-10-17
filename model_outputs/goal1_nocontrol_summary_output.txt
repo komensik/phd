@@ -1,229 +1,5 @@
 
 ==========================================================================================
-MODEL: m_prisonhelp_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.11143 -0.40125  0.09875  0.43209  1.09875 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.90125    0.01847 157.108  < 2e-16 ***
-impact       0.21019    0.02995   7.018 3.06e-12 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.656 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.02364,	Adjusted R-squared:  0.02316 
-F-statistic: 49.25 on 1 and 2034 DF,  p-value: 3.059e-12
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonhelp_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.95774 -0.45774  0.04226  0.54226  1.04226 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.95774    0.01519 194.692  < 2e-16 ***
-incarc       0.30759    0.05506   5.586 2.63e-08 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6589 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.01511,	Adjusted R-squared:  0.01463 
-F-statistic: 31.21 on 1 and 2034 DF,  p-value: 2.629e-08
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonhelp_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.12017 -0.42014  0.07986  0.49653  1.07986 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.92014    0.01748  167.07  < 2e-16 ***
-knowincarc   0.20003    0.03165    6.32  3.2e-10 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6575 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.01926,	Adjusted R-squared:  0.01878 
-F-statistic: 39.95 on 1 and 2034 DF,  p-value: 3.199e-10
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonhelp_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.17152 -0.45463  0.04537  0.54537  1.04537 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.95463    0.01562 189.216  < 2e-16 ***
-vict         0.21689    0.04465   4.857 1.28e-06 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.6601 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.01147,	Adjusted R-squared:  0.01098 
-F-statistic:  23.6 on 1 and 2034 DF,  p-value: 1.28e-06
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.87401 -0.37401 -0.05911  0.62599  1.19089 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.87401    0.01992 144.268   <2e-16 ***
-impact      -0.06490    0.03231  -2.009   0.0447 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7077 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.00198,	Adjusted R-squared:  0.001489 
-F-statistic: 4.035 on 1 and 2034 DF,  p-value: 0.0447
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.86005 -0.36005  0.03065  0.63995  1.28065 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.86005    0.01631  175.34   <2e-16 ***
-incarc      -0.14069    0.05912   -2.38   0.0174 *  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7074 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.002777,	Adjusted R-squared:  0.002287 
-F-statistic: 5.664 on 1 and 2034 DF,  p-value: 0.01741
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.86802 -0.36802 -0.05676  0.63198  1.19324 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.86802    0.01882 152.415   <2e-16 ***
-knowincarc  -0.06126    0.03407  -1.798   0.0723 .  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.7078 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.001587,	Adjusted R-squared:  0.001096 
-F-statistic: 3.232 on 1 and 2034 DF,  p-value: 0.07234
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--1.85814 -0.35814 -0.03614  0.64186  1.21386 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.85814    0.01675 170.651   <2e-16 ***
-vict        -0.07200    0.04789  -1.503    0.133    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.708 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.00111,	Adjusted R-squared:  0.0006188 
-F-statistic:  2.26 on 1 and 2034 DF,  p-value: 0.1329
-
-
-
-
-
-==========================================================================================
 MODEL: m_q23_2_rev_impact
 ==========================================================================================
 
@@ -896,119 +672,7 @@ F-statistic: 19.49 on 1 and 2033 DF,  p-value: 1.066e-05
 
 
 ==========================================================================================
-MODEL: m_prisonpen_1_impact
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7742 -0.7397  0.2258  1.2258  1.2603 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.77417    0.02716 102.144   <2e-16 ***
-impact      -0.03450    0.04405  -0.783    0.434    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9648 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.0003016,	Adjusted R-squared:  -0.0001899 
-F-statistic: 0.6136 on 1 and 2034 DF,  p-value: 0.4335
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_incarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7687 -0.7687  0.2313  1.2313  1.3323 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.76874    0.02224 124.489   <2e-16 ***
-incarc      -0.10100    0.08061  -1.253     0.21    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9646 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.0007712,	Adjusted R-squared:  0.00028 
-F-statistic:  1.57 on 1 and 2034 DF,  p-value: 0.2104
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_knowincarc
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7693 -0.7423  0.2307  1.2307  1.2576 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.76926    0.02565 107.960   <2e-16 ***
-knowincarc  -0.02691    0.04645  -0.579    0.562    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9649 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.000165,	Adjusted R-squared:  -0.0003266 
-F-statistic: 0.3356 on 1 and 2034 DF,  p-value: 0.5624
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_1_vict
-==========================================================================================
-
-
-Call:
-lm(formula = fml, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--1.7683 -0.7683  0.2317  1.2317  1.2912 
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.76833    0.02282 121.298   <2e-16 ***
-vict        -0.05949    0.06526  -0.912    0.362    
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-Residual standard error: 0.9648 on 2034 degrees of freedom
-  (186 observations deleted due to missingness)
-Multiple R-squared:  0.0004084,	Adjusted R-squared:  -8.305e-05 
-F-statistic: 0.831 on 1 and 2034 DF,  p-value: 0.3621
-
-
-
-
-
-==========================================================================================
-MODEL: m_prisonpen_5_impact
+MODEL: m_prisonhelp_impact
 ==========================================================================================
 
 
@@ -1017,26 +681,26 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.97385 -0.47385  0.02615  1.02615  1.12145 
+-2.11143 -0.40125  0.09875  0.43209  1.09875 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.97385    0.02340 127.102   <2e-16 ***
-impact      -0.09530    0.03795  -2.511   0.0121 *  
+(Intercept)  2.90125    0.01847 157.108  < 2e-16 ***
+impact       0.21019    0.02995   7.018 3.06e-12 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.8312 on 2034 degrees of freedom
+Residual standard error: 0.656 on 2034 degrees of freedom
   (186 observations deleted due to missingness)
-Multiple R-squared:  0.003091,	Adjusted R-squared:  0.002601 
-F-statistic: 6.307 on 1 and 2034 DF,  p-value: 0.01211
+Multiple R-squared:  0.02364,	Adjusted R-squared:  0.02316 
+F-statistic: 49.25 on 1 and 2034 DF,  p-value: 3.059e-12
 
 
 
 
 
 ==========================================================================================
-MODEL: m_prisonpen_5_incarc
+MODEL: m_prisonhelp_incarc
 ==========================================================================================
 
 
@@ -1045,26 +709,26 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.95136 -0.45136  0.04864  1.04864  1.22903 
+-1.95774 -0.45774  0.04226  0.54226  1.04226 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.95136    0.01916 154.016  < 2e-16 ***
-incarc      -0.18039    0.06945  -2.597  0.00946 ** 
+(Intercept)  2.95774    0.01519 194.692  < 2e-16 ***
+incarc       0.30759    0.05506   5.586 2.63e-08 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.8311 on 2034 degrees of freedom
+Residual standard error: 0.6589 on 2034 degrees of freedom
   (186 observations deleted due to missingness)
-Multiple R-squared:  0.003306,	Adjusted R-squared:  0.002816 
-F-statistic: 6.746 on 1 and 2034 DF,  p-value: 0.009463
+Multiple R-squared:  0.01511,	Adjusted R-squared:  0.01463 
+F-statistic: 31.21 on 1 and 2034 DF,  p-value: 2.629e-08
 
 
 
 
 
 ==========================================================================================
-MODEL: m_prisonpen_5_knowincarc
+MODEL: m_prisonhelp_knowincarc
 ==========================================================================================
 
 
@@ -1073,26 +737,26 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.96678 -0.46678  0.03322  1.03322  1.12882 
+-2.12017 -0.42014  0.07986  0.49653  1.07986 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.96678    0.02210 134.247   <2e-16 ***
-knowincarc  -0.09561    0.04002  -2.389    0.017 *  
+(Intercept)  2.92014    0.01748  167.07  < 2e-16 ***
+knowincarc   0.20003    0.03165    6.32  3.2e-10 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.8313 on 2034 degrees of freedom
+Residual standard error: 0.6575 on 2034 degrees of freedom
   (186 observations deleted due to missingness)
-Multiple R-squared:  0.002799,	Adjusted R-squared:  0.002309 
-F-statistic: 5.709 on 1 and 2034 DF,  p-value: 0.01697
+Multiple R-squared:  0.01926,	Adjusted R-squared:  0.01878 
+F-statistic: 39.95 on 1 and 2034 DF,  p-value: 3.199e-10
 
 
 
 
 
 ==========================================================================================
-MODEL: m_prisonpen_5_vict
+MODEL: m_prisonhelp_vict
 ==========================================================================================
 
 
@@ -1101,19 +765,19 @@ lm(formula = fml, data = df)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--1.94796 -0.44796  0.05204  1.05204  1.13655 
+-2.17152 -0.45463  0.04537  0.54537  1.04537 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.94796    0.01968 149.780   <2e-16 ***
-vict        -0.08450    0.05628  -1.501    0.133    
+(Intercept)  2.95463    0.01562 189.216  < 2e-16 ***
+vict         0.21689    0.04465   4.857 1.28e-06 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.832 on 2034 degrees of freedom
+Residual standard error: 0.6601 on 2034 degrees of freedom
   (186 observations deleted due to missingness)
-Multiple R-squared:  0.001107,	Adjusted R-squared:  0.0006161 
-F-statistic: 2.254 on 1 and 2034 DF,  p-value: 0.1334
+Multiple R-squared:  0.01147,	Adjusted R-squared:  0.01098 
+F-statistic:  23.6 on 1 and 2034 DF,  p-value: 1.28e-06
 
 
 
