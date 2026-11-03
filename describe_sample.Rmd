@@ -1032,7 +1032,7 @@ data_full %>%
 
 ```{r}
 
-data_full %>%
+data_full %>%l.;
   group_by(impact)%>%
   summarise(
     n=n(),
