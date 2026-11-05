@@ -140,6 +140,26 @@ raw_data_cleaned <- raw_data_cleaned %>%
 
 ```
 
+Checking Impact Counts
+
+```{r}
+raw_data_cleaned %>%
+  group_by(impact)%>%
+  summarise(
+    n=n(),
+    total = 2327,
+    incarc = sum(incarc, na.rm = TRUE),
+    incarc_pct = ((incarc / total) *100),
+    knowincarc = sum(knowincarc, na.rm = TRUE),
+    knowincarc_pct = ((knowincarc / total) *100),
+    vict = sum(vict, na.rm = TRUE),
+    vict_pct = ((vict / total) *100),
+    any_impact = sum(impact, na.rm = TRUE),
+    any_impact_pct = ((any_impact / total) *100)
+  )
+
+```
+
 ### B. Other Experiences
 
 #### Impact Plus (Constructing For-Analysis)

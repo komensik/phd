@@ -54,7 +54,7 @@ summary(data_full$duration_minutes)
 ## gender, sexual ID
 
 ```{r}
-table(data_full$trans)
+table(data_full$age)
 
 view(data_full %>%
        group_by(trans)%>%
@@ -863,7 +863,8 @@ filter(combo_counts, n_races >= 2)          # multiracial combos only
 
 
 ```{r}
-view(data_full %>%
+
+data_full %>%
   group_by(state) %>%
   summarise(
     n = n(),
@@ -881,7 +882,7 @@ view(data_full %>%
 ```{r}
 table(data_full$AllOthers)
 
-view(data_full) %>%
+data_full %>%
   group_by(White) %>% 
   summarise (
     n = n(), 
@@ -892,7 +893,7 @@ view(data_full) %>%
 ```
 ```{r}
 
-view(data_full) %>%
+data_full %>%
   group_by(Black) %>% 
   summarise (
     n = n(), 
@@ -900,10 +901,11 @@ view(data_full) %>%
     Hisp_Latino       = sum(Hisp_Latino, na.rm = TRUE),
     AllOthers = sum(AllOthers, na.rm = TRUE)
   )
+
 ```
 ```{r}
 
-view(data_full) %>%
+data_full %>%
   group_by(Hisp_Latino) %>% 
   summarise (
     n = n(), 
@@ -915,14 +917,18 @@ view(data_full) %>%
 ```
 
 ```{r}
-view(data_full) %>%
+
+data_full %>%
   group_by(AllOthers) %>% 
   summarise (
     n = n(), 
     White = sum(White, na.rm = TRUE),
     Black       = sum(Black, na.rm = TRUE),
-    Hisp_Latino = sum(Hisp_Latino, na.rm = TRUE)
+    Hisp_Latino = sum(Hisp_Latino, na.rm = TRUE),
+    Asian_Am     = sum(Asian_Am, na.rm = TRUE),
+    Native_am = sum(Native_Am, na.rm = TRUE)
   )
+
 ```
 
 
@@ -1012,6 +1018,8 @@ table(not_full$impact, useNA = "ifany")
 ```
 
 ```{r}
+
+nrow(data_full)
 data_full %>%
   group_by(impact)%>%
   summarise(
@@ -1027,7 +1035,6 @@ data_full %>%
     any_impact_pct = ((any_impact / total) *100)
   )
 ```
-
 
 
 ```{r}
