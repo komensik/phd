@@ -1,0 +1,17 @@
+---
+title: "Section Nov 6"
+author: "Kristina Mensik"
+date: "2026-11-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Estimators with modeled spillovers and estimating with data: subgroup analysis
+
+## Estimating with data: subgroup analysis
+
+spillover may reduce precision
+

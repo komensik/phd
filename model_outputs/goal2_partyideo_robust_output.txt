@@ -6,19 +6,31 @@ MODEL: comp_q23_2_rev_impact
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.640255   0.077770 46.8080 < 2.2e-16 ***
-impact           0.371737   0.056393  6.5919 5.891e-11 ***
-Black           -0.037286   0.079764 -0.4675  0.640236    
-Hispanic        -0.126835   0.083041 -1.5274  0.126864    
-OtherRace       -0.092945   0.127483 -0.7291  0.466062    
-gender          -0.050691   0.055751 -0.9092  0.363363    
-Republican      -0.130230   0.093103 -1.3988  0.162076    
-Democrat         0.094343   0.062953  1.4986  0.134167    
-fiscal_ideology -0.067745   0.041365 -1.6377  0.101679    
-social_ideology -0.129170   0.040341 -3.2019  0.001392 ** 
+                 Estimate Std. Error t value
+(Intercept)      3.640255   0.077770 46.8080
+impact           0.371737   0.056393  6.5919
+Black           -0.037286   0.079764 -0.4675
+Hispanic        -0.126835   0.083041 -1.5274
+OtherRace       -0.092945   0.127483 -0.7291
+gender          -0.050691   0.055751 -0.9092
+Republican      -0.130230   0.093103 -1.3988
+Democrat         0.094343   0.062953  1.4986
+fiscal_ideology -0.067745   0.041365 -1.6377
+social_ideology -0.129170   0.040341 -3.2019
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+impact          5.891e-11 ***
+Black            0.640236    
+Hispanic         0.126864    
+OtherRace        0.466062    
+gender           0.363363    
+Republican       0.162076    
+Democrat         0.134167    
+fiscal_ideology  0.101679    
+social_ideology  0.001392 ** 
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -37,19 +49,31 @@ MODEL: comp_q23_2_rev_incarc
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.694369   0.098451 37.5250 < 2.2e-16 ***
-treat            0.618304   0.093818  6.5904 6.758e-11 ***
-Black           -0.079862   0.101998 -0.7830  0.433808    
-Hispanic        -0.058494   0.103759 -0.5638  0.573034    
-OtherRace        0.044679   0.127897  0.3493  0.726901    
-gender           0.053426   0.067467  0.7919  0.428603    
-Republican      -0.128417   0.112429 -1.1422  0.253615    
-Democrat         0.072167   0.080527  0.8962  0.370343    
-fiscal_ideology -0.091128   0.049620 -1.8365  0.066545 .  
-social_ideology -0.151967   0.048703 -3.1203  0.001853 ** 
+                 Estimate Std. Error t value
+(Intercept)      3.694369   0.098451 37.5250
+treat            0.618304   0.093818  6.5904
+Black           -0.079862   0.101998 -0.7830
+Hispanic        -0.058494   0.103759 -0.5638
+OtherRace        0.044679   0.127897  0.3493
+gender           0.053426   0.067467  0.7919
+Republican      -0.128417   0.112429 -1.1422
+Democrat         0.072167   0.080527  0.8962
+fiscal_ideology -0.091128   0.049620 -1.8365
+social_ideology -0.151967   0.048703 -3.1203
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           6.758e-11 ***
+Black            0.433808    
+Hispanic         0.573034    
+OtherRace        0.726901    
+gender           0.428603    
+Republican       0.253615    
+Democrat         0.370343    
+fiscal_ideology  0.066545 .  
+social_ideology  0.001853 ** 
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -68,19 +92,31 @@ MODEL: comp_q23_2_rev_knowincarc
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.644995   0.078897 46.1991 < 2.2e-16 ***
-treat            0.405252   0.058730  6.9002  7.65e-12 ***
-Black           -0.064325   0.083499 -0.7704  0.441204    
-Hispanic        -0.122597   0.085255 -1.4380  0.150644    
-OtherRace       -0.118178   0.134800 -0.8767  0.380795    
-gender          -0.036574   0.057413 -0.6370  0.524202    
-Republican      -0.126836   0.096623 -1.3127  0.189489    
-Democrat         0.095708   0.064544  1.4828  0.138328    
-fiscal_ideology -0.068098   0.042525 -1.6014  0.109506    
-social_ideology -0.132622   0.041814 -3.1717  0.001546 ** 
+                 Estimate Std. Error t value
+(Intercept)      3.644995   0.078897 46.1991
+treat            0.405252   0.058730  6.9002
+Black           -0.064325   0.083499 -0.7704
+Hispanic        -0.122597   0.085255 -1.4380
+OtherRace       -0.118178   0.134800 -0.8767
+gender          -0.036574   0.057413 -0.6370
+Republican      -0.126836   0.096623 -1.3127
+Democrat         0.095708   0.064544  1.4828
+fiscal_ideology -0.068098   0.042525 -1.6014
+social_ideology -0.132622   0.041814 -3.1717
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat            7.65e-12 ***
+Black            0.441204    
+Hispanic         0.150644    
+OtherRace        0.380795    
+gender           0.524202    
+Republican       0.189489    
+Democrat         0.138328    
+fiscal_ideology  0.109506    
+social_ideology  0.001546 ** 
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -99,19 +135,31 @@ MODEL: comp_q23_2_rev_vict
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.640193   0.093651 38.8696 < 2.2e-16 ***
-treat            0.302771   0.090448  3.3475 0.0008411 ***
-Black           -0.035696   0.099272 -0.3596 0.7192237    
-Hispanic        -0.105354   0.101556 -1.0374 0.2997616    
-OtherRace       -0.048912   0.136945 -0.3572 0.7210330    
-gender           0.014216   0.066449  0.2139 0.8306348    
-Republican      -0.201874   0.113857 -1.7730 0.0764777 .  
-Democrat         0.107339   0.077367  1.3874 0.1655789    
-fiscal_ideology -0.076967   0.048763 -1.5784 0.1147469    
-social_ideology -0.129777   0.047892 -2.7098 0.0068294 ** 
+                 Estimate Std. Error t value
+(Intercept)      3.640193   0.093651 38.8696
+treat            0.302771   0.090448  3.3475
+Black           -0.035696   0.099272 -0.3596
+Hispanic        -0.105354   0.101556 -1.0374
+OtherRace       -0.048912   0.136945 -0.3572
+gender           0.014216   0.066449  0.2139
+Republican      -0.201874   0.113857 -1.7730
+Democrat         0.107339   0.077367  1.3874
+fiscal_ideology -0.076967   0.048763 -1.5784
+social_ideology -0.129777   0.047892 -2.7098
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           0.0008411 ***
+Black           0.7192237    
+Hispanic        0.2997616    
+OtherRace       0.7210330    
+gender          0.8306348    
+Republican      0.0764777 .  
+Democrat        0.1655789    
+fiscal_ideology 0.1147469    
+social_ideology 0.0068294 ** 
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -130,19 +178,31 @@ MODEL: comp_q23_7_rev_impact
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.623764   0.075415 48.0512 < 2.2e-16 ***
-impact           0.337620   0.056610  5.9639 3.029e-09 ***
-Black            0.023047   0.077861  0.2960   0.76727    
-Hispanic        -0.013998   0.078466 -0.1784   0.85844    
-OtherRace       -0.138429   0.115286 -1.2007   0.23003    
-gender          -0.013938   0.055660 -0.2504   0.80230    
-Republican       0.031578   0.090398  0.3493   0.72690    
-Democrat         0.127559   0.062455  2.0424   0.04128 *  
-fiscal_ideology -0.062535   0.040535 -1.5428   0.12309    
-social_ideology -0.166830   0.038954 -4.2828 1.956e-05 ***
+                 Estimate Std. Error t value
+(Intercept)      3.623764   0.075415 48.0512
+impact           0.337620   0.056610  5.9639
+Black            0.023047   0.077861  0.2960
+Hispanic        -0.013998   0.078466 -0.1784
+OtherRace       -0.138429   0.115286 -1.2007
+gender          -0.013938   0.055660 -0.2504
+Republican       0.031578   0.090398  0.3493
+Democrat         0.127559   0.062455  2.0424
+fiscal_ideology -0.062535   0.040535 -1.5428
+social_ideology -0.166830   0.038954 -4.2828
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+impact          3.029e-09 ***
+Black             0.76727    
+Hispanic          0.85844    
+OtherRace         0.23003    
+gender            0.80230    
+Republican        0.72690    
+Democrat          0.04128 *  
+fiscal_ideology   0.12309    
+social_ideology 1.956e-05 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -161,19 +221,31 @@ MODEL: comp_q23_7_rev_incarc
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.6839635  0.0955069 38.5728 < 2.2e-16 ***
-treat            0.5155592  0.1081915  4.7652 2.136e-06 ***
-Black           -0.0086524  0.0970562 -0.0891    0.9290    
-Hispanic        -0.0582834  0.1013943 -0.5748    0.5655    
-OtherRace       -0.1323678  0.1212011 -1.0921    0.2750    
-gender           0.0048245  0.0671888  0.0718    0.9428    
-Republican       0.0547828  0.1077445  0.5085    0.6112    
-Democrat         0.1242143  0.0801235  1.5503    0.1214    
-fiscal_ideology -0.0543519  0.0489286 -1.1108    0.2669    
-social_ideology -0.2053341  0.0464899 -4.4167 1.100e-05 ***
+                  Estimate Std. Error t value
+(Intercept)      3.6839635  0.0955069 38.5728
+treat            0.5155592  0.1081915  4.7652
+Black           -0.0086524  0.0970562 -0.0891
+Hispanic        -0.0582834  0.1013943 -0.5748
+OtherRace       -0.1323678  0.1212011 -1.0921
+gender           0.0048245  0.0671888  0.0718
+Republican       0.0547828  0.1077445  0.5085
+Democrat         0.1242143  0.0801235  1.5503
+fiscal_ideology -0.0543519  0.0489286 -1.1108
+social_ideology -0.2053341  0.0464899 -4.4167
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           2.136e-06 ***
+Black              0.9290    
+Hispanic           0.5655    
+OtherRace          0.2750    
+gender             0.9428    
+Republican         0.6112    
+Democrat           0.1214    
+fiscal_ideology    0.2669    
+social_ideology 1.100e-05 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -192,19 +264,31 @@ MODEL: comp_q23_7_rev_knowincarc
 
 t test of coefficients:
 
-                   Estimate  Std. Error t value  Pr(>|t|)    
-(Intercept)      3.62503100  0.07694573 47.1115 < 2.2e-16 ***
-treat            0.33919821  0.05999737  5.6536  1.88e-08 ***
-Black           -0.01395455  0.08211904 -0.1699   0.86509    
-Hispanic         0.00024044  0.08051228  0.0030   0.99762    
-OtherRace       -0.10368921  0.11536004 -0.8988   0.36889    
-gender           0.00636454  0.05764808  0.1104   0.91210    
-Republican      -0.02204972  0.09500357 -0.2321   0.81650    
-Democrat         0.12965071  0.06393394  2.0279   0.04275 *  
-fiscal_ideology -0.06162049  0.04155371 -1.4829   0.13831    
-social_ideology -0.16673927  0.04030729 -4.1367  3.72e-05 ***
+                   Estimate  Std. Error t value
+(Intercept)      3.62503100  0.07694573 47.1115
+treat            0.33919821  0.05999737  5.6536
+Black           -0.01395455  0.08211904 -0.1699
+Hispanic         0.00024044  0.08051228  0.0030
+OtherRace       -0.10368921  0.11536004 -0.8988
+gender           0.00636454  0.05764808  0.1104
+Republican      -0.02204972  0.09500357 -0.2321
+Democrat         0.12965071  0.06393394  2.0279
+fiscal_ideology -0.06162049  0.04155371 -1.4829
+social_ideology -0.16673927  0.04030729 -4.1367
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat            1.88e-08 ***
+Black             0.86509    
+Hispanic          0.99762    
+OtherRace         0.36889    
+gender            0.91210    
+Republican        0.81650    
+Democrat          0.04275 *  
+fiscal_ideology   0.13831    
+social_ideology  3.72e-05 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -223,19 +307,31 @@ MODEL: comp_q23_7_rev_vict
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.642044   0.087763 41.4987 < 2.2e-16 ***
-treat            0.472301   0.078920  5.9846 2.872e-09 ***
-Black            0.063916   0.089588  0.7134   0.47571    
-Hispanic        -0.061310   0.094006 -0.6522   0.51440    
-OtherRace       -0.196948   0.129242 -1.5239   0.12781    
-gender          -0.013559   0.064047 -0.2117   0.83237    
-Republican       0.044518   0.106609  0.4176   0.67632    
-Democrat         0.164083   0.074744  2.1953   0.02834 *  
-fiscal_ideology -0.036487   0.047368 -0.7703   0.44128    
-social_ideology -0.210527   0.044539 -4.7267 2.555e-06 ***
+                 Estimate Std. Error t value
+(Intercept)      3.642044   0.087763 41.4987
+treat            0.472301   0.078920  5.9846
+Black            0.063916   0.089588  0.7134
+Hispanic        -0.061310   0.094006 -0.6522
+OtherRace       -0.196948   0.129242 -1.5239
+gender          -0.013559   0.064047 -0.2117
+Republican       0.044518   0.106609  0.4176
+Democrat         0.164083   0.074744  2.1953
+fiscal_ideology -0.036487   0.047368 -0.7703
+social_ideology -0.210527   0.044539 -4.7267
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           2.872e-09 ***
+Black             0.47571    
+Hispanic          0.51440    
+OtherRace         0.12781    
+gender            0.83237    
+Republican        0.67632    
+Democrat          0.02834 *  
+fiscal_ideology   0.44128    
+social_ideology 2.555e-06 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -254,19 +350,31 @@ MODEL: comp_q25_2_rev_impact
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.1553675  0.0660597 47.7654 < 2.2e-16 ***
-impact           0.1423962  0.0474440  3.0014 0.0027297 ** 
-Black            0.1963546  0.0654696  2.9992 0.0027492 ** 
-Hispanic         0.1156076  0.0621883  1.8590 0.0632129 .  
-OtherRace       -0.0019009  0.0857008 -0.0222 0.9823070    
-gender          -0.0456957  0.0447579 -1.0210 0.3074325    
-Republican      -0.1326164  0.0690252 -1.9213 0.0548756 .  
-Democrat        -0.0169595  0.0525785 -0.3226 0.7470743    
-fiscal_ideology -0.1004456  0.0349386 -2.8749 0.0040952 ** 
-social_ideology -0.1181285  0.0331536 -3.5631 0.0003774 ***
+                  Estimate Std. Error t value
+(Intercept)      3.1553675  0.0660597 47.7654
+impact           0.1423962  0.0474440  3.0014
+Black            0.1963546  0.0654696  2.9992
+Hispanic         0.1156076  0.0621883  1.8590
+OtherRace       -0.0019009  0.0857008 -0.0222
+gender          -0.0456957  0.0447579 -1.0210
+Republican      -0.1326164  0.0690252 -1.9213
+Democrat        -0.0169595  0.0525785 -0.3226
+fiscal_ideology -0.1004456  0.0349386 -2.8749
+social_ideology -0.1181285  0.0331536 -3.5631
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+impact          0.0027297 ** 
+Black           0.0027492 ** 
+Hispanic        0.0632129 .  
+OtherRace       0.9823070    
+gender          0.3074325    
+Republican      0.0548756 .  
+Democrat        0.7470743    
+fiscal_ideology 0.0040952 ** 
+social_ideology 0.0003774 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -285,19 +393,31 @@ MODEL: comp_q25_2_rev_incarc
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.1567877  0.0789301 39.9947 < 2.2e-16 ***
-treat            0.3539663  0.0951470  3.7202  0.000209 ***
-Black            0.2208156  0.0792911  2.7849  0.005446 ** 
-Hispanic         0.1180727  0.0762826  1.5478  0.121947    
-OtherRace        0.0172885  0.0924266  0.1871  0.851655    
-gender          -0.0438987  0.0524651 -0.8367  0.402928    
-Republican      -0.1274097  0.0795104 -1.6024  0.109345    
-Democrat        -0.0048648  0.0629825 -0.0772  0.938446    
-fiscal_ideology -0.0982132  0.0386754 -2.5394  0.011239 *  
-social_ideology -0.1265725  0.0368791 -3.4321  0.000621 ***
+                  Estimate Std. Error t value
+(Intercept)      3.1567877  0.0789301 39.9947
+treat            0.3539663  0.0951470  3.7202
+Black            0.2208156  0.0792911  2.7849
+Hispanic         0.1180727  0.0762826  1.5478
+OtherRace        0.0172885  0.0924266  0.1871
+gender          -0.0438987  0.0524651 -0.8367
+Republican      -0.1274097  0.0795104 -1.6024
+Democrat        -0.0048648  0.0629825 -0.0772
+fiscal_ideology -0.0982132  0.0386754 -2.5394
+social_ideology -0.1265725  0.0368791 -3.4321
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat            0.000209 ***
+Black            0.005446 ** 
+Hispanic         0.121947    
+OtherRace        0.851655    
+gender           0.402928    
+Republican       0.109345    
+Democrat         0.938446    
+fiscal_ideology  0.011239 *  
+social_ideology  0.000621 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -316,19 +436,31 @@ MODEL: comp_q25_2_rev_knowincarc
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.201850   0.067493 47.4395 < 2.2e-16 ***
-treat            0.113886   0.050055  2.2752 0.0230341 *  
-Black            0.175067   0.067980  2.5753 0.0101118 *  
-Hispanic         0.103332   0.064344  1.6059 0.1084991    
-OtherRace        0.011013   0.087106  0.1264 0.8994030    
-gender          -0.070952   0.045991 -1.5427 0.1231042    
-Republican      -0.136615   0.071819 -1.9022 0.0573373 .  
-Democrat        -0.038212   0.053621 -0.7126 0.4761880    
-fiscal_ideology -0.099025   0.036113 -2.7421 0.0061783 ** 
-social_ideology -0.129665   0.034361 -3.7736 0.0001672 ***
+                 Estimate Std. Error t value
+(Intercept)      3.201850   0.067493 47.4395
+treat            0.113886   0.050055  2.2752
+Black            0.175067   0.067980  2.5753
+Hispanic         0.103332   0.064344  1.6059
+OtherRace        0.011013   0.087106  0.1264
+gender          -0.070952   0.045991 -1.5427
+Republican      -0.136615   0.071819 -1.9022
+Democrat        -0.038212   0.053621 -0.7126
+fiscal_ideology -0.099025   0.036113 -2.7421
+social_ideology -0.129665   0.034361 -3.7736
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           0.0230341 *  
+Black           0.0101118 *  
+Hispanic        0.1084991    
+OtherRace       0.8994030    
+gender          0.1231042    
+Republican      0.0573373 .  
+Democrat        0.4761880    
+fiscal_ideology 0.0061783 ** 
+social_ideology 0.0001672 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -347,19 +479,31 @@ MODEL: comp_q25_2_rev_vict
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.1371385  0.0777986 40.3238 < 2.2e-16 ***
-treat            0.1711881  0.0798071  2.1450 0.0321539 *  
-Black            0.2631914  0.0773492  3.4026 0.0006897 ***
-Hispanic         0.1361891  0.0740435  1.8393 0.0661195 .  
-OtherRace        0.0217064  0.0954208  0.2275 0.8200888    
-gender          -0.0664746  0.0518737 -1.2815 0.2002795    
-Republican      -0.2114943  0.0801951 -2.6372 0.0084677 ** 
-Democrat        -0.0037112  0.0617289 -0.0601 0.9520696    
-fiscal_ideology -0.0840684  0.0377350 -2.2279 0.0260770 *  
-social_ideology -0.1229017  0.0361898 -3.3960 0.0007064 ***
+                  Estimate Std. Error t value
+(Intercept)      3.1371385  0.0777986 40.3238
+treat            0.1711881  0.0798071  2.1450
+Black            0.2631914  0.0773492  3.4026
+Hispanic         0.1361891  0.0740435  1.8393
+OtherRace        0.0217064  0.0954208  0.2275
+gender          -0.0664746  0.0518737 -1.2815
+Republican      -0.2114943  0.0801951 -2.6372
+Democrat        -0.0037112  0.0617289 -0.0601
+fiscal_ideology -0.0840684  0.0377350 -2.2279
+social_ideology -0.1229017  0.0361898 -3.3960
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           0.0321539 *  
+Black           0.0006897 ***
+Hispanic        0.0661195 .  
+OtherRace       0.8200888    
+gender          0.2002795    
+Republican      0.0084677 ** 
+Democrat        0.9520696    
+fiscal_ideology 0.0260770 *  
+social_ideology 0.0007064 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -378,19 +522,31 @@ MODEL: comp_q25_3_rev_impact
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.2715476  0.0653029 50.0981 < 2.2e-16 ***
-impact           0.2090666  0.0468904  4.4586 8.827e-06 ***
-Black            0.0125116  0.0707630  0.1768   0.85968    
-Hispanic         0.0492639  0.0640710  0.7689   0.44207    
-OtherRace       -0.0144099  0.0898602 -0.1604   0.87262    
-gender          -0.0849020  0.0447203 -1.8985   0.05781 .  
-Republican       0.0580684  0.0677800  0.8567   0.39173    
-Democrat         0.0031662  0.0524535  0.0604   0.95188    
-fiscal_ideology -0.0393766  0.0340733 -1.1556   0.24800    
-social_ideology -0.1614050  0.0328525 -4.9130 9.893e-07 ***
+                  Estimate Std. Error t value
+(Intercept)      3.2715476  0.0653029 50.0981
+impact           0.2090666  0.0468904  4.4586
+Black            0.0125116  0.0707630  0.1768
+Hispanic         0.0492639  0.0640710  0.7689
+OtherRace       -0.0144099  0.0898602 -0.1604
+gender          -0.0849020  0.0447203 -1.8985
+Republican       0.0580684  0.0677800  0.8567
+Democrat         0.0031662  0.0524535  0.0604
+fiscal_ideology -0.0393766  0.0340733 -1.1556
+social_ideology -0.1614050  0.0328525 -4.9130
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+impact          8.827e-06 ***
+Black             0.85968    
+Hispanic          0.44207    
+OtherRace         0.87262    
+gender            0.05781 .  
+Republican        0.39173    
+Democrat          0.95188    
+fiscal_ideology   0.24800    
+social_ideology 9.893e-07 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -409,19 +565,31 @@ MODEL: comp_q25_3_rev_incarc
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.298794   0.079729 41.3750 < 2.2e-16 ***
-treat            0.471424   0.095028  4.9609 8.110e-07 ***
-Black           -0.022215   0.091772 -0.2421   0.80877    
-Hispanic         0.152339   0.077031  1.9776   0.04822 *  
-OtherRace        0.078165   0.094551  0.8267   0.40858    
-gender          -0.043211   0.053049 -0.8145   0.41551    
-Republican       0.098506   0.078733  1.2512   0.21114    
-Democrat        -0.043025   0.064732 -0.6647   0.50641    
-fiscal_ideology -0.046536   0.038586 -1.2060   0.22806    
-social_ideology -0.177756   0.037711 -4.7136 2.742e-06 ***
+                 Estimate Std. Error t value
+(Intercept)      3.298794   0.079729 41.3750
+treat            0.471424   0.095028  4.9609
+Black           -0.022215   0.091772 -0.2421
+Hispanic         0.152339   0.077031  1.9776
+OtherRace        0.078165   0.094551  0.8267
+gender          -0.043211   0.053049 -0.8145
+Republican       0.098506   0.078733  1.2512
+Democrat        -0.043025   0.064732 -0.6647
+fiscal_ideology -0.046536   0.038586 -1.2060
+social_ideology -0.177756   0.037711 -4.7136
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           8.110e-07 ***
+Black             0.80877    
+Hispanic          0.04822 *  
+OtherRace         0.40858    
+gender            0.41551    
+Republican        0.21114    
+Democrat          0.50641    
+fiscal_ideology   0.22806    
+social_ideology 2.742e-06 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -440,19 +608,31 @@ MODEL: comp_q25_3_rev_knowincarc
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.3057460  0.0676118 48.8930 < 2.2e-16 ***
-treat            0.1914580  0.0501030  3.8213 0.0001382 ***
-Black           -0.0267319  0.0747813 -0.3575 0.7207929    
-Hispanic         0.0573211  0.0663599  0.8638 0.3878414    
-OtherRace       -0.0522746  0.0920591 -0.5678 0.5702307    
-gender          -0.0806988  0.0463805 -1.7399 0.0820779 .  
-Republican       0.0539513  0.0713391  0.7563 0.4496093    
-Democrat        -0.0094406  0.0541695 -0.1743 0.8616695    
-fiscal_ideology -0.0390891  0.0353416 -1.1060 0.2688892    
-social_ideology -0.1727805  0.0342341 -5.0470 5.039e-07 ***
+                  Estimate Std. Error t value
+(Intercept)      3.3057460  0.0676118 48.8930
+treat            0.1914580  0.0501030  3.8213
+Black           -0.0267319  0.0747813 -0.3575
+Hispanic         0.0573211  0.0663599  0.8638
+OtherRace       -0.0522746  0.0920591 -0.5678
+gender          -0.0806988  0.0463805 -1.7399
+Republican       0.0539513  0.0713391  0.7563
+Democrat        -0.0094406  0.0541695 -0.1743
+fiscal_ideology -0.0390891  0.0353416 -1.1060
+social_ideology -0.1727805  0.0342341 -5.0470
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           0.0001382 ***
+Black           0.7207929    
+Hispanic        0.3878414    
+OtherRace       0.5702307    
+gender          0.0820779 .  
+Republican      0.4496093    
+Democrat        0.8616695    
+fiscal_ideology 0.2688892    
+social_ideology 5.039e-07 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -471,19 +651,31 @@ MODEL: comp_q25_3_rev_vict
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.2678464  0.0758962 43.0568 < 2.2e-16 ***
-treat            0.2739261  0.0702444  3.8996 0.0001018 ***
-Black            0.0156454  0.0863270  0.1812 0.8562153    
-Hispanic         0.0870774  0.0719418  1.2104 0.2263722    
-OtherRace        0.0117938  0.0967246  0.1219 0.9029739    
-gender          -0.0628853  0.0507023 -1.2403 0.2151160    
-Republican       0.0206029  0.0757055  0.2721 0.7855576    
-Democrat        -0.0038564  0.0615856 -0.0626 0.9500810    
-fiscal_ideology -0.0310959  0.0371780 -0.8364 0.4030957    
-social_ideology -0.1713747  0.0361008 -4.7471 2.315e-06 ***
+                  Estimate Std. Error t value
+(Intercept)      3.2678464  0.0758962 43.0568
+treat            0.2739261  0.0702444  3.8996
+Black            0.0156454  0.0863270  0.1812
+Hispanic         0.0870774  0.0719418  1.2104
+OtherRace        0.0117938  0.0967246  0.1219
+gender          -0.0628853  0.0507023 -1.2403
+Republican       0.0206029  0.0757055  0.2721
+Democrat        -0.0038564  0.0615856 -0.0626
+fiscal_ideology -0.0310959  0.0371780 -0.8364
+social_ideology -0.1713747  0.0361008 -4.7471
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           0.0001018 ***
+Black           0.8562153    
+Hispanic        0.2263722    
+OtherRace       0.9029739    
+gender          0.2151160    
+Republican      0.7855576    
+Democrat        0.9500810    
+fiscal_ideology 0.4030957    
+social_ideology 2.315e-06 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -502,19 +694,31 @@ MODEL: comp_q25_4_rev_impact
 
 t test of coefficients:
 
-                   Estimate  Std. Error t value  Pr(>|t|)    
-(Intercept)      3.48904850  0.05720721 60.9897 < 2.2e-16 ***
-impact           0.16845981  0.04088395  4.1204 3.976e-05 ***
-Black            0.05890543  0.06105515  0.9648   0.33480    
-Hispanic         0.09922159  0.05608272  1.7692   0.07705 .  
-OtherRace       -0.05856405  0.08047830 -0.7277   0.46690    
-gender          -0.08072146  0.03914658 -2.0620   0.03937 *  
-Republican       0.03850784  0.06141561  0.6270   0.53075    
-Democrat         0.06149262  0.04675744  1.3151   0.18865    
-fiscal_ideology -0.00078431  0.02908127 -0.0270   0.97849    
-social_ideology -0.18983057  0.02814113 -6.7457 2.126e-11 ***
+                   Estimate  Std. Error t value
+(Intercept)      3.48904850  0.05720721 60.9897
+impact           0.16845981  0.04088395  4.1204
+Black            0.05890543  0.06105515  0.9648
+Hispanic         0.09922159  0.05608272  1.7692
+OtherRace       -0.05856405  0.08047830 -0.7277
+gender          -0.08072146  0.03914658 -2.0620
+Republican       0.03850784  0.06141561  0.6270
+Democrat         0.06149262  0.04675744  1.3151
+fiscal_ideology -0.00078431  0.02908127 -0.0270
+social_ideology -0.18983057  0.02814113 -6.7457
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+impact          3.976e-05 ***
+Black             0.33480    
+Hispanic          0.07705 .  
+OtherRace         0.46690    
+gender            0.03937 *  
+Republican        0.53075    
+Democrat          0.18865    
+fiscal_ideology   0.97849    
+social_ideology 2.126e-11 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -533,19 +737,31 @@ MODEL: comp_q25_4_rev_incarc
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.4831538  0.0691446 50.3749 < 2.2e-16 ***
-treat            0.3587036  0.0821621  4.3658 1.385e-05 ***
-Black            0.0994456  0.0743940  1.3367   0.18158    
-Hispanic         0.1117804  0.0669427  1.6698   0.09524 .  
-OtherRace        0.0177675  0.0798594  0.2225   0.82398    
-gender          -0.0431177  0.0463267 -0.9307   0.35219    
-Republican       0.0700621  0.0728944  0.9611   0.33669    
-Democrat         0.0646969  0.0574154  1.1268   0.26006    
-fiscal_ideology -0.0082663  0.0345130 -0.2395   0.81075    
-social_ideology -0.1962460  0.0340572 -5.7622 1.074e-08 ***
+                  Estimate Std. Error t value
+(Intercept)      3.4831538  0.0691446 50.3749
+treat            0.3587036  0.0821621  4.3658
+Black            0.0994456  0.0743940  1.3367
+Hispanic         0.1117804  0.0669427  1.6698
+OtherRace        0.0177675  0.0798594  0.2225
+gender          -0.0431177  0.0463267 -0.9307
+Republican       0.0700621  0.0728944  0.9611
+Democrat         0.0646969  0.0574154  1.1268
+fiscal_ideology -0.0082663  0.0345130 -0.2395
+social_ideology -0.1962460  0.0340572 -5.7622
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           1.385e-05 ***
+Black             0.18158    
+Hispanic          0.09524 .  
+OtherRace         0.82398    
+gender            0.35219    
+Republican        0.33669    
+Democrat          0.26006    
+fiscal_ideology   0.81075    
+social_ideology 1.074e-08 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -564,19 +780,31 @@ MODEL: comp_q25_4_rev_knowincarc
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.514389   0.057895 60.7024 < 2.2e-16 ***
-treat            0.169416   0.042847  3.9540 8.046e-05 ***
-Black            0.040462   0.064029  0.6319   0.52752    
-Hispanic         0.087361   0.057616  1.5163   0.12966    
-OtherRace       -0.066504   0.079403 -0.8376   0.40242    
-gender          -0.082299   0.040203 -2.0471   0.04082 *  
-Republican       0.042772   0.063970  0.6686   0.50384    
-Democrat         0.051031   0.047469  1.0750   0.28253    
-fiscal_ideology  0.007022   0.030089  0.2334   0.81550    
-social_ideology -0.206410   0.029217 -7.0648 2.460e-12 ***
+                 Estimate Std. Error t value
+(Intercept)      3.514389   0.057895 60.7024
+treat            0.169416   0.042847  3.9540
+Black            0.040462   0.064029  0.6319
+Hispanic         0.087361   0.057616  1.5163
+OtherRace       -0.066504   0.079403 -0.8376
+gender          -0.082299   0.040203 -2.0471
+Republican       0.042772   0.063970  0.6686
+Democrat         0.051031   0.047469  1.0750
+fiscal_ideology  0.007022   0.030089  0.2334
+social_ideology -0.206410   0.029217 -7.0648
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           8.046e-05 ***
+Black             0.52752    
+Hispanic          0.12966    
+OtherRace         0.40242    
+gender            0.04082 *  
+Republican        0.50384    
+Democrat          0.28253    
+fiscal_ideology   0.81550    
+social_ideology 2.460e-12 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -595,19 +823,31 @@ MODEL: comp_q25_4_rev_vict
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.4542840  0.0650016 53.1415 < 2.2e-16 ***
-treat            0.1926151  0.0686855  2.8043  0.005125 ** 
-Black            0.1424059  0.0697047  2.0430  0.041275 *  
-Hispanic         0.0794428  0.0665349  1.1940  0.232716    
-OtherRace       -0.0320731  0.0874026 -0.3670  0.713715    
-gender          -0.0731795  0.0454067 -1.6116  0.107306    
-Republican      -0.0121526  0.0714165 -0.1702  0.864910    
-Democrat         0.0986690  0.0544643  1.8116  0.070297 .  
-fiscal_ideology -0.0021158  0.0332049 -0.0637  0.949204    
-social_ideology -0.1795286  0.0326117 -5.5050 4.522e-08 ***
+                  Estimate Std. Error t value
+(Intercept)      3.4542840  0.0650016 53.1415
+treat            0.1926151  0.0686855  2.8043
+Black            0.1424059  0.0697047  2.0430
+Hispanic         0.0794428  0.0665349  1.1940
+OtherRace       -0.0320731  0.0874026 -0.3670
+gender          -0.0731795  0.0454067 -1.6116
+Republican      -0.0121526  0.0714165 -0.1702
+Democrat         0.0986690  0.0544643  1.8116
+fiscal_ideology -0.0021158  0.0332049 -0.0637
+social_ideology -0.1795286  0.0326117 -5.5050
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat            0.005125 ** 
+Black            0.041275 *  
+Hispanic         0.232716    
+OtherRace        0.713715    
+gender           0.107306    
+Republican       0.864910    
+Democrat         0.070297 .  
+fiscal_ideology  0.949204    
+social_ideology 4.522e-08 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -626,19 +866,31 @@ MODEL: comp_q25_6_rev_impact
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.078467   0.057160 53.8566 < 2.2e-16 ***
-impact           0.155632   0.040988  3.7970  0.000152 ***
-Black            0.042061   0.059785  0.7035  0.481819    
-Hispanic        -0.011859   0.059909 -0.1980  0.843105    
-OtherRace       -0.110390   0.070799 -1.5592  0.119145    
-gender          -0.039103   0.038934 -1.0043  0.315365    
-Republican       0.013586   0.062496  0.2174  0.827930    
-Democrat         0.033969   0.045755  0.7424  0.457949    
-fiscal_ideology -0.087441   0.028165 -3.1045  0.001939 ** 
-social_ideology -0.038028   0.027115 -1.4025  0.160969    
+                 Estimate Std. Error t value
+(Intercept)      3.078467   0.057160 53.8566
+impact           0.155632   0.040988  3.7970
+Black            0.042061   0.059785  0.7035
+Hispanic        -0.011859   0.059909 -0.1980
+OtherRace       -0.110390   0.070799 -1.5592
+gender          -0.039103   0.038934 -1.0043
+Republican       0.013586   0.062496  0.2174
+Democrat         0.033969   0.045755  0.7424
+fiscal_ideology -0.087441   0.028165 -3.1045
+social_ideology -0.038028   0.027115 -1.4025
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+impact           0.000152 ***
+Black            0.481819    
+Hispanic         0.843105    
+OtherRace        0.119145    
+gender           0.315365    
+Republican       0.827930    
+Democrat         0.457949    
+fiscal_ideology  0.001939 ** 
+social_ideology  0.160969    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -657,19 +909,31 @@ MODEL: comp_q25_6_rev_incarc
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.067324   0.070830 43.3053 < 2.2e-16 ***
-treat            0.336120   0.085285  3.9411 8.615e-05 ***
-Black           -0.050473   0.074338 -0.6790  0.497305    
-Hispanic         0.021881   0.072421  0.3021  0.762607    
-OtherRace       -0.057365   0.080078 -0.7164  0.473913    
-gender          -0.016125   0.046375 -0.3477  0.728121    
-Republican      -0.036978   0.075078 -0.4925  0.622445    
-Democrat         0.038137   0.055434  0.6880  0.491618    
-fiscal_ideology -0.085650   0.032337 -2.6487  0.008196 ** 
-social_ideology -0.032836   0.031380 -1.0464  0.295602    
+                 Estimate Std. Error t value
+(Intercept)      3.067324   0.070830 43.3053
+treat            0.336120   0.085285  3.9411
+Black           -0.050473   0.074338 -0.6790
+Hispanic         0.021881   0.072421  0.3021
+OtherRace       -0.057365   0.080078 -0.7164
+gender          -0.016125   0.046375 -0.3477
+Republican      -0.036978   0.075078 -0.4925
+Democrat         0.038137   0.055434  0.6880
+fiscal_ideology -0.085650   0.032337 -2.6487
+social_ideology -0.032836   0.031380 -1.0464
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           8.615e-05 ***
+Black            0.497305    
+Hispanic         0.762607    
+OtherRace        0.473913    
+gender           0.728121    
+Republican       0.622445    
+Democrat         0.491618    
+fiscal_ideology  0.008196 ** 
+social_ideology  0.295602    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -688,19 +952,31 @@ MODEL: comp_q25_6_rev_knowincarc
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.0885169  0.0589353 52.4052 < 2.2e-16 ***
-treat            0.1294158  0.0428256  3.0219 0.0025545 ** 
-Black            0.0233203  0.0625480  0.3728 0.7093218    
-Hispanic        -0.0438885  0.0614365 -0.7144 0.4751097    
-OtherRace       -0.1275995  0.0710022 -1.7971 0.0725188 .  
-gender          -0.0330559  0.0399082 -0.8283 0.4076336    
-Republican      -0.0072294  0.0646152 -0.1119 0.9109305    
-Democrat         0.0276198  0.0470460  0.5871 0.5572392    
-fiscal_ideology -0.0966770  0.0285636 -3.3846 0.0007313 ***
-social_ideology -0.0266500  0.0275309 -0.9680 0.3331996    
+                  Estimate Std. Error t value
+(Intercept)      3.0885169  0.0589353 52.4052
+treat            0.1294158  0.0428256  3.0219
+Black            0.0233203  0.0625480  0.3728
+Hispanic        -0.0438885  0.0614365 -0.7144
+OtherRace       -0.1275995  0.0710022 -1.7971
+gender          -0.0330559  0.0399082 -0.8283
+Republican      -0.0072294  0.0646152 -0.1119
+Democrat         0.0276198  0.0470460  0.5871
+fiscal_ideology -0.0966770  0.0285636 -3.3846
+social_ideology -0.0266500  0.0275309 -0.9680
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           0.0025545 ** 
+Black           0.7093218    
+Hispanic        0.4751097    
+OtherRace       0.0725188 .  
+gender          0.4076336    
+Republican      0.9109305    
+Democrat        0.5572392    
+fiscal_ideology 0.0007313 ***
+social_ideology 0.3331996    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -719,19 +995,31 @@ MODEL: comp_q25_6_rev_vict
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.0599013  0.0676314 45.2438 < 2.2e-16 ***
-treat            0.2410958  0.0679037  3.5506 0.0003995 ***
-Black            0.0461839  0.0705259  0.6549 0.5126913    
-Hispanic         0.0469014  0.0698166  0.6718 0.5018544    
-OtherRace       -0.0907849  0.0776959 -1.1685 0.2428546    
-gender          -0.0329858  0.0451991 -0.7298 0.4656637    
-Republican      -0.0056923  0.0727543 -0.0782 0.9376508    
-Democrat         0.0539661  0.0536232  1.0064 0.3144316    
-fiscal_ideology -0.0874490  0.0323049 -2.7070 0.0068873 ** 
-social_ideology -0.0365978  0.0314460 -1.1638 0.2447275    
+                  Estimate Std. Error t value
+(Intercept)      3.0599013  0.0676314 45.2438
+treat            0.2410958  0.0679037  3.5506
+Black            0.0461839  0.0705259  0.6549
+Hispanic         0.0469014  0.0698166  0.6718
+OtherRace       -0.0907849  0.0776959 -1.1685
+gender          -0.0329858  0.0451991 -0.7298
+Republican      -0.0056923  0.0727543 -0.0782
+Democrat         0.0539661  0.0536232  1.0064
+fiscal_ideology -0.0874490  0.0323049 -2.7070
+social_ideology -0.0365978  0.0314460 -1.1638
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           0.0003995 ***
+Black           0.5126913    
+Hispanic        0.5018544    
+OtherRace       0.2428546    
+gender          0.4656637    
+Republican      0.9376508    
+Democrat        0.3144316    
+fiscal_ideology 0.0068873 ** 
+social_ideology 0.2447275    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -750,19 +1038,31 @@ MODEL: comp_prisonhelp_impact
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.376408   0.043296 77.9835 < 2.2e-16 ***
-impact           0.230819   0.030174  7.6496 3.471e-14 ***
-Black            0.049266   0.043702  1.1273  0.259787    
-Hispanic         0.018567   0.042054  0.4415  0.658909    
-OtherRace       -0.069440   0.057270 -1.2125  0.225505    
-gender          -0.052508   0.029373 -1.7876  0.074026 .  
-Republican      -0.020184   0.046405 -0.4350  0.663653    
-Democrat         0.050595   0.034143  1.4819  0.138578    
-fiscal_ideology -0.059721   0.021743 -2.7467  0.006087 ** 
-social_ideology -0.133899   0.020332 -6.5856 6.137e-11 ***
+                 Estimate Std. Error t value
+(Intercept)      3.376408   0.043296 77.9835
+impact           0.230819   0.030174  7.6496
+Black            0.049266   0.043702  1.1273
+Hispanic         0.018567   0.042054  0.4415
+OtherRace       -0.069440   0.057270 -1.2125
+gender          -0.052508   0.029373 -1.7876
+Republican      -0.020184   0.046405 -0.4350
+Democrat         0.050595   0.034143  1.4819
+fiscal_ideology -0.059721   0.021743 -2.7467
+social_ideology -0.133899   0.020332 -6.5856
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+impact          3.471e-14 ***
+Black            0.259787    
+Hispanic         0.658909    
+OtherRace        0.225505    
+gender           0.074026 .  
+Republican       0.663653    
+Democrat         0.138578    
+fiscal_ideology  0.006087 ** 
+social_ideology 6.137e-11 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -781,19 +1081,31 @@ MODEL: comp_prisonhelp_incarc
 
 t test of coefficients:
 
-                  Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.3973986  0.0551925 61.5555 < 2.2e-16 ***
-treat            0.4423462  0.0578053  7.6523 4.264e-14 ***
-Black            0.0265099  0.0554656  0.4780   0.63278    
-Hispanic         0.0478825  0.0532217  0.8997   0.36849    
-OtherRace       -0.0053054  0.0557549 -0.0952   0.92421    
-gender          -0.0146838  0.0354206 -0.4146   0.67855    
-Republican      -0.0115755  0.0555018 -0.2086   0.83483    
-Democrat         0.0418876  0.0435129  0.9626   0.33593    
-fiscal_ideology -0.0640242  0.0262422 -2.4397   0.01485 *  
-social_ideology -0.1484519  0.0245191 -6.0546 1.923e-09 ***
+                  Estimate Std. Error t value
+(Intercept)      3.3973986  0.0551925 61.5555
+treat            0.4423462  0.0578053  7.6523
+Black            0.0265099  0.0554656  0.4780
+Hispanic         0.0478825  0.0532217  0.8997
+OtherRace       -0.0053054  0.0557549 -0.0952
+gender          -0.0146838  0.0354206 -0.4146
+Republican      -0.0115755  0.0555018 -0.2086
+Democrat         0.0418876  0.0435129  0.9626
+fiscal_ideology -0.0640242  0.0262422 -2.4397
+social_ideology -0.1484519  0.0245191 -6.0546
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           4.264e-14 ***
+Black             0.63278    
+Hispanic          0.36849    
+OtherRace         0.92421    
+gender            0.67855    
+Republican        0.83483    
+Democrat          0.33593    
+fiscal_ideology   0.01485 *  
+social_ideology 1.923e-09 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -812,19 +1124,31 @@ MODEL: comp_prisonhelp_knowincarc
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.396755   0.044441 76.4322 < 2.2e-16 ***
-treat            0.224771   0.031668  7.0977 1.955e-12 ***
-Black            0.022306   0.045896  0.4860  0.627023    
-Hispanic         0.013628   0.043182  0.3156  0.752354    
-OtherRace       -0.076205   0.057835 -1.3176  0.187830    
-gender          -0.049536   0.030323 -1.6336  0.102552    
-Republican      -0.032668   0.048262 -0.6769  0.498588    
-Democrat         0.042726   0.035164  1.2151  0.224533    
-fiscal_ideology -0.059581   0.022532 -2.6443  0.008273 ** 
-social_ideology -0.139145   0.021181 -6.5693 6.963e-11 ***
+                 Estimate Std. Error t value
+(Intercept)      3.396755   0.044441 76.4322
+treat            0.224771   0.031668  7.0977
+Black            0.022306   0.045896  0.4860
+Hispanic         0.013628   0.043182  0.3156
+OtherRace       -0.076205   0.057835 -1.3176
+gender          -0.049536   0.030323 -1.6336
+Republican      -0.032668   0.048262 -0.6769
+Democrat         0.042726   0.035164  1.2151
+fiscal_ideology -0.059581   0.022532 -2.6443
+social_ideology -0.139145   0.021181 -6.5693
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           1.955e-12 ***
+Black            0.627023    
+Hispanic         0.752354    
+OtherRace        0.187830    
+gender           0.102552    
+Republican       0.498588    
+Democrat         0.224533    
+fiscal_ideology  0.008273 ** 
+social_ideology 6.963e-11 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---
@@ -843,19 +1167,31 @@ MODEL: comp_prisonhelp_vict
 
 t test of coefficients:
 
-                 Estimate Std. Error t value  Pr(>|t|)    
-(Intercept)      3.366901   0.051434 65.4601 < 2.2e-16 ***
-treat            0.275650   0.047465  5.8074 8.144e-09 ***
-Black            0.082608   0.052414  1.5761   0.11528    
-Hispanic         0.030491   0.050413  0.6048   0.54541    
-OtherRace       -0.055870   0.062050 -0.9004   0.36810    
-gender          -0.039145   0.034456 -1.1361   0.25615    
-Republican      -0.061015   0.055457 -1.1002   0.27146    
-Democrat         0.069415   0.040895  1.6974   0.08988 .  
-fiscal_ideology -0.053030   0.025536 -2.0767   0.03805 *  
-social_ideology -0.141784   0.023779 -5.9625 3.275e-09 ***
+                 Estimate Std. Error t value
+(Intercept)      3.366901   0.051434 65.4601
+treat            0.275650   0.047465  5.8074
+Black            0.082608   0.052414  1.5761
+Hispanic         0.030491   0.050413  0.6048
+OtherRace       -0.055870   0.062050 -0.9004
+gender          -0.039145   0.034456 -1.1361
+Republican      -0.061015   0.055457 -1.1002
+Democrat         0.069415   0.040895  1.6974
+fiscal_ideology -0.053030   0.025536 -2.0767
+social_ideology -0.141784   0.023779 -5.9625
+                 Pr(>|t|)    
+(Intercept)     < 2.2e-16 ***
+treat           8.144e-09 ***
+Black             0.11528    
+Hispanic          0.54541    
+OtherRace         0.36810    
+gender            0.25615    
+Republican        0.27146    
+Democrat          0.08988 .  
+fiscal_ideology   0.03805 *  
+social_ideology 3.275e-09 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 --- Model fit ---

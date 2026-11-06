@@ -20,7 +20,8 @@ Hispanic    -0.07162    0.08337  -0.859   0.3904
 OtherRace    0.01700    0.13464   0.126   0.8995    
 gender      -0.10201    0.05782  -1.764   0.0779 .  
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 1.153 on 1597 degrees of freedom
   (619 observations deleted due to missingness)
@@ -44,15 +45,23 @@ Residuals:
 -2.6739 -0.6354  0.8349  0.8646  0.8681 
 
 Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  3.135406   0.055060  56.945  < 2e-16 ***
-treat        0.505375   0.122428   4.128 3.93e-05 ***
-Black        0.033129   0.103951   0.319    0.750    
-Hispanic     0.014903   0.106229   0.140    0.888    
-OtherRace    0.185812   0.154801   1.200    0.230    
-gender      -0.003472   0.071231  -0.049    0.961    
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)  3.135406   0.055060  56.945  < 2e-16
+treat        0.505375   0.122428   4.128 3.93e-05
+Black        0.033129   0.103951   0.319    0.750
+Hispanic     0.014903   0.106229   0.140    0.888
+OtherRace    0.185812   0.154801   1.200    0.230
+gender      -0.003472   0.071231  -0.049    0.961
+               
+(Intercept) ***
+treat       ***
+Black          
+Hispanic       
+OtherRace      
+gender         
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 1.188 on 1119 degrees of freedom
   (410 observations deleted due to missingness)
@@ -76,15 +85,23 @@ Residuals:
 -2.6045 -0.6967  0.5230  0.8033  0.9607 
 
 Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  3.196731   0.049159  65.029  < 2e-16 ***
-treat        0.369052   0.063903   5.775 9.33e-09 ***
-Black        0.038716   0.085294   0.454    0.650    
-Hispanic    -0.068592   0.085859  -0.799    0.424    
-OtherRace   -0.008403   0.138810  -0.061    0.952    
-gender      -0.088784   0.059619  -1.489    0.137    
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)  3.196731   0.049159  65.029  < 2e-16
+treat        0.369052   0.063903   5.775 9.33e-09
+Black        0.038716   0.085294   0.454    0.650
+Hispanic    -0.068592   0.085859  -0.799    0.424
+OtherRace   -0.008403   0.138810  -0.061    0.952
+gender      -0.088784   0.059619  -1.489    0.137
+               
+(Intercept) ***
+treat       ***
+Black          
+Hispanic       
+OtherRace      
+gender         
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 1.151 on 1499 degrees of freedom
   (549 observations deleted due to missingness)
@@ -116,7 +133,8 @@ Hispanic    -0.03291    0.10255  -0.321  0.74834
 OtherRace    0.06483    0.15465   0.419  0.67513    
 gender      -0.02942    0.06951  -0.423  0.67223    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 1.198 on 1191 degrees of freedom
   (445 observations deleted due to missingness)
@@ -148,7 +166,8 @@ Hispanic     0.02832    0.08295   0.341    0.733
 OtherRace   -0.03765    0.13396  -0.281    0.779    
 gender      -0.06789    0.05753  -1.180    0.238    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 1.147 on 1597 degrees of freedom
   (619 observations deleted due to missingness)
@@ -172,15 +191,23 @@ Residuals:
 -2.6453 -0.6735  0.8153  0.8292  0.8916 
 
 Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  3.173465   0.054430  58.304  < 2e-16 ***
-treat        0.404367   0.121026   3.341 0.000862 ***
-Black        0.067436   0.102760   0.656 0.511801    
-Hispanic    -0.002675   0.105013  -0.025 0.979682    
-OtherRace   -0.008861   0.153029  -0.058 0.953836    
-gender      -0.056186   0.070416  -0.798 0.425083    
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)  3.173465   0.054430  58.304  < 2e-16
+treat        0.404367   0.121026   3.341 0.000862
+Black        0.067436   0.102760   0.656 0.511801
+Hispanic    -0.002675   0.105013  -0.025 0.979682
+OtherRace   -0.008861   0.153029  -0.058 0.953836
+gender      -0.056186   0.070416  -0.798 0.425083
+               
+(Intercept) ***
+treat       ***
+Black          
+Hispanic       
+OtherRace      
+gender         
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 1.174 on 1119 degrees of freedom
   (410 observations deleted due to missingness)
@@ -212,7 +239,8 @@ Hispanic     0.04693    0.08603   0.545    0.585
 OtherRace    0.00462    0.13909   0.033    0.974    
 gender      -0.04879    0.05974  -0.817    0.414    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 1.153 on 1499 degrees of freedom
   (549 observations deleted due to missingness)
@@ -236,15 +264,23 @@ Residuals:
 -2.7328 -0.6742  0.6950  0.8353  0.9847 
 
 Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  3.174152   0.052886  60.018  < 2e-16 ***
-treat        0.427801   0.094659   4.519 6.82e-06 ***
-Black        0.130891   0.097858   1.338    0.181    
-Hispanic    -0.009459   0.099131  -0.095    0.924    
-OtherRace   -0.096059   0.149489  -0.643    0.521    
-gender      -0.062826   0.067190  -0.935    0.350    
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)  3.174152   0.052886  60.018  < 2e-16
+treat        0.427801   0.094659   4.519 6.82e-06
+Black        0.130891   0.097858   1.338    0.181
+Hispanic    -0.009459   0.099131  -0.095    0.924
+OtherRace   -0.096059   0.149489  -0.643    0.521
+gender      -0.062826   0.067190  -0.935    0.350
+               
+(Intercept) ***
+treat       ***
+Black          
+Hispanic       
+OtherRace      
+gender         
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 1.158 on 1191 degrees of freedom
   (445 observations deleted due to missingness)
@@ -276,7 +312,8 @@ Hispanic     0.17035    0.06833   2.493   0.0128 *
 OtherRace    0.10724    0.11035   0.972   0.3313    
 gender      -0.09682    0.04739  -2.043   0.0412 *  
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.9451 on 1597 degrees of freedom
   (619 observations deleted due to missingness)
@@ -308,7 +345,8 @@ Hispanic     0.18800    0.08350   2.251 0.024548 *
 OtherRace    0.14292    0.12168   1.175 0.240435    
 gender      -0.08918    0.05599  -1.593 0.111491    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.9338 on 1119 degrees of freedom
   (410 observations deleted due to missingness)
@@ -340,7 +378,8 @@ Hispanic     0.15901    0.07036   2.260 0.023971 *
 OtherRace    0.12105    0.11375   1.064 0.287420    
 gender      -0.12547    0.04886  -2.568 0.010324 *  
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.943 on 1499 degrees of freedom
   (549 observations deleted due to missingness)
@@ -372,7 +411,8 @@ Hispanic     0.20964    0.08120   2.582  0.00994 **
 OtherRace    0.12875    0.12244   1.052  0.29322    
 gender      -0.10215    0.05503  -1.856  0.06369 .  
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.9484 on 1191 degrees of freedom
   (445 observations deleted due to missingness)
@@ -404,7 +444,8 @@ Hispanic     0.07478    0.06661   1.123 0.261716
 OtherRace    0.05808    0.10758   0.540 0.589365    
 gender      -0.12822    0.04619  -2.776 0.005572 ** 
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.9214 on 1597 degrees of freedom
   (619 observations deleted due to missingness)
@@ -428,15 +469,23 @@ Residuals:
 -2.4051 -0.7286  0.1848  0.8761  1.2758 
 
 Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.815170   0.042538  66.180  < 2e-16 ***
-treat        0.395346   0.094584   4.180 3.14e-05 ***
-Black       -0.004421   0.080309  -0.055   0.9561    
-Hispanic     0.194539   0.082069   2.370   0.0179 *  
-OtherRace    0.159506   0.119595   1.334   0.1826    
-gender      -0.086590   0.055031  -1.573   0.1159    
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)  2.815170   0.042538  66.180  < 2e-16
+treat        0.395346   0.094584   4.180 3.14e-05
+Black       -0.004421   0.080309  -0.055   0.9561
+Hispanic     0.194539   0.082069   2.370   0.0179
+OtherRace    0.159506   0.119595   1.334   0.1826
+gender      -0.086590   0.055031  -1.573   0.1159
+               
+(Intercept) ***
+treat       ***
+Black          
+Hispanic    *  
+OtherRace      
+gender         
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.9178 on 1119 degrees of freedom
   (410 observations deleted due to missingness)
@@ -460,15 +509,23 @@ Residuals:
 -2.0944 -0.7278  0.1158  0.9891  1.2722 
 
 Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.854416   0.039580  72.117  < 2e-16 ***
-treat        0.156466   0.051452   3.041  0.00240 ** 
-Black        0.009566   0.068675   0.139  0.88924    
-Hispanic     0.083487   0.069130   1.208  0.22736    
-OtherRace    0.024629   0.111764   0.220  0.82562    
-gender      -0.126649   0.048003  -2.638  0.00842 ** 
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)  2.854416   0.039580  72.117  < 2e-16
+treat        0.156466   0.051452   3.041  0.00240
+Black        0.009566   0.068675   0.139  0.88924
+Hispanic     0.083487   0.069130   1.208  0.22736
+OtherRace    0.024629   0.111764   0.220  0.82562
+gender      -0.126649   0.048003  -2.638  0.00842
+               
+(Intercept) ***
+treat       ** 
+Black          
+Hispanic       
+OtherRace      
+gender      ** 
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.9265 on 1499 degrees of freedom
   (549 observations deleted due to missingness)
@@ -500,7 +557,8 @@ Hispanic     0.13052    0.07805   1.672  0.09476 .
 OtherRace    0.08518    0.11771   0.724  0.46940    
 gender      -0.09687    0.05290  -1.831  0.06735 .  
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.9118 on 1191 degrees of freedom
   (445 observations deleted due to missingness)
@@ -532,7 +590,8 @@ Hispanic     0.12667    0.06000   2.111  0.03491 *
 OtherRace    0.01880    0.09690   0.194  0.84621    
 gender      -0.12431    0.04161  -2.987  0.00286 ** 
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.8299 on 1597 degrees of freedom
   (619 observations deleted due to missingness)
@@ -564,7 +623,8 @@ Hispanic     0.15253    0.07419   2.056  0.04001 *
 OtherRace    0.10589    0.10811   0.979  0.32756    
 gender      -0.09013    0.04975  -1.812  0.07027 .  
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.8297 on 1119 degrees of freedom
   (410 observations deleted due to missingness)
@@ -596,7 +656,8 @@ Hispanic     0.11194    0.06177   1.812  0.07015 .
 OtherRace    0.01428    0.09986   0.143  0.88633    
 gender      -0.12698    0.04289  -2.961  0.00312 ** 
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.8279 on 1499 degrees of freedom
   (549 observations deleted due to missingness)
@@ -628,7 +689,8 @@ Hispanic     0.12378    0.07178   1.724  0.08489 .
 OtherRace    0.04672    0.10825   0.432  0.66612    
 gender      -0.11032    0.04865  -2.267  0.02354 *  
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.8385 on 1191 degrees of freedom
   (445 observations deleted due to missingness)
@@ -660,7 +722,8 @@ Hispanic     0.01375    0.05761   0.239  0.81140
 OtherRace   -0.05730    0.09305  -0.616  0.53809    
 gender      -0.06628    0.03996  -1.659  0.09737 .  
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.7969 on 1597 degrees of freedom
   (619 observations deleted due to missingness)
@@ -684,15 +747,23 @@ Residuals:
 -2.1362 -0.3071  0.1985  0.2487  1.2499 
 
 Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  2.791029   0.036839  75.762  < 2e-16 ***
-treat        0.289394   0.081913   3.533 0.000428 ***
-Black       -0.001259   0.069550  -0.018 0.985558    
-Hispanic     0.055832   0.071075   0.786 0.432306    
-OtherRace    0.010471   0.103573   0.101 0.919490    
-gender      -0.039707   0.047659  -0.833 0.404934    
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)  2.791029   0.036839  75.762  < 2e-16
+treat        0.289394   0.081913   3.533 0.000428
+Black       -0.001259   0.069550  -0.018 0.985558
+Hispanic     0.055832   0.071075   0.786 0.432306
+OtherRace    0.010471   0.103573   0.101 0.919490
+gender      -0.039707   0.047659  -0.833 0.404934
+               
+(Intercept) ***
+treat       ***
+Black          
+Hispanic       
+OtherRace      
+gender         
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.7949 on 1119 degrees of freedom
   (410 observations deleted due to missingness)
@@ -724,7 +795,8 @@ Hispanic    -0.01476    0.05901  -0.250   0.8026
 OtherRace   -0.07478    0.09541  -0.784   0.4333    
 gender      -0.06067    0.04098  -1.480   0.1390    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.791 on 1499 degrees of freedom
   (549 observations deleted due to missingness)
@@ -756,7 +828,8 @@ Hispanic     0.07601    0.06858   1.108 0.267961
 OtherRace   -0.03750    0.10342  -0.363 0.716989    
 gender      -0.05158    0.04648  -1.110 0.267436    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.8011 on 1191 degrees of freedom
   (445 observations deleted due to missingness)
@@ -788,7 +861,8 @@ Hispanic     0.05704    0.04698   1.214  0.22487
 OtherRace    0.01769    0.07588   0.233  0.81564    
 gender      -0.09759    0.03258  -2.995  0.00279 ** 
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.6499 on 1597 degrees of freedom
   (619 observations deleted due to missingness)
@@ -820,7 +894,8 @@ Hispanic     0.10052    0.05962   1.686    0.092 .
 OtherRace    0.09929    0.08687   1.143    0.253    
 gender      -0.06088    0.03998  -1.523    0.128    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.6667 on 1119 degrees of freedom
   (410 observations deleted due to missingness)
@@ -852,7 +927,8 @@ Hispanic     0.05300    0.04864   1.090  0.27600
 OtherRace    0.01357    0.07863   0.173  0.86304    
 gender      -0.09622    0.03377  -2.849  0.00444 ** 
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.6519 on 1499 degrees of freedom
   (549 observations deleted due to missingness)
@@ -884,7 +960,8 @@ Hispanic     0.08293    0.05715   1.451  0.14699
 OtherRace    0.03199    0.08618   0.371  0.71056    
 gender      -0.07553    0.03873  -1.950  0.05142 .  
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 0.6675 on 1191 degrees of freedom
   (445 observations deleted due to missingness)

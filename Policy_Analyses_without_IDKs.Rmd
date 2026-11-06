@@ -1741,6 +1741,17 @@ exp(coef(m_lwop_1))
 
 # IV. Correlations w/out DK
 
+
+# easy/hard
+
+```{r}
+
+# cor(sample_dk$dpen_rev, sample_dk$post_felony_vote_rev, use = "complete.obs")
+
+
+```
+
+
 # Help Outcome Correlations
 
 Correlations when full, incarc, knowincarc, vict, impacted, not impacted

@@ -1728,7 +1728,7 @@ data_full%>%
     unemployed_pct = ((unemployed/total)*100)
   )
 
-View(data_full%>%
+data_full%>%
        group_by(incarc)%>%
   summarise(
     n = n(),
@@ -1745,7 +1745,7 @@ View(data_full%>%
     
     unemployed = sum(unemployed, na.rm = TRUE)
     
-  ))
+  )
 
 ```
 
@@ -1759,6 +1759,7 @@ economic_vars <- c(
   "medicaid",
   "unemployed",
   "uninsured"
+
 )
 
 economic_impact_summary <- purrr::map_dfr(
@@ -1914,7 +1915,7 @@ plot_tanf
 
 # Save each figure as a PDF
 ggsave(
-  filename = "figures/snap_impact_groups_10_5.pdf",
+  filename = "figures/snap_impact_groups_11_5.pdf",
   plot = plot_snap,
   width = 7,
   height = 5,
@@ -1922,15 +1923,15 @@ ggsave(
 )
 
 ggsave(
-  filename = "figures/tanf_impact_groups_10_5.pdf",
-  plot = plot_snap,
+  filename = "figures/tanf_impact_groups_11_5.pdf",
+  plot = plot_tanf,
   width = 7,
   height = 5,
   units = "in"
 )
 
 ggsave(
-  filename = "figures/medicaid_impact_groups_10_5.pdf",
+  filename = "figures/medicaid_impact_groups_11_5.pdf",
   plot = plot_medicaid,
   width = 7,
   height = 5,
@@ -1938,7 +1939,7 @@ ggsave(
 )
 
 ggsave(
-  filename = "figures/unemployed_impact_groups_10_5.pdf",
+  filename = "figures/unemployed_impact_groups_11_5.pdf",
   plot = plot_unemployed,
   width = 7,
   height = 5,
@@ -1946,7 +1947,7 @@ ggsave(
 )
 
 ggsave(
-  filename = "figures/uninsured_impact_groups_10_5.pdf",
+  filename = "figures/uninsured_impact_groups_11_5.pdf",
   plot = plot_uninsured,
   width = 7,
   height = 5,
