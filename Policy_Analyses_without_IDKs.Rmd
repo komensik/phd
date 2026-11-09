@@ -480,6 +480,55 @@ dk_policy_summary <- dk_policy_summary %>%
 dk_policy_summary
 ```
 
+## D. Control Vars
+
+### FIRE
+
+```{r}
+
+demo_controls <- c(
+  "Black", "Hisp_Latino", "AllOthers", "gender"
+)
+
+demo_controls_labels <- c(
+  Black = "Black",
+  Hisp_Latino    = "Hispanic/Latino", 
+  AllOthers = "Other RID",
+  gender = "Men"
+)
+
+
+fire_controls <- c(
+  "fire_rare",
+  "fire_privilege",
+  "fire_angry",
+  "fire_fear"
+)
+
+fire_controls_labels <- c(
+  fire_rare = "Racism rare",
+  fire_privilege = "White privilege",
+  fire_angry = "Angry about racism",
+  fire_fear = "Fear other races"
+)
+
+# DV labels already defined in variable_labels_sept1.R through policy_map
+policy_labels <- setNames(
+  policy_map$label,
+  policy_map$var
+)
+
+
+make_policy_model <- function(df, dv, iv, controls = character(0)) { #character(0) just means empty character vector so this function works for uncontrolled model then for controlled model
+  rhs <- c(iv, controls)
+  fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
+  lm(fml, data = df)
+}
+
+
+```
+
+
 # II. Analysis: Preferences
 
 ## A. Name waves
