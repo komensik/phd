@@ -153,7 +153,7 @@ sample %>%
 
 ```
 
-## A. New DK Variables
+## A. +DK Vars ("sample_dk")
 
 One binary DK variable for each policy item
 
@@ -330,9 +330,7 @@ sample_dk <- sample_dk %>%
 
 ```
 
-## B. Edit Sample
-
-### "sample_no_idk"
+## C. "sample_no_idk"
 
 - has dk_policy indicator variables
 - IDK responses now remove from policy vars themselves by converting to NA
@@ -364,7 +362,7 @@ View(sample_no_dk)
 
 ```
 
-## C. Counts code (revise if needed)
+## D. Counts code (revise if needed)
 
 ```{r}
 # ------------------------------------------------------------
@@ -480,24 +478,54 @@ dk_policy_summary <- dk_policy_summary %>%
 dk_policy_summary
 ```
 
-## D. Control Vars
+## E. Control Vars
 
 ### FIRE
 
 ```{r}
+sample_no_dk %>%
+  dplyr::count(
+   White,
+     Black,
+    Hisp_Latino,
+    AllOthers
+  )
+```
 
+
+
+```{r}
+# ------------------------------------------------------------
+# 1. Define variables and model waves
+# ------------------------------------------------------------
+# Focal demographic predictors
 demo_controls <- c(
-  "Black", "Hisp_Latino", "AllOthers", "gender"
+  "Black",
+  "Hisp_Latino",
+  "AllOthers"
 )
 
 demo_controls_labels <- c(
   Black = "Black",
-  Hisp_Latino    = "Hispanic/Latino", 
-  AllOthers = "Other RID",
-  gender = "Men"
+  Hisp_Latino = "Hispanic/Latino",
+  AllOthers = "Other RID"
 )
 
+# Party controls
+party_controls <- c(
+  "Republican",
+  "Democrat"
+)
 
+# Party and ideology controls
+party_ideo_controls <- c(
+  "Republican",
+  "Democrat",
+  "fiscal_ideology",
+  "social_ideology"
+)
+
+# FIRE dependent variables
 fire_controls <- c(
   "fire_rare",
   "fire_privilege",
@@ -512,19 +540,534 @@ fire_controls_labels <- c(
   fire_fear = "Fear other races"
 )
 
-# DV labels already defined in variable_labels_sept1.R through policy_map
-policy_labels <- setNames(
-  policy_map$label,
-  policy_map$var
+# Three specifications
+fire_control_waves <- list(
+  nocontrol = character(0),
+  pid_wave = party_controls,
+  pid_ideo_wave = party_ideo_controls
 )
 
 
-make_policy_model <- function(df, dv, iv, controls = character(0)) { #character(0) just means empty character vector so this function works for uncontrolled model then for controlled model
-  rhs <- c(iv, controls)
-  fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
+# fire_control_waves <- list(
+#   nocontrol = "multiracial",
+# 
+#   pid_wave = c(
+#     "multiracial",
+#     party_controls
+#   ),
+# 
+#   pid_ideo_wave = c(
+#     "multiracial",
+#     party_ideo_controls
+#   )
+# )
+
+
+fire_wave_order <- c(
+  "nocontrol",
+  "pid_wave",
+  "pid_ideo_wave"
+)
+
+fire_wave_labels <- c(
+  nocontrol = "Demographics only",
+  pid_wave = "Party ID",
+  pid_ideo_wave = "Party and ideology"
+)
+
+
+
+
+# ------------------------------------------------------------
+# 2. Function to estimate one model
+# ------------------------------------------------------------
+
+make_fire_model <- function(
+    df,
+    dv,
+    ivs = demo_controls,
+    controls = character(0)
+) {
+
+  # Include ALL demographic predictors in every model
+  rhs <- c(ivs, controls)
+
+  fml <- stats::reformulate(
+    termlabels = rhs,
+    response = dv
+  )
+
   lm(fml, data = df)
 }
 
+
+# ------------------------------------------------------------
+# 3. Estimate and store models by wave
+# ------------------------------------------------------------
+
+fire_dummies_waves <- list()
+
+for (wave_name in fire_wave_order) {
+
+  model_list <- list()
+
+  # One regression per FIRE dependent variable
+  for (dv in fire_controls) {
+
+    model_name <- paste0("m_", dv)
+
+    model_list[[model_name]] <- make_fire_model(
+      df = sample_no_dk,
+      dv = dv,
+      ivs = demo_controls,
+      controls = fire_control_waves[[wave_name]]
+    )
+  }
+
+  fire_dummies_waves[[wave_name]] <- model_list
+}
+
+
+# ------------------------------------------------------------
+# 4. Formatting helpers
+# ------------------------------------------------------------
+
+p_to_stars <- function(p) {
+  dplyr::case_when(
+    is.na(p) ~ "",
+    p < .001 ~ "***",
+    p < .01 ~ "**",
+    p < .05 ~ "*",
+    TRUE ~ ""
+  )
+}
+
+fmt_num <- function(x, digits = 3) {
+  ifelse(
+    is.na(x),
+    "",
+    sprintf(paste0("%.", digits, "f"), x)
+  )
+}
+
+
+# ------------------------------------------------------------
+# 5. Extract one demographic coefficient from a model
+# ------------------------------------------------------------
+
+extract_fire_wave_stats <- function(
+    dv_name,
+    iv_name,
+    wave_name,
+    model_waves = fire_dummies_waves,
+    robust = TRUE
+) {
+
+  # Each model now includes all three demographics
+  model_name <- paste0("m_", dv_name)
+
+  if (!wave_name %in% names(model_waves)) {
+    stop("Wave not found: ", wave_name)
+  }
+
+  model_list <- model_waves[[wave_name]]
+
+  if (!model_name %in% names(model_list)) {
+    stop(
+      "Model not found in wave '",
+      wave_name, "': ", model_name
+    )
+  }
+
+  mod <- model_list[[model_name]]
+
+  # Extract coefficients with HC1 robust SEs by default
+  if (robust) {
+
+    ct <- lmtest::coeftest(
+      mod,
+      vcov. = sandwich::vcovHC(mod, type = "HC1")
+    )
+
+  } else {
+
+    ct <- summary(mod)$coefficients
+
+  }
+
+  coef_table <- data.frame(
+    term = rownames(ct),
+    estimate = ct[, 1],
+    std.error = ct[, 2],
+    p.value = ct[, 4],
+    row.names = NULL
+  )
+
+  # Find the requested demographic coefficient
+  if (!iv_name %in% coef_table$term) {
+    stop(
+      "Term '", iv_name,
+      "' not found in model ", model_name
+    )
+  }
+
+  focal_row <- coef_table[
+    coef_table$term == iv_name,
+    ,
+    drop = FALSE
+  ]
+
+  tibble::tibble(
+    dv = dv_name,
+    dv_label = fire_controls_labels[[dv_name]],
+    iv = iv_name,
+    iv_label = demo_controls_labels[[iv_name]],
+    wave = wave_name,
+    wave_label = fire_wave_labels[[wave_name]],
+    estimate = focal_row$estimate,
+    std.error = focal_row$std.error,
+    p.value = focal_row$p.value,
+    n = stats::nobs(mod),
+    r2 = summary(mod)$r.squared
+  )
+}
+
+
+# ------------------------------------------------------------
+# 6. Gather demographic coefficients across all three waves
+#    for one FIRE dependent variable
+# ------------------------------------------------------------
+
+make_wave_results_long <- function(
+    dv_name,
+    model_waves = fire_dummies_waves,
+    row_vars = demo_controls,
+    waves = fire_wave_order,
+    robust = TRUE
+) {
+
+  if (!dv_name %in% fire_controls) {
+    stop("DV not found in fire_controls: ", dv_name)
+  }
+
+  rows <- lapply(row_vars, function(iv_name) {
+
+    wave_rows <- lapply(waves, function(wave_name) {
+
+      extract_fire_wave_stats(
+        dv_name = dv_name,
+        iv_name = iv_name,
+        wave_name = wave_name,
+        model_waves = model_waves,
+        robust = robust
+      )
+    })
+
+    dplyr::bind_rows(wave_rows)
+  })
+
+  dplyr::bind_rows(rows) %>%
+    dplyr::mutate(
+      iv = factor(iv, levels = row_vars),
+      wave = factor(wave, levels = waves)
+    )
+}
+
+
+# ------------------------------------------------------------
+# 7. Build wide results table for one FIRE outcome
+# ------------------------------------------------------------
+
+make_wave_results_table <- function(
+    dv_name,
+    model_waves = fire_dummies_waves,
+    row_vars = demo_controls,
+    waves = fire_wave_order,
+    robust = TRUE
+) {
+
+  results_long <- make_wave_results_long(
+    dv_name = dv_name,
+    model_waves = model_waves,
+    row_vars = row_vars,
+    waves = waves,
+    robust = robust
+  ) %>%
+    dplyr::mutate(
+
+      result = paste0(
+        fmt_num(estimate, 3),
+        p_to_stars(p.value),
+        " (",
+        fmt_num(std.error, 3),
+        ")"
+      ),
+
+      iv_label = factor(
+        iv_label,
+        levels = unname(demo_controls_labels[row_vars])
+      ),
+
+      wave_label = factor(
+        wave_label,
+        levels = unname(fire_wave_labels[waves])
+      )
+    )
+
+  results_wide <- results_long %>%
+    dplyr::select(
+      iv_label,
+      wave_label,
+      result
+    ) %>%
+    tidyr::pivot_wider(
+      names_from = wave_label,
+      values_from = result
+    ) %>%
+    dplyr::arrange(iv_label) %>%
+    dplyr::rename(
+      `Demographic characteristic` = iv_label
+    )
+
+  results_wide
+}
+
+```
+
+
+#### fire results
+
+m_fire_rare
+m_fire_privilege
+m_fire_angry
+m_fire_fear
+
+##### Systemic Racism Results
+
+```{r}
+summary(
+  fire_dummies_waves[["nocontrol"]][["m_fire_rare"]]
+)
+
+summary(
+  fire_dummies_waves[["nocontrol"]][["m_fire_privilege"]]
+)
+
+```
+A belief that racial problems are rare would suggest a lack of recognition for institutional racism. 
+
+Recognition that white people have advantages is a recognition of institutionalized racism. 
+
+Before controlling for party or political ideology, the prior does not have significant correlation. 
+
+Before controlling for party or political ideology:
+ - coded 0 to 3 (0 is least agreement that white people have advantages)
+ -  white respondents are 2.295, and it is significant. 
+ Black
+
+```{r}
+
+mod <- fire_dummies_waves[["nocontrol"]][["m_fire_privilege"]]
+
+hist(
+  model.response(model.frame(mod)),
+  main = "Distribution of White Privilege Attitudes",
+  xlab = "FIRE: White Privilege",
+  col = "lightblue"
+)
+
+hist(
+  fitted(mod),
+  main = "Distribution of Predicted Values",
+  xlab = "Predicted FIRE: White Privilege",
+  col = "lightblue"
+)
+
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+sample_no_dk %>%
+  dplyr::select(fire_privilege, White, Black, Hisp_Latino, AllOthers) %>%
+
+  pivot_longer(
+    cols = c(White, Black, Hisp_Latino, AllOthers),
+    names_to = "race",
+    values_to = "selected"
+  ) %>%
+
+  filter(selected == 1, !is.na(fire_privilege)) %>%
+
+  mutate(
+    race = factor(
+      race,
+      levels = c("White", "Black", "Hisp_Latino", "AllOthers"),
+      labels = c("White", "Black", "Hispanic/Latino", "Other")
+    )
+  ) %>%
+
+  ggplot(aes(x = race, y = fire_privilege)) +
+  geom_boxplot(fill = "lightblue", alpha = 0.7) +
+  labs(
+    title = "White Privilege Attitudes by Racial Identity",
+    x = "Racial/Ethnic Identity",
+    y = "FIRE: White Privilege"
+  ) +
+  theme_minimal()
+
+```
+
+```{r}
+
+wp_experience <- lm(fire_privilege ~ incarc + Republican, data = sample_no_dk)
+
+summary(wp_experience)
+
+```
+
+```{r}
+# rare 
+
+sample_no_dk %>%
+  dplyr::select(fire_rare, White, Black, Hisp_Latino, AllOthers) %>%
+
+  pivot_longer(
+    cols = c(White, Black, Hisp_Latino, AllOthers),
+    names_to = "race",
+    values_to = "selected"
+  ) %>%
+
+  filter(selected == 1, !is.na(fire_rare)) %>%
+
+  mutate(
+    race = factor(
+      race,
+      levels = c("White", "Black", "Hisp_Latino", "AllOthers"),
+      labels = c("White", "Black", "Hispanic/Latino", "Other")
+    )
+  ) %>%
+
+  ggplot(aes(x = race, y = fire_rare)) +
+  geom_boxplot(fill = "lightblue", alpha = 0.7) +
+  labs(
+    title = "Racial Problems Rare Attitudes by Racial Identity",
+    x = "Racial/Ethnic Identity",
+    y = "FIRE: Rare"
+  ) +
+  theme_minimal()
+
+```
+
+
+
+
+##### Angry Results
+
+
+```{r}
+
+
+summary(
+  fire_dummies_waves[["pid_ideo_wave"]][["m_fire_angry"]]
+)
+
+
+```
+
+```{r}
+
+sample_no_dk %>%
+  dplyr::select(fire_angry, White, Black, Hisp_Latino, AllOthers) %>%
+
+  pivot_longer(
+    cols = c(White, Black, Hisp_Latino, AllOthers),
+    names_to = "race",
+    values_to = "selected"
+  ) %>%
+
+  filter(selected == 1, !is.na(fire_angry)) %>%
+
+  mutate(
+    race = factor(
+      race,
+      levels = c("White", "Black", "Hisp_Latino", "AllOthers"),
+      labels = c("White", "Black", "Hispanic/Latino", "Other")
+    )
+  ) %>%
+
+  ggplot(aes(x = race, y = fire_angry)) +
+  geom_boxplot(fill = "lightblue", alpha = 0.7) +
+  labs(
+    title = "Angry about Racism by Racial Identity",
+    x = "Racial/Ethnic Identity",
+    y = "FIRE: Angry Re: Racism"
+  ) +
+  theme_minimal()
+
+```
+
+##### Fear Results
+
+```{r}
+
+sample_no_dk %>%
+  dplyr::select(fire_fear, White, Black, Hisp_Latino, AllOthers) %>%
+
+  pivot_longer(
+    cols = c(White, Black, Hisp_Latino, AllOthers),
+    names_to = "race",
+    values_to = "selected"
+  ) %>%
+
+  filter(selected == 1, !is.na(fire_fear)) %>%
+
+  mutate(
+    race = factor(
+      race,
+      levels = c("White", "Black", "Hisp_Latino", "AllOthers"),
+      labels = c("White", "Black", "Hispanic/Latino", "Other")
+    )
+  ) %>%
+
+  ggplot(aes(x = race, y = fire_fear)) +
+  geom_boxplot(fill = "lightblue", alpha = 0.7) +
+  labs(
+    title = "Fear Other Races by Racial Identity",
+    x = "Racial/Ethnic Identity",
+    y = "FIRE: Fear Other Races"
+  ) +
+  theme_minimal()
+
+```
+
+
+```{r}
+
+summary(
+  fire_dummies_waves[["nocontrol"]][["m_fire_fear"]]
+)
+
+summary(
+  fire_dummies_waves[["pid_ideo_wave"]][["m_fire_fear"]]
+)
+
+```
+
+
+
+
+```{r}
+fire_results_tables <- lapply(
+  fire_controls,
+  make_wave_results_table
+)
+
+names(fire_results_tables) <- fire_controls
+
+fire_results_tables
 
 ```
 
@@ -534,6 +1077,8 @@ make_policy_model <- function(df, dv, iv, controls = character(0)) { #character(
 ## A. Name waves
 
 Each wave is controls, so first group controls (tho these should already/eventually be clear in variable labels R file)
+
+
 
 ```{r}
 demo_controls <- c(

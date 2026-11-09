@@ -9,22 +9,709 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+### FIRE
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Checking the relationship between FIRE battery and respondents across race. Why? I'm trying to decide whether these are appropriate controls to include in my policy analyses and deservingness score analyses. The batery was constructed to capture contemporary white racial attitudes. 
 
-```{r cars}
-summary(cars)
+If I include them, I should be able to explain what it means to apply these (or some combination, maybe just one) of these controls to white respondents and non-white respondents. 
+
+But equally as important is that I need to clarify why these are appropriate controls given my question and theory. 
+
+My supposition is that experience with the carceral state might:
+- shape policy preferences because 
+
+(a) it distributes information. I expect this information -> more support for policies that distribute rights and resources
+-> more certainty in support for less visible and "harder" issues. 
+
+(b1) information may acculuate/ be interpreted into distinct frameworks for understanding ie scripts
+
+(b2) information may acculuate/ be interpreted into institutional distrust  --> question dominant messages and scripts (would expect to deserving social construction scores that are fairly significantly higher for targets)
+
+but there's also this element of race-class subjugation. Soss and Weaver might push back on this (RCS is relational, not like a single positivist measure), but if communities of color already have more proximal and direct exposure, they might already have different knowledge frameworks for interpretation (this also is Cohen & L). They would be more likely to understand race as important -- or their "script" would be one of more recognition of systemic racism or institutionalized racism -- in some ways, an opposing script fromt he standard punitive/personal responsibility script. 
+
+# alternative
+
+```{r}
+
+# ------------------------------------------------------------
+# 1. Define variables and model waves
+# ------------------------------------------------------------
+
+# Focal demographic predictors
+demo_controls <- c(
+  "Black",
+  "Hisp_Latino",
+  "AllOthers"
+)
+
+demo_controls_labels <- c(
+  Black = "Black",
+  Hisp_Latino = "Hispanic/Latino",
+  AllOthers = "Other RID"
+)
+
+# Party controls
+party_controls <- c(
+  "Republican",
+  "Democrat"
+)
+
+# Party and ideology controls
+party_ideo_controls <- c(
+  "Republican",
+  "Democrat",
+  "fiscal_ideology",
+  "social_ideology"
+)
+
+# FIRE dependent variables
+fire_controls <- c(
+  "fire_rare",
+  "fire_privilege",
+  "fire_angry",
+  "fire_fear"
+)
+
+fire_controls_labels <- c(
+  fire_rare = "Racism rare",
+  fire_privilege = "White privilege",
+  fire_angry = "Angry about racism",
+  fire_fear = "Fear other races"
+)
+
+# Three specifications
+fire_control_waves <- list(
+  nocontrol = character(0),
+  pid_wave = party_controls,
+  pid_ideo_wave = party_ideo_controls
+)
+
+fire_wave_order <- c(
+  "nocontrol",
+  "pid_wave",
+  "pid_ideo_wave"
+)
+
+fire_wave_labels <- c(
+  nocontrol = "Demographics only",
+  pid_wave = "Party ID",
+  pid_ideo_wave = "Party and ideology"
+)
+
+
+# ------------------------------------------------------------
+# 2. Function to estimate one model
+# ------------------------------------------------------------
+
+make_fire_model <- function(
+    df,
+    dv,
+    ivs = demo_controls,
+    controls = character(0)
+) {
+
+  # Include ALL demographic predictors in every model
+  rhs <- c(ivs, controls)
+
+  fml <- stats::reformulate(
+    termlabels = rhs,
+    response = dv
+  )
+
+  lm(fml, data = df)
+}
+
+
+# ------------------------------------------------------------
+# 3. Estimate and store models by wave
+# ------------------------------------------------------------
+
+fire_dummies_waves <- list()
+
+for (wave_name in fire_wave_order) {
+
+  model_list <- list()
+
+  # One regression per FIRE dependent variable
+  for (dv in fire_controls) {
+
+    model_name <- paste0("m_", dv)
+
+    model_list[[model_name]] <- make_fire_model(
+      df = sample_no_dk,
+      dv = dv,
+      ivs = demo_controls,
+      controls = fire_control_waves[[wave_name]]
+    )
+  }
+
+  fire_dummies_waves[[wave_name]] <- model_list
+}
+
+
+# ------------------------------------------------------------
+# 4. Formatting helpers
+# ------------------------------------------------------------
+
+p_to_stars <- function(p) {
+  dplyr::case_when(
+    is.na(p) ~ "",
+    p < .001 ~ "***",
+    p < .01 ~ "**",
+    p < .05 ~ "*",
+    TRUE ~ ""
+  )
+}
+
+fmt_num <- function(x, digits = 3) {
+  ifelse(
+    is.na(x),
+    "",
+    sprintf(paste0("%.", digits, "f"), x)
+  )
+}
+
+
+# ------------------------------------------------------------
+# 5. Extract one demographic coefficient from a model
+# ------------------------------------------------------------
+
+extract_fire_wave_stats <- function(
+    dv_name,
+    iv_name,
+    wave_name,
+    model_waves = fire_dummies_waves,
+    robust = TRUE
+) {
+
+  # Each model now includes all three demographics
+  model_name <- paste0("m_", dv_name)
+
+  if (!wave_name %in% names(model_waves)) {
+    stop("Wave not found: ", wave_name)
+  }
+
+  model_list <- model_waves[[wave_name]]
+
+  if (!model_name %in% names(model_list)) {
+    stop(
+      "Model not found in wave '",
+      wave_name, "': ", model_name
+    )
+  }
+
+  mod <- model_list[[model_name]]
+
+  # Extract coefficients with HC1 robust SEs by default
+  if (robust) {
+
+    ct <- lmtest::coeftest(
+      mod,
+      vcov. = sandwich::vcovHC(mod, type = "HC1")
+    )
+
+  } else {
+
+    ct <- summary(mod)$coefficients
+
+  }
+
+  coef_table <- data.frame(
+    term = rownames(ct),
+    estimate = ct[, 1],
+    std.error = ct[, 2],
+    p.value = ct[, 4],
+    row.names = NULL
+  )
+
+  # Find the requested demographic coefficient
+  if (!iv_name %in% coef_table$term) {
+    stop(
+      "Term '", iv_name,
+      "' not found in model ", model_name
+    )
+  }
+
+  focal_row <- coef_table[
+    coef_table$term == iv_name,
+    ,
+    drop = FALSE
+  ]
+
+  tibble::tibble(
+    dv = dv_name,
+    dv_label = fire_controls_labels[[dv_name]],
+    iv = iv_name,
+    iv_label = demo_controls_labels[[iv_name]],
+    wave = wave_name,
+    wave_label = fire_wave_labels[[wave_name]],
+    estimate = focal_row$estimate,
+    std.error = focal_row$std.error,
+    p.value = focal_row$p.value,
+    n = stats::nobs(mod),
+    r2 = summary(mod)$r.squared
+  )
+}
+
+
+# ------------------------------------------------------------
+# 6. Gather demographic coefficients across all three waves
+#    for one FIRE dependent variable
+# ------------------------------------------------------------
+
+make_wave_results_long <- function(
+    dv_name,
+    model_waves = fire_dummies_waves,
+    row_vars = demo_controls,
+    waves = fire_wave_order,
+    robust = TRUE
+) {
+
+  if (!dv_name %in% fire_controls) {
+    stop("DV not found in fire_controls: ", dv_name)
+  }
+
+  rows <- lapply(row_vars, function(iv_name) {
+
+    wave_rows <- lapply(waves, function(wave_name) {
+
+      extract_fire_wave_stats(
+        dv_name = dv_name,
+        iv_name = iv_name,
+        wave_name = wave_name,
+        model_waves = model_waves,
+        robust = robust
+      )
+    })
+
+    dplyr::bind_rows(wave_rows)
+  })
+
+  dplyr::bind_rows(rows) %>%
+    dplyr::mutate(
+      iv = factor(iv, levels = row_vars),
+      wave = factor(wave, levels = waves)
+    )
+}
+
+
+# ------------------------------------------------------------
+# 7. Build wide results table for one FIRE outcome
+# ------------------------------------------------------------
+
+make_wave_results_table <- function(
+    dv_name,
+    model_waves = fire_dummies_waves,
+    row_vars = demo_controls,
+    waves = fire_wave_order,
+    robust = TRUE
+) {
+
+  results_long <- make_wave_results_long(
+    dv_name = dv_name,
+    model_waves = model_waves,
+    row_vars = row_vars,
+    waves = waves,
+    robust = robust
+  ) %>%
+    dplyr::mutate(
+
+      result = paste0(
+        fmt_num(estimate, 3),
+        p_to_stars(p.value),
+        " (",
+        fmt_num(std.error, 3),
+        ")"
+      ),
+
+      iv_label = factor(
+        iv_label,
+        levels = unname(demo_controls_labels[row_vars])
+      ),
+
+      wave_label = factor(
+        wave_label,
+        levels = unname(fire_wave_labels[waves])
+      )
+    )
+
+  results_wide <- results_long %>%
+    dplyr::select(
+      iv_label,
+      wave_label,
+      result
+    ) %>%
+    tidyr::pivot_wider(
+      names_from = wave_label,
+      values_from = result
+    ) %>%
+    dplyr::arrange(iv_label) %>%
+    dplyr::rename(
+      `Demographic characteristic` = iv_label
+    )
+
+  results_wide
+}
+
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+# older
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+sample_no_dk %>%
+  dplyr::count(
+   White,
+     Black,
+    Hisp_Latino,
+    AllOthers
+  )
+
+
+demo_controls <- c(
+  "Black", "Hisp_Latino", "AllOthers", "gender"
+)
+
+demo_controls_labels <- c(
+  Black = "Black",
+  Hisp_Latino    = "Hispanic/Latino", 
+  AllOthers = "Other RID",
+  gender = "Men"
+)
+
+
+party_controls <- c(
+  "Republican",
+  "Democrat"
+)
+
+party_controls_labels <- c(
+  Republican = "Republican",
+  Democrat = "Democrat"
+)
+
+
+party_ideo_controls <- c(
+  "Republican",
+  "Democrat",
+  "fiscal_ideology",
+  "social_ideology"
+)
+
+party_ideo_controls_labels <- c(
+  # pid_3 = "Party ID",
+  Republican = "Republican",
+  Democrat = "Democrat",
+  fiscal_ideology = "Fiscal ideology",
+  social_ideology = "Social ideology"
+)
+
+fire_controls <- c(
+  "fire_rare",
+  "fire_privilege",
+  "fire_angry",
+  "fire_fear"
+)
+
+fire_controls_labels <- c(
+  fire_rare = "Racism rare",
+  fire_privilege = "White privilege",
+  fire_angry = "Angry about racism",
+  fire_fear = "Fear other races"
+)
+
+
+fire_control_waves <- list(
+  nocontrol = character(0),
+  pid_wave = party_controls,
+  pid_ideo_wave = party_ideo_controls
+)
+
+fire_wave_order <- c(
+  "nocontrol",
+  "pid_wave",
+  "pid_ideo_wave"
+)
+
+fire_wave_labels <- c(
+  nocontrol = "No Controls",
+  pid_wave = "partyID",
+  pid_ideo_wave = "party and ideo"
+)
+
+
+
+make_fire_model <- function(df, dv, iv, controls = character(0)) { #character(0) just means empty character vector so this function works for uncontrolled model then for controlled model
+  rhs <- c(iv, controls)
+  fml <- as.formula(paste(dv, "~", paste(rhs, collapse = " + ")))
+  lm(fml, data = df)
+}
+
+fire_dummies_waves <- list()
+
+
+for (wave_name in names(fire_control_waves)) {#calls list of waves in control waves
+
+  model_list <- list() #fresh model list within each wave
+
+  for (dv in fire_controls) {
+    for (iv in demo_controls) { #loop thru dvs, ivs, labels file gives the 4 ivs; fits  models for each outcome
+
+      model_name <- paste0("m_", dv, "_", iv) #ie model using prisonhelp and incarc will be named m_prisonhelp_incarc
+
+      # NOW, actually telling it to run and store the regressions
+      model_list[[model_name]] <- make_fire_model(
+        df = sample_no_dk,
+        dv = dv, 
+        iv = iv,
+        controls = fire_control_waves[[wave_name]]
+      )
+    }
+  }
+
+  fire_dummies_waves[[wave_name]] <- model_list
+}
+
+
+# ------------------------------------------------------------
+# 2. Helpers for extracting and formatting one focal estimate
+# ------------------------------------------------------------
+
+p_to_stars <- function(p) {
+  dplyr::case_when(
+    is.na(p) ~ "",
+    p < .001 ~ "***",
+    p < .01  ~ "**",
+    p < .05  ~ "*",
+    TRUE     ~ ""
+  )
+}
+
+fmt_num <- function(x, digits = 3) {
+  ifelse(
+    is.na(x),
+    "",
+    sprintf(paste0("%.", digits, "f"), x)
+  )
+}
+
+
+extract_fire_wave_stats <- function(
+    dv_name,
+    iv_name,
+    wave_name,
+    model_waves = fire_dummies_waves,
+    robust = TRUE
+) {
+
+  # Model names follow the naming system created in your main loop:
+  # e.g. m_prisonhelp_incarc
+  model_name <- paste0("m_", dv_name, "_", iv_name)
+
+  # Check that requested wave exists
+  if (!wave_name %in% names(model_waves)) {
+    stop("Wave not found: ", wave_name)
+  }
+
+  # Pull that wave's model list
+  model_list <- model_waves[[wave_name]]
+
+  # Check that requested model exists
+  if (!model_name %in% names(model_list)) {
+    stop(
+      "Model not found in wave '",
+      wave_name,
+      "': ",
+      model_name
+    )
+  }
+
+  # Pull the actual lm object
+  mod <- model_list[[model_name]]
+
+  # Extract coefficient information
+  if (robust) {
+
+    ct <- lmtest::coeftest(
+      mod,
+      vcov. = sandwich::vcovHC(mod, type = "HC1")
+    )
+
+    coef_table <- data.frame(
+      term = rownames(ct),
+      estimate = ct[, 1],
+      std.error = ct[, 2],
+      p.value = ct[, 4],
+      row.names = NULL
+    )
+
+  } else {
+
+    sm <- summary(mod)$coefficients
+
+    coef_table <- data.frame(
+      term = rownames(sm),
+      estimate = sm[, 1],
+      std.error = sm[, 2],
+      p.value = sm[, 4],
+      row.names = NULL
+    )
+  }
+
+  # The focal coefficient should have the same name as the IV:
+  # impact, incarc, knowincarc, or vict
+  if (!iv_name %in% coef_table$term) {
+    stop(
+      "Term '",
+      iv_name,
+      "' not found in model ",
+      model_name
+    )
+  }
+
+  focal_row <- coef_table[
+    coef_table$term == iv_name,
+  ]
+
+  # Return one tidy row
+  tibble::tibble(
+    dv = dv_name,
+    dv_label = policy_labels[[dv_name]],
+    iv = iv_name,
+    iv_label = impact_labels[[iv_name]],
+    wave = wave_name,
+    wave_label = wave_labels[[wave_name]],
+    estimate = focal_row$estimate,
+    std.error = focal_row$std.error,
+    p.value = focal_row$p.value,
+    n = stats::nobs(mod),
+    r2 = summary(mod)$r.squared
+  )
+}
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+# ------------------------------------------------------------
+# 3. Gather all four IVs x all four waves for one DV
+# ------------------------------------------------------------
+
+make_wave_results_long <- function(
+    dv_name,
+    model_waves = fire_dummies_waves,
+    row_vars = demo_controls,
+    waves = fire_wave_order,
+    robust = TRUE
+) {
+
+  # Confirm requested DV belongs to current policy outcome set
+  if (!dv_name %in% fire_controls) {
+    stop(
+      "DV not found in fire_controls: ",
+      dv_name
+    )
+  }
+
+  rows <- lapply(row_vars, function(iv_name) {
+
+    wave_rows <- lapply(waves, function(wave_name) {
+
+      extract_fire_wave_stats(
+        dv_label =
+          fire_controls_labels[[dv_name]],
+        iv_label = demo_controls_labels[[iv_name]],
+        wave_name = wave_name,
+        model_waves = model_waves,
+        robust = robust
+      )
+    })
+
+    dplyr::bind_rows(wave_rows)
+  })
+
+  dplyr::bind_rows(rows) %>%
+    dplyr::mutate(
+      iv = factor(
+        iv,
+        levels = row_vars
+      ),
+      wave = factor(
+        wave,
+        levels = waves
+      )
+    )
+}
+
+
+# ------------------------------------------------------------
+# 4. Build one wide inspection table for one DV
+# ------------------------------------------------------------
+
+make_wave_results_table <- function(
+    dv_name,
+    model_waves = fire_dummies_waves,
+    row_vars = demo_controls,
+    waves = fire_wave_order,
+    robust = TRUE
+) {
+
+  results_long <- make_wave_results_long(
+    dv_name = dv_name,
+    model_waves = model_waves,
+    row_vars = row_vars,
+    waves = waves,
+    robust = robust
+  ) %>%
+    dplyr::mutate(
+
+      result = paste0(
+        fmt_num(estimate, 3),
+        p_to_stars(p.value),
+        " (",
+        fmt_num(std.error, 3),
+        ")"
+      ),
+
+      # Preserve demographic row order
+      iv_label = factor(
+        iv_label,
+        levels = unname(demo_controls_labels[row_vars])
+      ),
+
+      # Preserve model-wave column order
+      wave_label = factor(
+        wave_label,
+        levels = unname(fire_wave_labels[waves])
+      )
+    )
+
+  results_wide <- results_long %>%
+    dplyr::select(
+      iv_label,
+      wave_label,
+      result
+    ) %>%
+    tidyr::pivot_wider(
+      names_from = wave_label,
+      values_from = result
+    ) %>%
+    dplyr::arrange(iv_label) %>%
+    dplyr::rename(
+      `Demographic characteristic` = iv_label
+    )
+
+  results_wide
+}
+
+```
+
+#### fire results
+
+```{r}
+
+names(fire_dummies_waves[["nocontrol"]])
+
+
+```
+

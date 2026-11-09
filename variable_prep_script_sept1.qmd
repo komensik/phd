@@ -398,10 +398,10 @@ raw_data_cleaned <- raw_data_cleaned %>%
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(fire_privilege)
     ~ case_when(
-      . == 1 ~ 3,
+      . == 1 ~ 3,#originally, 1 meant you agree, now 3 means agree
       . == 2 ~ 2,
       . == 3 ~ 1,
-      . == 4 ~ 0,
+      . == 4 ~ 0,#originally, 4 meant strong disagree, now 0 means strong disagree
       TRUE ~ NA_real_
     )
 
