@@ -88,6 +88,18 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="impact-plus-constructing-for-analysis" class="level4">
 <h4 class="anchored" data-anchor-id="impact-plus-constructing-for-analysis">Impact Plus (Constructing For-Analysis)</h4>
+<p>Checking Impact Counts</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 11
+  impact     n total incarc incarc_pct knowincarc knowincarc_pct  vict vict_pct
+   &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+1      0  1361  2327      0       0             0            0       0      0  
+2      1   852  2327    168       7.22        685           29.4   275     11.8
+3     NA   114  2327      0       0             0            0       0      0  
+# ℹ 2 more variables: any_impact &lt;dbl&gt;, any_impact_pct &lt;dbl&gt;</code></pre>
+</div>
+</div>
 </section>
 </section>
 <section id="b.-other-experiences" class="level3">
@@ -124,7 +136,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="variable_prep_script_sept1_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="variable_prep_script_sept1_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -147,10 +159,24 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <p>Index?</p>
 </section>
+</section>
+<section id="survey-example" class="level1">
+<h1>Survey Example</h1>
 <section id="e.-race" class="level3">
 <h3 class="anchored" data-anchor-id="e.-race">E. Race</h3>
-<p>q51_ ▢ White (1) ▢ Black or African American (2) ▢ Native American / Alaska Native (3) ▢ Asian / Asian American (4) ▢ Native Hawaiian / Other Pacific Islander (5) ▢ Middle Eastern/ North African (6) ▢ Hispanic/Latino/a/e (7) ▢ My preferred response not listed (8)</p>
-<p>-measured as set of binary indicator variables in the survey, rather than as one categorical race variable. - 1 = selected that category - 0 = ? did not select? - NA = c</p>
+<p>q51: What racial or ethnic group best describes you? Select one or more.</p>
+<p>▢ White (1)</p>
+<p>▢ Black or African American (2)</p>
+<p>▢ Native American / Alaska Native (3)</p>
+<p>▢ Asian / Asian American (4)</p>
+<p>▢ Native Hawaiian / Other Pacific Islander (5)</p>
+<p>▢ Middle Eastern/ North African (6)</p>
+<p>▢ Hispanic/Latino/a/e (7)</p>
+<p>▢ My preferred response not listed (8)</p>
+<p>(measured as set of binary indicator variables in the survey, rather than as one categorical race variable.</p>
+<p>1 = selected that category</p>
+<p>0 = did not select</p>
+<p>NA = skipped</p>
 <p>Responses – noting consistent NAs so NAs are missing</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -167,6 +193,12 @@ ul.task-list li input[type="checkbox"] {
 8 race_notlisted  1582    20   725</code></pre>
 </div>
 </div>
+<p>How many respondents?</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2327</code></pre>
+</div>
+</div>
 <p>How many multiracial respondents?</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -179,19 +211,14 @@ ul.task-list li input[type="checkbox"] {
 4       3    19
 5       4     6</code></pre>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 2
-  multiracial     n
-  &lt;lgl&gt;       &lt;int&gt;
-1 FALSE        1384
-2 TRUE          218
-3 NA            725</code></pre>
 </div>
+<div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
  0.0000  0.0000  1.0000  0.7954  1.0000  4.0000 </code></pre>
 </div>
 </div>
+<p>193 + 19 + 6 = 218</p>
 <p>I have 218 multiracial respondents.</p>
 <section id="multiracial-var" class="level4">
 <h4 class="anchored" data-anchor-id="multiracial-var">multiracial var</h4>
