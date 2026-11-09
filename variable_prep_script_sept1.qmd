@@ -360,61 +360,57 @@ fire_fear: I am fearful of other races
 - 1 is strongly agree, 4 is strongly disagree
 
 ```{r}
-fire_vars <- c("fire_rare", "fire_privilege", "fire_angry", "fire_fear")
+fire_vars <- c(
+  "fire_rare",
+  "fire_privilege",
+  "fire_angry",
+  "fire_fear"
+)
 
-
+# Convert -99 to NA and ensure numeric variables
 raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
     all_of(fire_vars),
     ~ as.numeric(na_if(as.character(.x), "-99"))
   ))
 
-
-hist(raw_data_cleaned$fire_privilege)
-
+# Recode FIRE variables to 0–3
 raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(fire_rare)
-    ~ case_when(
-      . == 1 ~ 0,
-      . == 2 ~ 1,
-      . == 3 ~ 2,
-      . == 4 ~ 3,
+  mutate(
+    # Original 1–4 becomes 0–3
+    fire_rare = case_when(
+      fire_rare == 1 ~ 0,
+      fire_rare == 2 ~ 1,
+      fire_rare == 3 ~ 2,
+      fire_rare == 4 ~ 3,
+      TRUE ~ NA_real_
+    ),
+    
+    fire_fear = case_when(
+      fire_fear == 1 ~ 0,
+      fire_fear == 2 ~ 1,
+      fire_fear == 3 ~ 2,
+      fire_fear == 4 ~ 3,
+      TRUE ~ NA_real_
+    ),
+    
+    # Reverse coding: original 1 becomes 3
+    fire_privilege = case_when(
+      fire_privilege == 1 ~ 3,
+      fire_privilege == 2 ~ 2,
+      fire_privilege == 3 ~ 1,
+      fire_privilege == 4 ~ 0,
+      TRUE ~ NA_real_
+    ),
+    
+    fire_angry = case_when(
+      fire_angry == 1 ~ 3,
+      fire_angry == 2 ~ 2,
+      fire_angry == 3 ~ 1,
+      fire_angry == 4 ~ 0,
       TRUE ~ NA_real_
     )
-
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(fire_fear)
-~ case_when(
-  . == 1 ~ 0,
-  . == 2 ~ 1,
-  . == 3 ~ 2,
-  . == 4 ~ 3,
-  TRUE ~ NA_real_
-)
-
-# reversing the two where higher OG scores indicate  greater rejection of the idea of white privilege and less anger abt racism. This way, higher scores will mean greater recognition of white privilege and more anger about racism (empathy).
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(fire_privilege)
-    ~ case_when(
-      . == 1 ~ 3,#originally, 1 meant you agree, now 3 means agree
-      . == 2 ~ 2,
-      . == 3 ~ 1,
-      . == 4 ~ 0,#originally, 4 meant strong disagree, now 0 means strong disagree
-      TRUE ~ NA_real_
-    )
-
-
-raw_data_cleaned <- raw_data_cleaned %>%
-  mutate(fire_angry)
-~ case_when(
-  . == 1 ~ 3,
-  . == 2 ~ 2,
-  . == 3 ~ 1,
-  . == 4 ~ 0,
-  TRUE ~ NA_real_
-)
+  )
 
  hist(raw_data_cleaned$fire_privilege)
 
@@ -446,8 +442,6 @@ Index?
 # alpha_result
 
 ```
-
-# Survey Example
 
 ### E. Race
 
