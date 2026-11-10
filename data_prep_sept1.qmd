@@ -5,6 +5,7 @@ editor: visual
 ---
 
 ```{r setup, include=TRUE}
+
 knitr::opts_chunk$set(
   echo = FALSE,       # Hide code by default
   warning = FALSE,
@@ -51,7 +52,7 @@ raw_data <- clean_names(raw_data)
 
 respondent_state_county <- read_excel("./data/raw/respondent_state_county.xlsx")
 
-view(respondent_state_county)
+#view(respondent_state_county)
 
 # lookup table
 state_county_lookup <- respondent_state_county %>%
@@ -341,6 +342,9 @@ raw_data <- raw_data %>%
     other_sexuality  = q78_6
   
   )
+
+
+
 ```
 
 #### b2. Cleaned data frame, deleting un-needed vars
