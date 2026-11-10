@@ -31,25 +31,313 @@ library(ggplot2)
 library(broom)
 library(knitr)
 
-source("variable_labels.R")
+source("variable_labels_sept1.R")
 ```
 
 ```{r}
+
 sample <- read_csv("data/cleaned_control_data.csv")
 
 not_full <- read_csv("data/cleaned_sans_control_data.csv")
+
+
+# drop variables not working with, keep variables working with 
+## Some variables were dropped in Data_Junction.rmd
+## See variable_labels_sept1
+
+
+more_needed_vars <- unique(c( ##variables I need that are n
+  "state",
+  "county"
+))
+
+policy_analysis_vars <- c(
+  impact_vars, 
+  q25_help_vars,
+  policy_vars,
+  police_items,
+  deserving_vars,
+  political_behavior_vars,
+  race_vars,
+  demo_controls,
+  party_ideo_controls,
+  desor_core_vars,
+  fire_controls,
+  ration_vars,
+  experience_buffet,
+  all_dk_vars,
+  more_needed_vars
+)
+
+
+# sample will only have variables I know I'm using:
+sample <- sample %>%
+  dplyr::select(all_of(policy_analysis_vars))
+
+#names(sample)
 ```
+
 
 
 # 1. Policy
 
-## 2.1 Policy Means x Impact
+## A Means
 
 ```{r}
-
 sample %>%
   dplyr::select(all_of(policy_vars)) %>%
   psych::describe()
+```
+
+## B Stacked Bar Chart - Exclude IDK
+Setup for reports that include IDK as middle value
+```{r}
+
+# Six individual policies coded 1–4
+four_vars <- c(
+  "min_wage",
+  "free_calls",
+  "ed_funds",
+  "alt_sentencing",
+  "dpen_rev",
+  "lwop_rev"
+)
+
+# Two voting-rights policies coded 1–2
+vote_vars <- c(
+  "post_felony_vote_rev",
+  "jail_access_rev"
+)
+
+# Two indices, each ranging from 1–4
+index_vars <- c(
+  "prisonhelp",
+  "prisonpen"
+)
+
+# Labels for figures
+policy_labels <- c(
+  min_wage = "Minimum wage",
+  free_calls = "Free phone calls",
+  ed_funds = "Education funding",
+  alt_sentencing = "Alternative sentencing",
+  dpen_rev = "Death penalty",
+  lwop_rev = "Life without parole",
+  prisonhelp = "Help index",
+  prisonpen = "Punishment index",
+  post_felony_vote_rev = "Voting rights after felony conviction",
+  jail_access_rev = "Voting access while in jail"
+)
+
+# Create folder for figures
+dir.create("figures", showWarnings = FALSE,
+           recursive = TRUE)
+
+```
+
+### Response Percentages
+
+```{r}
+policy_dist <- sample %>%
+  dplyr::select(all_of(four_vars)) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "variable",
+    values_to = "response"
+  ) %>%
+  filter(!is.na(response), response %in% 1:4) %>%
+  count(variable, response, name = "n") %>%
+  complete(
+    variable = four_vars,
+    response = 1:4,
+    fill = list(n = 0)
+  ) %>%
+  group_by(variable) %>%
+  mutate(
+    N = sum(n),
+    pct = 100 * n / N
+  ) %>%
+  ungroup()
+
+# Check the resulting percentages
+policy_dist
+```
+```{r}
+policy_dist <- policy_dist %>%
+  group_by(variable) %>%
+  mutate(
+    p1 = pct[response == 1],
+    p2 = pct[response == 2],
+    p3 = pct[response == 3],
+    p4 = pct[response == 4],
+
+    xmin = case_when(
+      response == 1 ~ -(p1 + p2),
+      response == 2 ~ -p2,
+      response == 3 ~ 0,
+      response == 4 ~ p3
+    ),
+
+    xmax = case_when(
+      response == 1 ~ -p2,
+      response == 2 ~ 0,
+      response == 3 ~ p3,
+      response == 4 ~ p3 + p4
+    ),
+
+    y = match(variable, rev(four_vars))
+  ) %>%
+  ungroup()
+
+# Labels with sample sizes
+policy_ns <- policy_dist %>%
+  distinct(variable, N)
+
+axis_labels_A <- paste0(
+  unname(policy_labels[rev(four_vars)]),
+  " (n = ",
+  policy_ns$N[match(rev(four_vars), policy_ns$variable)],
+  ")"
+)
+
+## Create figure
+
+plot_A <- ggplot(policy_dist) +
+
+  geom_rect(
+    aes(
+      xmin = xmin,
+      xmax = xmax,
+      ymin = y - 0.35,
+      ymax = y + 0.35,
+      fill = factor(response, levels = 1:4)
+    ),
+    color = "white",
+    linewidth = 0.3
+  ) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "grey30",
+    linewidth = 0.5
+  ) +
+
+  scale_fill_manual(
+    values = c(
+      "1" = "#B35806",
+      "2" = "#F1A340",
+      "3" = "#92C5DE",
+      "4" = "#2166AC"
+    ),
+    labels = c(
+      "Strongly oppose",
+      "Somewhat oppose",
+      "Somewhat support",
+      "Strongly support"
+    ),
+    name = NULL
+  ) +
+
+  scale_x_continuous(
+    breaks = c(-100, -50, 0, 50, 100),
+    labels = c("100", "50", "0", "50", "100"),
+    limits = c(-100, 100)
+  ) +
+
+  scale_y_continuous(
+    breaks = seq_along(four_vars),
+    labels = axis_labels_A,
+    expand = expansion(add = 0.6)
+  ) +
+
+  labs(
+    title = "Distribution of policy preferences",
+    subtitle = "Opposition (left) and support (right)",
+    x = "Percentage of valid responses",
+    y = NULL,
+    caption = paste(
+      "Percentages exclude missing and uncertain responses.",
+      "Sample sizes vary by policy due to skipped questions and responses of unsure/no opinion."
+    )
+  ) +
+
+  theme_minimal(base_size = 11) +
+
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "bottom",
+    legend.text = element_text(size = 9),
+    plot.title = element_text(face = "bold"),
+    axis.text.y = element_text(color = "black"),
+    plot.caption = element_text(hjust = 0)
+  )
+
+# Display in R
+plot_A
+
+# Export to Overleaf
+ggsave(
+  "figures/option_A_policy_distribution.pdf",
+  plot = plot_A,
+  width = 9,
+  height = 5.2,
+  units = "in"
+)
+```
+
+## Stacked Bar Chart - Include IDK
+
+```{r}
+# 
+# # Six individual policies coded 1–4
+# four_vars <- c(
+#   "dk_min_wage",
+#   "dk_free_calls",
+#   "dk_ed_funds",
+#   "dk_alt_sentencing",
+#   "dk_dpen_rev",
+#   "dk_lwop_rev"
+# )
+# 
+# # Two voting-rights policies coded 1–2
+# vote_vars <- c(
+#   "dk_post_felony_vote_rev",
+#   "dk_jail_access_rev"
+# )
+# 
+# # Two indices, each ranging from 1–4
+# index_vars <- c(
+#   "dk_prisonhelp",
+#   "dk_prisonpen"
+# )
+# 
+# # Labels for figures
+# policy_labels <- c(
+#   dk_min_wage = "Minimum wage",
+#   dk_free_calls = "Free phone calls",
+#   dk_ed_funds = "Education funding",
+#   dk_alt_sentencing = "Alternative sentencing",
+#   dk_dpen_rev = "Death penalty",
+#   dk_lwop_rev = "Life without parole",
+#   dk_prisonhelp = "Help index",
+#   dk_prisonpen = "Punishment index",
+#   dk_post_felony_vote_rev = "Voting rights after felony conviction",
+#   dk_jail_access_rev = "Voting access while in jail"
+# )
+# 
+# # Create folder for figures
+# dir.create("figures", showWarnings = FALSE,
+#            recursive = TRUE)
+
+```
+
+
+## B Policy Means x Impact
+
+```{r}
+
+
 
 sample %>%
   dplyr::group_by(impact) %>%
@@ -147,7 +435,6 @@ pol_means_app_table <- bind_rows(lapply(impact_vars, get_means)) %>%
   )
 
 View(pol_means_app_table)
-
 
 ```
 

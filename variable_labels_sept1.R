@@ -4,7 +4,10 @@
 # in an iterative, systematic way (lots of loops) rather than running a million regressions seperately
 ##
 
-## Independent Variables: Impact, Incarc, Knowincarc, Vict
+# ----------------------------------------
+# Experience Independent Variables: 
+# Impact, Incarc, Knowincarc, Vict
+# ----------------------------------------
 
 impact_vars<- c("impact", "incarc", "knowincarc", "vict")
 
@@ -16,14 +19,11 @@ impact_labels <- c(
 )
 
 
-## Outcome A: Policy Questions
+# ----------------------------------------
+# Outcome A: Policy Questions (DK coded as NA)
+# ----------------------------------------
 
 q25_help_vars <- c("min_wage", "free_calls","ed_funds","alt_sentencing")
-
-policy_vars <- c("prisonhelp",
-  "post_felony_vote_rev", "jail_access_rev", "min_wage", "free_calls", "ed_funds", "alt_sentencing",
-  "dpen_rev", "lwop_rev" 
-)
 
 punish_vars <- c("dpen_rev", "lwop_rev")
 
@@ -32,47 +32,37 @@ incar_vote_vars <- c(
   "jail_access_rev"
 )
 
+policy_vars <- c("prisonhelp", "prisonpen",
+  "post_felony_vote_rev", "jail_access_rev", "min_wage", "free_calls", "ed_funds", "alt_sentencing",
+  "dpen_rev", "lwop_rev" 
+)
+
 policy_map <- tibble::tribble(
   ~var,          ~label,                                              ~section,
-  "prisonhelp", "Help-oriented CJ policy index",                  "Help",
+  "prisonhelp", "Help index",                  "Help",
   "post_felony_vote_rev",   "Post-sentence voting rights restoration", "Help",
   "jail_access_rev", "Requiring eligible incarcerated people ability to vote",  "Help",
-  "min_wage",   "Minimum wage for prison labor",                     "Help",
-  "free_calls",   "Free calls with family members",                    "Help",
-  "ed_funds",   "Funding GED and college courses in prisons",        "Help",
-  "alt_sentencing",   "Sentencing alternatives for parents of young children", "Help",
-  "dpen_rev", "Death penalty for people convicted of murder",      "Punish",
-  "lwop_rev", "Life without parole sentences",                     "Punish"
+  "min_wage",   "Minimum wage",                     "Help",
+  "free_calls",   "Free calls",                    "Help",
+  "ed_funds",   "Education Funding",        "Help",
+  "alt_sentencing",   "Alternatives to Incarceration", "Help",
+  "dpen_rev", "Death Penalty",      "Punish",
+  "lwop_rev", "Life without parole",                     "Punish",
+  "prisonpen", "Punishment index", "Punish"
 )
 
 
 # check where policy_map is used, remember go back to making sure variable prep correctly sets 
 # up so that I can group all the prison help items and then separately the two election 
 
-# ------------------------------------------------------------
-# Names the new DK indicator variables
-# ------------------------------------------------------------
-
-# dk_incar_vote_vars <- paste0(
-#   "dk_",
-#   incar_vote_vars
-# )
-# 
-# dk_q25_help_vars <- paste0(
-#   "dk_",
-#   q25_help_vars
-# )
-# 
-# dk_punish_vars <- paste0(
-#   "dk_",
-#   punish_vars
-# )
-# 
-# dk_all_vars <- c(
-#   dk_incar_vote_vars,
-#   dk_q25_help_vars,
-#   dk_punish_vars
-# )
+four_vars <- c(
+  "min_wage",
+  "free_calls",
+  "ed_funds",
+  "alt_sentencing",
+  "dpen_rev",
+  "lwop_rev"
+)
 
 ##
 
@@ -102,7 +92,101 @@ police_map <- tibble::tribble(
 )
 
 ##
-## Outcome B: Deservingness
+
+# ----------------------------------------
+# Outcome A: Original Versions Including DK
+# ----------------------------------------
+
+# Eight policy items retaining DK = 2 or 2.5
+policy_with_dk_vars <- paste0(
+  policy_vars,
+  "_with_dk"
+)
+
+# Five police items retaining DK = 2.5
+police_with_dk_vars <- paste0(
+  police_items,
+  "_with_dk"
+)
+
+# All original versions retaining DK
+all_with_dk_vars <- c(
+  policy_with_dk_vars,
+  police_with_dk_vars
+)
+
+
+# ----------------------------------------
+# Outcome A: DK Indicator Variables
+# ----------------------------------------
+
+dk_incar_vote_vars <- paste0(
+  "dk_",
+  incar_vote_vars
+)
+
+dk_q25_help_vars <- paste0(
+  "dk_",
+  q25_help_vars
+)
+
+dk_punish_vars <- paste0(
+  "dk_",
+  punish_vars
+)
+
+# All eight DK indicators
+dk_all_vars <- c(
+  dk_incar_vote_vars,
+  dk_q25_help_vars,
+  dk_punish_vars
+)
+
+
+# ----------------------------------------
+# Outcome A: Respondent-Level DK Measures
+# ----------------------------------------
+
+# Counts of DK responses
+dk_total_vars <- c(
+  "dk_total_all",
+  "dk_total_incar_vote",
+  "dk_total_q25_help",
+  "dk_total_punish"
+)
+
+# Counts of answered policy items
+dk_answered_vars <- c(
+  "dk_answered_all",
+  "dk_answered_incar_vote",
+  "dk_answered_q25_help",
+  "dk_answered_punish"
+)
+
+# Proportions of answers that were DK
+dk_prop_vars <- c(
+  "dk_prop_all",
+  "dk_prop_incar_vote",
+  "dk_prop_q25_help",
+  "dk_prop_punish"
+)
+
+# All respondent-level DK measures
+dk_summary_vars <- c(
+  dk_total_vars,
+  dk_answered_vars,
+  dk_prop_vars
+)
+
+# All DK indicators and respondent-level measures
+all_dk_vars <- c(
+  dk_all_vars,
+  dk_summary_vars
+)
+
+# ----------------------------------------
+# Outcome B: DK Deservingness
+# ----------------------------------------
 
 deserving_vars <- c("d_incppl_pris_abc", "d_crim_abc", "d_incwomen_abc")
 
@@ -299,8 +383,36 @@ experience_buffet <- c(
   "snap",
   "uninsured",
   "unionmember",
-  "on_mediaid",
+  "on_medicaid",
   "unemployed",
   "immigrated"
   )
+
+
+# quality variables
+
+quality_vars <- c(
+"attn_q9_pass",                
+"attn_q9_typo",  
+"attn_check_q17",
+"attn_q114_pass" ,
+"attn_q9_answered",
+"attn_q17_answered",
+"attn_q114_answered",
+"attn_pass_count",
+"attn_fail_count",
+"attn_answered_count",
+"duration_minutes",
+"sub_8.45",
+"sub_12.6",
+"sub_20",
+"sub_30",
+"over_52",
+"over_180",
+"nonfinisher"
+)
+
+         
+
+# quality variables label
   

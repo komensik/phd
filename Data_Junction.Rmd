@@ -41,31 +41,31 @@ raw_data_cleaned <-readr::read_csv("data/cleaned/all_vars_over_8.csv")
 sept 15 N is 2327
 
 ```{r}
-
-used <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc",
-          "impact", "incarc", "knowincarc", "vict",
-           "dpen_rev", "min_wage", "free_calls", "ed_funds", "alt_sentencing", "lwop_rev",
-"gov_attn", "vote2020", "willvote", "auto_reg", "post_felony_vote", "early_vote", "election_holiday", "voter_id", "noncit_local", "jail_access_rev", "White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am",  "Pac_Island", "MENA", "race_notlisted",
-  "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology")
-
-used_missing <- raw_data_cleaned %>% 
-  summarise(
-    across(
-      all_of(used),
-      ~sum(is.na(.))
-    )
-  ) %>%
-  pivot_longer(
-    everything(),
-    names_to = "variable",
-    values_to = "n_missing"
-  ) %>%
-  mutate(
-    n_answered = nrow(raw_data_cleaned)- n_missing,
-    pct_missing = n_missing/nrow(raw_data_cleaned) * 100,
-    pct_answered = n_answered/nrow(raw_data_cleaned) *100
-  ) %>%
-  arrange(desc(pct_missing))
+# 
+# used <- c("d_crim_abc", "d_incppl_pris_abc","d_incwomen_abc",
+#           "impact", "incarc", "knowincarc", "vict",
+#            "dpen_rev", "min_wage", "free_calls", "ed_funds", "alt_sentencing", "lwop_rev",
+# "gov_attn", "vote2020", "willvote", "auto_reg", "post_felony_vote_rev", "early_vote_rev", "election_holiday_rev", "voter_id_rev", "noncit_local_rev", "jail_access_rev", "White", "Black", "Hisp_Latino", "Asian_Am", "Native_Am",  "Pac_Island", "MENA", "race_notlisted",
+#   "self_ideo", "fire_rare", "fire_privilege", "fire_angry", "fire_fear", "fiscal_ideology", "social_ideology")
+# 
+# used_missing <- raw_data_cleaned %>% 
+#   summarise(
+#     across(
+#       all_of(used),
+#       ~sum(is.na(.))
+#     )
+#   ) %>%
+#   pivot_longer(
+#     everything(),
+#     names_to = "variable",
+#     values_to = "n_missing"
+#   ) %>%
+#   mutate(
+#     n_answered = nrow(raw_data_cleaned)- n_missing,
+#     pct_missing = n_missing/nrow(raw_data_cleaned) * 100,
+#     pct_answered = n_answered/nrow(raw_data_cleaned) *100
+#   ) %>%
+#   arrange(desc(pct_missing))
 
 #View(used_missing)
 
@@ -432,7 +432,30 @@ no_experience <- unique(c(
   "no_unable_vote"
 ))
 
-#experience
+#experience impact
+
+experience_impact <- unique(c(
+  "medicaid_impact", 
+  "notanf_impact",
+  "nosnap_impact",
+  "nonion_impact",
+  "nounemployed_impact",
+  "nouninsured_impact",
+  "no_unable_vote_impact"
+))
+
+# college
+
+college <- unique(c(
+"college_econ_wellbeing",
+"college_indoctrination",
+ "more_attend_college",
+ "college_diverse_students",
+ "public_college_funding",
+ "college_no_race_admissions",
+"college_ben_beat_costs",
+"colleges_out_touch"
+))
 
 ```
 
@@ -453,7 +476,9 @@ vars_to_drop <- c(
   classic_racism,
   experience_bins,
   experience_knows,
-  no_experience
+  no_experience,
+  experience_impact,
+  college
 )
 
 

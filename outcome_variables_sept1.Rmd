@@ -566,7 +566,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
     all_of(pen_raw_vars),
     ~ case_when(
-    . == 1 ~ 4,           # strongly favor → strongly support help
+    . == 1 ~ 4,           # OG 1 = strongly favor → Now 4 = strongly support 
     . == 2 ~ 3,
     . == 3 ~ 2,
     . == 4 ~ 1,
@@ -592,31 +592,31 @@ Takeaway: prison pen, prison pen 1 = dpen, prison pen 5 = lwop now -confirmed th
 ### CBA & Corr
 
 ```{r}
-
-pen_data <- raw_data_cleaned %>%
-  dplyr::select(all_of(pen_vars))
-
-
-cor(pen_data,
-    use = "pairwise.complete.obs")
-
-
-#print(psych::corr.test(pen_data))
-
-#print(psych::alpha(pen_data))
-
-# Quick look
-#psych::describe(pen_data)
-
-# Correlation (more interpretable than alpha for 2 items)
-cor(raw_data_cleaned[pen_vars], use = "pairwise.complete.obs")
-
-# Cronbach's alpha (fine to report, but remember it's 2 items)
-psych::alpha(pen_data, check.keys = FALSE)
-
-summary(raw_data_cleaned$dpen_rev)
-
-summary(raw_data_cleaned$lwop_rev)
+# 
+# pen_data <- raw_data_cleaned %>%
+#   dplyr::select(all_of(pen_vars))
+# 
+# 
+# cor(pen_data,
+#     use = "pairwise.complete.obs")
+# 
+# 
+# #print(psych::corr.test(pen_data))
+# 
+# #print(psych::alpha(pen_data))
+# 
+# # Quick look
+# #psych::describe(pen_data)
+# 
+# # Correlation (more interpretable than alpha for 2 items)
+# cor(raw_data_cleaned[pen_vars], use = "pairwise.complete.obs")
+# 
+# # Cronbach's alpha (fine to report, but remember it's 2 items)
+# psych::alpha(pen_data, check.keys = FALSE)
+# 
+# summary(raw_data_cleaned$dpen_rev)
+# 
+# summary(raw_data_cleaned$lwop_rev)
 
 ```
 
@@ -642,90 +642,91 @@ Interpretation
 # ------------------------------------------------------------
 # bar plot for overleaf
 # ------------------------------------------------------------
+# 
+# pen_data <- raw_data_cleaned %>%
+#   dplyr::select(all_of(pen_vars)) %>%
+#   pivot_longer(
+#     cols = everything(),
+#     names_to = "item",
+#     values_to = "position"
+#   ) %>%
+#   filter(!is.na(position)) %>%
+#   mutate(
+#     item = factor(
+#       item,
+#       levels = c(
+#         "dpen_rev",
+#         "lwop_rev"
+#       ),
+#       labels = c(
+#         "Death Penalty",
+#         "Life Without Parole"
+#       )
+#     ),
+#     
+#     # Treat the response categories as discrete/ordinal categories
+#     position = factor(
+#       position,
+#       levels = c(1, 2, 2.5, 3, 4)
+#     )
+#   ) %>%
+#   count(item, position, .drop = FALSE)
+# # ------------------------------------------------------------
+# # make figure
+# # ------------------------------------------------------------
+# pen_barplot <- ggplot(
+#   pen_data,
+#   aes(x = position, y = n)
+# ) +
+#   geom_col(
+#     width = 0.70,
+#     fill = "grey35"
+#   ) +
+#   facet_wrap(
+#     ~ item,
+#     ncol = 2
+#   ) +
+#   scale_x_discrete(drop = FALSE) +
+#   scale_y_continuous(
+#     expand = expansion(mult = c(0, 0.05))
+#   ) +
+#   labs(
+#     x = "Position",
+#     y = "Number of Respondents",
+#     caption = paste0(
+#       "Position: 1 = Strongly Oppose; 2 = Somewhat Oppose; ",
+#       "2.5 = Unsure; 3 = Somewhat Support; 4 = Strongly Support."
+#     )
+#   ) +
+#   theme_classic(base_size = 11) +
+#   theme(
+#     strip.background = element_blank(),
+#     strip.text = element_text(
+#       face = "bold",
+#       size = 11
+#     ),
+#     axis.title = element_text(size = 11),
+#     axis.text = element_text(size = 9.5),
+#     panel.spacing = grid::unit(1, "lines"),
+#     plot.caption = element_text(
+#       size = 9,
+#       hjust = 0,
+#       margin = margin(t = 8)
+#     )
+#   )
+# 
+# # ------------------------------------------------------------
+# # save/print
+# # ------------------------------------------------------------
+# 
+# ggsave(
+#   filename = "figures/pen_barplot.pdf",
+#   plot = pen_barplot,
+#   width = 6.5,
+#   height = 5,
+#   units = "in",
+# )
 
-pen_data <- raw_data_cleaned %>%
-  dplyr::select(all_of(pen_vars)) %>%
-  pivot_longer(
-    cols = everything(),
-    names_to = "item",
-    values_to = "position"
-  ) %>%
-  filter(!is.na(position)) %>%
-  mutate(
-    item = factor(
-      item,
-      levels = c(
-        "dpen_rev",
-        "lwop_rev"
-      ),
-      labels = c(
-        "Death Penalty",
-        "Life Without Parole"
-      )
-    ),
-    
-    # Treat the response categories as discrete/ordinal categories
-    position = factor(
-      position,
-      levels = c(1, 2, 2.5, 3, 4)
-    )
-  ) %>%
-  count(item, position, .drop = FALSE)
-# ------------------------------------------------------------
-# make figure
-# ------------------------------------------------------------
-pen_barplot <- ggplot(
-  pen_data,
-  aes(x = position, y = n)
-) +
-  geom_col(
-    width = 0.70,
-    fill = "grey35"
-  ) +
-  facet_wrap(
-    ~ item,
-    ncol = 2
-  ) +
-  scale_x_discrete(drop = FALSE) +
-  scale_y_continuous(
-    expand = expansion(mult = c(0, 0.05))
-  ) +
-  labs(
-    x = "Position",
-    y = "Number of Respondents",
-    caption = paste0(
-      "Position: 1 = Strongly Oppose; 2 = Somewhat Oppose; ",
-      "2.5 = Unsure; 3 = Somewhat Support; 4 = Strongly Support."
-    )
-  ) +
-  theme_classic(base_size = 11) +
-  theme(
-    strip.background = element_blank(),
-    strip.text = element_text(
-      face = "bold",
-      size = 11
-    ),
-    axis.title = element_text(size = 11),
-    axis.text = element_text(size = 9.5),
-    panel.spacing = grid::unit(1, "lines"),
-    plot.caption = element_text(
-      size = 9,
-      hjust = 0,
-      margin = margin(t = 8)
-    )
-  )
-
-# ------------------------------------------------------------
-# save/print
-# ------------------------------------------------------------
-
-ggsave(
-  filename = "figures/pen_barplot.pdf",
-  plot = pen_barplot,
-  width = 6.5,
-  height = 5,
-  units = "in",
-)
 ```
 
 ## C. Help Policies
@@ -940,28 +941,28 @@ q25_barplot
 
 ### CBA & Corr
 ```{r}
-
-q25_help_data <- raw_data_cleaned %>%
-  dplyr::select(all_of(q25_help_vars))
-
-cor(q25_help_data,
-    use = "pairwise.complete.obs")
-
-print(psych::corr.test(q25_help_data))
-
-print(psych::alpha(q25_help_data))
-
-# Correlation (more interpretable than alpha for 2 items)
-cor(q25_help_data, use = "pairwise.complete.obs")
-
-# Cronbach's alpha (fine to report, but remember it's 2 items)
-psych::alpha(q25_help_data, check.keys = FALSE)
-
-q25_help_data <- raw_data_cleaned %>%
-  dplyr::select(all_of(q25_help_vars))
-
-cor(q25_help_data,
-    use = "pairwise.complete.obs")
+# 
+# q25_help_data <- raw_data_cleaned %>%
+#   dplyr::select(all_of(q25_help_vars))
+# 
+# cor(q25_help_data,
+#     use = "pairwise.complete.obs")
+# 
+# print(psych::corr.test(q25_help_data))
+# 
+# print(psych::alpha(q25_help_data))
+# 
+# # Correlation (more interpretable than alpha for 2 items)
+# cor(q25_help_data, use = "pairwise.complete.obs")
+# 
+# # Cronbach's alpha (fine to report, but remember it's 2 items)
+# psych::alpha(q25_help_data, check.keys = FALSE)
+# 
+# q25_help_data <- raw_data_cleaned %>%
+#   dplyr::select(all_of(q25_help_vars))
+# 
+# cor(q25_help_data,
+#     use = "pairwise.complete.obs")
 ```
 
 ## D. Election Items
@@ -1169,16 +1170,16 @@ incarc_electoral_barplot
 
 ###CBA & Corr: JBV & RR
 ```{r}
-
-incarc_electoral_data <- raw_data_cleaned %>%
-  dplyr::select(all_of(incarc_electoral_vars))
-
-cor(incarc_electoral_data,
-    use = "pairwise.complete.obs")
-
-print(psych::corr.test(incarc_electoral_data))
-
-print(psych::alpha(incarc_electoral_data))
+# 
+# incarc_electoral_data <- raw_data_cleaned %>%
+#   dplyr::select(all_of(incarc_electoral_vars))
+# 
+# cor(incarc_electoral_data,
+#     use = "pairwise.complete.obs")
+# 
+# print(psych::corr.test(incarc_electoral_data))
+# 
+# print(psych::alpha(incarc_electoral_data))
 
 ```
 
@@ -1189,45 +1190,45 @@ Need
 post_felony_vote_rev jail_access_rev_1_to_4 q25_help_data or min_wage, free_calls, ed_funds, alt_sentencing
 
 ```{r, electionhelpqs_2}
-
-# ALL HELP ITEMS
-
-all_help_items <- c(
-  "min_wage",
-  "free_calls",
-  "ed_funds",
-  "alt_sentencing",
-  "post_felony_vote_rev_1_to_4",
-  "jail_access_rev_1_to_4"
-)
-
-#df for the six total vars
-all_help_data <- raw_data_cleaned %>%
-  dplyr::select(all_of(all_help_items))
-
-# now, pairwise corrs
-#View(round(
-#  cor(all_help_data, use = "pairwise.complete.obs"),
-#  2
-#))
-
-# Correlations + N + significance information
-all_help_corr <- psych::corr.test(
-  all_help_data,
-  use = "pairwise",
-  method = "pearson",
-  adjust = "none"
-)
-
-print(all_help_corr)
-
-# Internal consistency of the six items
-all_help_alpha <- psych::alpha(
-  all_help_data,
-  check.keys = FALSE
-)
-
-print(all_help_alpha)
+# 
+# # ALL HELP ITEMS
+# 
+# all_help_items <- c(
+#   "min_wage",
+#   "free_calls",
+#   "ed_funds",
+#   "alt_sentencing",
+#   "post_felony_vote_rev_1_to_4",
+#   "jail_access_rev_1_to_4"
+# )
+# 
+# #df for the six total vars
+# all_help_data <- raw_data_cleaned %>%
+#   dplyr::select(all_of(all_help_items))
+# 
+# # now, pairwise corrs
+# #View(round(
+# #  cor(all_help_data, use = "pairwise.complete.obs"),
+# #  2
+# #))
+# 
+# # Correlations + N + significance information
+# all_help_corr <- psych::corr.test(
+#   all_help_data,
+#   use = "pairwise",
+#   method = "pearson",
+#   adjust = "none"
+# )
+# 
+# print(all_help_corr)
+# 
+# # Internal consistency of the six items
+# all_help_alpha <- psych::alpha(
+#   all_help_data,
+#   check.keys = FALSE
+# )
+# 
+# print(all_help_alpha)
 
 ```
 
@@ -1346,7 +1347,6 @@ police_items <- c(
 
 ```{r}
 
-
 # -----------------------------------------
 # 1. Identify policy variables
 # -----------------------------------------
@@ -1370,6 +1370,7 @@ all_policy_vars <- c(
   dk_2.5_policy_vars, incar_vote_vars
 )
 
+#table(raw_data_cleaned$post_felony_vote_rev)
 
 # -----------------------------------------
 # 2. Preserve original variables WITH DK
@@ -1414,6 +1415,9 @@ raw_data_cleaned <- raw_data_cleaned %>%
     )
   )
 
+# table(raw_data_cleaned$post_felony_vote_rev)
+# 
+# table(raw_data_cleaned$jail_access_rev)
 
 # -----------------------------------------
 # 4. Recode original variables:
@@ -1440,6 +1444,30 @@ raw_data_cleaned <- raw_data_cleaned %>%
       ~ na_if(.x, 2.5)
     )
   )
+
+# -----------------------------------------
+# 5. Election/incarceration variables:
+#   Recode substantive responses to 1–2
+#    DK remains NA
+# -----------------------------------------
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    across(
+      all_of(incar_vote_vars),
+      ~ case_when(
+        .x == 1 ~ 1,
+        .x == 3 ~ 2,
+        TRUE ~ NA_real_
+      )
+    )
+  )
+
+table(raw_data_cleaned$post_felony_vote_rev)
+
+table(raw_data_cleaned$jail_access_rev)
+
+hist(raw_data_cleaned$post_felony_vote_rev)
 
 
 ```

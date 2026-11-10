@@ -1,9 +1,6 @@
----
+------------------------------------------------------------------------
 
-editor_options: 
-  markdown: 
-    wrap: 72
----
+editor_options: markdown: wrap: 72 ---
 
 |                                    |
 |------------------------------------|
@@ -53,7 +50,7 @@ source("variable_labels_sept1.R")
 
 Note on samples --
 
-Pre Nov 10, this used sample_all > sample > sample_dk > sample_no_dk
+Pre Nov 10, this used sample_all \> sample \> sample_dk \> sample_no_dk
 
 In Sample, as in prev analyses policy variables have "don't know/no answer" coded as a middle value (2.5 or 2).
 
@@ -61,15 +58,18 @@ Sample_dk has new ambivalence DK variables (ie dk_free_calls) indicate whether a
 
 sample_no_dk changes the policy variables so that "dunno" is now an NA. It also has the IDk indicator variables. - This (use for analysis of preferences) asks preferences after DK responses have been treated as missing.
 
-POST-Nov 10: 
+POST-Nov 10:
 
 # I. Setup
 
 ```{r}
 # load data
-sample_all <- read_csv("data/cleaned_control_data.csv")
+sample_all <- read_csv("data/cleaned_control_data.csv") #sample that drops observations with missing controls
 
-not_full <- read_csv("data/cleaned_sans_control_data.csv")
+names(sample_all)
+# nrow(sample_all) = 1600
+
+not_full <- read_csv("data/cleaned_sans_control_data.csv") #sample that includes observations with missing controls
 
 # drop variables not working with, keep variables working with 
 ## Some variables were dropped in Data_Junction.rmd
@@ -95,40 +95,16 @@ policy_analysis_vars <- c(
   fire_controls,
   ration_vars,
   experience_buffet,
-  
+  all_dk_vars,
   more_needed_vars
 )
 
 
+# sample will only have variables I know I'm using:
 sample <- sample_all %>%
-  dplyr::select(any_of(policy_analysis_vars))
+  dplyr::select(all_of(policy_analysis_vars))
 
-
-# Vars where DK is coded 2.5
-q25_help_vars <- c("min_wage", "free_calls","ed_funds","alt_sentencing")
-
-punish_vars <- c("dpen_rev", "lwop_rev")
-
-# Combine
-dk_2.5_policy_vars <- c(
-  q25_help_vars,
-  punish_vars
-)
-
-
-# Variables where DK is coded 2
-incar_vote_vars <- c(
-  "post_felony_vote_rev",
-  "jail_access_rev"
-)
-
-
-# All policy variables I want to use
-all_policy_vars <- c(
-  q25_help_vars,
-  punish_vars,
-  incar_vote_vars
-)
+names(sample)
 
 
 ```
@@ -136,7 +112,8 @@ all_policy_vars <- c(
 Confirm Counts
 
 ```{r}
-table(sample$impact)
+nrow(sample)
+table(sample)
 
 sample %>%
   group_by(impact) %>%
@@ -162,126 +139,128 @@ sample %>%
 
 ```
 
-## A. Uncertainty
+# II. Inspect Variables
 
+## A. Uncertainty
 
 ```{r}
 # ------------------------------------------------------------
 # Count DK responses overall and by impact status
 # ------------------------------------------------------------
-
-dk_policy_summary <- sample %>%
-  
-  # Put policy items into long format
-  pivot_longer(
-    cols = all_of(all_policy_vars),
-    names_to = "policy",
-    values_to = "response"
-  ) %>%
-  
-  # Identify whether each response is DK
-  mutate(
-    is_dk = case_when(
-      policy %in% incar_vote_vars ~ response == 2,
-      policy %in% dk_2.5_policy_vars ~ response == 2.5,
-      TRUE ~ FALSE
-    )
-  ) %>%
-  
-  group_by(policy) %>%
-  
-  summarise(
-    
-    # Total number of DK responses
-    total_dk = sum(is_dk, na.rm = TRUE),
-    
-    # Number of DK responses from each group
-    incarc_dk = sum(is_dk & incarc == 1, na.rm = TRUE),
-    knowincarc_dk = sum(is_dk & knowincarc == 1, na.rm = TRUE),
-    vict_dk = sum(is_dk & vict == 1, na.rm = TRUE),
-    impact_dk = sum(is_dk & impact == 1, na.rm = TRUE),
-    
-    .groups = "drop"
-  ) %>%
-  
-  # Calculate each group's share of all DK responses
-  mutate(
-    incarc_pct = if_else(
-      total_dk > 0,
-      100 * incarc_dk / total_dk,
-      NA_real_
-    ),
-    
-    knowincarc_pct = if_else(
-      total_dk > 0,
-      100 * knowincarc_dk / total_dk,
-      NA_real_
-    ),
-    
-    vict_pct = if_else(
-      total_dk > 0,
-      100 * vict_dk / total_dk,
-      NA_real_
-    ),
-    
-    impact_pct = if_else(
-      total_dk > 0,
-      100 * impact_dk / total_dk,
-      NA_real_
-    )
-  ) %>%
-  
-  # Optional: make percentages easier to read
-  mutate(
-    across(
-      ends_with("_pct"),
-      ~ round(.x, 2)
-    )
-  )
-
-dk_policy_summary
+# 
+# dk_policy_summary <- sample %>%
+#   
+#   # Put policy items into long format
+#   pivot_longer(
+#     cols = all_of(all_policy_vars),
+#     names_to = "policy",
+#     values_to = "response"
+#   ) %>%
+#   
+#   # Identify whether each response is DK
+#   mutate(
+#     is_dk = case_when(
+#       policy %in% incar_vote_vars ~ response == 2,
+#       policy %in% dk_2.5_policy_vars ~ response == 2.5,
+#       TRUE ~ FALSE
+#     )
+#   ) %>%
+#   
+#   group_by(policy) %>%
+#   
+#   summarise(
+#     
+#     # Total number of DK responses
+#     total_dk = sum(is_dk, na.rm = TRUE),
+#     
+#     # Number of DK responses from each group
+#     incarc_dk = sum(is_dk & incarc == 1, na.rm = TRUE),
+#     knowincarc_dk = sum(is_dk & knowincarc == 1, na.rm = TRUE),
+#     vict_dk = sum(is_dk & vict == 1, na.rm = TRUE),
+#     impact_dk = sum(is_dk & impact == 1, na.rm = TRUE),
+#     
+#     .groups = "drop"
+#   ) %>%
+#   
+#   # Calculate each group's share of all DK responses
+#   mutate(
+#     incarc_pct = if_else(
+#       total_dk > 0,
+#       100 * incarc_dk / total_dk,
+#       NA_real_
+#     ),
+#     
+#     knowincarc_pct = if_else(
+#       total_dk > 0,
+#       100 * knowincarc_dk / total_dk,
+#       NA_real_
+#     ),
+#     
+#     vict_pct = if_else(
+#       total_dk > 0,
+#       100 * vict_dk / total_dk,
+#       NA_real_
+#     ),
+#     
+#     impact_pct = if_else(
+#       total_dk > 0,
+#       100 * impact_dk / total_dk,
+#       NA_real_
+#     )
+#   ) %>%
+#   
+#   # Optional: make percentages easier to read
+#   mutate(
+#     across(
+#       ends_with("_pct"),
+#       ~ round(.x, 2)
+#     )
+#   )
+# 
+# dk_policy_summary
 
 ```
 
 ```{r}
+# 
+# # Group sizes in the original sample
+# group_totals <- sample %>%
+#   summarise(
+#     incarc_total = sum(incarc == 1, na.rm = TRUE),
+#     knowincarc_total = sum(knowincarc == 1, na.rm = TRUE),
+#     vict_total = sum(vict == 1, na.rm = TRUE),
+#     impact_total = sum(impact == 1, na.rm = TRUE)
+#   )
+# 
+# 
+# dk_policy_summary <- dk_policy_summary %>%
+#   mutate(
+#     incarc_dk_rate =
+#       100 * incarc_dk / group_totals$incarc_total,
+#     
+#     knowincarc_dk_rate =
+#       100 * knowincarc_dk / group_totals$knowincarc_total,
+#     
+#     vict_dk_rate =
+#       100 * vict_dk / group_totals$vict_total,
+#     
+#     impact_dk_rate =
+#       100 * impact_dk / group_totals$impact_total
+#   ) %>%
+#   mutate(
+#     across(
+#       ends_with("_rate"),
+#       ~ round(.x, 2)
+#     )
+#   )
+# 
+# dk_policy_summary
 
-# Group sizes in the original sample
-group_totals <- sample %>%
-  summarise(
-    incarc_total = sum(incarc == 1, na.rm = TRUE),
-    knowincarc_total = sum(knowincarc == 1, na.rm = TRUE),
-    vict_total = sum(vict == 1, na.rm = TRUE),
-    impact_total = sum(impact == 1, na.rm = TRUE)
-  )
-
-
-dk_policy_summary <- dk_policy_summary %>%
-  mutate(
-    incarc_dk_rate =
-      100 * incarc_dk / group_totals$incarc_total,
-    
-    knowincarc_dk_rate =
-      100 * knowincarc_dk / group_totals$knowincarc_total,
-    
-    vict_dk_rate =
-      100 * vict_dk / group_totals$vict_total,
-    
-    impact_dk_rate =
-      100 * impact_dk / group_totals$impact_total
-  ) %>%
-  mutate(
-    across(
-      ends_with("_rate"),
-      ~ round(.x, 2)
-    )
-  )
-
-dk_policy_summary
 ```
 
-## E. Control Vars
+## B. FIRE
 
-### FIRE
+### FIRE x Race
 
 ```{r}
 sample_no_dk %>%
@@ -760,11 +739,9 @@ sample_no_dk %>%
 
 ```{r}
 
-
 summary(
   fire_dummies_waves[["pid_ideo_wave"]][["m_fire_angry"]]
 )
-
 
 ```
 
@@ -927,6 +904,200 @@ fire_results_tables <- lapply(
 names(fire_results_tables) <- fire_controls
 
 fire_results_tables
+
+```
+
+# N. Correlations
+
+easy/hard
+
+```{r}
+
+# cor(sample_dk$dpen_rev, sample_dk$post_felony_vote_rev, use = "complete.obs")
+
+
+```
+
+## Help Policy Correlations
+
+Correlations when full, incarc, knowincarc, vict, impacted, not impacted
+
+```{r, desor0}
+# ------------------------------------------------------------
+# Carceral state help policies
+# ------------------------------------------------------------
+
+q25_help_vars <- c("min_wage", "free_calls", "ed_funds", "alt_sentencing")
+
+# ------------------------------------------------------------
+# 1. Define analysis groups
+# ------------------------------------------------------------
+
+help_groups <- list(
+  
+  full_sample = sample,
+  
+  incarc_1 = sample %>%
+    filter(incarc == 1),
+  
+  knowincarc_1 = sample %>%
+    filter(knowincarc == 1),
+  
+  vict_1 = sample %>%
+    filter(vict == 1),
+  
+  impact_1 = sample %>%
+    filter(impact == 1),
+  
+  impact_0 = sample %>%
+    filter(impact == 0)
+)
+
+
+# Check N in each group
+sapply(help_groups, nrow)
+
+# ------------------------------------------------------------
+# 2. Correlations within each group
+# ------------------------------------------------------------
+
+help_cont_corrs <- purrr::map(
+  help_groups,
+  ~ psych::corr.test(
+      .x %>% dplyr::select(all_of(q25_help_vars)),
+      use = "pairwise",
+      method = "pearson",
+      adjust = "none"
+    )
+)
+```
+
+Inspect
+
+```{r, desor1}
+# Full sample correlations
+round(help_cont_corrs$full_sample$r, 2)
+
+# Incarcerated respondents
+round(help_cont_corrs$incarc_1$r, 2)
+
+# Know someone incarcerated
+round(help_cont_corrs$knowincarc_1$r, 2)
+
+# Victimized respondents
+round(help_cont_corrs$vict_1$r, 2)
+
+# Any impact
+round(help_cont_corrs$impact_1$r, 2)
+
+# Not impacted
+round(help_cont_corrs$impact_0$r, 2)
+
+help_cont_corrs$full_sample$n
+
+help_cont_corrs$incarc_1$n
+
+help_cont_corrs$knowincarc_1$n
+
+help_cont_corrs$vict_1$n
+
+help_cont_corrs$impact_1$n
+
+help_cont_corrs$impact_0$n
+
+```
+
+```{r, desor2}
+# ------------------------------------------------------------
+# 3. Number of observed deservingness items, by group
+# ------------------------------------------------------------
+
+help_item_counts <- purrr::map(
+  help_groups,
+  ~ {
+    help_mat <- .x %>%
+      dplyr::select(all_of(q25_help_vars))
+    
+    help_n <- rowSums(!is.na(help_mat))
+    
+    table(help_n, useNA = "ifany")
+  }
+)
+
+help_item_counts
+
+
+# ------------------------------------------------------------
+# 4. Reliability / internal consistency by group
+# ------------------------------------------------------------
+
+help_alpha <- purrr::map(
+  help_groups,
+  ~ {
+    
+    help_mat <- .x %>%
+      dplyr::select(all_of(q25_help_vars))
+    
+    help_n <- rowSums(!is.na(help_mat))
+    
+    help_keep <- help_n >= 4
+    
+    psych::alpha(
+      help_mat[help_keep, ],
+      check.keys = TRUE
+    )
+  }
+)
+
+# Full sample
+help_alpha$full_sample$total$raw_alpha
+help_alpha$full_sample$total$std.alpha
+help_alpha$full_sample$total$average_r
+help_alpha$full_sample$n.obs
+
+# Incarcerated
+help_alpha$incarc_1$total$raw_alpha
+help_alpha$incarc_1$total$std.alpha
+help_alpha$incarc_1$total$average_r
+help_alpha$incarc_1$n.obs
+
+# vict
+help_alpha$vict_1$total$raw_alpha
+
+# Know Incarcerated
+help_alpha$knowincarc_1$total$raw_alpha
+
+# Impacted
+help_alpha$impact_1$total$raw_alpha
+
+
+# Not impacted
+help_alpha$impact_0$total$raw_alpha
+```
+
+```{r}
+# Item Stats
+View(help_alpha$full_sample$item.stats)
+```
+
+```{r}
+View(help_alpha$incarc_1$item.stats)
+```
+
+```{r}
+View(help_alpha$vict_1$item.stats)
+```
+
+```{r}
+View(help_alpha$knowincarc_1$item.stats)
+```
+
+```{r}
+View(help_alpha$impact_1$item.stats)
+```
+
+```{r}
+View(help_alpha$impact_0$item.stats)
 
 ```
 
@@ -2301,204 +2472,6 @@ m_lwop_1 <- glm(
 summary(m_lwop_1)
 
 exp(coef(m_lwop_1))
-
-```
-
-# IV. Correlations w/out DK
-
-# easy/hard
-
-```{r}
-
-# cor(sample_dk$dpen_rev, sample_dk$post_felony_vote_rev, use = "complete.obs")
-
-
-```
-
-# Help Outcome Correlations
-
-Correlations when full, incarc, knowincarc, vict, impacted, not impacted
-
-```{r, desor0}
-# ------------------------------------------------------------
-# Carceral state help policies
-# ------------------------------------------------------------
-
-q25_help_vars <- c("min_wage", "free_calls", "ed_funds", "alt_sentencing")
-
-# ------------------------------------------------------------
-# 1. Define analysis groups
-# ------------------------------------------------------------
-
-help_groups <- list(
-  
-  full_sample = sample,
-  
-  incarc_1 = sample %>%
-    filter(incarc == 1),
-  
-  knowincarc_1 = sample %>%
-    filter(knowincarc == 1),
-  
-  vict_1 = sample %>%
-    filter(vict == 1),
-  
-  impact_1 = sample %>%
-    filter(impact == 1),
-  
-  impact_0 = sample %>%
-    filter(impact == 0)
-)
-
-
-# Check N in each group
-sapply(help_groups, nrow)
-
-# ------------------------------------------------------------
-# 2. Correlations within each group
-# ------------------------------------------------------------
-
-help_cont_corrs <- purrr::map(
-  help_groups,
-  ~ psych::corr.test(
-      .x %>% dplyr::select(all_of(q25_help_vars)),
-      use = "pairwise",
-      method = "pearson",
-      adjust = "none"
-    )
-)
-```
-
-# ------------------------------------------------------------
-
-# Inspect
-
-# ------------------------------------------------------------
-
-```{r, desor1}
-# Full sample correlations
-round(help_cont_corrs$full_sample$r, 2)
-
-# Incarcerated respondents
-round(help_cont_corrs$incarc_1$r, 2)
-
-# Know someone incarcerated
-round(help_cont_corrs$knowincarc_1$r, 2)
-
-# Victimized respondents
-round(help_cont_corrs$vict_1$r, 2)
-
-# Any impact
-round(help_cont_corrs$impact_1$r, 2)
-
-# Not impacted
-round(help_cont_corrs$impact_0$r, 2)
-
-help_cont_corrs$full_sample$n
-
-help_cont_corrs$incarc_1$n
-
-help_cont_corrs$knowincarc_1$n
-
-help_cont_corrs$vict_1$n
-
-help_cont_corrs$impact_1$n
-
-help_cont_corrs$impact_0$n
-
-```
-
-```{r, desor2}
-# ------------------------------------------------------------
-# 3. Number of observed deservingness items, by group
-# ------------------------------------------------------------
-
-help_item_counts <- purrr::map(
-  help_groups,
-  ~ {
-    help_mat <- .x %>%
-      dplyr::select(all_of(q25_help_vars))
-    
-    help_n <- rowSums(!is.na(help_mat))
-    
-    table(help_n, useNA = "ifany")
-  }
-)
-
-help_item_counts
-
-
-# ------------------------------------------------------------
-# 4. Reliability / internal consistency by group
-# ------------------------------------------------------------
-
-help_alpha <- purrr::map(
-  help_groups,
-  ~ {
-    
-    help_mat <- .x %>%
-      dplyr::select(all_of(q25_help_vars))
-    
-    help_n <- rowSums(!is.na(help_mat))
-    
-    help_keep <- help_n >= 4
-    
-    psych::alpha(
-      help_mat[help_keep, ],
-      check.keys = TRUE
-    )
-  }
-)
-
-# Full sample
-help_alpha$full_sample$total$raw_alpha
-help_alpha$full_sample$total$std.alpha
-help_alpha$full_sample$total$average_r
-help_alpha$full_sample$n.obs
-
-# Incarcerated
-help_alpha$incarc_1$total$raw_alpha
-help_alpha$incarc_1$total$std.alpha
-help_alpha$incarc_1$total$average_r
-help_alpha$incarc_1$n.obs
-
-# vict
-help_alpha$vict_1$total$raw_alpha
-
-# Know Incarcerated
-help_alpha$knowincarc_1$total$raw_alpha
-
-# Impacted
-help_alpha$impact_1$total$raw_alpha
-
-
-# Not impacted
-help_alpha$impact_0$total$raw_alpha
-```
-
-```{r}
-# Item Stats
-View(help_alpha$full_sample$item.stats)
-```
-
-```{r}
-View(help_alpha$incarc_1$item.stats)
-```
-
-```{r}
-View(help_alpha$vict_1$item.stats)
-```
-
-```{r}
-View(help_alpha$knowincarc_1$item.stats)
-```
-
-```{r}
-View(help_alpha$impact_1$item.stats)
-```
-
-```{r}
-View(help_alpha$impact_0$item.stats)
 
 ```
 
