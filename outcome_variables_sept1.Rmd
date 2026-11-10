@@ -765,6 +765,8 @@ raw_data_cleaned <- raw_data_cleaned %>%
   mutate(prisonhelp = mean(c_across(c(min_wage, free_calls, ed_funds, alt_sentencing)), na.rm = TRUE)) %>%
   ungroup()
 
+
+
 ```
 
 ### Descriptive
@@ -1351,10 +1353,10 @@ police_items <- c(
 
 q25_help_vars <- c(
   "min_wage", "free_calls",
-  "ed_funds", "alt_sentencing"
+  "ed_funds", "alt_sentencing", "prisonhelp"
 )
 
-punish_vars <- c("dpen_rev", "lwop_rev")
+punish_vars <- c("dpen_rev", "lwop_rev", "prisonpen")
 
 incar_vote_vars <- c(
   "post_felony_vote_rev", "jail_access_rev"
