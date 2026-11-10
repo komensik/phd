@@ -49,6 +49,30 @@ policy_map <- tibble::tribble(
 # check where policy_map is used, remember go back to making sure variable prep correctly sets 
 # up so that I can group all the prison help items and then separately the two election 
 
+# ------------------------------------------------------------
+# Names the new DK indicator variables
+# ------------------------------------------------------------
+
+# dk_incar_vote_vars <- paste0(
+#   "dk_",
+#   incar_vote_vars
+# )
+# 
+# dk_q25_help_vars <- paste0(
+#   "dk_",
+#   q25_help_vars
+# )
+# 
+# dk_punish_vars <- paste0(
+#   "dk_",
+#   punish_vars
+# )
+# 
+# dk_all_vars <- c(
+#   dk_incar_vote_vars,
+#   dk_q25_help_vars,
+#   dk_punish_vars
+# )
 
 ##
 

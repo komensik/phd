@@ -513,7 +513,7 @@ raw_alpha: 0.9078 and 0.9142 internal consistency -- suggests items hang togethe
 
 # Policy Preferences
 
-## Purpose of Incarceration
+## A. Purpose of Incarceration
 
 ```{r, punishorrehab}
 
@@ -545,7 +545,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
 # NOTE: Factor version of PenalPunitiveness (reverse-coded already: 1 = least punitive, 7 = most punitive)
 ```
 
-## Dpen & LWOP
+## B. Death Pen & LWOP
 
 ```{r, prisonpen}
 #ORIGINALLY Q25_1 and Q25_5, death penalty and LWOP (1 = strongly favor 4 = strongly oppose, 5 = don't know)
@@ -728,7 +728,7 @@ ggsave(
 )
 ```
 
-## Prison Help
+## C. Help Policies
 
 ```{r, prisonhelp}
 # Originally 1 = strong favor, 4 = strong oppose, 5 = don't know
@@ -962,7 +962,7 @@ cor(q25_help_data,
     use = "pairwise.complete.obs")
 ```
 
-## Election Items
+## D. Election Items
 
 ```{r}
 names(raw_data_cleaned) %>% stringr::str_subset("q25|q23")
@@ -1288,8 +1288,8 @@ combined_alpha <- psych::alpha(
 
 ```
 
+## E. Police
 
-## Police
 
 ```{r}
 
@@ -1339,7 +1339,249 @@ police_items <- c(
 
 ```
 
-# Civics
+
+## F. IDK Recoding
+
+```{r}
+
+
+# -----------------------------------------
+# 1. Identify policy variables
+# -----------------------------------------
+
+q25_help_vars <- c(
+  "min_wage", "free_calls",
+  "ed_funds", "alt_sentencing"
+)
+
+punish_vars <- c("dpen_rev", "lwop_rev")
+
+incar_vote_vars <- c(
+  "post_felony_vote_rev", "jail_access_rev"
+)
+
+# Variables where DK = 2.5
+dk_2.5_policy_vars <- c(q25_help_vars, punish_vars)
+
+# All eight policy variables
+all_policy_vars <- c(
+  dk_2.5_policy_vars, incar_vote_vars
+)
+
+
+# -----------------------------------------
+# 2. Preserve original variables WITH DK
+# -----------------------------------------
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    across(
+      all_of(c(all_policy_vars, police_items)),
+      ~ .x,
+      .names = "{.col}_with_dk"
+    )
+  )
+
+
+# -----------------------------------------
+# 3. Create DK indicator variables
+# -----------------------------------------
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    # DK = 2 for incarceration/voting items
+    across(
+      all_of(incar_vote_vars),
+      ~ case_when(
+        .x == 2 ~ 1L,
+        !is.na(.x) ~ 0L,
+        TRUE ~ NA_integer_
+      ),
+      .names = "dk_{.col}"
+    ),
+
+    # DK = 2.5 for help + punishment items
+    across(
+      all_of(dk_2.5_policy_vars),
+      ~ case_when(
+        .x == 2.5 ~ 1L,
+        !is.na(.x) ~ 0L,
+        TRUE ~ NA_integer_
+      ),
+      .names = "dk_{.col}"
+    )
+  )
+
+
+# -----------------------------------------
+# 4. Recode original variables:
+#    DK responses become NA
+# -----------------------------------------
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    # Incarceration/voting items: DK = 2
+    across(
+      all_of(incar_vote_vars),
+      ~ na_if(.x, 2)
+    ),
+
+    # Help + punishment items: DK = 2.5
+    across(
+      all_of(dk_2.5_policy_vars),
+      ~ na_if(.x, 2.5)
+    ),
+
+    # Police items: preserve existing recoding
+    across(
+      all_of(police_items),
+      ~ na_if(.x, 2.5)
+    )
+  )
+
+
+```
+
+
+### DK Variable Name List
+
+```{r}
+# ------------------------------------------------------------
+# Names the new DK indicator variables
+# ------------------------------------------------------------
+
+dk_incar_vote_vars <- paste0(
+  "dk_",
+  incar_vote_vars
+)
+
+dk_q25_help_vars <- paste0(
+  "dk_",
+  q25_help_vars
+)
+
+dk_punish_vars <- paste0(
+  "dk_",
+  punish_vars
+)
+
+dk_all_vars <- c(
+  dk_incar_vote_vars,
+  dk_q25_help_vars,
+  dk_punish_vars
+)
+
+```
+
+### Per-respondent DK count
+
+Create total DK counts for each respondent
+
+```{r}
+# ------------------------------------------------------------
+# Respondent-level DK totals
+# ------------------------------------------------------------
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    
+    # --------------------------------
+    # Number of DK responses
+    # --------------------------------
+    
+    dk_total_all =
+      rowSums(
+        pick(all_of(dk_all_vars)),
+        na.rm = TRUE
+      ),
+    
+    dk_total_incar_vote =
+      rowSums(
+        pick(all_of(dk_incar_vote_vars)),
+        na.rm = TRUE
+      ),
+    
+    dk_total_q25_help =
+      rowSums(
+        pick(all_of(dk_q25_help_vars)),
+        na.rm = TRUE
+      ),
+    
+    dk_total_punish =
+      rowSums(
+        pick(all_of(dk_punish_vars)),
+        na.rm = TRUE
+      ),
+    
+    
+    # --------------------------------
+    # Number of items actually answered
+    # --------------------------------
+    
+    dk_answered_all =
+      rowSums(
+        !is.na(pick(all_of(dk_all_vars)))
+      ),
+    
+    dk_answered_incar_vote =
+      rowSums(
+        !is.na(pick(all_of(dk_incar_vote_vars)))
+      ),
+    
+    dk_answered_q25_help =
+      rowSums(
+        !is.na(pick(all_of(dk_q25_help_vars)))
+      ),
+    
+    dk_answered_punish =
+      rowSums(
+        !is.na(pick(all_of(dk_punish_vars)))
+      )
+  )
+
+```
+
+Respondents might not have the same number of observed answers.
+
+Proportions of answered items that were DK
+
+```{r}
+
+raw_data_cleaned <- raw_data_cleaned %>%
+  mutate(
+    
+    dk_prop_all = if_else(
+      dk_answered_all > 0,
+      dk_total_all / dk_answered_all,
+      NA_real_
+    ),
+    
+    dk_prop_incar_vote = if_else(
+      dk_answered_incar_vote > 0,
+      dk_total_incar_vote / dk_answered_incar_vote,
+      NA_real_
+    ),
+    
+    dk_prop_q25_help = if_else(
+      dk_answered_q25_help > 0,
+      dk_total_q25_help / dk_answered_q25_help,
+      NA_real_
+    ),
+    
+    dk_prop_punish = if_else(
+      dk_answered_punish > 0,
+      dk_total_punish / dk_answered_punish,
+      NA_real_
+    )
+  )
+
+```
+
+
+
+# Other Outcomes
+
+## A. Civics
 
 ```{r}
 
@@ -1419,6 +1661,12 @@ raw_data_cleaned <- raw_data_cleaned %>%
     )
   )
 ```
+
+```{r}
+names(raw_data_cleaned)
+```
+
+
 
 Note:
 

@@ -1,3 +1,10 @@
+---
+
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
 |                                    |
 |------------------------------------|
 | le: "Policy Analyses without IDKs" |
@@ -46,13 +53,15 @@ source("variable_labels_sept1.R")
 
 Note on samples --
 
-This uses sample_all-\> sample -\> sample_dk -\> sample_no_dk
+Pre Nov 10, this used sample_all > sample > sample_dk > sample_no_dk
 
 In Sample, as in prev analyses policy variables have "don't know/no answer" coded as a middle value (2.5 or 2).
 
 Sample_dk has new ambivalence DK variables (ie dk_free_calls) indicate whether a respondent gave a policy "dunno." - Can use this for analysis of ambivalence, or can use below
 
 sample_no_dk changes the policy variables so that "dunno" is now an NA. It also has the IDk indicator variables. - This (use for analysis of preferences) asks preferences after DK responses have been treated as missing.
+
+POST-Nov 10: 
 
 # I. Setup
 
@@ -153,216 +162,8 @@ sample %>%
 
 ```
 
-## A. +DK Vars ("sample_dk")
+## A. Uncertainty
 
-One binary DK variable for each policy item
-
-```{r}
-# ------------------------------------------------------------
-# Item-level DK indicators
-# ------------------------------------------------------------
-
-sample_dk <- sample %>%
-  mutate(
-    
-    # DK = 2 for incarceration/voting items
-    across(
-      all_of(incar_vote_vars),
-      ~ case_when(
-        .x == 2 ~ 1L,          # DK
-        !is.na(.x) ~ 0L,       # answered, but not DK
-        TRUE ~ NA_integer_     # did not answer
-      ),
-      .names = "dk_{.col}"
-    ),
-    
-    # DK = 2.5 for help + punishment items
-    across(
-      all_of(dk_2.5_policy_vars),
-      ~ case_when(
-        .x == 2.5 ~ 1L,        # DK
-        !is.na(.x) ~ 0L,       # answered, but not DK
-        TRUE ~ NA_integer_     # did not answer
-      ),
-      .names = "dk_{.col}"
-    )
-  )
-
-
-#look at min wage:
-
-table(
-  sample_dk$dk_min_wage,
-  useNA = "ifany" #should use usena if any
-)
-
-```
-
-Create group DKs to match how the vars are grouped
-
-```{r}
-# ------------------------------------------------------------
-# Names the new DK indicator variables
-# ------------------------------------------------------------
-
-dk_incar_vote_vars <- paste0(
-  "dk_",
-  incar_vote_vars
-)
-
-dk_q25_help_vars <- paste0(
-  "dk_",
-  q25_help_vars
-)
-
-dk_punish_vars <- paste0(
-  "dk_",
-  punish_vars
-)
-
-dk_all_vars <- c(
-  dk_incar_vote_vars,
-  dk_q25_help_vars,
-  dk_punish_vars
-)
-
-```
-
-Create total DK counts for each respondent
-
-```{r}
-# ------------------------------------------------------------
-# Respondent-level DK totals
-# ------------------------------------------------------------
-
-sample_dk <- sample_dk %>%
-  mutate(
-    
-    # --------------------------------
-    # Number of DK responses
-    # --------------------------------
-    
-    dk_total_all =
-      rowSums(
-        pick(all_of(dk_all_vars)),
-        na.rm = TRUE
-      ),
-    
-    dk_total_incar_vote =
-      rowSums(
-        pick(all_of(dk_incar_vote_vars)),
-        na.rm = TRUE
-      ),
-    
-    dk_total_q25_help =
-      rowSums(
-        pick(all_of(dk_q25_help_vars)),
-        na.rm = TRUE
-      ),
-    
-    dk_total_punish =
-      rowSums(
-        pick(all_of(dk_punish_vars)),
-        na.rm = TRUE
-      ),
-    
-    
-    # --------------------------------
-    # Number of items actually answered
-    # --------------------------------
-    
-    dk_answered_all =
-      rowSums(
-        !is.na(pick(all_of(dk_all_vars)))
-      ),
-    
-    dk_answered_incar_vote =
-      rowSums(
-        !is.na(pick(all_of(dk_incar_vote_vars)))
-      ),
-    
-    dk_answered_q25_help =
-      rowSums(
-        !is.na(pick(all_of(dk_q25_help_vars)))
-      ),
-    
-    dk_answered_punish =
-      rowSums(
-        !is.na(pick(all_of(dk_punish_vars)))
-      )
-  )
-
-```
-
-Respondents might not have the same number of observed answers.
-
-Proportions of answered items that were DK
-
-```{r}
-
-sample_dk <- sample_dk %>%
-  mutate(
-    
-    dk_prop_all = if_else(
-      dk_answered_all > 0,
-      dk_total_all / dk_answered_all,
-      NA_real_
-    ),
-    
-    dk_prop_incar_vote = if_else(
-      dk_answered_incar_vote > 0,
-      dk_total_incar_vote / dk_answered_incar_vote,
-      NA_real_
-    ),
-    
-    dk_prop_q25_help = if_else(
-      dk_answered_q25_help > 0,
-      dk_total_q25_help / dk_answered_q25_help,
-      NA_real_
-    ),
-    
-    dk_prop_punish = if_else(
-      dk_answered_punish > 0,
-      dk_total_punish / dk_answered_punish,
-      NA_real_
-    )
-  )
-
-```
-
-## C. "sample_no_idk"
-
-- has dk_policy indicator variables
-- IDK responses now remove from policy vars themselves by converting to NA
-
-```{r}
-sample_no_dk <- sample_dk %>%
-  mutate(
-    
-    # Incarceration/voting variables: DK = 2
-    across(
-      all_of(incar_vote_vars),
-      ~ na_if(.x, 2)
-    ),
-    
-    # Help + punishment variables: DK = 2.5
-    across(
-      all_of(dk_2.5_policy_vars),
-      ~ na_if(.x, 2.5)
-    ),
-    
-    # Police variables
-    across(
-      all_of(police_items),
-      ~ na_if(.x, 2.5)
-    )
-  )
-
-View(sample_no_dk)
-
-```
-
-## D. Counts code (revise if needed)
 
 ```{r}
 # ------------------------------------------------------------
@@ -491,8 +292,6 @@ sample_no_dk %>%
     AllOthers
   )
 ```
-
-
 
 ```{r}
 # ------------------------------------------------------------
@@ -834,13 +633,9 @@ make_wave_results_table <- function(
 
 ```
 
-
 #### fire results
 
-m_fire_rare
-m_fire_privilege
-m_fire_angry
-m_fire_fear
+m_fire_rare m_fire_privilege m_fire_angry m_fire_fear
 
 ##### Systemic Racism Results
 
@@ -854,18 +649,18 @@ summary(
 )
 
 ```
-A belief that racial problems are rare would suggest a lack of recognition for institutional racism. 
 
-Recognition that white people have advantages is a recognition of institutionalized racism. 
+A belief that racial problems are rare would suggest a lack of recognition for institutional racism.
 
-Before controlling for party or political ideology, the prior does not have significant correlation. 
+Recognition that white people have advantages is a recognition of institutionalized racism.
 
-Before controlling for party or political ideology:
- - coded 0 to 3 (0 is least agreement that white people have advantages)
- -  white respondents are 2.295, and it is significant. 
- Black
+Before controlling for party or political ideology, the prior does not have significant correlation.
+
+Before controlling for party or political ideology: - coded 0 to 3 (0 is least agreement that white people have advantages) - white respondents are 2.295, and it is significant. Black
 
 ```{r}
+
+table(sample_no_dk$fire_privilege)
 
 mod <- fire_dummies_waves[["nocontrol"]][["m_fire_privilege"]]
 
@@ -961,11 +756,7 @@ sample_no_dk %>%
 
 ```
 
-
-
-
 ##### Angry Results
-
 
 ```{r}
 
@@ -1011,6 +802,74 @@ sample_no_dk %>%
 
 ##### Fear Results
 
+First, I just want to know the distribution of answers here. If virtually every respondent says "strongly disagree" it probably isn't a meaningful variable to include.
+
+```{r}
+
+summary(sample_no_dk$fire_fear)
+
+summary(sample_no_dk$fire_angry)
+
+summary(sample_no_dk$fire_rare)
+
+summary(sample_no_dk$fire_privilege)
+
+hist(sample_no_dk$fire_fear)
+
+
+# variation by impact?
+
+# Step 1: Calculate total respondents in each impact group
+
+
+
+data_full %>%
+  group_by(fire_fear)%>%
+  summarise(
+    n=n(),
+    total = 1600,
+    incarc = sum(incarc, na.rm = TRUE),
+    knowincarc = sum(knowincarc, na.rm = TRUE),
+    vict = sum(vict, na.rm = TRUE),
+    any_impact = sum(impact, na.rm = TRUE),
+  )
+
+# Step 1: Calculate total respondents in each racial group
+
+race_totals <- data_full %>%
+  summarise(
+    white = sum(White == 1, na.rm = TRUE),
+    HispLat = sum(Hisp_Latino == 1, na.rm = TRUE),
+    black = sum(Black == 1, na.rm = TRUE),
+    other = sum(AllOthers == 1, na.rm = TRUE)
+  )
+
+# Step 2: Calculate counts and percentages by fire_fear
+
+data_full %>%
+  group_by(fire_fear) %>%
+  summarise(
+    n = n(),
+
+    white = sum(White == 1, na.rm = TRUE),
+    whitepct = (white / race_totals$white) * 100,
+
+    HispLat = sum(Hisp_Latino == 1, na.rm = TRUE),
+    hisplatpct = (HispLat / race_totals$HispLat) * 100,
+
+    black = sum(Black == 1, na.rm = TRUE),
+    blackpct = (black / race_totals$black) * 100,
+
+    other = sum(AllOthers == 1, na.rm = TRUE),
+    otherpct = (other / race_totals$other) * 100,
+
+    .groups = "drop"
+  )
+
+```
+
+Second, I want to know if it varies by race.
+
 ```{r}
 
 sample_no_dk %>%
@@ -1043,7 +902,6 @@ sample_no_dk %>%
 
 ```
 
-
 ```{r}
 
 summary(
@@ -1051,13 +909,14 @@ summary(
 )
 
 summary(
+  fire_dummies_waves[["pid_wave"]][["m_fire_fear"]]
+)
+
+summary(
   fire_dummies_waves[["pid_ideo_wave"]][["m_fire_fear"]]
 )
 
 ```
-
-
-
 
 ```{r}
 fire_results_tables <- lapply(
@@ -1071,14 +930,11 @@ fire_results_tables
 
 ```
 
-
 # II. Analysis: Preferences
 
 ## A. Name waves
 
 Each wave is controls, so first group controls (tho these should already/eventually be clear in variable labels R file)
-
-
 
 ```{r}
 demo_controls <- c(
@@ -1527,12 +1383,127 @@ summary(policy_dummies_demo_party_models[["m_prisonhelp_knowincarc"]])
 # Demographics + party/ideology
 summary(policy_dummies_partyideo_models[["m_prisonhelp_incarc"]])
 
+# all 
 summary(policy_dummies_full_models[["m_prisonhelp_incarc"]])
 
 ```
 
+### min wage
+
 ```{r}
 summary(policy_dummies_full_models[["m_min_wage_vict"]])
+
+# impact 
+
+# No controls
+summary(policy_dummies_models[["m_min_wage_impact"]])
+
+# Demographic controls
+summary(policy_dummies_demo_models[["m_min_wage_impact"]])
+
+# Demographics + party
+summary(policy_dummies_demo_party_models[["m_min_wage_impact"]])
+
+# Demographics + party/ideology
+summary(policy_dummies_partyideo_models[["m_min_wage_impact"]])
+
+# all 
+summary(policy_dummies_full_models[["m_min_wage_impact"]])
+
+# incarc 
+
+# No controls
+summary(policy_dummies_models[["m_min_wage_incarc"]])
+
+# Demographic controls
+summary(policy_dummies_demo_models[["m_min_wage_incarc"]])
+
+# Demographics + party
+summary(policy_dummies_demo_party_models[["m_min_wage_incarc"]])
+
+# Demographics + party/ideology
+summary(policy_dummies_partyideo_models[["m_min_wage_incarc"]])
+
+# all 
+summary(policy_dummies_full_models[["m_min_wage_incarc"]])
+
+
+# vict
+
+# No controls
+summary(policy_dummies_models[["m_min_wage_vict"]])
+
+# Demographic controls
+summary(policy_dummies_demo_models[["m_min_wage_vict"]])
+
+# Demographics + party
+summary(policy_dummies_demo_party_models[["m_min_wage_vict"]])
+
+# Demographics + party/ideology
+summary(policy_dummies_partyideo_models[["m_min_wage_vict"]])
+
+# all 
+summary(policy_dummies_full_models[["m_min_wage_vict"]])
+
+```
+
+### prison education
+
+```{r}
+summary(policy_dummies_full_models[["m_ed_funds_vict"]])
+
+# impact 
+
+# No controls
+summary(policy_dummies_models[["m_ed_funds_impact"]])
+
+# Demographic controls
+summary(policy_dummies_demo_models[["m_ed_funds_impact"]])
+
+# Demographics + party
+summary(policy_dummies_demo_party_models[["m_ed_funds_impact"]])
+
+# Demographics + party/ideology
+summary(policy_dummies_partyideo_models[["m_ed_funds_impact"]])
+
+# all 
+summary(policy_dummies_full_models[["m_ed_funds_impact"]])
+
+# incarc 
+
+# No controls
+summary(policy_dummies_models[["m_ed_funds_incarc"]])
+
+# Demographic controls
+summary(policy_dummies_demo_models[["m_ed_funds_incarc"]])
+
+# Demographics + party
+summary(policy_dummies_demo_party_models[["m_ed_funds_incarc"]])
+
+# Demographics + party/ideology
+summary(policy_dummies_partyideo_models[["m_ed_funds_incarc"]])
+
+# all 
+summary(policy_dummies_full_models[["m_ed_funds_incarc"]])
+
+
+# vict
+
+# No controls
+summary(policy_dummies_models[["m_ed_funds_vict"]])
+
+# Demographic controls
+summary(policy_dummies_demo_models[["m_ed_funds_vict"]])
+
+# Demographics + party
+summary(policy_dummies_demo_party_models[["m_ed_funds_vict"]])
+
+# Demographics + party/ideology
+summary(policy_dummies_partyideo_models[["m_ed_funds_vict"]])
+
+# all 
+summary(policy_dummies_full_models[["m_ed_funds_vict"]])
+
 ```
 
 ### Voting Variables
@@ -2335,7 +2306,6 @@ exp(coef(m_lwop_1))
 
 # IV. Correlations w/out DK
 
-
 # easy/hard
 
 ```{r}
@@ -2344,7 +2314,6 @@ exp(coef(m_lwop_1))
 
 
 ```
-
 
 # Help Outcome Correlations
 
@@ -2948,6 +2917,7 @@ cat(latex_tab)
 ```
 
 Into Plots
+
 ```{r}
 
 # -----------------------------
@@ -3229,7 +3199,6 @@ cat("\nMaster files written to:\n",
     master_robust_file, "\n")
 ```
 
-
 deservingness means by target by impact
 
 ```{r}
@@ -3377,4 +3346,3 @@ mediation_1 <- lm(prisonhelp ~ d_incppl_pris_abc * impact,
 summary(mediation_1)
 
 ```
-
