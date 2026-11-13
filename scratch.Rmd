@@ -715,3 +715,8 @@ names(fire_dummies_waves[["nocontrol"]])
 
 ```
 
+
+Mean commands that should go before Fire x race regression
+
+
+

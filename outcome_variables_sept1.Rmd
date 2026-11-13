@@ -747,7 +747,7 @@ raw_data_cleaned <- raw_data_cleaned %>%
   mutate(across(
     all_of(q25_help_items),
     ~ case_when(
-    . == 1 ~ 4,           # strongly favor → strongly support help
+    . == 1 ~ 4,           # 1 strongly favor → 4 = strongly favor help
     . == 2 ~ 3,
     . == 3 ~ 2,
     . == 4 ~ 1,

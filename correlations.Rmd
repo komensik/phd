@@ -1,6 +1,8 @@
 ---
 title: "Correlations"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -35,6 +37,13 @@ sample <- read_csv("data/cleaned_control_data.csv")
 not_full <- read_csv("data/cleaned_sans_control_data.csv")
 ```
 
+
+
+
+
+
+
+
 ```{r, desor}
 #desor_core is respondent level composite
 
@@ -51,7 +60,7 @@ summary(desors)
 
 Correlations when full, incarc, knowincarc, vict, impacted, not impacted
 
-```{r, desor0}
+```{r, desor_by_impact_start}
 # ------------------------------------------------------------
 # Deservingness / "sympathy" orientation: CORE items
 # ------------------------------------------------------------
@@ -107,7 +116,7 @@ desor_cont_corrs <- purrr::map(
 # Inspect
 # ------------------------------------------------------------
 
-```{r, desor1}
+```{r, }
 # Full sample correlations
 round(desor_cont_corrs$full_sample$r, 2)
 
@@ -142,7 +151,7 @@ desor_cont_corrs$impact_0$n
 
 
 
-```{r, desor2}
+```{r, }
 # ------------------------------------------------------------
 # 3. Number of observed deservingness items, by group
 # ------------------------------------------------------------
@@ -213,17 +222,17 @@ desor_cont_alpha$impact_0$total$raw_alpha
 
 ```{r}
 # Item Stats
-View(desor_cont_alpha$full_sample$item.stats)
+# View(desor_cont_alpha$full_sample$item.stats)
 ```
 
 
 ```{r}
-View(desor_cont_alpha$incarc_1$item.stats)
+# View(desor_cont_alpha$incarc_1$item.stats)
 ```
 
 
 ```{r}
-View(desor_cont_alpha$vict_1$item.stats)
+# View(desor_cont_alpha$vict_1$item.stats)
 ```
 
 
@@ -241,12 +250,208 @@ View(desor_cont_alpha$impact_1$item.stats)
 View(desor_cont_alpha$impact_0$item.stats)
 
 ```
+# All Policy Outcome Correlations
+
+
+Correlations when full, incarc, knowincarc, vict, impacted, not impacted
+
+```{r, policies}
+# ------------------------------------------------------------
+# Carceral state help policies
+# ------------------------------------------------------------
+
+all_pol_vars <- c("min_wage", "free_calls", "ed_funds", "alt_sentencing", "post_felony_vote_rev",
+  "jail_access_rev", "dpen_rev", "lwop_rev")
+
+# ------------------------------------------------------------
+# 1. Define analysis groups
+# ------------------------------------------------------------
+
+resp_groups <- list(
+  
+  full_sample = sample,
+  
+  incarc_1 = sample %>%
+    filter(incarc == 1),
+  
+  knowincarc_1 = sample %>%
+    filter(knowincarc == 1),
+  
+  vict_1 = sample %>%
+    filter(vict == 1),
+  
+  impact_1 = sample %>%
+    filter(impact == 1),
+  
+  impact_0 = sample %>%
+    filter(impact == 0)
+)
+
+
+# Check N in each group
+sapply(resp_groups, nrow)
+
+# ------------------------------------------------------------
+# 2. Correlations within each group
+# ------------------------------------------------------------
+
+pol_cont_corrs <- purrr::map(
+  resp_groups,
+  ~ psych::corr.test(
+      .x %>% dplyr::select(all_of(all_pol_vars)),
+      use = "pairwise",
+      method = "pearson",
+      adjust = "none"
+    )
+)
+
+```
+
+# ------------------------------------------------------------
+# Inspect
+# ------------------------------------------------------------
+
+```{r, }
+# Full sample correlations
+round(pol_cont_corrs$full_sample$r, 2)
+
+# Incarcerated respondents
+round(pol_cont_corrs$incarc_1$r, 2)
+
+# Know someone incarcerated
+round(pol_cont_corrs$knowincarc_1$r, 2)
+
+# Victimized respondents
+round(pol_cont_corrs$vict_1$r, 2)
+
+# Any impact
+round(pol_cont_corrs$impact_1$r, 2)
+
+# Not impacted
+round(pol_cont_corrs$impact_0$r, 2)
+
+pol_cont_corrs$full_sample$n
+
+pol_cont_corrs$incarc_1$n
+
+pol_cont_corrs$knowincarc_1$n
+
+pol_cont_corrs$vict_1$n
+
+pol_cont_corrs$impact_1$n
+
+pol_cont_corrs$impact_0$n
+
+```
+
+
+
+```{r, }
+# ------------------------------------------------------------
+# 3. Number of observed deservingness items, by group
+# ------------------------------------------------------------
+
+pol_item_counts <- purrr::map(
+  resp_groups,
+  ~ {
+    pol_mat <- .x %>%
+      select(all_of(all_pol_vars))
+    
+    pol_n <- rowSums(!is.na(pol_mat))
+    
+    table(pol_n, useNA = "ifany")
+  }
+)
+
+pol_item_counts
+
+
+# ------------------------------------------------------------
+# 4. Reliability / internal consistency by group
+# ------------------------------------------------------------
+
+pol_alpha <- purrr::map(
+  resp_groups,
+  ~ {
+    
+    pol_mat <- .x %>%
+      select(all_of(all_pol_vars))
+    
+    pol_n <- rowSums(!is.na(pol_mat))
+    
+    pol_keep <- pol_n >= 4
+    
+    psych::alpha(
+      pol_mat[pol_keep, ],
+      check.keys = TRUE
+    )
+  }
+)
+
+# Full sample
+pol_alpha$full_sample$total$raw_alpha
+pol_alpha$full_sample$total$std.alpha
+pol_alpha$full_sample$total$average_r
+pol_alpha$full_sample$n.obs
+
+# Incarcerated
+pol_alpha$incarc_1$total$raw_alpha
+pol_alpha$incarc_1$total$std.alpha
+pol_alpha$incarc_1$total$average_r
+pol_alpha$incarc_1$n.obs
+
+# vict
+pol_alpha$vict_1$total$raw_alpha
+
+# Know Incarcerated
+pol_alpha$knowincarc_1$total$raw_alpha
+
+# Impacted
+pol_alpha$impact_1$total$raw_alpha
+
+
+# Not impacted
+pol_alpha$impact_0$total$raw_alpha
+```
+
+
+```{r}
+# Item Stats
+View(pol_alpha$full_sample$item.stats)
+```
+
+
+```{r}
+View(pol_alpha$incarc_1$item.stats)
+```
+
+
+```{r}
+View(pol_alpha$vict_1$item.stats)
+```
+
+
+```{r}
+View(pol_alpha$knowincarc_1$item.stats)
+```
+
+
+```{r}
+View(pol_alpha$impact_1$item.stats)
+```
+
+
+```{r}
+View(pol_alpha$impact_0$item.stats)
+
+```
+
 
 # Help Outcome Correlations
 
 Correlations when full, incarc, knowincarc, vict, impacted, not impacted
 
-```{r, desor0}
+```{r, help}
 # ------------------------------------------------------------
 # Carceral state help policies
 # ------------------------------------------------------------
@@ -288,19 +493,20 @@ sapply(help_groups, nrow)
 help_cont_corrs <- purrr::map(
   help_groups,
   ~ psych::corr.test(
-      .x %>% select(all_of(q25_help_vars)),
+      .x %>% dplyr::select(all_of(q25_help_vars)),
       use = "pairwise",
       method = "pearson",
       adjust = "none"
     )
 )
+
 ```
 
 # ------------------------------------------------------------
 # Inspect
 # ------------------------------------------------------------
 
-```{r, desor1}
+```{r, }
 # Full sample correlations
 round(help_cont_corrs$full_sample$r, 2)
 
@@ -335,7 +541,7 @@ help_cont_corrs$impact_0$n
 
 
 
-```{r, desor2}
+```{r, }
 # ------------------------------------------------------------
 # 3. Number of observed deservingness items, by group
 # ------------------------------------------------------------
@@ -440,7 +646,7 @@ View(help_alpha$impact_0$item.stats)
 
 Correlations when full, incarc, knowincarc, vict, impacted, not impacted
 
-```{r, desor0}
+```{r, police}
 # ------------------------------------------------------------
 # Carceral state help policies
 # ------------------------------------------------------------
@@ -501,7 +707,7 @@ police_corrs <- purrr::map(
 # Inspect
 # ------------------------------------------------------------
 
-```{r, desor1}
+```{r, }
 # Full sample correlations
 round(police_corrs$full_sample$r, 2)
 
@@ -536,7 +742,7 @@ police_corrs$impact_0$n
 
 
 
-```{r, desor2}
+```{r, }
 # ------------------------------------------------------------
 # 3. Number of observed deservingness items, by group
 # ------------------------------------------------------------
@@ -910,9 +1116,7 @@ cor(sample[pen_vars], use = "pairwise.complete.obs")
 # Cronbach's alpha (fine to report, but remember it's 2 items)
 psych::alpha(pen_data, check.keys = FALSE)
 
-summary(raw_data_cleaned$dpen_rev)
 
-summary(raw_data_cleaned$lwop_rev)
 
 ```
 

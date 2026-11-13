@@ -144,6 +144,11 @@ sample %>%
 ## A. Uncertainty
 
 ```{r}
+
+
+```
+
+```{r}
 # ------------------------------------------------------------
 # Count DK responses overall and by impact status
 # ------------------------------------------------------------
@@ -908,6 +913,39 @@ fire_results_tables
 ```
 
 # N. Correlations
+
+Across all policy variables
+
+```{r}
+ 
+all_pol_vars <- c(four_vars, incar_vote_vars)
+
+cor_matrix <- cor(
+  sample[all_pol_vars],
+  use = "pairwise.complete.obs"
+)
+
+round(cor_matrix, 2)
+
+library(psych)
+
+
+alpha_result <- psych::alpha(sample[all_pol_vars])
+
+print(alpha_result)
+
+names(alpha_result)
+
+alpha_result$alpha.drop
+
+alpha_result
+
+as.data.frame(alpha_result$alpha.drop)
+
+View(alpha_result$alpha.drop)
+
+
+```
 
 easy/hard
 

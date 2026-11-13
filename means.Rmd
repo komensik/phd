@@ -74,7 +74,7 @@ policy_analysis_vars <- c(
 sample <- sample %>%
   dplyr::select(all_of(policy_analysis_vars))
 
-#names(sample)
+names(sample)
 ```
 
 
@@ -84,12 +84,17 @@ sample <- sample %>%
 ## A Means
 
 ```{r}
+
 sample %>%
   dplyr::select(all_of(policy_vars)) %>%
   psych::describe()
+
+
 ```
 
-## B Stacked Bar Chart - Exclude IDK
+## B Prison Policies
+
+### 1 Stacked Bar Chart - Exclude IDK
 Setup for reports that include IDK as middle value
 ```{r}
 
@@ -135,9 +140,10 @@ dir.create("figures", showWarnings = FALSE,
 
 ```
 
-### Response Percentages
+####  Response Percentages
 
 ```{r}
+
 policy_dist <- sample %>%
   dplyr::select(all_of(four_vars)) %>%
   pivot_longer(
@@ -161,7 +167,12 @@ policy_dist <- sample %>%
 
 # Check the resulting percentages
 policy_dist
+
+
 ```
+
+
+
 ```{r}
 policy_dist <- policy_dist %>%
   group_by(variable) %>%
@@ -286,7 +297,232 @@ ggsave(
 )
 ```
 
-## Stacked Bar Chart - Include IDK
+### 2. Mean and SD figure - Exclude IDK
+
+```{r}
+# Items and indices to include
+plot_order <- c(index_vars, four_vars)
+
+summary_B <- sample %>%
+  dplyr::select(all_of(plot_order)) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "variable",
+    values_to = "value"
+  ) %>%
+
+  # Individual items must have responses 1, 2, 3, 4
+  # Indices can contain decimals between 1 and 4
+  filter(
+    !is.na(value),
+    if_else(
+      variable %in% four_vars,
+      value %in% 1:4,
+      value >= 1 & value <= 4
+    )
+  ) %>%
+
+  group_by(variable) %>%
+  summarise(
+    n = n(),
+    mean = mean(value),
+    sd = sd(value),
+    .groups = "drop"
+  ) %>%
+
+  mutate(
+    type = if_else(
+      variable %in% index_vars,
+      "Index",
+      "Individual item"
+    ),
+    variable = factor(
+      variable,
+      levels = rev(plot_order)
+    )
+  )
+
+# Inspect before graphing
+summary_B
+```
+#### Mean Panel
+```{r}
+# Labels with sample sizes
+axis_labels_B <- paste0(
+  unname(policy_labels[rev(plot_order)]),
+  " (n = ",
+  summary_B$n[
+    match(rev(plot_order),
+          as.character(summary_B$variable))
+  ],
+  ")"
+)
+
+names(axis_labels_B) <- rev(plot_order)
+
+# Common appearance
+theme_B <- theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.text.y = element_text(color = "black"),
+    plot.title = element_text(face = "bold"),
+    legend.position = "none"
+  )
+
+plot_mean <- ggplot(
+  summary_B,
+  aes(x = mean, y = variable)
+) +
+
+  geom_vline(
+    xintercept = 2.5,
+    linetype = "dashed",
+    color = "grey70"
+  ) +
+
+  geom_point(
+    aes(shape = type, color = type),
+    size = 3.2
+  ) +
+
+  scale_shape_manual(
+    values = c(
+      "Individual item" = 16,
+      "Index" = 18
+    )
+  ) +
+
+  scale_color_manual(
+    values = c(
+      "Individual item" = "#303D43",
+      "Index" = "#2166AC"
+    )
+  ) +
+
+  scale_x_continuous(
+    breaks = seq(1, 4, 0.5),
+    limits = c(1, 4)
+  ) +
+
+  scale_y_discrete(
+    labels = axis_labels_B
+  ) +
+
+  labs(
+    title = "Average support",
+    x = "Mean response (1–4)",
+    y = NULL
+  ) +
+
+  theme_B
+
+plot_mean
+```
+vertical daashed line is numberical midpoint, not a response category.
+
+#### Standard Deviation Panel
+```{r}
+plot_sd <- ggplot(
+  summary_B,
+  aes(y = variable)
+) +
+
+  geom_segment(
+    aes(
+      x = 0,
+      xend = sd,
+      yend = variable
+    ),
+    color = "grey70",
+    linewidth = 0.8
+  ) +
+
+  geom_point(
+    aes(
+      x = sd,
+      shape = type,
+      color = type
+    ),
+    size = 3
+  ) +
+
+  scale_shape_manual(
+    values = c(
+      "Individual item" = 16,
+      "Index" = 18
+    )
+  ) +
+
+  scale_color_manual(
+    values = c(
+      "Individual item" = "#303D43",
+      "Index" = "#2166AC"
+    )
+  ) +
+
+  scale_x_continuous(
+    limits = c(0, 1.25),
+    breaks = c(0, 0.25, 0.5, 0.75, 1, 1.25)
+  ) +
+
+  scale_y_discrete(
+    labels = axis_labels_B
+  ) +
+
+  labs(
+    title = "Variation in responses",
+    x = "Standard deviation",
+    y = NULL
+  ) +
+
+  theme_B +
+
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+plot_sd
+
+```
+
+#### Panels together
+```{r}
+library(patchwork)
+
+plot_B <- (plot_mean + plot_sd) +
+
+  plot_layout(
+    widths = c(1.8, 1)
+  ) +
+
+  plot_annotation(
+    title = "Policy preferences: means and variation",
+    caption = paste(
+      "Circles denote individual policy items;",
+      "diamonds denote indices.",
+      "Standard deviations describe respondent variation,",
+      "not confidence intervals."
+    )
+  )
+
+# Display
+plot_B
+
+# Save as vector PDF
+ggsave(
+  "figures/option_B_policy_means_sd.pdf",
+  plot = plot_B,
+  width = 10,
+  height = 5.5,
+  units = "in"
+)
+
+```
+
+
+### C Stacked Bar Chart - Include IDK
 
 ```{r}
 # 
@@ -332,8 +568,489 @@ ggsave(
 
 ```
 
+### A. No Opinion Rates
 
-## B Policy Means x Impact
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+dk_items <- c(
+  "post_felony_vote_rev",
+  "jail_access_rev",
+  "min_wage",
+  "free_calls",
+  "ed_funds",
+  "alt_sentencing",
+  "dpen_rev",
+  "lwop_rev"
+)
+
+dk_labels <- c(
+  post_felony_vote_rev = "Post-felony voting",
+  jail_access_rev = "Voting access in jail",
+  min_wage = "Minimum wage",
+  free_calls = "Free phone calls",
+  ed_funds = "Education funding",
+  alt_sentencing = "Alternative sentencing",
+  dpen_rev = "Death penalty policy",
+  lwop_rev = "Life without parole policy"
+)
+
+dk_groups <- c(
+  post_felony_vote_rev = "Voting rights",
+  jail_access_rev = "Voting rights",
+  min_wage = "Help policies",
+  free_calls = "Help policies",
+  ed_funds = "Help policies",
+  alt_sentencing = "Help policies",
+  dpen_rev = "Punishment policies",
+  lwop_rev = "Punishment policies"
+)
+
+# Check all columns exist
+stopifnot(all(
+  c(dk_items, paste0("dk_", dk_items)) %in% names(sample)
+))
+
+# Create long dataset with one row per person-policy
+dk_long <- bind_rows(
+  lapply(dk_items, function(v) {
+    tibble(
+      policy = v,
+      score = sample[[v]],
+      dk = sample[[paste0("dk_", v)]]
+    )
+  })
+) %>%
+  mutate(
+    status = case_when(
+      dk == 1 ~ "No opinion",
+      dk == 0 & !is.na(score) ~ "Substantive",
+      TRUE ~ "Unobserved"
+    )
+  )
+```
+
+```{r}
+dk_policy_summary <- dk_long %>%
+  group_by(policy) %>%
+  summarise(
+    n_substantive = sum(status == "Substantive"),
+    n_dk = sum(status == "No opinion"),
+    n_unobserved = sum(status == "Unobserved"),
+
+    n_observed = n_substantive + n_dk,
+
+    pct_dk = if_else(
+      n_observed > 0,
+      100 * n_dk / n_observed,
+      NA_real_
+    ),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    policy = factor(policy, levels = rev(dk_items)),
+    group = factor(
+      unname(dk_groups[as.character(policy)]),
+      levels = c(
+        "Voting rights",
+        "Help policies",
+        "Punishment policies"
+      )
+    )
+  )
+
+dk_policy_summary
+```
+dot plot
+
+```{r}
+plot_dk_A <- ggplot(
+  dk_policy_summary,
+  aes(x = pct_dk, y = policy)
+) +
+
+  geom_segment(
+    aes(
+      x = 0,
+      xend = pct_dk,
+      yend = policy
+    ),
+    color = "grey75",
+    linewidth = 0.7
+  ) +
+
+  geom_point(
+    color = "#2166AC",
+    size = 3
+  ) +
+
+  geom_text(
+    aes(
+      label = sprintf(
+        "%.1f%% (n=%d)",
+        pct_dk, n_observed
+      )
+    ),
+    hjust = -0.15,
+    size = 3.2
+  ) +
+
+  facet_grid(
+    group ~ .,
+    scales = "free_y",
+    space = "free_y"
+  ) +
+
+  scale_y_discrete(
+    labels = function(x) unname(dk_labels[x])
+  ) +
+
+  scale_x_continuous(
+    labels = function(x) paste0(x, "%"),
+    expand = expansion(mult = c(0, 0.25))
+  ) +
+
+  labs(
+    title = "Uncertainty Across Policies",
+    x = "Pct. reporting no opinion",
+    y = NULL,
+    caption = paste(
+      "Denominator: respondents giving a substantive",
+      "or no-opinion response to each item."
+    )
+  ) +
+
+  theme_minimal(base_size = 11) +
+
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    strip.text.y = element_text(face = "bold"),
+    axis.text.y = element_text(color = "black"),
+    plot.title = element_text(face = "bold"),
+    plot.caption = element_text(hjust = 0)
+  )
+
+plot_dk_A
+
+ggsave(
+  "figures/policy_no_opinion_rates.pdf",
+  plot = plot_dk_A,
+  width = 9,
+  height = 5.5
+)
+```
+### B. Respondent-Level Distribution of No-Opinion Responses (skip for now)
+
+For each respondent, horizontal axis should represent how many of the eight policy questions have observed responses. The vertical axis represents how many received a no-opinion response. Each cell reports the number of respondents with that combination.
+
+What this addresses: someone choosing no opinion on two out of two observed items is not equivalent to someone choosing no opinion on two out of eight.
+
+```{r}
+
+#Check- start
+# Which indicators were included?
+dk_all_vars
+length(dk_all_vars)
+
+# How many items were observed per respondent?
+table(sample$dk_answered_all, useNA = "ifany")
+
+# How many no-opinion answers per respondent?
+table(sample$dk_total_all, useNA = "ifany")
+
+# Check the distribution jointly
+sample %>%
+  count(dk_answered_all, dk_total_all) %>%
+  arrange(dk_answered_all, dk_total_all)
+#Check- end
+
+# recalc start
+dk_eight_vars <- c(
+  "dk_post_felony_vote_rev",
+  "dk_jail_access_rev",
+  "dk_min_wage",
+  "dk_free_calls",
+  "dk_ed_funds",
+  "dk_alt_sentencing",
+  "dk_dpen_rev",
+  "dk_lwop_rev"
+)
+
+dk_person <- sample %>%
+  mutate(
+    n_observed_8 = rowSums(
+      !is.na(pick(all_of(dk_eight_vars)))
+    ),
+
+    n_dk_8 = rowSums(
+      pick(all_of(dk_eight_vars)) == 1,
+      na.rm = TRUE
+    ),
+
+    prop_dk_8 = if_else(
+      n_observed_8 > 0,
+      n_dk_8 / n_observed_8,
+      NA_real_
+    )
+  )
+
+# Inspect the new variables
+table(dk_person$n_observed_8, useNA = "ifany")
+table(dk_person$n_dk_8, useNA = "ifany")
+
+summary(dk_person$prop_dk_8)
+
+# recalc end
+
+# new chart code
+
+dk_frequency <- dk_person %>%
+  filter(n_observed_8 == 8) %>%
+  count(n_dk_8, name = "respondents") %>%
+  complete(
+    n_dk_8 = 0:8,
+    fill = list(respondents = 0)
+  )
+
+plot_dk_B <- ggplot(
+  dk_frequency,
+  aes(x = n_dk_8, y = respondents)
+) +
+
+  geom_col(
+    fill = "#4477AA",
+    width = 0.7
+  ) +
+
+  geom_text(
+    aes(label = respondents),
+    vjust = -0.5,
+    size = 3.5
+  ) +
+
+  scale_x_continuous(
+    breaks = 0:8
+  ) +
+
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.1))
+  ) +
+
+  labs(
+    title = "Distribution of no-opinion responses",
+    subtitle = "Respondents with eight observed policy responses",
+    x = "Number of policies answered 'no opinion'",
+    y = "Number of respondents"
+  ) +
+
+  theme_minimal(base_size = 11) +
+
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.title = element_text(face = "bold")
+  )
+
+plot_dk_B
+
+
+ggsave(
+  "figures/respondent_dk_distribution.pdf",
+  plot = plot_dk_B,
+  width = 7.5,
+  height = 6
+)
+
+```
+
+### C. Response Status Composition
+
+```{r}
+
+dk_status_summary <- dk_long %>%
+  count(policy, status, name = "n") %>%
+  group_by(policy) %>%
+  mutate(
+    pct = 100 * n / sum(n)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    policy = factor(
+      policy,
+      levels = rev(dk_items)
+    ),
+    status = factor(
+      status,
+      levels = c(
+        "Substantive",
+        "No opinion",
+        "Unobserved"
+      )
+    )
+  )
+
+plot_dk_C <- ggplot(
+  dk_status_summary,
+  aes(x = policy, y = pct, fill = status)
+) +
+
+  geom_col(width = 0.7) +
+  coord_flip() +
+
+  scale_fill_manual(
+    values = c(
+      "Substantive" = "#4477AA",
+      "No opinion" = "#D6A354",
+      "Unobserved" = "#B8BDC5"
+    ),
+    name = NULL
+  ) +
+
+  scale_x_discrete(
+    labels = function(x) unname(dk_labels[x])
+  ) +
+
+  scale_y_continuous(
+    breaks = seq(0, 100, 25),
+    labels = function(x) paste0(x, "%")
+  ) +
+
+  labs(
+    title = "Observed response status by policy",
+    x = NULL,
+    y = "Percentage of sample"
+  ) +
+
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "bottom",
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold")
+  )
+
+plot_dk_C
+
+ggsave(
+  "figures/policy_response_status.pdf",
+  plot = plot_dk_C,
+  width = 9,
+  height = 5
+)
+```
+
+
+
+## Prison Voting Policies
+
+###  Stacked - Exclude IDKs
+```{r}
+vote_summary <- sample %>%
+  dplyr::select(all_of(vote_vars)) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "variable",
+    values_to = "response"
+  ) %>%
+  filter(!is.na(response), response %in% c(1, 2)) %>%
+  group_by(variable) %>%
+  summarise(
+    n = n(),
+    pct_support = 100 * mean(response == 2),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    variable = factor(
+      variable,
+      levels = rev(vote_vars)
+    )
+  )
+
+plot_vote <- ggplot(
+  vote_summary,
+  aes(x = pct_support, y = variable)
+) +
+
+  geom_col(
+    fill = "#2166AC",
+    width = 0.55
+  ) +
+
+  geom_text(
+    aes(
+      label = sprintf(
+        "%.1f%% (n = %s)",
+        pct_support, n
+      )
+    ),
+    hjust = 1.05,
+    color = "white",
+    size = 3.5
+  ) +
+
+  scale_x_continuous(
+    limits = c(0, 100),
+    breaks = seq(0, 100, 25),
+    labels = function(x) paste0(x, "%")
+  ) +
+
+  scale_y_discrete(
+    labels = function(x) unname(policy_labels[x])
+  ) +
+
+  labs(
+    title = "Support for voting-rights policies",
+    x = "Percentage supporting",
+    y = NULL
+  ) +
+
+  theme_minimal(base_size = 11) +
+
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.y = element_text(color = "black"),
+    plot.title = element_text(face = "bold")
+  )
+
+plot_vote
+
+ggsave(
+  "figures/voting_rights_support.pdf",
+  plot = plot_vote,
+  width = 8,
+  height = 3,
+  units = "in"
+)
+```
+
+To combine with other
+
+```{r}
+plot_A_combined <- plot_A / plot_vote +
+  plot_layout(heights = c(3, 1.5))
+
+plot_A_combined
+
+ggsave(
+  "figures/option_A_combined.pdf",
+  plot = plot_A_combined,
+  width = 9,
+  height = 7.5,
+  units = "in"
+)
+```
+
+
+
+###  Stacked - Exclude IDKs
+
+## B All Policy Means x Impact - Version 1
+
+Grouped by help, pun, etc.
 
 ```{r}
 
@@ -854,22 +1571,107 @@ print(all_police_means)
 
 ```
 
-**Basic Means Write-Up: Index 1**
+## B All Policy Means x Impact - Version 2
 
 ```{r}
 
 
+library(dplyr)
+library(tidyr)
+library(purrr)
+
+# -----------------------------------------
+# 1. Define the eight individual policies
+# -----------------------------------------
+
+policy_items <- c(
+  "min_wage",
+  "free_calls",
+  "ed_funds",
+  "alt_sentencing",
+  "dpen_rev",
+  "lwop_rev",
+  "post_felony_vote_rev",
+  "jail_access_rev"
+)
+
+# -----------------------------------------
+# 2. Define the six groups
+# -----------------------------------------
+
+policy_groups <- list(
+  "Full sample" = sample,
+
+  "No experience" = sample %>%
+    filter(impact == 0),
+
+  "Any experience" = sample %>%
+    filter(impact == 1),
+
+  "Incarcerated" = sample %>%
+    filter(incarc == 1),
+
+  "Proximal" = sample %>%
+    filter(knowincarc == 1),
+
+  "Victimized" = sample %>%
+    filter(vict == 1)
+)
+
+# -----------------------------------------
+# 3. Calculate statistics for each group
+# -----------------------------------------
+
+policy_stats <- purrr::imap_dfr(
+  policy_groups,
+  function(df, group_label) {
+
+    df %>%
+      dplyr::select(all_of(policy_items)) %>%
+      pivot_longer(
+        cols = everything(),
+        names_to = "policy",
+        values_to = "response"
+      ) %>%
+      group_by(policy) %>%
+      summarise(
+        n = sum(!is.na(response)),
+
+        mean = if (n > 0) {
+          mean(response, na.rm = TRUE)
+        } else NA_real_,
+
+        sd = if (n > 1) {
+          sd(response, na.rm = TRUE)
+        } else NA_real_,
+
+        .groups = "drop"
+      ) %>%
+      mutate(group = group_label)
+  }
+)
+
+# Inspect the long-format results
+View(policy_stats)
+
 ```
 
+For Latex
 ```{r}
+policy_table <- policy_stats %>%
+  mutate(
+    display = sprintf("%.2f (%.2f)", mean, sd),
+    group = factor(
+      group,
+      levels = names(policy_groups)
+    )
+  ) %>%
+  dplyr::select(policy, group, display) %>%
+  pivot_wider(
+    names_from = group,
+    values_from = display
+  )
 
+print(policy_table)
 ```
-
-Police Means Tables
-
-```{r}
-
-
-```
-
 
